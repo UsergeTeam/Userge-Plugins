@@ -9,8 +9,8 @@ BASE_URL = "https://headp.at/pats/{}"
 PAT_IMAGE = "pat.jpg"
 
 @userge.on_cmd("pat", about={
-    'header': "Give head Pat xD"
-    'usage': "{tr}pat [reply | username]})
+    'header': "Give head Pat xD",
+    'usage': "{tr}pat [reply | username]"})
 async def lastfm(message: Message):
 
     username = message.input_str
