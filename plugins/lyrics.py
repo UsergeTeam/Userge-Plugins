@@ -6,7 +6,7 @@ from PyLyrics import *
 @userge.on_cmd("lyrics", about={
     'header': "Get Lyrics of a Song",
     'usage': "{tr}lyrics Singer Name - Song Name",
-    'examples': "{tr}lyrics ROXXANNE - Arizona Zervas"})
+    'examples': "{tr}lyrics Alan Walker - Faded"})
 async def lyrics(message: Message):
     i = 0
 
