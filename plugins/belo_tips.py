@@ -17,9 +17,13 @@ async def being_logical(message: Message):
 async def pro_tips(message: Message):
 
     raw_list = await userge.get_history(" @Interesting_Knowledge")
-    raw_message = random.choice(raw_list)
-    pru_text = raw_message.text
-    while "Pro Tip" not in pru_text:
+    try:
         raw_message = random.choice(raw_list)
         pru_text = raw_message.text
-    await message.edit(pru_text)
+        while "Pro Tip" not in pru_text:
+            raw_message = random.choice(raw_list)
+            pru_text = raw_message.text
+        await message.edit(pru_text)
+    #None Type Error 😴🙃
+    except:
+        await message.edit("I Ran Out of Tips.")

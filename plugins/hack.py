@@ -39,7 +39,7 @@ async def hack_func(message):
               "**User Data Upload Completed:** Target's User Data Stored at `downloads/victim/telegram-authuser.data.sql`",
           ]
 
-  hecked = f"**Targeted Account Hacked**\n\n```Pay 69$ To {heckerman} To Remove This Hack```"
+  hecked = f"**Targeted Account Hacked**\n\n```Pay 69$ To``` {heckerman}``` To Remove This Hack```"
   MAX_ANI = len(animation_chars)
   for i in range(MAX_ANI):
     await asyncio.sleep(2)
