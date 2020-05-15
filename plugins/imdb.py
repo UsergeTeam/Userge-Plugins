@@ -86,7 +86,7 @@ async def imdb(message: Message):
     			'</code>\n<b>Writer : </b><code>'+writer+
     			'</code>\n<b>Stars : </b><code>'+stars+
     			'</code>\n<b>IMDB Url : </b>'+mov_link+
-    			'\n\n<b>Story Line : </b><em>'+story_line'</em>,
+    			'\n\n<b>Story Line : </b><em>'+story_line + '</em>',
     			parse_mode = 'HTML'
     			)
  except IndexError:
