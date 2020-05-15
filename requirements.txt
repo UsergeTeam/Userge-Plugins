@@ -1,0 +1,3 @@
+PyLyrics
+requests
+urllib

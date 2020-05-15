@@ -3,9 +3,18 @@ from userge import userge, Message
 #by Alone
 @userge.on_cmd("hack$", about={'header': "kensar hacking animation"})
 async def hack_func(message):
+
+  user = await userge.get_user_dict(message.from_user.id)
+  heckerman = user['mention']
   animation_chars = [          
-              "```Connecting To Private Server...```",
+              "```Connecting To Private Server \```",
+              "```Connecting To Private Server |```",
+              "```Connecting To Private Server /```",
+              "```Connecting To Private Server \```",
+              "```Connection Established ```",
               "```Target Selected```",
+              "```Backdoor Found In Target```",
+              "```Trying To Hack```",
               "```Hacking... 0%\n▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒```",
               "```Hacking... 4%\n█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒```",
               "```Hacking... 8%\n██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒```",    
@@ -27,8 +36,12 @@ async def hack_func(message):
               "```Uploading Data to Server... 68%\n███████████████▒▒▒▒▒▒▒▒```",
               "```Uploading Data to Server... 89%\n████████████████████▒▒▒```",
               "```Uploaded Data to Server... 100%\n███████████████████████```",
-              "**Targeted Account Hacked**\n\n```Pay 69$ To Remove This Hack```"
+              "**User Data Upload Completed:** Target's User Data Stored at `downloads/victim/telegram-authuser.data.sql`",
           ]
-  for i in range(24):
+
+  hecked = f"**Targeted Account Hacked**\n\n```Pay 69$ To {heckerman} To Remove This Hack```"
+  MAX_ANI = len(animation_chars)
+  for i in range(MAX_ANI):
     await asyncio.sleep(2)
-    await message.edit(animation_chars[i % 24])
+    await message.edit(animation_chars[i % MAX_ANI])
+  await message.edit(hecked)
