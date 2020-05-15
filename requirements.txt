@@ -1,4 +1,4 @@
 bs4
-PyLyrics
+pyLyrics
 requests
 urllib
