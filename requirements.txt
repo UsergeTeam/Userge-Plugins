@@ -1,4 +1,1 @@
-bs4
 pyLyrics
-requests
-urllib
