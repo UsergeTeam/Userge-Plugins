@@ -26,5 +26,6 @@ async def lastfm(message: Message):
     if username:
         await message.reply_photo(photo=PAT_IMAGE, caption=username, reply_to_message_id=message.message_id)
     else:
-        await message.reply_photo(photo=PAT_IMAGE, reply_to_message_id=message.reply_to_message.message_id) 
+        await message.reply_photo(photo=PAT_IMAGE, reply_to_message_id=message.reply_to_message.message_id)
+    await message.delete() # hmm
     remove(PAT_IMAGE)
