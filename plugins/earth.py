@@ -3,7 +3,7 @@ from collections import deque
 from userge import userge, Message
 
 
-@userge.on_cmd("earth$", about="__Beautiful Earth Animation__")
+@userge.on_cmd("earth$", about={'header': "Beautiful Earth Animation"})
 async def sun_(message: Message):
     """earth"""
     deq = deque(list("🌏🌍🌎🌎🌍🌏🌍🌎"))
