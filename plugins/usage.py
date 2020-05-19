@@ -12,7 +12,7 @@ HEROKU_API_KEY = Config.HEROKU_API_KEY
 # ================= CONSTANT =================
 
 
-@userge.on_cmd("usage", outgoing=True, about="__Get Dyno hours usage__")  # pylint:disable=E0602
+@userge.on_cmd("usage", about={'header': "Get Dyno hours usage"})  # pylint:disable=E0602
 async def usage(message: Message):
     # async def dyno_usage(dyno):
     """
