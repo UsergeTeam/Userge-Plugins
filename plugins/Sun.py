@@ -5,7 +5,7 @@ from collections import deque
 from userge import userge, Message
 
 
-@userge.on_cmd("sun$", about="__kensar sun animation__")
+@userge.on_cmd("sun$", about={'header': "kensar sun animation"})
 async def sun_(message: Message):
     """sun"""
     deq = deque(list("😎🌤🌥☀️⛅️🌦🌞"))
