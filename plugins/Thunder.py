@@ -18,7 +18,7 @@ async def thunder_(message: Message):
     deq = deque(list("☀️🌤️⛅🌥️☁️🌩️🌧️⛈️⚡🌩️🌧️🌦️🌥️⛅🌤️☀️"))
     try:
         for _ in range(32):
-            await sleep(0.1)
+            await sleep(0.3)
             await message.edit("".join(deq))
             deq.rotate(1)
     except Exception:
