@@ -1,4 +1,2 @@
-bs4
+justwatch
 pyLyrics
-requests
-urllib
