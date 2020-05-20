@@ -6,6 +6,7 @@ from datetime import datetime
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from userge import userge, Message, Config
+from userge.utils import progress, humanbytes
 
 
 FF_MPEG_DOWN_LOAD_MEDIA_PATH = "userge.media.ffmpeg"
