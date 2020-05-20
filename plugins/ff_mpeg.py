@@ -44,7 +44,7 @@ async def ff_mpeg_trim_cmd(message: Message):
         await message.edit(f"a media file already exists in path. Please remove the media and try again!\n`.exec rm {FF_MPEG_DOWN_LOAD_MEDIA_PATH}`")
 
 
-@userge.on_cmd"ffmpegtrim")
+@userge.on_cmd("ffmpegtrim")
 async def ff_mpeg_trim_cmd(message: Message):
 
     if not os.path.exists(FF_MPEG_DOWN_LOAD_MEDIA_PATH):
