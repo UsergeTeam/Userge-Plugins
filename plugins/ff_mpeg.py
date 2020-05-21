@@ -14,8 +14,8 @@ FF_MPEG_DOWN_LOAD_MEDIA_PATH = "userge.media.ffmpeg"
 
 @userge.on_cmd("ffmpegsave", about={'header': "Save a media that is to be used in ffmpeg"})
 async def ff_mpeg_trim_cmd(message: Message):
-
-    if not os.path.exists(FF_MPEG_DOWN_LOAD_MEDIA_PATH):
+    ffm_path = "/app/downloads/" + FF_MPEG_DOWN_LOAD_MEDIA_PATH
+    if not os.path.exists(ffm_path):
         if not os.path.isdir(Config.DOWN_PATH):
             os.makedirs(Config.DOWN_PATH)
         if message.reply_to_message.media:
@@ -48,8 +48,8 @@ async def ff_mpeg_trim_cmd(message: Message):
     'header': "Trim a given media",
     'usage': "{tr}ffmpegtrim [start time] [end time]})
 async def ff_mpeg_trim_cmd(message: Message):
-
-    if not os.path.exists(FF_MPEG_DOWN_LOAD_MEDIA_PATH):
+    ffm_path = "/app/downloads/" + FF_MPEG_DOWN_LOAD_MEDIA_PATH
+    if not os.path.exists(ffm_path):
         await message.edit(f"a media file needs to be downloaded, and saved to the following path: `{FF_MPEG_DOWN_LOAD_MEDIA_PATH}`")
         return
     current_message_text = message.input_str
@@ -59,7 +59,8 @@ async def ff_mpeg_trim_cmd(message: Message):
         # output should be video
         cmd, start_time, end_time = cmt
         o = await cult_small_video(
-            FF_MPEG_DOWN_LOAD_MEDIA_PATH,
+            ffm_path,
+            #FF_MPEG_DOWN_LOAD_MEDIA_PATH,
             Config.DOWN_PATH,
             start_time,
             end_time
@@ -78,7 +79,8 @@ async def ff_mpeg_trim_cmd(message: Message):
         # output should be image
         cmd, start_time = cmt
         o = await take_screen_shot(
-            FF_MPEG_DOWN_LOAD_MEDIA_PATH,
+            ffm_path,
+            #FF_MPEG_DOWN_LOAD_MEDIA_PATH,
             Config.DOWN_PATH,
             start_time
         )
