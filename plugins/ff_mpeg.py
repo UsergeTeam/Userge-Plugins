@@ -12,7 +12,7 @@ from userge.utils import progress, humanbytes
 FF_MPEG_DOWN_LOAD_MEDIA_PATH = "userge.media.ffmpeg"
 
 
-@userge.on_cmd("ffmpegsave")
+@userge.on_cmd("ffmpegsave", about={'header': "Save a media that is to be used in ffmpeg"})
 async def ff_mpeg_trim_cmd(message: Message):
 
     if not os.path.exists(FF_MPEG_DOWN_LOAD_MEDIA_PATH):
@@ -44,7 +44,9 @@ async def ff_mpeg_trim_cmd(message: Message):
         await message.edit(f"a media file already exists in path. Please remove the media and try again!\n`.exec rm {FF_MPEG_DOWN_LOAD_MEDIA_PATH}`")
 
 
-@userge.on_cmd("ffmpegtrim")
+@userge.on_cmd("ffmpegtrim", about={
+    'header': "Trim a given media",
+    'usage': "{tr}ffmpegtrim [start time] [end time]})
 async def ff_mpeg_trim_cmd(message: Message):
 
     if not os.path.exists(FF_MPEG_DOWN_LOAD_MEDIA_PATH):
@@ -52,18 +54,16 @@ async def ff_mpeg_trim_cmd(message: Message):
         return
     current_message_text = message.input_str
     cmt = current_message_text.split(" ")
-    logger.info(cmt)
     start = datetime.now()
     if len(cmt) == 3:
         # output should be video
         cmd, start_time, end_time = cmt
         o = await cult_small_video(
             FF_MPEG_DOWN_LOAD_MEDIA_PATH,
-            Config.TMP_DOWNLOAD_DIRECTORY,
+            Config.DOWN_PATH,
             start_time,
             end_time
         )
-        logger.info(o)
         try:
             c_time = time.time()
             await userge.send_video(
@@ -73,16 +73,16 @@ async def ff_mpeg_trim_cmd(message: Message):
             )
             os.remove(o)
         except Exception as e:
-            logger.info(str(e))
+            await message.edit(str(e))
     elif len(cmt) == 2:
         # output should be image
         cmd, start_time = cmt
         o = await take_screen_shot(
             FF_MPEG_DOWN_LOAD_MEDIA_PATH,
-            Config.TMP_DOWNLOAD_DIRECTORY,
+            Config.DOWN_PATH,
             start_time
         )
-        logger.info(o)
+
         try:
             c_time = time.time()
             await userge.send_photo(
@@ -92,7 +92,7 @@ async def ff_mpeg_trim_cmd(message: Message):
             )
             os.remove(o)
         except Exception as e:
-            logger.info(str(e))
+            await message.edit(str(e))
     else:
         await event.edit("RTFM")
         return
@@ -129,8 +129,6 @@ async def take_screen_shot(video_file, output_directory, ttl):
     if os.path.lexists(out_put_file_name):
         return out_put_file_name
     else:
-        logger.info(e_response)
-        logger.info(t_response)
         return None
 
 # https://github.com/Nekmo/telegram-upload/blob/master/telegram_upload/video.py#L26
@@ -166,6 +164,5 @@ async def cult_small_video(video_file, output_directory, start_time, end_time):
     if os.path.lexists(out_put_file_name):
         return out_put_file_name
     else:
-        logger.info(e_response)
-        logger.info(t_response)
+
         return None
