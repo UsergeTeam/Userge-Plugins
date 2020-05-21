@@ -55,8 +55,8 @@ def get_stream_data(query):
 
 @userge.on_cmd("watch", about={
     'header': "Get stream link for a Movie and TV Shows",
-    'usage': ".watch [query]",
-    'examples': ".watch Avengers Endgame"})
+    'usage': "{tr}watch [query]",
+    'examples': "{tr}watch Avengers Endgame"})
 async def fetch_watch_sources(message: Message):
     await message.edit("Finding Sites...")
     query = message.input_str
