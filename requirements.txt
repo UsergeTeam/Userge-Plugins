@@ -1,2 +1,4 @@
+cairosvg
 justwatch
+lottie
 pyLyrics
