@@ -31,7 +31,7 @@ async def memify(message: Message):
         file_name=Config.DOWN_PATH,
         progress=progress,
         progress_args=(
-            "trying to download", userge, message, c_time
+            "Trying to Posses given content", userge, message, c_time
         )
     )
     dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
@@ -51,7 +51,7 @@ async def memify(message: Message):
         await take_screen_shot(dls_loc, 0, jpg_file)
         os.remove(dls_loc)
         if not os.path.lexists(jpg_file):
-            await message.err("Well that's not a gif, That is Gey")
+            await message.err("This Gif is Gey (｡ì _ í｡), won't memify it.")
             return
         dls_loc = jpg_file
     await message.edit("Decoration Time ≧∇≦, I'm an Artist")
