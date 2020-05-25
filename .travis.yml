@@ -2,14 +2,14 @@ language: python
 python:
   - "3.8"
 before_install:
-  - cd
-  - git clone --depth=50 --branch=dev https://github.com/UsergeTeam/Userge.git UsergeTeam/Userge
-  - mv UsergeTeam/Userge-Plugins/plugins/ UsergeTeam/Userge/userge/plugins/unof_plugins/
-  - cp -r UsergeTeam/Userge-Plugins/resources/* UsergeTeam/Userge/resources/
+  - cd ..
+  - git clone --depth=50 --branch=dev https://github.com/UsergeTeam/Userge.git Userge
+  - mv Userge-Plugins/plugins/ Userge/userge/plugins/unof_plugins/
+  - cp -r Userge-Plugins/resources/* Userge/resources/
 install:
-  - pip install -r UsergeTeam/Userge-Plugins/requirements.txt UsergeTeam/Userge/requirements.txt
+  - pip install -r Userge-Plugins/requirements.txt Userge/requirements.txt
 before_script:
-  - rm -rf UsergeTeam/Userge-Plugins/
-  - cd UsergeTeam/Userge
+  - rm -rf Userge-Plugins/
+  - cd Userge
 script:
   - python test.py
