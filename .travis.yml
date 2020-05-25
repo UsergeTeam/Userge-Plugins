@@ -7,7 +7,8 @@ before_install:
   - mv Userge-Plugins/plugins/ Userge/userge/plugins/unof_plugins/
   - cp -r Userge-Plugins/resources/* Userge/resources/
 install:
-  - pip install -r Userge-Plugins/requirements.txt Userge/requirements.txt
+  - pip install -r Userge/requirements.txt
+  - pip install -r Userge-Plugins/requirements.txt
 before_script:
   - rm -rf Userge-Plugins/
   - cd Userge
