@@ -9,6 +9,7 @@ before_install:
 install:
   - pip install -r UsergeTeam/Userge-Plugins/requirements.txt UsergeTeam/Userge/requirements.txt
 before_script:
+  - rm -rf UsergeTeam/Userge-Plugins/
   - cd UsergeTeam/Userge
 script:
   - python test.py
