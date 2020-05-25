@@ -5,7 +5,7 @@ from userge import userge, Message
 
 
 @userge.on_cmd("spam$", about={'header': "THE SPAMMER"})
-async def brain_func(message: Message):
+async def spam_func(message: Message):
     animation_chars = [
         "YOU", "ARE", "A", "REAL", "SPAMMER", "THAT", "I", "HAVE", "SEEN",
         "YOU ARE A REAL SPAMMER THAT I HAVE SEEN",
