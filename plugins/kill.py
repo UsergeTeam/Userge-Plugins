@@ -1,6 +1,6 @@
 import asyncio
 from userge import userge, Message
-#by Harsh , inspired by brain.py
+# by Harsh , inspired by brain.py
 @userge.on_cmd("kill$", about={'header': "Kill anybody With Full Power ;-)"})
 async def kill_func(message):
   animation_chars = [          
