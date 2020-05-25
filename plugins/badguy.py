@@ -14,7 +14,7 @@ async def bguy_func(message):
 "KEEP",
 "QUITE",
 "BUDDY",
-]
+                  ]
   for i in range(10):
     await asyncio.sleep(0.6)
     await message.edit(animation_chars[i % 10], parse_mode="html")
