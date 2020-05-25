@@ -12,7 +12,7 @@ from userge import userge
 
 async def worker():
     chat_id = int(os.environ.get("CHAT_ID"))
-    await userge.send_message(chat_id, 'testing_changes')
+    await userge.send_message(chat_id, 'testing_plugins')
     print('sleeping 3 sec...!')
     await asyncio.sleep(3)
 
@@ -37,4 +37,4 @@ loop.run_until_complete(main())
 print('closing loop...!')
 loop.close()
 
-print('test finished!')
+print('userge unofficial plugins test has been finished!')
