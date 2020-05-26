@@ -1,5 +1,5 @@
 import os
-import asyncio 
+import asyncio
 from userge import userge, Message, Config
 
 S_LOG = userge.getCLogger(__name__)
@@ -12,7 +12,6 @@ S_LOG = userge.getCLogger(__name__)
     'usage': "{tr}spem [spam count] [spam message/reply to a media]",
     'example': "{tr}spem 10 Durov will ban me for using this plugin"})
 async def spem(message: Message):
-    
     if message.reply_to_message:
         replied = message.reply_to_message
         if not replied.media:
@@ -29,8 +28,8 @@ async def spem(message: Message):
             except ValueError as e:
                 await message.edit(e)
                 await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
-                return 
-            await massage.edit(f"Spamming {sc} Time")
+                return
+            await message.edit(f"Spamming {sc} Time")
             for spem in range(sc):
                 await userge.send_sticker(sticker=to_spem, chat_id=message.chat.id)
                 await asyncio.sleep(0.1)
