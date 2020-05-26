@@ -4,6 +4,7 @@ from userge import userge, Message, Config
 
 S_LOG = userge.getCLogger(__name__)
 
+
 @userge.on_cmd("spem", about={
     'header': "Spam some Messages",
     'description': "Message Spam module just for fun."
