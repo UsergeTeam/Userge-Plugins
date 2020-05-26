@@ -1,6 +1,5 @@
 import os
 import time
-import textwrap
 import random
 
 from PIL import Image, ImageEnhance, ImageOps
@@ -14,7 +13,7 @@ from userge.utils import progress, take_screen_shot, runcmd
     'description': "Well deepfy any image/sticker/gif and make it look ugly",
     'usage': "{tr}deepfry [fry count] as a reply.",
     'examples': "{tr}deepfry 1"})
-async def deepfry(message: Message):
+async def deepfryer(message: Message):
     replied = message.reply_to_message
     if not (replied or message.input_str):
         await message.err("LMAO no one's gonna help you, if u use .help now then u **Gey**")
