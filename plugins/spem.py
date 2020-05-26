@@ -69,7 +69,7 @@ async def spem(message: Message):
         for _ in range(sc):
             await userge.send_message(text=spem_text, chat_id=message.chat.id)
             await asyncio.sleep(0.1)
-        await S_LOG.log("Spammed Text in Chat» {message.chat.id}, {sc} times")
+        await S_LOG.log("Spammed Text in Chat» {message.chat.title}, {sc} times")
     else:
         await message.edit("Well it doesn't work that way")
         await message.reply_sticker(sticker="CAADAQAD6gADfAVQRnyVSb3GhGT4FgQ")
