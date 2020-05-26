@@ -13,7 +13,7 @@ S_LOG = userge.getCLogger(__name__)
     'example': "{tr}spem 10 Durov will ban me for using this plugin"})
 async def spem(message: Message):
     
-    if message.reply_to_mesage:
+    if message.reply_to_message:
         replied = message.reply_to_message
         if not replied.media:
             await message.edit("Bruh! Hands up!! Durov wants to know ur location")
@@ -30,6 +30,7 @@ async def spem(message: Message):
                 await message.err(text=e)
                 await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
                 return 
+            await massage.edit(f"Spamming {sc} Time")
             for spem in range(sc):
                 await userge.send_sticker(sticker=to_spem, chat_id=message.chat.id)
                 await asyncio.sleep(0.1)
@@ -46,6 +47,7 @@ async def spem(message: Message):
                 await message.err(text=e)
                 await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
                 return
+            await message.edit(f"Spamming {sc} times")
             if (replied.video or replied.animation):
                 for spem in range(sc):
                     await userge.send_video(video=to_spem, chat_id=message.chat.id)
@@ -63,6 +65,7 @@ async def spem(message: Message):
             await message.err(text=e)
             await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
             return
+        await message.edit(f"Spamming {sc} times")
         for spem in range(sc):
             await userge.send_text(text=spem_text, chat_id=message.chat.id)
             await asyncio.sleep(0.1)
