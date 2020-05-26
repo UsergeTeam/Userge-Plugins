@@ -31,7 +31,7 @@ async def spem(message: Message):
                 await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
                 return
             await message.edit(f"Spamming {sc} Time")
-            for spem in range(sc):
+            for _ in range(sc):
                 await userge.send_sticker(sticker=to_spem, chat_id=message.chat.id)
                 await asyncio.sleep(0.1)
             await S_LOG.log(f"Spammed Sticker in Chat» {message.chat.title}, {sc} times")
@@ -49,11 +49,11 @@ async def spem(message: Message):
                 return
             await message.edit(f"Spamming {sc} times")
             if (replied.video or replied.animation):
-                for spem in range(sc):
+                for _ in range(sc):
                     await userge.send_video(video=to_spem, chat_id=message.chat.id)
                     await asyncio.sleep(0.1)
             elif replied.photo:
-                for spem in range(sc):
+                for _ in range(sc):
                     await userge.send_photo(photo=to_spem, chat_id=message.chat.id)
                     await asyncio.sleep(0.1)
             await S_LOG.log("Spammed Media in Chat» {message.chat.title}, {sc} times")
@@ -66,7 +66,7 @@ async def spem(message: Message):
             await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
             return
         await message.edit(f"Spamming {sc} times")
-        for spem in range(sc):
+        for _ in range(sc):
             await userge.send_message(text=spem_text, chat_id=message.chat.id)
             await asyncio.sleep(0.1)
         await S_LOG.log("Spammed Text in Chat» {message.chat.id}, {sc} times")
