@@ -15,12 +15,12 @@ from userge.utils import progress, take_screen_shot, runcmd
     'examples': "{tr}deepfry 1"})
 async def deepfryer(message: Message):
     replied = message.reply_to_message
-    if not (replied or message.input_str):
-        await message.err("LMAO no one's gonna help you, if u use .help now then u **Gey**")
+    if not (replied and message.input_str):
+        await message.edit("LMAO no one's gonna help you, if u use .help now then u **Gey**")
         await message.reply_sticker(sticker="CAADAQADhAAD3gkwRviGxMVn5813FgQ")
         return
     if not (replied.photo or replied.sticker or replied.animation):
-        await message.err("Bruh, U Comedy me? Can you deepfry rocks?")
+        await message.edit("Bruh, U Comedy me? Can you deepfry rocks?")
         return
     try:
         fry_c = int(message.input_str)
@@ -83,14 +83,11 @@ async def deepfry(img):
     img = img.convert("RGB")
     width, height = img.width, img.height
     img = img.resize((int(width**random.uniform(
-        0.8, 0.9)), int(height**random.uniform(0.8, 0.9))),
-                     resample=Image.LANCZOS)
+        0.8, 0.9)), int(height**random.uniform(0.8, 0.9))), resample=Image.LANCZOS)
     img = img.resize((int(width**random.uniform(
-        0.85, 0.95)), int(height**random.uniform(0.85, 0.95))),
-                     resample=Image.BILINEAR)
+        0.85, 0.95)), int(height**random.uniform(0.85, 0.95))), resample=Image.BILINEAR)
     img = img.resize((int(width**random.uniform(
-        0.89, 0.98)), int(height**random.uniform(0.89, 0.98))),
-                     resample=Image.BICUBIC)
+        0.89, 0.98)), int(height**random.uniform(0.89, 0.98))), resample=Image.BICUBIC)
     img = img.resize((width, height), resample=Image.BICUBIC)
     img = ImageOps.posterize(img, random.randint(3, 7))
 
