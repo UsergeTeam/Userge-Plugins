@@ -1,8 +1,10 @@
 """Userge Plugin for getting information about an user on GitHub
+
 Syntax: .github USERNAME"""
 
 import requests
 from userge import userge, Message
+
 
 @userge.on_cmd("github", about={
     'header': "Get info about an GitHub User",
@@ -20,7 +22,7 @@ async def fetch_github_info(message: Message):
         name = b["name"]
         company = b["company"]
         blog = b["blog"]
-        location = b["location"]    
+        location = b["location"]
         bio = b["bio"]
         followers = b["followers"]
         following = b["following"]
@@ -35,7 +37,9 @@ Location: {}
 Bio: {}
 Followers: {}
 Following: {}
-Profile Created: {}""".format(name, html_url, gh_type, company, blog, location, bio, followers, following, created_at),
+Profile Created: {}""".format(
+                name, html_url, gh_type, company, blog, location,
+                bio, followers, following, created_at),
             photo=avatar_url,
             disable_notification=True
         )
