@@ -27,7 +27,7 @@ async def spem(message: Message):
             try:
                 sc = int(message.input_str)
             except ValueError as e:
-                await message.err(text=e)
+                await message.edit(e)
                 await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
                 return 
             await massage.edit(f"Spamming {sc} Time")
@@ -44,7 +44,7 @@ async def spem(message: Message):
             try:
                 sc = int(message.input_str)
             except ValueError as e:
-                await message.err(text=e)
+                await message.edit(e)
                 await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
                 return
             await message.edit(f"Spamming {sc} times")
@@ -62,12 +62,12 @@ async def spem(message: Message):
         try:
             sc = int(spem_count)
         except ValueError as e:
-            await message.err(text=e)
+            await message.edit(e)
             await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
             return
         await message.edit(f"Spamming {sc} times")
         for spem in range(sc):
-            await userge.send_text(text=spem_text, chat_id=message.chat.id)
+            await userge.send_message(text=spem_text, chat_id=message.chat.id)
             await asyncio.sleep(0.1)
         await S_LOG.log("Spammed Text in Chat» {message.chat.id}, {sc} times")
     else:
