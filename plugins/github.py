@@ -1,7 +1,7 @@
 """Userge Plugin for getting information about an user on GitHub
 
-Syntax: .github USERNAME"""
-
+Syntax: .github USERNAME
+"""
 import requests
 from userge import userge, Message
 
