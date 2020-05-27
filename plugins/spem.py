@@ -10,7 +10,7 @@ S_LOG = userge.getCLogger(__name__)
     'description': "Message Spam module just for fun."
                    "Btw Don't over use this plugin or get"
                    "ready for account ban or flood waits. "
-                   "For spamming text use "|" to separate count and text.",
+                   "For spamming text use '|' to separate count and text.",
     'usage': "{tr}spem [spam count] | [spam message/reply to a media]",
     'example': "**For Text:** `{tr}spem 2 | Durov will ban me for using this plugin`"})
 async def spem(message: Message):
