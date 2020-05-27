@@ -9,9 +9,10 @@ S_LOG = userge.getCLogger(__name__)
     'header': "Spam some Messages",
     'description': "Message Spam module just for fun."
                    "Btw Don't over use this plugin or get"
-                   "ready for account ban or flood waits.",
-    'usage': "{tr}spem [spam count] [spam message/reply to a media]",
-    'example': "{tr}spem 10 Durov will ban me for using this plugin"})
+                   "ready for account ban or flood waits. "
+                   "For spamming text use "|" to separate count and text.",
+    'usage': "{tr}spem [spam count] | [spam message/reply to a media]",
+    'example': "**For Text:** `{tr}spem 2 | Durov will ban me for using this plugin`"})
 async def spem(message: Message):
     if message.reply_to_message:
         replied = message.reply_to_message
@@ -56,9 +57,9 @@ async def spem(message: Message):
                 for _ in range(sc):
                     await userge.send_photo(photo=to_spem, chat_id=message.chat.id)
                     await asyncio.sleep(0.1)
-            await S_LOG.log("Spammed Media in Chat» {message.chat.title}, {sc} times")
+            await S_LOG.log(f"Spammed Media in Chat» {message.chat.title}, {sc} times")
     elif len(message.input_str.split()) > 1:
-        spem_count, spem_text = message.input_str.split()
+        spem_count, spem_text = message.input_str.split("|")
         try:
             sc = int(spem_count)
         except ValueError as e:
@@ -69,7 +70,7 @@ async def spem(message: Message):
         for _ in range(sc):
             await userge.send_message(text=spem_text, chat_id=message.chat.id)
             await asyncio.sleep(0.1)
-        await S_LOG.log("Spammed Text in Chat» {message.chat.title}, {sc} times")
+        await S_LOG.log(f"Spammed Text in Chat» {message.chat.title}, {sc} times")
     else:
         await message.edit("Well it doesn't work that way")
         await message.reply_sticker(sticker="CAADAQAD6gADfAVQRnyVSb3GhGT4FgQ")
