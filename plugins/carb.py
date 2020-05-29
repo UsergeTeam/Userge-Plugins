@@ -54,7 +54,8 @@ async def carb(message: Message):
 
     try:
         carbon_result = requests.get(
-            "https://sjprojectsapi.herokuapp.com/carbon/?text="+text+"&theme="+theme+"&bg="+bg).json()
+            "https://sjprojectsapi.herokuapp.com/carbon/?text="
+            + text + "&theme=" + theme + "&bg=" + bg).json()
         await userge.send_photo(chat_id=message.chat.id, photo=carbon_result['link'])
         await message.delete()
     except Exception:
