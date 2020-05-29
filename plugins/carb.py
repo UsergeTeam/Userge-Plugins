@@ -36,16 +36,17 @@ async def carb(message: Message):
         text = message.input_str
         args = text.split('|')
 
-    for arg in args:
-        arg = arg.strip()
-        if arg.lower().replace(" ", "-") in themes:
-            theme = arg.lower()
-        elif arg.startswith("#") or arg.startswith("rgb"):
-            if arg[0] == "#":
-                arg = arg[1:]
-            bg = arg
-        else:
-            text = arg
+    if '|' in args:
+        for arg in args:
+            arg = arg.strip()
+            if arg.lower().replace(" ", "-") in themes:
+                theme = arg.lower()
+            elif arg.startswith("#") or arg.startswith("rgb"):
+                if arg[0] == "#" and len(arg) == 7:
+                    arg = arg[1:]
+                bg = arg
+            elif len(arg) > 0:
+                text = arg
 
     if not text:
         await message.err("Input not found!")
