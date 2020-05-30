@@ -11,7 +11,8 @@ path_ = 'deezdown_temp/'
 @userge.on_cmd("deezload", about={
     'header': "Name's Deez, DeezLoader",
     'description': "Download Songs/Albums/Playlists via "
-                   "Sopitfy or Deezer Links. ",
+                   "Sopitfy or Deezer Links. "
+                   "\n**NOTE:** Music Quality is optional",
     'flags': {'-stl': "Download a Track via Spotify Link",
               '-dtl': "Download a Track via Deezer Link",
               '-sal': "Download an Album via Spotify Link",
@@ -21,12 +22,12 @@ path_ = 'deezdown_temp/'
               '-dsong': "Download a Song by passing Artist Name and Song Name",
               '-zip': "Get a zip archive for Albums/Playlist Download"},
     'options': "Available Sound Quality: `FLAC` | `MP3_320` | `MP3_256` | `MP3_128`",
-    'usage': "{tr}deezload [flag] [link | quality]",
+    'usage': "{tr}deezload [flag] [link | quality (default MP3_320)]",
     'examples':"`{tr}deezload -dtl https://www.deezer.com/track/142750222` \n"
                "`{tr}deezload -dtl https://www.deezer.com/track/3824710 FLAC` \n"
                "`{tr}deezload -dal https://www.deezer.com/album/1240787 FLAC` \n"
                "`{tr}deezload -dal -zip https://www.deezer.com/album/1240787` \n"
-               "`{tr}deezload -dsong Ed Sheeran - Shape of You`"})
+               "`{tr}deezload -dsong Ed Sheeran - Shape of You - MP3_256 (quality is optional)`"})
 async def deezload(message: Message):
     if not os.path.exists(path_):
         os.makedirs(path_)
