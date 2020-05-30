@@ -31,7 +31,7 @@ async def google_rs(message: Message):
             if not os.path.lexists(img_file):
                 await message.err("Something went wrong in Conversion")
                 return
-            dls_loc = img_file
+            dis_loc = img_file
         if dis_loc:
             SEARCH_URL = "{}/searchbyimage/upload".format(BASE_URL)
             multipart = {
