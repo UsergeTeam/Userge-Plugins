@@ -1,5 +1,5 @@
 import os
-import shutil 
+import shutil
 import deezloader
 from userge import userge, Message
 
@@ -37,7 +37,7 @@ async def deezload(message: Message):
     await message.edit("Trying to Login 🥴")
     if ARL_TOKEN is None:
         await message.edit(
-            "Oops, Time to Help Yourself " 
+            "Oops, Time to Help Yourself "
             "\n[Here Help Yourself](https://www.google.com/search?q=how+to+get+deezer+arl+token)"
             "\nAfter getting Arl token Config `ARL_TOKEN` var in heroku"
         )
