@@ -32,7 +32,8 @@ async def glyrics(message: Message):
             "**NOTE:** Please **don't turn on** the '**Search the entire Web**'"
             " feature as it is currently not possible to scrape from any random"
             " sites appearing in the search results.\n"
-            "3. Visit here to get your API key: https://developers.google.com/custom-search/v1/overview"
+            "3. Visit here to get your API key: "
+            "https://developers.google.com/custom-search/v1/overview"
             "\n4. Finally Add following in Heroku Config vars:\n"
             "**Key:** `GCS_ENGINE_ID` \n**Value:** Engine ID of CSE (got in Step 1)\n"
             "**Key:** `GCS_API_KEY`\n**Value:** API Token (got in Step 3)")

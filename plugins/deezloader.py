@@ -3,9 +3,8 @@ import shutil
 import deezloader
 from userge import userge, Message
 
-
 ARL_TOKEN = os.environ.get("ARL_TOKEN", None)
-path_ = 'deezdown_temp/'
+PATH = 'deezdown_temp/'
 
 
 @userge.on_cmd("deezload", about={
@@ -23,16 +22,17 @@ path_ = 'deezdown_temp/'
               '-zip': "Get a zip archive for Albums/Playlist Download"},
     'options': "Available Sound Quality: `FLAC` | `MP3_320` | `MP3_256` | `MP3_128`",
     'usage': "{tr}deezload [flag] [link | quality (default MP3_320)]",
-    'examples':"`{tr}deezload -dtl https://www.deezer.com/track/142750222` \n"
-               "`{tr}deezload -dtl https://www.deezer.com/track/3824710 FLAC` \n"
-               "`{tr}deezload -dal https://www.deezer.com/album/1240787 FLAC` \n"
-               "`{tr}deezload -dal -zip https://www.deezer.com/album/1240787` \n"
-               "`{tr}deezload -dsong Ed Sheeran - Shape of You - MP3_256 (quality is optional)`"})
+    'examples': "`{tr}deezload -dtl https://www.deezer.com/track/142750222` \n"
+                "`{tr}deezload -dtl https://www.deezer.com/track/3824710 FLAC` \n"
+                "`{tr}deezload -dal https://www.deezer.com/album/1240787 FLAC` \n"
+                "`{tr}deezload -dal -zip https://www.deezer.com/album/1240787` \n"
+                "`{tr}deezload -dsong Ed Sheeran - Shape of You - MP3_256 (quality is optional)`"})
 async def deezload(message: Message):
-    if not os.path.exists(path_):
-        os.makedirs(path_)
+    if not os.path.exists(PATH):
+        os.makedirs(PATH)
     if not message.flags:
-        await message.edit("Check your E-Mail📧 I've sent an invitation to read help for DeezLoader :)")
+        await message.edit(
+            "Check your E-Mail📧 I've sent an invitation to read help for DeezLoader :)")
         return
     await message.edit("Trying to Login 🥴")
     if ARL_TOKEN is None:
@@ -63,34 +63,34 @@ async def deezload(message: Message):
             input_link, quality = input_.split()
         except ValueError:
             if len(input_.split()) == 1:
-              input_link = input_
-              quality = d_quality
+                input_link = input_
+                quality = d_quality
             else:
-              await message.edit("🤔 Comedy? You are good at it")
-              return
+                await message.edit("🤔 Comedy? You are good at it")
+                return
         if '.com' not in input_link:
             await message.edit("Invalid Link")
             return
-    elif '-dsong'in flags:
+    elif '-dsong' in flags:
         try:
             artist, song, quality = input_.split('-')
         except ValueError:
             if len(input_.split("-")) == 2:
-              artist, song = input_.split('-')
-              quality = d_quality
+                artist, song = input_.split('-')
+                quality = d_quality
             else:
-              await message.edit("WeW, Use that thing which is present on top floor of ur body 🌚")
-              return
+                await message.edit("WeW, Use that thing which is present on top floor of ur body 🌚")
+                return
 
     if '-stl' in flags:
         await message.edit("Trying to download song via Spotify Link 🥴")
         track = loader.download_trackspo(
-	    input_link,
-	    output = path_,
-	    quality = quality,
-	    recursive_quality = True,
-	    recursive_download = True,
-	    not_interface = True
+            input_link,
+            output=PATH,
+            quality=quality,
+            recursive_quality=True,
+            recursive_download=True,
+            not_interface=True
         )
         await message.edit("Now Uploading 📤")
         await userge.send_audio(
@@ -101,11 +101,11 @@ async def deezload(message: Message):
         await message.edit("trying to download song via Deezer Link 🥴")
         track = loader.download_trackdee(
             input_link,
-            output = path_,
-            quality = quality,
-            recursive_quality = True,
-            recursive_download = True,
-            not_interface = True
+            output=PATH,
+            quality=quality,
+            recursive_quality=True,
+            recursive_download=True,
+            not_interface=True
         )
         await message.edit("Now Uploading 📤")
         await userge.send_audio(
@@ -118,12 +118,12 @@ async def deezload(message: Message):
         if to_zip:
             _, zip_ = loader.download_albumspo(
                 input_link,
-                output = path_,
-                quality = quality,
-                recursive_quality = True,
-                recursive_download = True,
-                not_interface = True,
-                zips = to_zip
+                output=PATH,
+                quality=quality,
+                recursive_quality=True,
+                recursive_download=True,
+                not_interface=True,
+                zips=to_zip
             )
             await message.edit("Sending as Zip File 🗜")
             await userge.send_document(
@@ -131,14 +131,14 @@ async def deezload(message: Message):
                 document=zip_
             )
         else:
-            ablum_list = loader.download_albumspo(
+            album_list = loader.download_albumspo(
                 input_link,
-                output = path_,
-                quality = quality,
-                recursive_quality = True,
-                recursive_download = True,
-                not_interface = True,
-                zips = to_zip)
+                output=PATH,
+                quality=quality,
+                recursive_quality=True,
+                recursive_download=True,
+                not_interface=True,
+                zips=to_zip)
             await message.edit("Uploading Tracks 📤")
             for tracks in album_list:
                 await userge.send_audio(
@@ -150,12 +150,12 @@ async def deezload(message: Message):
         if to_zip:
             _, zip_ = loader.download_albumdee(
                 input_link,
-                output = path_,
-                quality = quality,
-                recursive_quality = True,
-                recursive_download = True,
-                not_interface = True,
-                zips = to_zip
+                output=PATH,
+                quality=quality,
+                recursive_quality=True,
+                recursive_download=True,
+                not_interface=True,
+                zips=to_zip
             )
             await message.edit("Uploading as Zip File 🗜")
             await userge.send_document(
@@ -165,12 +165,12 @@ async def deezload(message: Message):
         else:
             album_list = loader.download_albumdee(
                 input_link,
-                output = path_,
-                quality = quality,
-                recursive_quality = True,
-                recursive_download = True,
-                not_interface = True,
-                zips = to_zip
+                output=PATH,
+                quality=quality,
+                recursive_quality=True,
+                recursive_download=True,
+                not_interface=True,
+                zips=to_zip
             )
             await message.edit("Uploading Tracks 📤")
             for tracks in album_list:
@@ -184,12 +184,12 @@ async def deezload(message: Message):
         if to_zip:
             _, zip_ = loader.download_playlistspo(
                 input_link,
-                output = path_,
-                quality = quality,
-                recursive_quality = True,
-                recursive_download = True,
-                not_interface = True,
-                zips = to_zip
+                output=PATH,
+                quality=quality,
+                recursive_quality=True,
+                recursive_download=True,
+                not_interface=True,
+                zips=to_zip
             )
             await message.edit("Sending as Zip 🗜")
             await userge.send_document(
@@ -199,12 +199,12 @@ async def deezload(message: Message):
         else:
             album_list = loader.download_playlistspo(
                 input_link,
-                output = path_,
-                quality = quality,
-                recursive_quality = True,
-                recursive_download = True,
-                not_interface = True,
-                zips = to_zip
+                output=PATH,
+                quality=quality,
+                recursive_quality=True,
+                recursive_download=True,
+                not_interface=True,
+                zips=to_zip
             )
             await message.edit("Uploading Tracks 📤")
             for tracks in album_list:
@@ -217,12 +217,12 @@ async def deezload(message: Message):
         if to_zip:
             _, zip_ = loader.download_playlistdee(
                 input_link,
-                output = path_,
-                quality = quality,
-                recursive_quality = True,
-                recursive_download = True,
-                not_interface = True,
-                zips = to_zip
+                output=PATH,
+                quality=quality,
+                recursive_quality=True,
+                recursive_download=True,
+                not_interface=True,
+                zips=to_zip
             )
             await message.edit("Sending as Zip File 🗜")
             await userge.send_document(
@@ -232,12 +232,12 @@ async def deezload(message: Message):
         else:
             album_list = loader.download_playlistdee(
                 input_link,
-                output = path_,
-                quality = quality,
-                recursive_quality = True,
-                recursive_download = True,
-                not_interface = True,
-                zips = to_zip
+                output=PATH,
+                quality=quality,
+                recursive_quality=True,
+                recursive_download=True,
+                not_interface=True,
+                zips=to_zip
             )
             await message.edit("Uploading Tracks 📤")
             for tracks in album_list:
@@ -250,13 +250,13 @@ async def deezload(message: Message):
         await message.edit("Searching for Song 🔍")
         try:
             track = loader.download_name(
-                artist = artist,
-                song = song,
-                output = path_,
-                quality = quality,
-                recursive_quality = True,
-                recursive_download = True,
-                not_interface = True
+                artist=artist,
+                song=song,
+                output=PATH,
+                quality=quality,
+                recursive_quality=True,
+                recursive_download=True,
+                not_interface=True
             )
             await message.edit("Song found, Now Uploading 📤")
             await userge.send_audio(
@@ -266,7 +266,4 @@ async def deezload(message: Message):
         except:
             await message.edit("Song not Found 🚫")
     await message.delete()
-    try:
-        shutil.rmtree(path_)
-    except:
-        pass
+    shutil.rmtree(PATH, ignore_errors=True)
