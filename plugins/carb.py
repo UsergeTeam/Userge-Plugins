@@ -1,4 +1,5 @@
 # Userge Plugin for carbon.now.sh with custom theme and background colour support
+# Based on https://github.com/cyberboysumanjay/Carbon-API
 # Author: Sumanjay (https://github.com/cyberboysumanjay) (@cyberboysumanjay)
 # All rights reserved.
 
@@ -10,12 +11,12 @@ import requests
     'header': "Create a carbon",
     'usage': "{tr}carb [text or reply to msg | theme-name | colour code]",
     'examples': "{tr}carb Carbon Plugin by Sumanjay | one-dark | #FF0000",
-    'themes': "3024-night, a11y-dark, blackboard, base16-dark, base16-light"
-    "cobalt, dracula, duotone-dark, hopscotch, lucario, material"
-    "monokai, night-owl, nord, oceanic-next, one-light, one-dark"
-    "panda-syntax, paraiso-dark, seti, shades-of-purple, solarized-dark"
-    "solarized-light, synthwave-84, twilight, verminal, vscode"
-    "yeti, zenburn"})
+    'themes': "`3024-night`, `a11y-dark`, `blackboard`, `base16-dark`, `base16-light`"
+    "`cobalt`, `dracula`, `duotone-dark`, `hopscotch`, `lucario`, `material`"
+    "`monokai`, `night-owl`, `nord`, `oceanic-next`, `one-light`, `one-dark`"
+    "`panda-syntax`, `paraiso-dark`, `seti`, `shades-of-purple`, `solarized-dark`"
+    "`solarized-light`, `synthwave-84`, `twilight`, `verminal`, `vscode`"
+    "`yeti`, `zenburn`"})
 async def carb(message: Message):
     # Setting Default Theme and Background Colour
     theme = 'dracula'
@@ -36,7 +37,7 @@ async def carb(message: Message):
         text = message.input_str
         args = text.split('|')
 
-    if '|' in args:
+    if len(args) > 0:
         for arg in args:
             arg = arg.strip()
             if arg.lower().replace(" ", "-") in themes:
@@ -52,7 +53,6 @@ async def carb(message: Message):
         await message.err("Input not found!")
         return
     await message.edit("⚡️ Carbonizing ⚡️")
-
     try:
         carbon_result = requests.get(
             "https://sjprojectsapi.herokuapp.com/carbon/?"
