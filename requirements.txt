@@ -1,4 +1,5 @@
 cairosvg
+deezloader
 justwatch
 lottie
-pyLyrics
+lyrics-extractor
