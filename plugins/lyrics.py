@@ -11,7 +11,7 @@ GCS_API_KEY = os.environ.get("GCS_API_KEY", None)
     'description': "Scrape Song Lyrics from various websites"
                    " using your Custom Search Engine.",
     'usage': "{tr}glyrics [Song Name]",
-    'examples': "`{tr}glyrics Swalla Nicki Minaj`"})
+    'examples': "{tr}glyrics Swalla Nicki Minaj"})
 async def glyrics(message: Message):
     if (GCS_ENGINE_ID and GCS_API_KEY) is None:
         await message.edit(
