@@ -31,7 +31,7 @@ async def google_rs(message: Message):
             if not os.path.lexists(img_file):
                 await message.err("Something went wrong in Conversion")
                 return
-            dls_loc = jpg_file
+            dls_loc = img_file
         if dis_loc:
             SEARCH_URL = "{}/searchbyimage/upload".format(BASE_URL)
             multipart = {
@@ -60,8 +60,8 @@ async def google_rs(message: Message):
         ms = (end - start).seconds
         OUTPUT_STR = """{img_size}
 
-<b>Possible Related Search</b>: <a href="{prs_url}">{prs_text}</a> 
-<b>More Info</b>: Open this <a href="{the_location}">Link</a> 
+<b>Possible Related Search</b>: <a href="{prs_url}">{prs_text}</a>
+<b>More Info</b>: Open this <a href="{the_location}">Link</a>
 
 <b>Time Taken</b>: {ms} seconds""".format(**locals())
     await message.edit(OUTPUT_STR, parse_mode="HTML", disable_web_page_preview=True)
