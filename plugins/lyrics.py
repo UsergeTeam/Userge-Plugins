@@ -2,8 +2,9 @@ import os
 from userge import userge, Message
 from lyrics_extractor import Song_Lyrics
 
-GCS_ENGINE_ID = os.environ.get("GCS_ENGINE_ID", None) 
+GCS_ENGINE_ID = os.environ.get("GCS_ENGINE_ID", None)
 GCS_API_KEY = os.environ.get("GCS_API_KEY", None)
+
 
 @userge.on_cmd("glyrics", about={
     'header': "GCS Lyrics",
