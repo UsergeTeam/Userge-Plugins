@@ -50,3 +50,4 @@ async def google_img(message: Message):
         await userge.send_photo(
             chat_id=message.chat.id,
             photo=imgs)
+    shutil.rmtree(PATH, ignore_errors=True)
