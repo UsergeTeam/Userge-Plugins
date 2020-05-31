@@ -16,7 +16,6 @@ from userge.utils import take_screen_shot, progress
     'usage': "{tr}genss [No of SS] (optional) as reply to Video"})
 async def ss_gen(message: Message):
     replied = message.reply_to_message
-    input_loc = ''
     vid_loc = ''
     ss_c = 5
     await message.edit("Checking you Input?🧐🤔😳")
