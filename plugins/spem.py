@@ -12,15 +12,10 @@ S_LOG = userge.getCLogger(__name__)
                    "ready for account ban or flood waits. "
                    "For spamming text use '|' to separate count and text.",
     'usage': "{tr}spem [spam count] | [spam message/reply to a media]",
-    'example': "**For Text:** `{tr}spem 2 | Durov will ban me for using this plugin`"})
+    'examples': "**For Text:** `{tr}spem 2 | Durov will ban me for using this plugin`"})
 async def spem(message: Message):
-    if message.reply_to_message:
-        replied = message.reply_to_message
-        if not replied.media:
-            await message.edit("Bruh! Hands up!! Durov wants to know ur location")
-            await message.reply_sticker(sticker="CAADAQADrwAD3RUoRoRNidg0f7S3FgQ")
-            await S_LOG.log("Sent your current location to Durov, Good Luck kek")
-            return
+    replied = message.reply_to_message
+    if replied.media:
         if not os.path.isdir(Config.DOWN_PATH):
             os.makedirs(Config.DOWN_PATH)
         if replied.sticker:
