@@ -15,7 +15,8 @@ S_LOG = userge.getCLogger(__name__)
     'examples': "**For Text:** `{tr}spem 2 | Durov will ban me for using this plugin`"})
 async def spem(message: Message):
     replied = message.reply_to_message
-    if replied.media:
+    is_str = True if "|" in message.input_str else False
+    if replied.media and not is_str:
         if not os.path.isdir(Config.DOWN_PATH):
             os.makedirs(Config.DOWN_PATH)
         if replied.sticker:
@@ -53,7 +54,7 @@ async def spem(message: Message):
                     await userge.send_photo(photo=to_spem, chat_id=message.chat.id)
                     await asyncio.sleep(0.1)
             await S_LOG.log(f"Spammed Media in Chat» {message.chat.title}, {sc} times")
-    elif len(message.input_str.split()) > 1:
+    elif is_str:
         spem_count, spem_text = message.input_str.split("|")
         try:
             sc = int(spem_count)
