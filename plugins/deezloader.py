@@ -137,7 +137,7 @@ async def proper_trackdl(link, qual, msg, client, dir, u):
             recursive_download=True,
             not_interface=True
         )
-        await mag.edit("Now Uploading 📤")
+        await msg.edit("Now Uploading 📤")
         await u.send_audio(
             chat_id=msg.chat.id,
             audio=track
@@ -245,7 +245,7 @@ async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
                         audio=tracks
                     )
         elif 'playlist/' in link:
-            await message.edit("Trying to download Playlist 🎶")
+            await msg.edit("Trying to download Playlist 🎶")
             if allow_zip:
                 _, zip_ = client.download_playlistdee(
                     link,
