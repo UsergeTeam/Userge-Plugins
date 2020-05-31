@@ -244,7 +244,7 @@ async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
                 await msg.edit("Uploading Tracks 📤")
                 for tracks in album_list:
                     await u.send_audio(
-                        chat_id=msgchat.id,
+                        chat_id=msg.chat.id,
                         audio=tracks
                     )
         elif 'playlist/' in link:
