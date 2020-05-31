@@ -111,6 +111,7 @@ async def deezload(message: Message):
     await message.delete()
     shutil.rmtree(PATH, ignore_errors=True)
 
+
 async def proper_trackdl(link, qual, msg, client, dir, u):
     if 'spotify' in link:
         await msg.edit("Trying to download song via Spotify Link 🥴")
@@ -142,6 +143,8 @@ async def proper_trackdl(link, qual, msg, client, dir, u):
             chat_id=msg.chat.id,
             audio=track
         )
+
+
 async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
     if 'spotify' in link:
         if 'album/' in link:
@@ -165,7 +168,7 @@ async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
                 album_list = client.download_albumspo(
                     link,
                     output=dir,
-                    quality=qual
+                    quality=qual,
                     recursive_quality=True,
                     recursive_download=True,
                     not_interface=True,
