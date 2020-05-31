@@ -15,7 +15,7 @@ S_LOG = userge.getCLogger(__name__)
     'examples': "**For Text:** `{tr}spem 2 | Durov will ban me for using this plugin`"})
 async def spem(message: Message):
     replied = message.reply_to_message
-    is_str = True if "|" in message.input_str else False
+    is_str = "|" in message.input_str
     if replied.media and not is_str:
         if not os.path.isdir(Config.DOWN_PATH):
             os.makedirs(Config.DOWN_PATH)
