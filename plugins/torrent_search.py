@@ -1,5 +1,8 @@
-import requests
+# Userge Plugin for Torrent Search
+# Author: Sumanjay (https://github.com/cyberboysumanjay) (@cyberboysumanjay)
+# All rights reserved
 
+import requests
 from userge import userge, Message
 
 
@@ -10,7 +13,8 @@ from userge import userge, Message
 async def torr_search(message: Message):
     await message.edit("`Searching for available Torrents!`")
     query = message.input_or_reply_str
-    r = requests.get("https://sjprojectsapi.herokuapp.com/torrent/?query=" + query)
+    r = requests.get(
+        "https://sjprojectsapi.herokuapp.com/torrent/?query=" + query)
     try:
         torrents = r.json()
         reply_ = ""
@@ -18,10 +22,10 @@ async def torr_search(message: Message):
             if len(reply_) < 4096:
                 try:
                     reply_ = (reply_ + f"\n\n<b>{torrent['name']}</b>\n"
-                              "<b>Size:</b> {torrent['size']}\n"
-                              "<b>Seeders:</b> {torrent['seeder']}\n"
-                              "<b>Leechers:</b> {torrent['leecher']}\n"
-                              "<code>{torrent['magnet']}</code>")
+                              f"<b>Size:</b> {torrent['size']}\n"
+                              f"<b>Seeders:</b> {torrent['seeder']}\n"
+                              f"<b>Leechers:</b> {torrent['leecher']}\n"
+                              f"<code>{torrent['magnet']}</code>")
                     await message.edit(text=reply_, parse_mode="html")
                 except Exception:
                     pass
