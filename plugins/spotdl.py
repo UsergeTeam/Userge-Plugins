@@ -10,7 +10,7 @@ from userge.plugins.misc.upload import audio_upload
     'header': "Spotify Downloader",
     'description': "Download Songs via Spotify Links"
                    " or just by giving song names. ",
-    'usage': "TODO lol, lemme how this plugin ends to be"})
+    'usage': "{tr}spotdl [Spotify Link or Song Name]|[Quality (optional)]"})
 async def spotify_dl(message: Message):
     await message.edit("Checking? 🧐😳🤔🤔")
     cmd = ''
@@ -18,21 +18,21 @@ async def spotify_dl(message: Message):
     song_n = ''
     quality = "mp3"
     try:
-        input, quality = message.input_str.split("|")
+        input_, quality = message.input_str.split("|")
         if 'spotify.com' in input:
-            await message.edit("Link, Hmm")
-            link = input
+            await message.edit("Link, Hmm, Make sure to give valid one")
+            link = input_
         else:
-            await message.edit("🤔Song?")
-            song_n = input
+            await message.edit("🤔Song? Searching...")
+            song_n = input_
     except ValueError:
-        input = message.input_str
+        input_ = message.input_str
         if 'spotify.com' in input:
-            await message.edit("Link, Hmm")
-            link = input
+            await message.edit("Link, Hmm, Make sure to gave valid one")
+            link = input_
         else:
-            await message.edit("🤔Song?")
-            song_n = input
+            await message.edit("🤔Song? Searching....")
+            song_n = input_
 
     file_n = f"spotify_dl.{quality}"
     path = os.path.join(Config.DOWN_PATH, file_n)
@@ -40,9 +40,10 @@ async def spotify_dl(message: Message):
         if 'track/' in link:
             song_n = link
         if not song_n:
+            await message.edit("Selling Brain is not yet Legalized")
             return
         await message.edit("Downloading")
-        quality = quality.strip()
+        quality = quality.strip() # Just for Precautions 🤷‍♂
         cmd = f"spotdl --song {song_n} -o {quality} -f {path}"
     if cmd:
         stdout, stderr = (await runcmd(cmd))[:2]
