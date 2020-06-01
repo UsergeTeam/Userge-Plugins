@@ -1,7 +1,9 @@
 import os
+from datetime import datetime
+
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+
 from userge.utils import take_screen_shot
 from userge import userge, Message, Config
 
@@ -13,8 +15,8 @@ from userge import userge, Message, Config
 async def google_rs(message: Message):
     start = datetime.now()
     dis_loc = ''
-    BASE_URL = "http://www.google.com"
-    OUTPUT_STR = "Reply to an image to do Google Reverse Search"
+    base_url = "http://www.google.com"
+    out_str = "Reply to an image to do Google Reverse Search"
     if message.reply_to_message:
         await message.edit("Downloading Media to my Local")
         message_ = message.reply_to_message
@@ -36,12 +38,12 @@ async def google_rs(message: Message):
                 return
             dis_loc = img_file
         if dis_loc:
-            SEARCH_URL = "{}/searchbyimage/upload".format(BASE_URL)
+            search_url = "{}/searchbyimage/upload".format(base_url)
             multipart = {
                 "encoded_image": (dis_loc, open(dis_loc, "rb")),
                 "image_content": ""
             }
-            google_rs_response = requests.post(SEARCH_URL, files=multipart, allow_redirects=False)
+            google_rs_response = requests.post(search_url, files=multipart, allow_redirects=False)
             the_location = google_rs_response.headers.get("Location")
             os.remove(dis_loc)
         else:
@@ -55,16 +57,16 @@ async def google_rs(message: Message):
         soup = BeautifulSoup(response.text, "html.parser")
         prs_div = soup.find_all("div", {"class": "r5a77d"})[0]
         prs_anchor_element = prs_div.find("a")
-        prs_url = BASE_URL + prs_anchor_element.get("href")
+        prs_url = base_url + prs_anchor_element.get("href")
         prs_text = prs_anchor_element.text
         img_size_div = soup.find(id="jHnbRc")
         img_size = img_size_div.find_all("div")
         end = datetime.now()
         ms = (end - start).seconds
-        OUTPUT_STR = """{img_size}
+        out_str = f"""{img_size}
 
 <b>Possible Related Search</b>: <a href="{prs_url}">{prs_text}</a>
 <b>More Info</b>: Open this <a href="{the_location}">Link</a>
 
-<b>Time Taken</b>: {ms} seconds""".format(**locals())
-    await message.edit(OUTPUT_STR, parse_mode="HTML", disable_web_page_preview=True)
+<b>Time Taken</b>: {ms} seconds"""
+    await message.edit(out_str, parse_mode="HTML", disable_web_page_preview=True)

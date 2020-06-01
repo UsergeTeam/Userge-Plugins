@@ -1,20 +1,16 @@
-import asyncio
-import io
 import os
 import time
+import asyncio
 from datetime import datetime
-from hachoir.metadata import extractMetadata
-from hachoir.parser import createParser
-from userge import userge, Message, Config
-from userge.utils import progress, humanbytes
 
+from userge import userge, Message, Config
+from userge.utils import progress
 
 FF_MPEG_DOWN_LOAD_MEDIA_PATH = "/app/downloads/userge.media.ffmpeg"
 
 
 @userge.on_cmd("ffmpegsave", about={'header': "Save a media that is to be used in ffmpeg"})
-async def ff_mpeg_trim_cmd(message: Message):
-     
+async def ffmpegsave(message: Message):
     if not os.path.exists(FF_MPEG_DOWN_LOAD_MEDIA_PATH):
         if not os.path.isdir(Config.DOWN_PATH):
             os.makedirs(Config.DOWN_PATH)
@@ -33,30 +29,35 @@ async def ff_mpeg_trim_cmd(message: Message):
                     )
                 )
             except Exception as e:  # pylint:disable=C0103,W0703
-                await event.edit(str(e))
+                await message.edit(str(e))
             else:
                 end = datetime.now()
                 ms = (end - start).seconds
-                await message.edit("Downloaded to `{}` in {} seconds.".format(downloaded_file_name, ms))
+                await message.edit(
+                    "Downloaded to `{}` in {} seconds.".format(downloaded_file_name, ms))
         else:
             await message.edit("Reply to a Telegram media file")
     else:
-        await message.edit(f"a media file already exists in path. Please remove the media and try again!\n`.term rm {FF_MPEG_DOWN_LOAD_MEDIA_PATH}`")
+        await message.edit(
+            "a media file already exists in path. "
+            f"Please remove the media and try again!\n`.term rm {FF_MPEG_DOWN_LOAD_MEDIA_PATH}`")
 
 
 @userge.on_cmd("ffmpegtrim", about={
     'header': "Trim a given media",
     'usage': "{tr}ffmpegtrim [start time] [end time]"})
-async def ff_mpeg_trim_cmd(message: Message):
+async def ffmpegtrim(message: Message):
     if not os.path.exists(FF_MPEG_DOWN_LOAD_MEDIA_PATH):
-        await message.edit(f"a media file needs to be downloaded, and saved to the following path: `{FF_MPEG_DOWN_LOAD_MEDIA_PATH}`")
+        await message.edit(
+            "a media file needs to be downloaded, and saved to the "
+            f"following path: `{FF_MPEG_DOWN_LOAD_MEDIA_PATH}`")
         return
     current_message_text = message.text
     cmt = current_message_text.split(" ")
     start = datetime.now()
     if len(cmt) == 3:
         # output should be video
-        cmd, start_time, end_time = cmt
+        _, start_time, end_time = cmt
         o = await cult_small_video(
             FF_MPEG_DOWN_LOAD_MEDIA_PATH,
             Config.DOWN_PATH,
@@ -64,7 +65,6 @@ async def ff_mpeg_trim_cmd(message: Message):
             end_time
         )
         try:
-            c_time = time.time()
             await userge.send_video(
                 chat_id=message.chat.id,
                 video=o,
@@ -75,7 +75,7 @@ async def ff_mpeg_trim_cmd(message: Message):
             await message.edit(str(e))
     elif len(cmt) == 2:
         # output should be image
-        cmd, start_time = cmt
+        _, start_time = cmt
         o = await take_screen_shot(
             FF_MPEG_DOWN_LOAD_MEDIA_PATH,
             Config.DOWN_PATH,
@@ -83,7 +83,6 @@ async def ff_mpeg_trim_cmd(message: Message):
         )
 
         try:
-            c_time = time.time()
             await userge.send_photo(
                 chat_id=message.chat.id,
                 photo=o,
@@ -122,15 +121,13 @@ async def take_screen_shot(video_file, output_directory, ttl):
         stderr=asyncio.subprocess.PIPE,
     )
     # Wait for the subprocess to finish
-    stdout, stderr = await process.communicate()
-    e_response = stderr.decode().strip()
-    t_response = stdout.decode().strip()
+    await process.communicate()
     if os.path.lexists(out_put_file_name):
         return out_put_file_name
-    else:
-        return None
+    return None
 
 # https://github.com/Nekmo/telegram-upload/blob/master/telegram_upload/video.py#L26
+
 
 async def cult_small_video(video_file, output_directory, start_time, end_time):
     # https://stackoverflow.com/a/13891070/4723940
@@ -157,11 +154,7 @@ async def cult_small_video(video_file, output_directory, start_time, end_time):
         stderr=asyncio.subprocess.PIPE,
     )
     # Wait for the subprocess to finish
-    stdout, stderr = await process.communicate()
-    e_response = stderr.decode().strip()
-    t_response = stdout.decode().strip()
+    await process.communicate()
     if os.path.lexists(out_put_file_name):
         return out_put_file_name
-    else:
-
-        return None
+    return None

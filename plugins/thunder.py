@@ -1,5 +1,3 @@
-
-
 from asyncio import sleep
 from collections import deque
 from userge import userge, Message
