@@ -4,3 +4,4 @@ Google-Images-Search
 justwatch
 lottie
 lyrics-extractor
+spotdl
