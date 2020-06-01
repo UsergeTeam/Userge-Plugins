@@ -10,14 +10,16 @@ from userge.utils import progress, take_screen_shot, runcmd
 
 @userge.on_cmd("mmf", about={
     'header': "Memify aka Geyify (๑¯ω¯๑)",
-    'description': "Write text on any gif/sticker/image. Top and bottom text are separated by ; \n Naw gu Awey",
+    'description': "Write text on any gif/sticker/image. "
+                   "Top and bottom text are separated by ; \n Naw gu Awey",
     'usage': "{tr}mmf [text on top] ; [text on bottom] as a reply.",
     'examples': "Gwad who needs examples for this"})
 async def memify(message: Message):
     replied = message.reply_to_message
     if not replied:
         await message.err("LMAO no one's gonna help you, if u use .help now then u **Gey**")
-        await userge.send_sticker(sticker="CAADAQADhAAD3gkwRviGxMVn5813FgQ", chat_id=message.chat.id)
+        await userge.send_sticker(
+            sticker="CAADAQADhAAD3gkwRviGxMVn5813FgQ", chat_id=message.chat.id)
         return
     if not (replied.photo or replied.sticker or replied.animation):
         await message.err("Bruh, U Comedy me? Read help or gtfo (¬_¬)")

@@ -1,6 +1,8 @@
 import os
 import shutil
+
 import deezloader
+
 from userge import userge, Message
 
 ARL_TOKEN = os.environ.get("ARL_TOKEN", None)
@@ -106,18 +108,18 @@ async def deezload(message: Message):
                 chat_id=message.chat.id,
                 audio=track
             )
-        except:
+        except Exception:
             await message.edit("Song not Found 🚫")
     await message.delete()
     shutil.rmtree(PATH, ignore_errors=True)
 
 
-async def proper_trackdl(link, qual, msg, client, dir, u):
+async def proper_trackdl(link, qual, msg, client, dir_, u):
     if 'spotify' in link:
         await msg.edit("Trying to download song via Spotify Link 🥴")
         track = client.download_trackspo(
             link,
-            output=dir,
+            output=dir_,
             quality=qual,
             recursive_quality=True,
             recursive_download=True,
@@ -132,7 +134,7 @@ async def proper_trackdl(link, qual, msg, client, dir, u):
         await msg.edit("Trying to download song via Deezer Link 🥴")
         track = client.download_trackdee(
             link,
-            output=dir,
+            output=dir_,
             quality=qual,
             recursive_quality=True,
             recursive_download=True,
@@ -145,14 +147,14 @@ async def proper_trackdl(link, qual, msg, client, dir, u):
         )
 
 
-async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
+async def batch_dl(link, qual, msg, client, dir_, u, allow_zip):
     if 'spotify' in link:
         if 'album/' in link:
             await msg.edit("Trying to download album 🤧")
             if allow_zip:
                 _, zip_ = client.download_albumspo(
                     link,
-                    output=dir,
+                    output=dir_,
                     quality=qual,
                     recursive_quality=True,
                     recursive_download=True,
@@ -167,7 +169,7 @@ async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
             else:
                 album_list = client.download_albumspo(
                     link,
-                    output=dir,
+                    output=dir_,
                     quality=qual,
                     recursive_quality=True,
                     recursive_download=True,
@@ -184,7 +186,7 @@ async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
             if allow_zip:
                 _, zip_ = client.download_playlistspo(
                     link,
-                    output=dir,
+                    output=dir_,
                     quality=qual,
                     recursive_quality=True,
                     recursive_download=True,
@@ -199,7 +201,7 @@ async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
             else:
                 album_list = client.download_playlistspo(
                     link,
-                    output=dir,
+                    output=dir_,
                     quality=qual,
                     recursive_quality=True,
                     recursive_download=True,
@@ -219,7 +221,7 @@ async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
             if allow_zip:
                 _, zip_ = client.download_albumdee(
                     link,
-                    output=dir,
+                    output=dir_,
                     quality=qual,
                     recursive_quality=True,
                     recursive_download=True,
@@ -234,7 +236,7 @@ async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
             else:
                 album_list = client.download_albumdee(
                     link,
-                    output=dir,
+                    output=dir_,
                     quality=qual,
                     recursive_quality=True,
                     recursive_download=True,
@@ -252,7 +254,7 @@ async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
             if allow_zip:
                 _, zip_ = client.download_playlistdee(
                     link,
-                    output=dir,
+                    output=dir_,
                     quality=qual,
                     recursive_quality=True,
                     recursive_download=True,
@@ -267,7 +269,7 @@ async def batch_dl(link, qual, msg, client, dir, u, allow_zip):
             else:
                 album_list = client.download_playlistdee(
                     link,
-                    output=dir,
+                    output=dir_,
                     quality=qual,
                     recursive_quality=True,
                     recursive_download=True,

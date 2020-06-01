@@ -3,8 +3,9 @@
 # Author: Sumanjay (https://github.com/cyberboysumanjay) (@cyberboysumanjay)
 # All rights reserved.
 
-from userge import userge, Message
 import requests
+
+from userge import userge, Message
 
 
 @userge.on_cmd("carb", about={
@@ -12,11 +13,11 @@ import requests
     'usage': "{tr}carb [text or reply to msg | theme-name | colour code]",
     'examples': "{tr}carb Carbon Plugin by Sumanjay | one-dark | #FF0000",
     'themes': "`3024-night`, `a11y-dark`, `blackboard`, `base16-dark`, `base16-light`"
-    "`cobalt`, `dracula`, `duotone-dark`, `hopscotch`, `lucario`, `material`"
-    "`monokai`, `night-owl`, `nord`, `oceanic-next`, `one-light`, `one-dark`"
-    "`panda-syntax`, `paraiso-dark`, `seti`, `shades-of-purple`, `solarized-dark`"
-    "`solarized-light`, `synthwave-84`, `twilight`, `verminal`, `vscode`"
-    "`yeti`, `zenburn`"})
+              "`cobalt`, `dracula`, `duotone-dark`, `hopscotch`, `lucario`, `material`"
+              "`monokai`, `night-owl`, `nord`, `oceanic-next`, `one-light`, `one-dark`"
+              "`panda-syntax`, `paraiso-dark`, `seti`, `shades-of-purple`, `solarized-dark`"
+              "`solarized-light`, `synthwave-84`, `twilight`, `verminal`, `vscode`"
+              "`yeti`, `zenburn`"})
 async def carb(message: Message):
     # Setting Default Theme and Background Colour
     theme = 'dracula'

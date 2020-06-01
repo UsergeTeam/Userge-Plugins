@@ -1,7 +1,9 @@
-import heroku3
-import requests
 import math
 import asyncio
+
+import heroku3
+import requests
+
 from userge import Config, userge, Message
 
 # ================= CONSTANT =================
@@ -21,8 +23,7 @@ async def usage(message: Message):
     await message.edit("`Processing...`")
     useragent = ('Mozilla/5.0 (Linux; Android 10; SM-G975F) '
                  'AppleWebKit/537.36 (KHTML, like Gecko) '
-                 'Chrome/80.0.3987.149 Mobile Safari/537.36'
-                 )
+                 'Chrome/80.0.3987.149 Mobile Safari/537.36')
     u_id = Heroku.account().id
     headers = {
         'User-Agent': useragent,
@@ -60,12 +61,11 @@ async def usage(message: Message):
 
     await asyncio.sleep(1.5)
 
-    return await message.edit("**Dyno Usage:**\n\n"
-                              f" -> `Dyno usage for`  **{HEROKU_APP_NAME}**:\n"
-                              f"     •  `{AppHours}`**h**  `{AppMinutes}`**m**  "
-                              f"**|**  [`{AppPercentage}`**%**]"
-                              "\n"
-                              " -> `Dyno hours quota remaining this month`:\n"
-                              f"     •  `{hours}`**h**  `{minutes}`**m**  "
-                              f"**|**  [`{percentage}`**%**]"
-                              )
+    await message.edit("**Dyno Usage:**\n\n"
+                       f" -> `Dyno usage for`  **{HEROKU_APP_NAME}**:\n"
+                       f"     •  `{AppHours}`**h**  `{AppMinutes}`**m**  "
+                       f"**|**  [`{AppPercentage}`**%**]"
+                       "\n"
+                       " -> `Dyno hours quota remaining this month`:\n"
+                       f"     •  `{hours}`**h**  `{minutes}`**m**  "
+                       f"**|**  [`{percentage}`**%**]")
