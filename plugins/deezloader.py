@@ -86,7 +86,7 @@ async def deezload(message: Message):
     elif '-ddl' in flags:
         if 'track/' in input_link:
             await proper_trackdl(input_link, quality, message, loader, PATH, userge)
-        elif 'album/' or 'playlist' in input_link:
+        elif 'album/' or 'playlist/' in input_link:
             await batch_dl(input_link, quality, message, loader, PATH, userge, to_zip)
 
     if '-dsong' in flags:
