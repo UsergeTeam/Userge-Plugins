@@ -43,7 +43,7 @@ async def spotify_dl(message: Message):
             await message.edit("Selling Brain is not yet Legalized")
             return
         await message.edit("Downloading")
-        quality = quality.strip() # Just for Precautions 🤷‍♂
+        quality = quality.strip()  # Just for Precautions 🤷‍♂
         cmd = f"spotdl --song {song_n} -o {quality} -f {path}"
     if cmd:
         stdout, stderr = (await runcmd(cmd))[:2]
