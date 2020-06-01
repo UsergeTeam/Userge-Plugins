@@ -18,7 +18,7 @@ async def google_rs(message: Message):
     if message.reply_to_message:
         await message.edit("Downloading Media to my Local")
         message_ = message.reply_to_message
-        if message_.sticker.file_name.endswith('.tgs'):
+        if message_.sticker and message_.sticker.file_name.endswith('.tgs'):
             await message.edit('Bruh, Searching Animated Sticker is no(T YET) implemented')
             return
         if message_.photo or message_.animation or message_.sticker:
