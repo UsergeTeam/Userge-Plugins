@@ -50,6 +50,6 @@ async def spotify_dl(message: Message):
         if not os.path.lexists(path):
             await message.err("Download Failed")
             raise Exception(stdout + stderr)
-        elif os.path.lexists:
+        if os.path.lexists:
             await message.delete()
             await audio_upload(message.chat.id, Path(path), True)
