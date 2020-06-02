@@ -17,17 +17,17 @@ async def spotify_dl(message: Message):
     link = ''
     song_n = ''
     quality = "mp3"
-    try:
+    if "|" in message.input_str:
         input_, quality = message.input_str.split("|")
-        if 'spotify.com' in input:
+        if 'spotify.com' in input_:
             await message.edit("Link, Hmm, Make sure to give valid one")
             link = input_
         else:
             await message.edit("🤔Song? Searching...")
             song_n = input_
-    except ValueError:
+    else:
         input_ = message.input_str
-        if 'spotify.com' in input:
+        if 'spotify.com' in input_:
             await message.edit("Link, Hmm, Make sure to gave valid one")
             link = input_
         else:
