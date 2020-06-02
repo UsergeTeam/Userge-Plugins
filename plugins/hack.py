@@ -2,7 +2,7 @@
 
 import asyncio
 
-from userge import userge, Message
+from userge import userge
 
 
 @userge.on_cmd("hack$", about={'header': "kensar hacking animation"})
