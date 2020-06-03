@@ -33,7 +33,7 @@ option and for "Sites to search" option select "Search the entire
     'usage': "{tr}gimg [Query]",
     'examples': "{tr}gimg Dogs"})
 async def google_img(message: Message):
-    if GCS_API_KEY and GCS_IMAGE_E_ID is None:
+    if (GCS_API_KEY and GCS_IMAGE_E_ID) is None:
         await message.edit(REQ_ERR)
         return
     fetcher = GIS(GCS_API_KEY, GCS_IMAGE_E_ID)
