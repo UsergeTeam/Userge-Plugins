@@ -30,7 +30,11 @@ ENABLED_CHATS = []
 CUSTOM_REPLIES = []
 
 LYDIA_API_INFO = """This module uses Lydia AI 
-Powered by CoffeeHouse API created by @Intellivoid."""
+Powered by CoffeeHouse API created by @Intellivoid.
+
+Lydia is a Active Machine Learning Chat Bot. 
+Which can adapt to current user and chat with user
+on any given topic. """
 
 
 async def _init():
