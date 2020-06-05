@@ -131,7 +131,7 @@ async def lydia_session(message: Message):
             await message.edit("`creating new session...`")
             ses = LYDIA.create_session("en")
             await LYDIA_CHATS.insert_one(
-                {'_id': user_id, 'session_id': ses.id, 'session_exp': ses.expires, 'active': True})
+                {'_id': chat_id, 'session_id': ses.id, 'session_exp': ses.expires, 'active': True})
             ACTIVE_CHATS[chat_id] = (ses.id, ses.expires)
         else:
             await message.edit("`activating session...`")
