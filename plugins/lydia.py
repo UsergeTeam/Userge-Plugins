@@ -144,7 +144,7 @@ async def lydia_session(message: Message):
         for chat_id in ENABLED_CHATS:
             chat_ = await userge.get_chat(chat_id)
             title = chat_.title
-            msg += "{title} {chat_id}\n"
+            msg += f"{title} {chat_id}\n"
         await message.edit_or_send_as_file(msg)
 
     if '-list' in message.flags:
