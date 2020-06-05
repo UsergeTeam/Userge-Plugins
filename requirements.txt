@@ -1,4 +1,5 @@
 cairosvg
+coffeehouse
 deezloader
 Google-Images-Search
 justwatch
