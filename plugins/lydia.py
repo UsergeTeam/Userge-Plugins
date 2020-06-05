@@ -59,7 +59,7 @@ async def custom_media_reply(message, client):
         if cus_msg.sticker:
             await message.reply_sticker(cus_msg.sticker.file_id)
         if (cus_msg.photo or cus_msg.video or cus_msg.animation):
-            dls = await userge.download_media(message=cus_msg, file_name=Config.DOWN_PATH)
+            dls = await client.download_media(message=cus_msg, file_name=Config.DOWN_PATH)
             dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
             if cus_msg.photo:
                 await message.reply_photo(dls_loc)
@@ -90,7 +90,7 @@ async def custom_media_reply(message, client):
 async def lydia_session(message: Message):
     if CH_LYDIA_API is None:
         await message.edit(
-            "Please Configure `CH_LYDIA_API`"
+            "Please Configure `CH_LYDIA_API` & `CUSTOM_REPLY_CHANNEL`"
             "\n\nAll Instructions are available"
             " in @UnofficialPluginsHelp")
 
