@@ -178,7 +178,8 @@ async def lydia_ai_chat(message: Message):
                     ses_id = ses.id
                     ses_exp = ses.expires
                     await LYDIA_SESSION.find_one_and_update(
-                        {'uid': "LYDIA_SES"}, {"$set": {'session_id': ses_id, 'session_exp': ses_exp}})
+                        {'uid': "LYDIA_SES"},
+                        {"$set": {'session_id': ses_id, 'session_exp': ses_exp}})
                 try:
                     output_ = lydia.think_thought(ses_id, mess_text)
                     await message.reply_chat_action("typing")
