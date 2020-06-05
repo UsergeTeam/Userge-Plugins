@@ -106,7 +106,7 @@ async def lydia_session(message: Message):
             ACTIVE_CHATS[user_id] = (ses.id, ses.expires)
         else:
             await message.edit("`activating session...`")
-            await LYDIA_CHATS.update_one({'_id': user_id}, {'active': True})
+            await LYDIA_CHATS.update_one({'_id': user_id}, {"$set": {'active': True}})
             ACTIVE_CHATS[user_id] = (data['session_id'], data['session_exp'])
         await message.edit("`AI Enabled for Replied User`", del_in=2)
 
@@ -116,7 +116,7 @@ async def lydia_session(message: Message):
             await message.edit("How to delete a thing that doesn't Exist?", del_in=5)
             return
         await message.edit("`disactivating session...`")
-        await LYDIA_CHATS.update_one({'_id': user_id}, {'active': False})
+        await LYDIA_CHATS.update_one({'_id': user_id}, {"$set": {'active': False}})
         del ACTIVE_CHATS[user_id]
         await message.edit("`AI Disable for Replied User`", del_in=5)
 
@@ -135,7 +135,7 @@ async def lydia_session(message: Message):
             ACTIVE_CHATS[chat_id] = (ses.id, ses.expires)
         else:
             await message.edit("`activating session...`")
-            await LYDIA_CHATS.update_one({'_id': chat_id}, {'active': True})
+            await LYDIA_CHATS.update_one({'_id': chat_id}, {"$set": {'active': True}})
             ACTIVE_CHATS[chat_id] = (data['session_id'], data['session_exp'])
         await message.edit("`AI Enabled in Current Chat :D`")
 
@@ -145,7 +145,7 @@ async def lydia_session(message: Message):
             await message.edit("AI wasn't enabled in current chat. >:(", del_in=5)
             return
         await message.edit("`disactivating session...`")
-        await LYDIA_CHATS.update_one({'_id': chat_id}, {'active': False})
+        await LYDIA_CHATS.update_one({'_id': chat_id}, {"$set": {'active': False}})
         del ACTIVE_CHATS[chat_id]
         await message.edit("`AI Disabled in Current Chat`", del_in=5)
 
