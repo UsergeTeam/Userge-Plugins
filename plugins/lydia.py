@@ -20,7 +20,7 @@ LYDIA_SESSION = get_collection("LYDIA_SESSION")
 LYDIA_EUL = get_collection("LYDIA_ENABLED_USERS_LIST")
 LYDIA_GRP = get_collection("LYDIA_ENABLED_GROUPS")
 CH_LYDIA_API = os.environ.get("CH_LYDIA_API", None)
-CUSTOM_REPLY_CHANNEL = int(os.environ.get("CUSTOM_REPLY_CHANNEL", -100))
+CUSTOM_REPLY_CHANNEL = int(os.environ.get("CUSTOM_REPLY_CHANNEL", 0))
 if CH_LYDIA_API is not None:
     ch_api = API(CH_LYDIA_API)
     lydia = LydiaAI(ch_api)
