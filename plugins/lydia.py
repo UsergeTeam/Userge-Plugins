@@ -1,4 +1,4 @@
-# AI Chat Bot Module for @theUserge. 
+# AI Chat Bot Module for @theUserge.
 # Lydia AI Powered by CoffeeHouse from Intellivoid (Telegram: t.me/Intellivoid)
 # Author: Phyco-Ninja (https://github.com/Phyco-Ninja) (@PhycoNinja13b)
 # Thanks to @Intellivoid For Creating CoffeeHouse API
@@ -29,10 +29,10 @@ ACTIVE_USER_LIST = []
 ENABLED_CHATS = []
 CUSTOM_REPLIES = []
 
-LYDIA_API_INFO = """This module uses Lydia AI 
+LYDIA_API_INFO = """This module uses Lydia AI
 Powered by CoffeeHouse API created by @Intellivoid.
 
-Lydia is a Active Machine Learning Chat Bot. 
+Lydia is a Active Machine Learning Chat Bot.
 Which can adapt to current user and chat with user
 on any given topic. """
 
@@ -47,11 +47,11 @@ async def _init():
             CUSTOM_REPLIES.append(message)
 
 
-# A workaround for replies of Media as per now Lydia can't process Media input, 
-# And it's logical though. So this func will call custom message input by user 
-# saved in a channel and reply it to message. 
+# A workaround for replies of Media as per now Lydia can't process Media input,
+# And it's logical though. So this func will call custom message input by user
+# saved in a channel and reply it to message.
 # Idea arised from here (https://t.me/usergeot/157629) thnx 👍
-async def custom_media_reply(message, userge):
+async def custom_media_reply(message, client):
     global CUSTOM_REPLIES
     cus_msg = random.choice(CUSTOM_REPLIES)
     replied = message.message_id
@@ -66,7 +66,7 @@ async def custom_media_reply(message, userge):
             if cus_msg.video:
                 await message.reply_video(dls_loc)
             if cus_msg.animation:
-                await userge.send_animation(
+                await client.send_animation(
                     chat_id=message.chat.id,
                     animation=dls_loc,
                     unsave=True,
@@ -133,7 +133,7 @@ async def lydia_session(message: Message):
         chat_id = message.chat.id
         if await LYDIA_GRP.find_one_and_delete({'_cid': chat_id}):
             out = "AI Disabled in Current Chat"
-            if chat_id in ENABLED_CHAT:
+            if chat_id in ENABLED_CHATS:
                 ENABLED_CHATS.remove(chat_id)
         else:
             out = "AI wasn't enabled in current chat. >:("
