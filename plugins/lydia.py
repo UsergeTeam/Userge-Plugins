@@ -5,17 +5,17 @@
 # Author: Phyco-Ninja (https://github.com/Phyco-Ninja) (@PhycoNinja13b)
 # Thanks to @Intellivoid For Creating CoffeeHouse API
 
-
 import os
 import random
 import asyncio
-# from time import time
+from time import time
 
-from coffeehouse.lydia import LydiaAI
 from coffeehouse.api import API
+from coffeehouse.lydia import LydiaAI, Session
 from coffeehouse.exception import CoffeeHouseError
+from pyrogram.errors.exceptions.bad_request_400 import PeerIdInvalid
 
-from userge import userge, get_collection, Message, Filters, Config
+from userge import userge, get_collection, Message, Filters, Config, pool
 
 
 LYDIA_CHATS = get_collection("LYDIA_CHATS")
@@ -26,13 +26,14 @@ if CH_LYDIA_API is not None:
 
 ACTIVE_CHATS = {}
 CUSTOM_REPLIES = []
+QUEUE = asyncio.Queue()
 
 LYDIA_API_INFO = """This module uses Lydia AI
 Powered by CoffeeHouse API created by @Intellivoid.
 
 Lydia is a Active Machine Learning Chat Bot.
 Which can adapt to current user and chat with user
-on any given topic. """
+on any given topic."""
 
 
 async def _init():
@@ -48,7 +49,7 @@ async def _init():
 # saved in a channel and reply it to message.
 # Idea arised from here (https://t.me/usergeot/157629) thnx 👍
 async def custom_media_reply(message: Message):
-    global CUSTOM_REPLIES
+    """ custom reply handler """
     if CUSTOM_REPLIES:
         cus_msg = random.choice(CUSTOM_REPLIES)
         replied = message.message_id
@@ -84,23 +85,24 @@ async def custom_media_reply(message: Message):
               '-info': "Get Info about Lydia"},
     'usage': "{tr}lydia [flag] [reply to user]"})
 async def lydia_session(message: Message):
+    """ lydia command handler """
     if CH_LYDIA_API is None:
         await message.edit(
             "Please Configure `CH_LYDIA_API` & `CUSTOM_REPLY_CHANNEL`"
             "\n\nAll Instructions are available"
             " in @UnofficialPluginsHelp")
         return
-
+    await message.edit("`processing lydia...`")
     replied = message.reply_to_message
     if '-on' in message.flags and replied:
         user_id = replied.from_user.id
         if user_id in ACTIVE_CHATS:
-            await message.edit("AI is already Enabled on Replied User")
+            await message.edit("AI is already Enabled on Replied User", del_in=3)
             return
         data = await LYDIA_CHATS.find_one({'_id': user_id})
         if not data:
             await message.edit("`creating new session...`")
-            ses = LYDIA.create_session("en")
+            ses = await _create_lydia()
             await LYDIA_CHATS.insert_one(
                 {'_id': user_id, 'session_id': ses.id, 'session_exp': ses.expires, 'active': True})
             ACTIVE_CHATS[user_id] = (ses.id, ses.expires)
@@ -108,28 +110,26 @@ async def lydia_session(message: Message):
             await message.edit("`activating session...`")
             await LYDIA_CHATS.update_one({'_id': user_id}, {"$set": {'active': True}})
             ACTIVE_CHATS[user_id] = (data['session_id'], data['session_exp'])
-        await message.edit("`AI Enabled for Replied User`", del_in=2)
-
+        await message.edit("`AI Enabled for Replied User`", del_in=3)
     elif '-off' in message.flags and replied:
         user_id = replied.from_user.id
         if user_id not in ACTIVE_CHATS:
-            await message.edit("How to delete a thing that doesn't Exist?", del_in=5)
+            await message.edit("How to delete a thing that doesn't Exist?", del_in=3)
             return
         await message.edit("`disactivating session...`")
         await LYDIA_CHATS.update_one({'_id': user_id}, {"$set": {'active': False}})
         del ACTIVE_CHATS[user_id]
-        await message.edit("`AI Disable for Replied User`", del_in=5)
-
+        await message.edit("`AI Disable for Replied User`", del_in=3)
     # Group Features Won't be displayed in Help Info For Now 😉
     elif '-enagrp' in message.flags:
         chat_id = message.chat.id
         if chat_id in ACTIVE_CHATS:
-            await message.edit("AI is already Enabled on this chat")
+            await message.edit("AI is already Enabled on this chat", del_in=3)
             return
         data = await LYDIA_CHATS.find_one({'_id': chat_id})
         if not data:
             await message.edit("`creating new session...`")
-            ses = LYDIA.create_session("en")
+            ses = await _create_lydia()
             await LYDIA_CHATS.insert_one(
                 {'_id': chat_id, 'session_id': ses.id, 'session_exp': ses.expires, 'active': True})
             ACTIVE_CHATS[chat_id] = (ses.id, ses.expires)
@@ -137,18 +137,16 @@ async def lydia_session(message: Message):
             await message.edit("`activating session...`")
             await LYDIA_CHATS.update_one({'_id': chat_id}, {"$set": {'active': True}})
             ACTIVE_CHATS[chat_id] = (data['session_id'], data['session_exp'])
-        await message.edit("`AI Enabled in Current Chat :D`")
-
+        await message.edit("`AI Enabled in Current Chat :D`", del_in=3)
     elif '-disgrp' in message.flags:
         chat_id = message.chat.id
         if chat_id not in ACTIVE_CHATS:
-            await message.edit("AI wasn't enabled in current chat. >:(", del_in=5)
+            await message.edit("AI wasn't enabled in current chat. >:(", del_in=3)
             return
         await message.edit("`disactivating session...`")
         await LYDIA_CHATS.update_one({'_id': chat_id}, {"$set": {'active': False}})
         del ACTIVE_CHATS[chat_id]
-        await message.edit("`AI Disabled in Current Chat`", del_in=5)
-
+        await message.edit("`AI Disabled in Current Chat`", del_in=3)
     elif '-grps' in message.flags:
         msg = "**AI Enabled Chats**\n\n"
         for chat_id in ACTIVE_CHATS:
@@ -158,50 +156,88 @@ async def lydia_session(message: Message):
             title = chat_.title
             msg += f"{title} {chat_id}\n"
         await message.edit_or_send_as_file(msg)
-
     elif '-list' in message.flags:
         msg = "**AI Enabled User List**\n\n"
         for user_id in ACTIVE_CHATS:
             if str(user_id).startswith("-100"):
                 continue
-            u_info = await userge.get_user_dict(user_id)
-            u_men = u_info['mention']
-            msg += f"{u_men}\n"
+            try:
+                u_info = await userge.get_user_dict(user_id)
+                u_men = u_info['mention']
+                msg += f"{u_men}\n"
+            except PeerIdInvalid:
+                msg += f"[user](tg://user?id={user_id}) - `{user_id}`\n"
         await message.edit_or_send_as_file(msg)
-
     elif '-info' in message.flags:
-        await message.reply_photo(photo="resources/lydia.jpg", caption=LYDIA_API_INFO)
+        await asyncio.gather(
+            message.reply_photo(photo="resources/lydia.jpg", caption=LYDIA_API_INFO),
+            message.delete()
+        )
     else:
-        await message.reply_sticker("CAADAQAEAQAC0rXRRju3sbCT07jIFgQ")
+        await asyncio.gather(
+            message.reply_sticker("CAADAQAEAQAC0rXRRju3sbCT07jIFgQ"),
+            message.delete()
+        )
 
 
-@userge.on_filters(~Filters.me & (Filters.mentioned | Filters.private))
+@userge.on_filters(~Filters.me & ~Filters.edited & (Filters.mentioned | Filters.private))
 async def lydia_ai_chat(message: Message):
     """ incomming message handler """
     if CH_LYDIA_API is None:
         return
-    data = ACTIVE_CHATS.get(message.from_user.id, None) or ACTIVE_CHATS.get(message.chat.id, None)
+    data = ACTIVE_CHATS.get(message.from_user.id, None)
+    chat_id = message.from_user.id
+    if not data:
+        data = ACTIVE_CHATS.get(message.chat.id, None)
+        chat_id = message.chat.id
     if data:
-        if message.media:
-            await custom_media_reply(message)
-        else:
-            ses = LYDIA.get_session(data[0])
-            mess_text = message.text
-            # if int(ses_exp) < time():
-            #     ses = lydia.create_session("en")
-            #     ses_id = ses.id
-            #     ses_exp = ses.expires
-            #     await LYDIA_SESSION.find_one_and_update(
-            #         {'uid': "LYDIA_SES"},
-            #         {"$set": {'session_id': ses_id, 'session_exp': ses_exp}})
-            try:
-                output_ = LYDIA.think_thought(ses.id, mess_text)
-                await message.reply_chat_action("typing")
-                await asyncio.sleep(7)
-                await message.reply_chat_action("typing")
-                await asyncio.sleep(2)
-                await message.reply_chat_action("cancel")
-                await message.reply(output_)
-            except CoffeeHouseError:
-                pass
+        ses_id, ses_time = data
+        if int(ses_time) < time():
+            ses = await _create_lydia()
+            await LYDIA_CHATS.update_one(
+                {'_id': chat_id},
+                {"$set": {'session_id': ses.id, 'session_exp': ses.expires}})
+            ACTIVE_CHATS[chat_id] = (ses.id, ses.expires)
+            ses_id = ses.id
+        try:
+            out = ''
+            if not message.media and message.text:
+                out = await _think_lydia(ses_id, message.text)
+            QUEUE.put_nowait((message, out))
+        except CoffeeHouseError:
+            pass
     message.continue_propagation()
+
+
+@userge.add_task
+async def lydia_queue() -> None:
+    """ queue handler """
+    while True:
+        msg: Message
+        out: str
+        msg, out = await QUEUE.get()
+        if (msg is None) or (out is None):
+            break
+        if msg.media or not out:
+            await asyncio.sleep(1)
+            await custom_media_reply(msg)
+        else:
+            sleep_time = len(out) // 5
+            count = 0
+            while sleep_time > count:
+                if not count % 5:
+                    await msg.reply_chat_action("typing")
+                await asyncio.sleep(1)
+                count += 1
+            await msg.reply_chat_action("cancel")
+            await msg.reply(out)
+
+
+@pool.run_in_thread
+def _create_lydia() -> Session:
+    return LYDIA.create_session("en")
+
+
+@pool.run_in_thread
+def _think_lydia(ses_id: int, text: str) -> str:
+    return LYDIA.think_thought(ses_id, text)
