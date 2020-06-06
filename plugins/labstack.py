@@ -10,11 +10,8 @@ import math
 import asyncio
 import string
 import random
-import humanize
 from urllib.parse import unquote_plus
-
 from pySmartDL import SmartDL
-
 from userge import userge, Config, Message
 from userge.utils import progress, humanbytes
 
@@ -134,7 +131,7 @@ async def labstack(message: Message):
         link = (
             "https://up.labstack.com/api/v1/links/{}/receive".format(r['code']))
         await message.edit(f"**Filename**: `{filename}`\n**Size**: "
-                           f"`{humanize.naturalsize(filesize)}`\n\n"
+                           f"`{humanbytes(filesize)}`\n\n"
                            f"**Link**: {link}\n`Expires in 7 Days`")
     else:
         await message.edit("Request Failed!", del_in=5)
