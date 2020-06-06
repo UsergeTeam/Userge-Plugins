@@ -17,7 +17,7 @@ async def app(message: Message):
         final_name = '+'.join(remove_space)
         page = requests.get("https://play.google.com/store/search?q = "+final_name+"&c = apps")
 
-        soup = bs4.BeautifulSoup(page.content ,'lxml',
+        soup = bs4.BeautifulSoup(page.content,'lxml',
         from_encoding='utf-8')
         results = soup.findAll("div",
         "ZmHEEd")
@@ -32,7 +32,8 @@ async def app(message: Message):
         app_icon = results[0].findNext('div', 'Vpfmgd').findNext('div', 'uzcko').img['data-src']
         app_details = "<a href='" + app_icon + "'>📲&#8203;</a>"
         app_details += " <b>" + app_name + "</b>"
-        app_details += "\n\n<code>Developer :</code> <a href='" + app_dev_link + "'>" + app_dev + "</a>"
+        app_details += "\n\n<code>Developer :</code> <a href='" +
+        app_dev_link + "'>" + app_dev + "</a>"
         app_details += "\n<code>Rating :</code> "+app_rating.replace("Rated ",
         "⭐️ ").replace(" out of ",
         "/").replace(" stars", "", 1).replace(" stars", "⭐️").replace("five", "5")
