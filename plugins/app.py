@@ -8,7 +8,8 @@ import bs4
 from userge import userge, Message
 
 
-@userge.on_cmd("app", about={'header': "Search application details of any app in play store.\nPlugin By - @kirito6969"})
+@userge.on_cmd("app", about={'header': 
+      "Search application details of any app in play store.\nPlugin By - @kirito6969"})
 async def app(message: Message):
     try:
         app_name = message.input_str
