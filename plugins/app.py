@@ -3,8 +3,8 @@
 By - @kirito6969
 """
 import requests
-import bs4 
-import re
+import bs4
+
 from userge import userge, Message
 
 
