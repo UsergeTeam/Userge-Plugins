@@ -2,33 +2,24 @@
 # Author: Sumanjay (https://github.com/cyberboysumanjay) (@cyberboysumanjay)
 # All rights reserved.
 
-from datetime import datetime
 import os
 import requests
-import subprocess
 import time
-import json
-import sys
 import re
 import math
 import asyncio
 import string
 import random
 import humanize
-from pathlib import Path
 from urllib.parse import unquote_plus
-
 from pySmartDL import SmartDL
-from hachoir.metadata import extractMetadata
-from hachoir.parser import createParser
-from pyrogram.errors.exceptions import FloodWait
-
 from userge import userge, Config, Message
-from userge.utils import progress, take_screen_shot, humanbytes
+from userge.utils import progress, humanbytes
 
 
 @userge.on_cmd("labstack", about={
-    'header': "Uploads and shares files for free on Labstack, without any restriction on file size and speed.",
+    'header': "Uploads and shares files for free on Labstack,"
+    "without any restriction on file size and speed.",
     'usage': "{tr}labstack : [Direct Link | Reply to Telegram Media]",
     'examples': "{tr}labstack https://mirror.nforce.com/pub/speedtests/10mb.bin"}, del_pre=True)
 async def labstack(message: Message):
@@ -40,9 +31,7 @@ async def labstack(message: Message):
     dl_loc = ""
     if path_:
         is_url = re.search(r"(?:https?|ftp)://[^|\s]+\.[^|\s]+", path_)
-        del_path = False
         if is_url:
-            del_path = True
             await message.edit("`Downloading From URL...`")
             if not os.path.isdir(Config.DOWN_PATH):
                 os.mkdir(Config.DOWN_PATH)
@@ -127,7 +116,8 @@ async def labstack(message: Message):
         'up-user-id':
         user_id,
         'User-Agent':
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'
+        'Mozilla/5.0 (X11; Linux x86_64)'
+        'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'
     }
     r = requests.post(
         "https://up.labstack.com/api/v1/links", json=data, headers=headers).json()
@@ -141,6 +131,7 @@ async def labstack(message: Message):
     if (response.status_code) == 200:
         link = (
             "https://up.labstack.com/api/v1/links/{}/receive".format(r['code']))
-        await message.edit(f"**Filename**: `{filename}`\n**Size**: `{humanize.naturalsize(filesize)}`\n\n**Link**: {link}\n`Expires in 7 Days`")
+        await message.edit(f"**Filename**: `{filename}`\n**Size**: `{humanize.naturalsize(filesize)}`\n\n"
+                           f"**Link**: {link}\n`Expires in 7 Days`")
     else:
         await message.edit("Request Failed!", del_in=5)
