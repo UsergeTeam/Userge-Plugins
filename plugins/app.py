@@ -17,7 +17,7 @@ async def app(message: Message):
         final_name = '+'.join(remove_space)
         page = requests.get("https://play.google.com/store/search?q = " + final_name + "&c = apps")
 
-        soup = bs4.BeautifulSoup(page.content,' lxml',
+        soup = bs4.BeautifulSoup(page.content ,'lxml',
         from_encoding='utf-8')
         results = soup.findAll("div",
         "ZmHEEd")
