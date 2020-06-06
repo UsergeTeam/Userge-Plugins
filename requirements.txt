@@ -1,6 +1,7 @@
 cairosvg
 deezloader
 Google-Images-Search
+humanize
 justwatch
 lottie
 lyrics-extractor
