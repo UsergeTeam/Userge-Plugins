@@ -1,11 +1,15 @@
 from userge import userge, Message
 
-normal_char = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-              'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
-              'v', 'w', 'x', 'y', 'z']
-weeby_char = ['卂', '乃', '匚', '刀', '乇', '下', '厶', '卄', '工', '丁',
-             '长', '乚', '从', '𠘨', '口', '尸', '㔿', '尺', '丂', '丅', '凵',
-             'リ', '山', '乂', '丫', '乙']
+normal_char = [
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+    'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+    'v', 'w', 'x', 'y', 'z'
+]
+weeby_char = [
+    '卂', '乃', '匚', '刀', '乇', '下', '厶', '卄', '工', '丁',
+    '长', '乚', '从', '𠘨', '口', '尸', '㔿', '尺', '丂', '丅', '凵',
+    'リ', '山', '乂', '丫', '乙'
+]
 
 
 @userge.on_cmd("weebify", about={
@@ -15,8 +19,10 @@ weeby_char = ['卂', '乃', '匚', '刀', '乇', '下', '厶', '卄', '工', '�
 async def _weeb_text(message: Message):
     args = message.input_or_reply_str
     if not args:
-        await message.edit("try:\n    weebify\nexcept **Exception** as **Intelligence**:"
-            f"\n    print({message.from_user.first_name})")
+        await message.edit(
+            "try:\n    weebify\nexcept **Exception** as **Intelligence**:"
+            f"\n    print({message.from_user.first_name})"
+        )
         return
     str = ' '.join(args).lower()
     for nor_c in str:
