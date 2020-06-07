@@ -274,7 +274,7 @@ async def uload_tg(track: str, message: Message):
     if metadata.has("duration"):
         duration = metadata.get("duration").seconds
     if metadata.has("artist"):
-        # I don't know why Telegram calls it performer 
+        # I don't know why Telegram calls it performer
         performer = metadata.get("artist")
     if metadata.has("title"):
         title = metadata.get("title")
