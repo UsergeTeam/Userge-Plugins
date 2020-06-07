@@ -8,7 +8,7 @@ weeby_char = ['卂', '乃', '匚', '刀', '乇', '下', '厶', '卄', '工', '�
              '长', '乚', '从', '𠘨', '口', '尸', '㔿', '尺', '丂', '丅', '凵',
              'リ', '山', '乂', '丫', '乙']
 
-@userge.on_cmd("weebify", about!={
+@userge.on_cmd("weebify", about={
     'header': "Weebify",
     'description': "create text in a weeb style",
     'usage': "{tr}weebify [text | reply]"})
