@@ -36,6 +36,9 @@ async def google_img(message: Message):
     if (GCS_API_KEY and GCS_IMAGE_E_ID) is None:
         await message.edit(REQ_ERR, disable_web_page_preview=True)
         return
+    if os.path.exists(PATH):
+        shutil.rmtree(PATH, ignore_errors=True)
+
     fetcher = GIS(GCS_API_KEY, GCS_IMAGE_E_ID)
     query = message.input_str
     search = {'q': query,
