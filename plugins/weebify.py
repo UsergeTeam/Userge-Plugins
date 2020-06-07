@@ -24,9 +24,9 @@ async def _weeb_text(message: Message):
             f"\n    print({message.from_user.first_name})"
         )
         return
-    str = ' '.join(args).lower()
+    str_ = ' '.join(args).lower()
     for nor_c in str:
         if nor_c in normal_char:
             weeb_c = weeby_char[normal_char.index(nor_c)]
-            str = str.replace(nor_c, weeb_c)
+            str_ = str_.replace(nor_c, weeb_c)
     await message.edit(str)
