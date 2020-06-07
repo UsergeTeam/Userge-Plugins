@@ -3,6 +3,8 @@ import shutil
 
 import deezloader
 
+from hachoir.metadata import extractMetadata
+from hachoir.parser import createParser
 from userge import userge, Message
 
 ARL_TOKEN = os.environ.get("ARL_TOKEN", None)
@@ -104,9 +106,13 @@ async def deezload(message: Message):
                 not_interface=True
             )
             await message.edit("Song found, Now Uploading 📤")
+            metadata = extractMetadata(createParser(track))
             await userge.send_audio(
                 chat_id=message.chat.id,
-                audio=track
+                audio=track,
+                duration=metadata.get("duration").seconds,
+                performer=metadata.get("artist"),
+                title=metadata.get("title")
             )
         except Exception:
             await message.edit("Song not Found 🚫")
@@ -126,9 +132,13 @@ async def proper_trackdl(link, qual, msg, client, dir_, u):
             not_interface=True
         )
         await msg.edit("Now Uploading 📤")
+        metadata = extractMetadata(createParser(track))
         await u.send_audio(
             chat_id=msg.chat.id,
-            audio=track
+            audio=track,
+            duration=metadata.get("duration").seconds,
+            performer=metadata.get("artist"),
+            title=metadata.get("title")
         )
     elif 'deezer' in link:
         await msg.edit("Trying to download song via Deezer Link 🥴")
@@ -141,9 +151,13 @@ async def proper_trackdl(link, qual, msg, client, dir_, u):
             not_interface=True
         )
         await msg.edit("Now Uploading 📤")
+        metadata = extractMetadata(createParser(track))
         await u.send_audio(
             chat_id=msg.chat.id,
-            audio=track
+            audio=track,
+            duration=metadata.get("duration").seconds,
+            performer=metadata.get("artist"),
+            title=metadata.get("title")
         )
 
 
@@ -176,10 +190,14 @@ async def batch_dl(link, qual, msg, client, dir_, u, allow_zip):
                     not_interface=True,
                     zips=False)
                 await msg.edit("Uploading Tracks 📤")
-                for tracks in album_list:
+                for track in album_list:
+                    metadata = extractMetadata(createParser(track))
                     await u.send_audio(
                         chat_id=msg.chat.id,
-                        audio=tracks
+                        audio=track,
+                        duration=metadata.get("duration").seconds,
+                        performer=metadata.get("artist"),
+                        title=metadata.get("title")
                     )
         if 'playlist/' in link:
             await msg.edit("Trying to download Playlist 🎶")
@@ -209,10 +227,14 @@ async def batch_dl(link, qual, msg, client, dir_, u, allow_zip):
                     zips=False
                 )
                 await msg.edit("Uploading Tracks 📤")
-                for tracks in album_list:
+                for track in album_list:
+                    metadata = extractMetadata(createParser(track))
                     await u.send_audio(
                         chat_id=msg.chat.id,
-                        audio=tracks
+                        audio=track,
+                        duration=metadata.get("duration").seconds,
+                        performer=metadata.get("artist"),
+                        title=metadata.get("title")
                     )
 
     if 'deezer' in link:
@@ -244,10 +266,14 @@ async def batch_dl(link, qual, msg, client, dir_, u, allow_zip):
                     zips=False
                 )
                 await msg.edit("Uploading Tracks 📤")
-                for tracks in album_list:
+                for track in album_list:
+                    metadata = extractMetadata(createParser(track))
                     await u.send_audio(
                         chat_id=msg.chat.id,
-                        audio=tracks
+                        audio=track,
+                        duration=metadata.get("duration").seconds,
+                        performer=metadata.get("artist"),
+                        title=metadata.get("title")
                     )
         elif 'playlist/' in link:
             await msg.edit("Trying to download Playlist 🎶")
@@ -277,8 +303,12 @@ async def batch_dl(link, qual, msg, client, dir_, u, allow_zip):
                     zips=False
                 )
                 await msg.edit("Uploading Tracks 📤")
-                for tracks in album_list:
+                for track in album_list:
+                    metadata = extractMetadata(createParser(track))
                     await u.send_audio(
                         chat_id=msg.chat.id,
-                        audio=tracks
+                        audio=track,
+                        duration=metadata.get("duration").seconds,
+                        performer=metadata.get("artist"),
+                        title=metadata.get("title")
                     )
