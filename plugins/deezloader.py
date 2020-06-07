@@ -90,7 +90,7 @@ async def deezload(message: Message):
             await batch_dl(input_link, quality, message, loader, PATH, userge, to_zip)
     elif '-ddl' in flags:
         if 'track/' in input_link:
-            await proper_trackdl(input_link, quality, message, loader, PATH, userge)
+            await proper_trackdl(input_link, quality, message, loader, PATH)
         elif 'album/' or 'playlist/' in input_link:
             await batch_dl(input_link, quality, message, loader, PATH, userge, to_zip)
 
@@ -114,7 +114,7 @@ async def deezload(message: Message):
     shutil.rmtree(PATH, ignore_errors=True)
 
 
-async def proper_trackdl(link, qual, msg, client, dir_, u):
+async def proper_trackdl(link, qual, msg, client, dir_):
     if 'spotify' in link:
         await msg.edit("Trying to download song via Spotify Link 🥴")
         track = client.download_trackspo(
