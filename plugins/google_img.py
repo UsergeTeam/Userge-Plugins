@@ -1,6 +1,7 @@
 import os
 import shutil
 
+from pyrogram import InputMediaPhoto
 from google_images_search import GoogleImagesSearch as GIS
 
 from userge import userge, Message
@@ -54,10 +55,11 @@ async def google_img(message: Message):
     if not os.path.exists(PATH):
         await message.edit("Oops, No Results Found")
         return
+    ss = []
     for img in os.listdir(PATH):
         imgs = PATH + img
-        await userge.send_photo(
-            chat_id=message.chat.id,
-            photo=imgs)
+        ss.append(InputMediaPhoto(str(imgs)))
+    await message.reply_chat_action("upload_photo")
+    await message.reply_media_group(ss, True)
     shutil.rmtree(PATH, ignore_errors=True)
     await message.delete()
