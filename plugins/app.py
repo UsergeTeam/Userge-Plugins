@@ -17,7 +17,7 @@ async def app(message: Message):
         app_name = message.input_str
         remove_space = app_name.split(' ')
         final_name = '+'.join(remove_space)
-        page = requests.get("https://play.google.com/store/search?q = " + final_name + "&c=apps")
+        page = requests.get(f"https://play.google.com/store/search?q={final_name}&c=apps")
         soup = bs4.BeautifulSoup(page.content, 'lxml', from_encoding='utf-8')
         results = soup.findAll("div", "ZmHEEd")
         app_name = results[0].findNext('div', 'Vpfmgd').findNext('div', 'WsMG1c nnK0zc').text
@@ -38,7 +38,7 @@ async def app(message: Message):
                 " stars", "", 1).replace(" stars", "⭐️").replace("five", "5")
         app_details += "\n<code>Features :</code> <a href='" + app_link + "'>View in Play Store</a>"
         app_details += "\n\n===> @krishna_bolte <==="
-        await message.edit(app_details, disable_web_page_preview=False, parse_mode='HTML')
+        await message.edit(app_details, disable_web_page_preview=False, parse_mode='html')
     except IndexError:
         await message.edit("No result found in search. Please enter **Valid app name**")
     except Exception as err:

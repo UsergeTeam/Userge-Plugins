@@ -44,36 +44,6 @@ async def _init():
             CUSTOM_REPLIES.append(message)
 
 
-# A workaround for replies of Media as per now Lydia can't process Media input,
-# And it's logical though. So this func will call custom message input by user
-# saved in a channel and reply it to message.
-# Idea arised from here (https://t.me/usergeot/157629) thnx 👍
-async def custom_media_reply(message: Message):
-    """ custom reply handler """
-    if CUSTOM_REPLIES:
-        cus_msg = random.choice(CUSTOM_REPLIES)
-        replied = message.message_id
-        if cus_msg.media:
-            if cus_msg.sticker:
-                await message.reply_sticker(cus_msg.sticker.file_id)
-            if (cus_msg.photo or cus_msg.video or cus_msg.animation):
-                dls = await userge.download_media(message=cus_msg, file_name=Config.DOWN_PATH)
-                if cus_msg.photo:
-                    await message.reply_photo(dls)
-                if cus_msg.video:
-                    await message.reply_video(dls)
-                if cus_msg.animation:
-                    await userge.send_animation(
-                        chat_id=message.chat.id,
-                        animation=dls,
-                        unsave=True,
-                        reply_to_message_id=replied
-                    )
-                os.remove(dls)
-        if cus_msg.text:
-            await message.reply(cus_msg.text)
-
-
 @userge.on_cmd("lydia", about={
     'header': "Lydia AI Chat Bot",
     'description': "An AI Powered Chat Bot Module"
@@ -218,19 +188,55 @@ async def lydia_queue() -> None:
         msg, out = await QUEUE.get()
         if (msg is None) or (out is None):
             break
+        if msg.text:
+            await asyncio.sleep(len(msg.text) / 10)
         if msg.media or not out:
-            await asyncio.sleep(1)
-            await custom_media_reply(msg)
+            await _custom_media_reply(msg)
         else:
-            sleep_time = len(out) // 5
-            count = 0
-            while sleep_time > count:
-                if not count % 5:
-                    await msg.reply_chat_action("typing")
+            await _send_text_like_a_human(msg, out)
+
+
+# A workaround for replies of Media as per now Lydia can't process Media input,
+# And it's logical though. So this func will call custom message input by user
+# saved in a channel and reply it to message.
+# Idea arised from here (https://t.me/usergeot/157629) thnx 👍
+async def _custom_media_reply(message: Message):
+    if CUSTOM_REPLIES:
+        await asyncio.sleep(1)
+        cus_msg = random.choice(CUSTOM_REPLIES)
+        replied = message.message_id
+        if cus_msg.media:
+            if cus_msg.sticker:
                 await asyncio.sleep(1)
-                count += 1
-            await msg.reply_chat_action("cancel")
-            await msg.reply(out)
+                await message.reply_sticker(cus_msg.sticker.file_id)
+            if (cus_msg.photo or cus_msg.video or cus_msg.animation):
+                dls = await userge.download_media(message=cus_msg, file_name=Config.DOWN_PATH)
+                if cus_msg.photo:
+                    await message.reply_photo(dls)
+                if cus_msg.video:
+                    await message.reply_video(dls)
+                if cus_msg.animation:
+                    await userge.send_animation(
+                        chat_id=message.chat.id,
+                        animation=dls,
+                        unsave=True,
+                        reply_to_message_id=replied
+                    )
+                os.remove(dls)
+        if cus_msg.text:
+            await _send_text_like_a_human(message, cus_msg.text)
+
+
+async def _send_text_like_a_human(message: Message, text: str) -> None:
+    sleep_time = len(text) // 5 or 1
+    count = 0
+    while sleep_time > count:
+        if not count % 5:
+            await message.reply_chat_action("typing")
+        await asyncio.sleep(1)
+        count += 1
+    await message.reply_chat_action("cancel")
+    await message.reply(text)
 
 
 @pool.run_in_thread
@@ -239,5 +245,5 @@ def _create_lydia() -> Session:
 
 
 @pool.run_in_thread
-def _think_lydia(ses_id: int, text: str) -> str:
+def _think_lydia(ses_id: str, text: str) -> str:
     return LYDIA.think_thought(ses_id, text)
