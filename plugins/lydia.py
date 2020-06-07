@@ -171,6 +171,10 @@ async def lydia_ai_chat(message: Message):
             ses_id = ses.id
         try:
             out = ''
+            await userge.send_read_acknowledge(
+                chat_id=chat_id,
+                message=message,
+                clear_mentions=True)
             if not message.media and message.text:
                 out = await _think_lydia(ses_id, message.text)
             QUEUE.put_nowait((message, out))
