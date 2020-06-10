@@ -39,15 +39,20 @@ async def hii_(message: Message):
             paytext = args[0]
             filler = '✨'
     else:
-        await message.edit("`Don't feel bad. A lot of people have no brain! and they blame to others.`")
+        await message.edit(
+            "`Don't feel bad. A lot of people have no brain! and they blame to others.`")
         await message.reply_sticker(sticker="CAADAgADEAADTLa2EO03s8D-kSlOFgQ")
         return
     pay = "{}\n{}\n{}\n{}\n{}".format(
-    paytext  + filler * 2 + paytext + filler + paytext * 3,
-    paytext + filler * 2 + paytext + filler * 2 + paytext + filler,
-    paytext * 4 + filler * 2 + paytext + filler,
-    paytext + filler * 2 + paytext + filler * 2 + paytext + filler,
-    paytext + filler * 2 + paytext + filler + paytext * 3)
+        'paytext' + 'filler * 2' + 'paytext' +
+        'filler' + 'paytext * 3',
+        'paytext' + 'filler * 2' + 'paytext' +
+        'filler * 2' + 'paytext' + 'filler',
+        'paytext * 4' + 'filler * 2' + 'paytext + filler',
+        'paytext' + 'filler * 2' + 'paytext' +
+        'filler * 2' + 'paytext' + 'filler',
+        'paytext' + 'filler * 2' + 'paytext' +
+        'filler' + 'paytext * 3')
     await message.edit(pay)
 
 
@@ -85,14 +90,19 @@ async def lol_(message: Message):
             paytext = args[0]
             filler = '✨'
     else:
-        await message.edit("`Don't feel bad. A lot of people have no brain! and they blame to others.`")
+        await message.edit(
+            "`Don't feel bad. A lot of people have no brain! and they blame to others.`")
         await message.reply_sticker(sticker="CAADAgADEAADTLa2EO03s8D-kSlOFgQ")
         return
     pay = "{}\n{}\n{}\n{}".format(
-    paytext * 1 + filler * 3 + paytext * 3 + filler * 1 + paytext * 1 + filler * 2,
-    paytext * 1 + filler * 3 + paytext * 1 + filler * 1 + paytext * 1 + filler * 1 + paytext * 1 + filler * 2,
-    paytext * 1 + filler * 3 + paytext * 1 + filler * 1 + paytext * 1 + filler * 1 + paytext * 1 + filler * 2,
-    paytext * 3 + filler * 1 + paytext * 3 + filler * 1 + paytext * 3)
+        'paytext' + 'filler * 3' +
+        'paytext * 3' + 'filler' + 'paytext' + 'filler * 2',
+        'paytext' + 'filler * 3' +
+        'paytext' + 'filler' + 'paytext' + 'filler' +
+        'paytext' + 'filler * 2',
+        'paytext' + 'filler * 3' + 'paytext' + 'filler' +
+        'paytext' + 'filler' + 'paytext' + 'filler * 2',
+        'paytext * 3' + 'filler' + 'paytext * 3' + 'filler' + 'paytext * 3')
     await message.edit(pay)
 
 
@@ -129,12 +139,16 @@ async def wtf_(message: Message):
             paytext = args[0]
             filler = '✨'
     else:
-        await message.edit("`Don't feel bad. A lot of people have no brain! and they blame to others.`")
+        await message.edit(
+            "`Don't feel bad. A lot of people have no brain! and they blame to others.`")
         await message.reply_sticker(sticker="CAADAgADEAADTLa2EO03s8D-kSlOFgQ")
         return
     pay = "{}\n{}\n{}\n{}".format(
-    paytext + filler * 3 + paytext + filler + paytext * 3 + filler + paytext * 3,
-    paytext + filler + paytext + filler + paytext + filler * 2 + paytext + filler * 2 +paytext + filler * 2,
-    paytext * 2 + filler + paytext * 2 + filler * 2 + paytext + filler * 2 + paytext * 2 + filler,
-    paytext + filler * 3 + paytext + filler * 2 + paytext + filler * 2 + paytext + filler * 2)
+        'paytext' + 'filler * 3' + 'paytext' +
+        'filler' + 'paytext * 3' + 'filler' + 'paytext * 3',
+        'paytext' + 'filler' + 'paytext' + 'filler' + 'paytext' +
+        'filler * 2' + 'paytext' + 'filler * 2' + 'paytext' + 'filler * 2',
+        'paytext * 2' + 'filler' + 'paytext * 2' + 'filler * 2' + 'paytext' +
+        'filler * 2' + 'paytext * 2' + 'filler',
+        'paytext' + 'filler * 3' + 'paytext' + 'filler * 2' + 'paytext' + 'filler * 2' + 'paytext' + 'filler * 2')
     await message.edit(pay)
