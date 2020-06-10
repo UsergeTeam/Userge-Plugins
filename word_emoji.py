@@ -44,21 +44,21 @@ async def hii_(message: Message):
         await message.reply_sticker(sticker="CAADAgADEAADTLa2EO03s8D-kSlOFgQ")
         return
     pay = "{}\n{}\n{}\n{}\n{}".format(
-        'paytext' + 'filler * 2' + 'paytext' +
-        'filler' + 'paytext * 3',
-        'paytext' + 'filler * 2' + 'paytext' +
-        'filler * 2' + 'paytext' + 'filler',
-        'paytext * 4' + 'filler * 2' + 'paytext + filler',
-        'paytext' + 'filler * 2' + 'paytext' +
-        'filler * 2' + 'paytext' + 'filler',
-        'paytext' + 'filler * 2' + 'paytext' +
-        'filler' + 'paytext * 3')
+        paytext + filler*2 + paytext +
+        filler + paytext*3,
+        paytext + filler*2 + paytext +
+        filler*2 + paytext + filler,
+        paytext*4 + filler*2 + paytext + filler,
+        paytext + filler*2 + paytext +
+        filler*2 + paytext + filler,
+        paytext + filler*2 + paytext +
+        filler + paytext*3)
     await message.edit(pay)
 
 
-
 @userge.on_cmd("lol", about={
-    'header': "Lol also known as lots of laugh used to indicate smiling or slight amusement.\nplugin - @krishna_bolte",
+    'header': "Lol also known as lots of laugh used to indicate "
+              "smiling or slight amusement.\nplugin - @krishna_bolte",
     'flags': {'-bnw': "Show as black and white as background.",
               '-wnb': "Show as white and black as background.",
               '-dnb': "Show as drops and black as background.",
@@ -95,14 +95,14 @@ async def lol_(message: Message):
         await message.reply_sticker(sticker="CAADAgADEAADTLa2EO03s8D-kSlOFgQ")
         return
     pay = "{}\n{}\n{}\n{}".format(
-        'paytext' + 'filler * 3' +
-        'paytext * 3' + 'filler' + 'paytext' + 'filler * 2',
-        'paytext' + 'filler * 3' +
-        'paytext' + 'filler' + 'paytext' + 'filler' +
-        'paytext' + 'filler * 2',
-        'paytext' + 'filler * 3' + 'paytext' + 'filler' +
-        'paytext' + 'filler' + 'paytext' + 'filler * 2',
-        'paytext * 3' + 'filler' + 'paytext * 3' + 'filler' + 'paytext * 3')
+        paytext + filler*3 +
+        paytext*3 + filler + paytext + filler*2,
+        paytext + filler*3 +
+        paytext + filler + paytext + filler +
+        paytext + filler*2,
+        paytext + filler*3 + paytext + filler +
+        paytext + filler + paytext + filler*2,
+        paytext*3 + filler + paytext*3 + filler + paytext*3)
     await message.edit(pay)
 
 
@@ -144,11 +144,11 @@ async def wtf_(message: Message):
         await message.reply_sticker(sticker="CAADAgADEAADTLa2EO03s8D-kSlOFgQ")
         return
     pay = "{}\n{}\n{}\n{}".format(
-        'paytext' + 'filler * 3' + 'paytext' +
-        'filler' + 'paytext * 3' + 'filler' + 'paytext * 3',
-        'paytext' + 'filler' + 'paytext' + 'filler' + 'paytext' +
-        'filler * 2' + 'paytext' + 'filler * 2' + 'paytext' + 'filler * 2',
-        'paytext * 2' + 'filler' + 'paytext * 2' + 'filler * 2' + 'paytext' +
-        'filler * 2' + 'paytext * 2' + 'filler',
-        'paytext' + 'filler * 3' + 'paytext' + 'filler * 2' + 'paytext' + 'filler * 2' + 'paytext' + 'filler * 2')
+        paytext + filler*3 + paytext +
+        filler + paytext*3 + filler + paytext*3,
+        paytext + filler + paytext + filler + paytext +
+        filler*2 + paytext + filler*2 + paytext + filler*2,
+        paytext*2 + filler + paytext*2 + filler*2 + paytext +
+        filler*2 + paytext*2 + filler,
+        paytext + filler*3 + paytext + filler*2 + paytext + filler*2 + paytext + filler*2)
     await message.edit(pay)
