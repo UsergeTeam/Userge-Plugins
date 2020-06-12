@@ -93,9 +93,10 @@ async def imdb(message: Message):
     if os.path.exists(THUMB_PATH):
         await message.reply_photo(
             photo=THUMB_PATH,
-            caption=des_
+            caption=des_,
+            parse_mode="HTML"
         )
     else:
-        await message.edit(des_)
+        await message.edit(des_, parse_mode="HTML")
     except IndexError:
         await message.edit("Bruh, Plox enter **Valid movie name** kthx")
