@@ -10,7 +10,9 @@ from userge import userge, Message
 
 
 @userge.on_cmd("app", about={
-    'header': "Search application details of any app in play store.\nPlugin By - @kirito6969"})
+    'header': "Search application details of any app"
+              "in play store."
+              "Plugin by - @kirito6969 , @krishna_bolte"})
 async def app(message: Message):
     try:
         await message.edit("`searching...`")
@@ -37,7 +39,6 @@ async def app(message: Message):
             "Rated ", "⭐️ ").replace(" out of ", "/").replace(
                 " stars", "", 1).replace(" stars", "⭐️").replace("five", "5")
         app_details += "\n<code>Features :</code> <a href='" + app_link + "'>View in Play Store</a>"
-        app_details += "\n\n===> @krishna_bolte <==="
         await message.edit(app_details, disable_web_page_preview=False, parse_mode='html')
     except IndexError:
         await message.edit("No result found in search. Please enter **Valid app name**")
