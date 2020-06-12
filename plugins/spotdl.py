@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 
 from userge.utils import runcmd
-from userge import userge, Message, Config
+from userge import userge, Message
 from userge.plugins.misc.upload import audio_upload
 
 TEMP_DIR = "spotdl/"
@@ -13,8 +13,8 @@ TEMP_DIR = "spotdl/"
     'header': "Spotify Downloader",
     'description': "Download Songs via Spotify Links"
                    " or just by giving song names. ",
-    'usage': "{tr}spotdl [Spotify Link or Song Name]|[Quality (optional)]"
-    'examples': "{tr}spotdl })
+    'usage': "{tr}spotdl [Spotify Link or Song Name]|[Quality (optional)]",
+    'examples': "{tr}spotdl https://open.spotify.com/track/0Cy7wt6IlRfBPHXXjmZbcP|flac"})
 async def spotify_dl(message: Message):
     if not os.path.exists(TEMP_DIR):
         os.makedirs(TEMP_DIR)
@@ -40,7 +40,6 @@ async def spotify_dl(message: Message):
             await message.edit("🤔Song? Searching....")
             song_n = input_
 
-    path = os.path.join(Config.DOWN_PATH, file_n)
     if song_n or link:
         if 'track/' in link:
             song_n = link
@@ -57,6 +56,6 @@ async def spotify_dl(message: Message):
             raise Exception(stdout + stderr)
         if os.path.lexists:
             await message.delete()
-            for track in os.listdir(PATH):
+            for track in os.listdir(TEMP_DIR):
                 await audio_upload(message.chat.id, Path(track), True)
-    shutil.rmtree(PATH, ignore_errors=True)
+    shutil.rmtree(TEMP_DIR, ignore_errors=True)
