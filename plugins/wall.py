@@ -4,6 +4,7 @@ import requests
 from random import randint, choice
 import os
 
+
 CHANNEL = userge.getCLogger(__name__)
 
 async def dlimg(link):
@@ -89,7 +90,6 @@ async def idk_sir(message: Message):
     if message.input_str:
         qu = message.input_str
         await CHANNEL.log(f"Search Query : {qu}")
-        await userge.send_message(Config.LOG_CHANNEL_ID, logmesys)
         try:
             link = await wall(str(qu))
         except Exception as e:
