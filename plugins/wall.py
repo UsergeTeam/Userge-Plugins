@@ -72,6 +72,7 @@ async def wall(strin: str):
                     p = (li, titl)
                     tit_links.append(p)
             except Exception:
+                pass
             del list_a_s
             tit_link = choice(tit_links)
             return tit_link
