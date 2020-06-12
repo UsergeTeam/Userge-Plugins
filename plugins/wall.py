@@ -14,9 +14,10 @@ async def dlimg(link):
     k.close()
     return path_i
 
+
 async def wall(strin: str):
-    if len(strin.split(' ')) > 1:
-        strin = '+'.join(strin.split(' '))
+    if len(strin.split()) > 1:
+        strin = '+'.join(strin.split())
     url = 'https://wall.alphacoders.com/search.php?search='
     none_got = 'https://wall.alphacoders.com/finding_wallpapers.php'
     page_link = 'https://wall.alphacoders.com/search.php?search={}&page={}'
@@ -24,14 +25,14 @@ async def wall(strin: str):
     if resp.url == none_got:
         return False
     if 'by_category.php' in resp.url:
-        page_link = str(resp.url).replace('&amp;', '')+'&page={}'
+        page_link = str(resp.url).replace('&amp;', '') + '&page={}'
         check_link = True
     else:
         check_link = False
     if True:
         resp = soup(resp.content, 'lxml')
         wall_num = resp.find('h1', {'class': 'center title'})
-        wall_num = list(wall_num.text.split(' '))
+        wall_num = list(wall_num.text.split())
         for i in wall_num:
             try:
                 wall_num = int(i)
@@ -41,9 +42,9 @@ async def wall(strin: str):
             page_num = resp.find('div', {'class': 'visible-xs'})
             page_num = page_num.find('input', {'class': 'form-control'})
             page_num = int(page_num['placeholder'].split(' ')[-1])
-        except:
+        except Exception as e:
             page_num = 1
-        links = []
+        
         n = randint(1, page_num)
         if True:
             if page_num != 1:
@@ -56,9 +57,9 @@ async def wall(strin: str):
             list_a_s = []
             tit_links = []
             r = ['thumb', '350', 'img', 'big.php?i', 'data-src', 'title']
-            for l in a_s:
-                if all(d in str(l) for d in r):
-                    list_a_s.append(l)
+            for a_tag in a_s:
+                if all(d in str(a_tag) for d in r):
+                    list_a_s.append(a_tag)
             try:
                 for df in list_a_s:
                     imgi = df.find('img')
@@ -85,7 +86,7 @@ alphacoders and upload to Telegram''',
     'usage': "{tr}wall [Query]",
     'examples': "{tr}wall luffy"
 })
-async def idk_sir(message):
+async def idk_sir(message: Message):
     if not os.path.isdir(Config.DOWN_PATH):
         os.makedirs(Config.DOWN_PATH)
     if message.input_str:
@@ -104,9 +105,9 @@ Search Query : {}'''.format(message.input_str)
             idl = await dlimg(link[0])
             await message.edit('**Uploading...**')
             if not len(link[1].split()) < 11:
-                capo = '**'+' '.join(link[1].split()[:11])+'**'
+                capo = '**' + ' '.join(link[1].split()[:11]) + '**'
             else:
-                capo = '**'+link[1]+'**'
+                capo = '**' +link[1]+ '**'
             try:
                 cat_id = message.chat.id
                 await userge.send_photo(cat_id, idl, caption=capo)
