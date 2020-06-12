@@ -90,6 +90,9 @@ async def imdb(message: Message):
 <b>IMDB URL Link🔗: </b>{mov_link}
 
 <b>Story Line : </b><em>{story_line}</em>"""
+    except IndexError:
+        await message.edit("Bruh, Plox enter **Valid movie name** kthx")
+
     if os.path.exists(THUMB_PATH):
         await message.reply_photo(
             photo=THUMB_PATH,
@@ -98,5 +101,3 @@ async def imdb(message: Message):
         )
     else:
         await message.edit(des_, parse_mode="HTML")
-    except IndexError:
-        await message.edit("Bruh, Plox enter **Valid movie name** kthx")
