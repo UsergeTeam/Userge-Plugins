@@ -15,8 +15,8 @@ async def dlimg(link):
     return path_i
 
 async def wall(strin: str):
-    if len(strin.split()) > 1:
-        strin = '+'.join(strin.split())
+    if len(strin.split(' ')) > 1:
+        strin = '+'.join(strin.split(' '))
     url = 'https://wall.alphacoders.com/search.php?search='
     none_got = 'https://wall.alphacoders.com/finding_wallpapers.php'
     page_link = 'https://wall.alphacoders.com/search.php?search={}&page={}'
@@ -31,7 +31,7 @@ async def wall(strin: str):
     if True:
         resp = soup(resp.content, 'lxml')
         wall_num = resp.find('h1', {'class': 'center title'})
-        wall_num = list(wall_num.text.split())
+        wall_num = list(wall_num.text.split(' '))
         for i in wall_num:
             try:
                 wall_num = int(i)
@@ -40,7 +40,7 @@ async def wall(strin: str):
         try:
             page_num = resp.find('div', {'class': 'visible-xs'})
             page_num = page_num.find('input', {'class': 'form-control'})
-            page_num = int(page_num['placeholder'].split()[-1])
+            page_num = int(page_num['placeholder'].split(' ')[-1])
         except:
             page_num = 1
         links = []
