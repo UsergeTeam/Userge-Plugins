@@ -2,7 +2,8 @@ from userge import userge, Message, Config
 from bs4 import BeautifulSoup as soup
 import requests
 from random import randint, choice
-import os, subprocess
+import os
+import subprocess
 
 
 async def dlimg(link):
@@ -113,8 +114,7 @@ Search Query : {}'''.format(message.input_str)
                 await message.edit(e)
                 return
             await message.delete()
-            
-            subprocess.call(['rm',idl])
+            subprocess.call(['rm', idl])
         else:
             await message.edit('**Result Not Found**')
             await message.reply_sticker('CAADBAADIQEAAl_GARknbPJaYsVA2xYE')
