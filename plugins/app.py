@@ -10,8 +10,8 @@ from userge import userge, Message
 
 
 @userge.on_cmd("app", about={
-    'header': "Search application details of any app"
-              "in play store."
+    'header': "Search application details of any app\n"
+              "in play store.\n"
               "Plugin by - @kirito6969 , @krishna_bolte"})
 async def app(message: Message):
     try:
