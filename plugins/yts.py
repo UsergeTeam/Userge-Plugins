@@ -1,10 +1,14 @@
 # Tesla's Project YTS
-import asyncio, requests, json, os, re
+import os
+import re
+import requests
 from userge import userge, Message
+
 
 @userge.on_cmd("yts", about={
     'header': "YTS Movie Search.",
-    'description': "To Download .torrent file from YTS. By default it'll download first 5 matched torrents and quality is 720p.",
+    'description': """To Download .torrent file from YTS. 
+By default it'll download first 5 matched torrents and quality is 720p.""",
     'usage': "{tr}yts [Movie name] [-limit] [-quality]",
     'examples': "{tr}yts lion king -l10 -q1080p"})
 async def yts(message: Message):
@@ -16,15 +20,13 @@ async def yts(message: Message):
     get_quality = re.compile(r'-q\d*[PpDd]')
     _movie = re.sub(r'-\w*', "", input_).strip()
 
-    if get_limit.search(input_) == None and get_quality.search(input_) == None:
+    if get_limit.search(input_) is None and get_quality.search(input_) is None:
         pass
-    elif get_quality.search(input_) != None and get_limit.search(input_) != None:
+    elif get_quality.search(input_) is not None and get_limit.search(input_) is not None:
         qual = get_quality.search(input_).group().strip('-q')
         max_limit = int(get_limit.search(input_).group().strip('-l'))
-
     elif  get_quality.search(input_):
         qual = get_quality.search(input_).group().strip('-q')
-
     elif get_limit.search(input_):
         max_limit = int(get_limit.search(input_).group().strip('-l'))
     
@@ -40,13 +42,12 @@ async def yts(message: Message):
     if datas['status'] != "ok":
         await message.edit("WRONG STATUS")
         return
-
     elif datas['data']['movie_count'] == 0 or len(datas['data']) == 3:
         await message.edit(f"{_movie} Not Found!", del_in=5)
-        return
-    
+        return  
     else:
-        await message.edit(f"{datas['data']['movie_count']} Matches Found!, Sending {len(datas['data']['movies'])}.")
+        _matches = datas['data']['movie_count']
+        await message.edit(f"{_matches} Matches Found!, Sending {len(datas['data']['movies'])}.")
         for data in datas['data']['movies']:
             _title = data['title_long']
             _rating = data['rating']
