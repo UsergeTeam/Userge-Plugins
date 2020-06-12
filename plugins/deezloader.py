@@ -84,14 +84,14 @@ async def deezload(message: Message):
 
     if '-sdl' in flags:
         if 'track/' in input_link:
-            await proper_trackdl(input_link, quality, message, loader, TEMP_PATH, Path)
+            await proper_trackdl(input_link, quality, message, loader, TEMP_PATH)
         elif 'album/' or 'playlist/' in input_link:
-            await batch_dl(input_link, quality, message, loader, TEMP_PATH, Path, to_zip)
+            await batch_dl(input_link, quality, message, loader, TEMP_PATH, to_zip)
     elif '-ddl' in flags:
         if 'track/' in input_link:
-            await proper_trackdl(input_link, quality, message, loader, TEMP_PATH, Path)
+            await proper_trackdl(input_link, quality, message, loader, TEMP_PATH)
         elif 'album/' or 'playlist/' in input_link:
-            await batch_dl(input_link, quality, message, loader, TEMP_PATH, Path, to_zip)
+            await batch_dl(input_link, quality, message, loader, TEMP_PATH, to_zip)
 
     if '-dsong' in flags:
         await message.edit("Searching for Song 🔍")
@@ -113,7 +113,7 @@ async def deezload(message: Message):
     shutil.rmtree(TEMP_PATH, ignore_errors=True)
 
 
-async def proper_trackdl(link, qual, msg, client, dir_, Path):
+async def proper_trackdl(link, qual, msg, client, dir_):
     if 'spotify' in link:
         await msg.edit("Trying to download song via Spotify Link 🥴")
         track = client.download_trackspo(
@@ -140,7 +140,7 @@ async def proper_trackdl(link, qual, msg, client, dir_, Path):
         await audio_upload(msg.chat.id, Path(track), True)
 
 
-async def batch_dl(link, qual, msg, client, dir_, Path, allow_zip):
+async def batch_dl(link, qual, msg, client, dir_, allow_zip):
     if 'spotify' in link:
         if 'album/' in link:
             await msg.edit("Trying to download album 🤧")
