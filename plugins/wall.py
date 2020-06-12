@@ -9,9 +9,9 @@ async def dlimg(link):
     e = requests.get(link).content
     paea = 'donno.{}'.format(link.split('.')[-1])
     path_i = os.path.join(Config.DOWN_PATH, paea)
-    k = open(path_i, 'wb')
-    k.write(e)
-    k.close()
+    with open(path_i, 'wb') as k:
+        write(e)
+        k.close()
     return path_i
 
 
@@ -42,7 +42,7 @@ async def wall(strin: str):
             page_num = resp.find('div', {'class': 'visible-xs'})
             page_num = page_num.find('input', {'class': 'form-control'})
             page_num = int(page_num['placeholder'].split(' ')[-1])
-        except:
+        except Exception:
             page_num = 1
         n = randint(1, page_num)
         if True:
