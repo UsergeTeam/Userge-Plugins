@@ -2,6 +2,7 @@ cairosvg
 coffeehouse
 deezloader
 Google-Images-Search
+gtts
 justwatch
 lottie
 lyrics-extractor
