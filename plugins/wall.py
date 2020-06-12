@@ -10,7 +10,7 @@ async def dlimg(link):
     paea = 'donno.{}'.format(link.split('.')[-1])
     path_i = os.path.join(Config.DOWN_PATH, paea)
     with open(path_i, 'wb') as k:
-        write(e)
+        k.write(e)
         k.close()
     return path_i
 
