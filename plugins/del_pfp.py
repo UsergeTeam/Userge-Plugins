@@ -14,8 +14,8 @@ async def del_pfp(message: Message):
             await message.err(text=e)
             return
         await message.edit(f"Deleting first {del_c} Profile Photos")
-        to_del = await userge.iter_profile_photos("me", limit=del_c)
-        await userge.delete_profile_photos([photo.file_id for photo in to_del])
+        async for photo in userge.iter_profile_photos("me", limit=del_c):
+            await userge.delete_profile_photos(photo.file_id)
     else:
         await message.edit("What am i supposed to delete nothing")
         await message.reply_sticker(sticker="CAADBQADPwAD7BHsKmSxAAHVc0NMKBYE")

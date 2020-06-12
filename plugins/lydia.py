@@ -212,7 +212,10 @@ async def _custom_media_reply(message: Message):
         if cus_msg.media:
             if cus_msg.sticker:
                 await asyncio.sleep(1)
-                await message.reply_sticker(cus_msg.sticker.file_id)
+                await message.reply_sticker(
+                    sticker=cus_msg.sticker.file_id,
+                    file_ref=cus_msg.sticker.file_ref
+                )
             if (cus_msg.photo or cus_msg.video or cus_msg.animation):
                 dls = await userge.download_media(message=cus_msg, file_name=Config.DOWN_PATH)
                 if cus_msg.photo:
