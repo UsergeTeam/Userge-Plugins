@@ -42,9 +42,8 @@ async def wall(strin: str):
             page_num = resp.find('div', {'class': 'visible-xs'})
             page_num = page_num.find('input', {'class': 'form-control'})
             page_num = int(page_num['placeholder'].split(' ')[-1])
-        except Exception as e:
+        except:
             page_num = 1
-        
         n = randint(1, page_num)
         if True:
             if page_num != 1:
@@ -72,8 +71,7 @@ async def wall(strin: str):
                     titl = titl.replace('Background', '')
                     p = (li, titl)
                     tit_links.append(p)
-            except Exception as erro:
-                print(erro)
+            except Exception:
             del list_a_s
             tit_link = choice(tit_links)
             return tit_link
@@ -107,7 +105,7 @@ Search Query : {}'''.format(message.input_str)
             if not len(link[1].split()) < 11:
                 capo = '**' + ' '.join(link[1].split()[:11]) + '**'
             else:
-                capo = '**' +link[1]+ '**'
+                capo = '**' + link[1] + '**'
             try:
                 cat_id = message.chat.id
                 await userge.send_photo(cat_id, idl, caption=capo)
