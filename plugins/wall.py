@@ -89,6 +89,7 @@ async def idk_sir(message: Message):
         os.makedirs(Config.DOWN_PATH)
     if message.input_str:
         qu = message.input_str
+        await message.edit('**Processing...**')
         await CHANNEL.log(f"Search Query : {qu}")
         try:
             link = await wall(str(qu))
@@ -96,7 +97,6 @@ async def idk_sir(message: Message):
             await message.edit(e)
             return
         if link:
-            await message.edit('**Processing...**')
             idl = await dlimg(link[0])
             await message.edit('**Uploading...**')
             if not len(link[1].split()) < 11:
