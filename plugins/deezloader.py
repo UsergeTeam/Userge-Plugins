@@ -9,6 +9,7 @@ from userge.plugins.misc.upload import doc_upload, audio_upload
 
 ARL_TOKEN = os.environ.get("ARL_TOKEN", None)
 TEMP_PATH = 'deezdown_temp/'
+rex = r"(http:|https:)\/\/(open.spotify|www.deezer).com\/(track|album|playlist)\/[A-Z0-9a-z]{3,}"
 ARL_HELP = """**Oops, Time to Help Yourself**
 [Here Help Yourself](https://www.google.com/search?q=how+to+get+deezer+arl+token)
 
@@ -67,7 +68,6 @@ async def deezload(message: Message):
             else:
                 await message.edit("🤔 Comedy? You are good at it")
                 return
-        rex = r"(http:|https:)\/\/(open.spotify|www.deezer).com\/(track|album|playlist)\/[A-Z0-9a-z]{3,}"
         if not re.search(rex, input_link):
             await message.edit("Invalid Link")
             return
@@ -155,7 +155,7 @@ async def batch_dl(link, qual, msg, client, dir_, Path, allow_zip):
                     zips=True
                 )
                 await msg.edit("Sending as Zip File 🗜")
-                await doc_upload(msg.chat.id, Path(track), True)
+                await doc_upload(msg.chat.id, Path(zip_), True)
             else:
                 album_list = client.download_albumspo(
                     link,
