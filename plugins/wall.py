@@ -4,6 +4,7 @@ import requests
 from random import randint, choice
 import os
 
+CHANNEL = userge.getCLogger(__name__)
 
 async def dlimg(link):
     e = requests.get(link).content
@@ -87,9 +88,7 @@ async def idk_sir(message: Message):
         os.makedirs(Config.DOWN_PATH)
     if message.input_str:
         qu = message.input_str
-        logmesys = '''**logger** : #wall
-
-Search Query : {}'''.format(message.input_str)
+        await CHANNEL.log(f"Search Query : {qu}")
         await userge.send_message(Config.LOG_CHANNEL_ID, logmesys)
         try:
             link = await wall(str(qu))
