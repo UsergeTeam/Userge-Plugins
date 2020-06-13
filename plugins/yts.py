@@ -71,9 +71,9 @@ Available in: {qualsize}'''
             with open(files, 'wb') as f:
                 f.write(requests.get(_torrents[_qualities.index(def_quality)]['url']).content)
             await userge.send_document(chat_id=message.chat.id,
-                                        document=files,
-                                        caption=capts,
-                                        disable_notification=True)
+                                       document=files,
+                                       caption=capts,
+                                       disable_notification=True)
             os.remove(files)
         else:
             message.edit("NOT FOUND", del_in=5)
