@@ -46,4 +46,3 @@ async def glyrics(message: Message):
         await message.edit(lyr_format)
     else:
         await message.edit(f"No Lyrics Found for **{song}**")
- 
