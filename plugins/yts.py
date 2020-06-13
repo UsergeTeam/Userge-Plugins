@@ -32,33 +32,31 @@ async def yts(message: Message):
     if len(input_) == 0:
         await message.edit("No Input Found!, check .help yts", del_in=5)
         return
-    else:
-        URL = "https://yts.mx/api/v2/list_movies.json?query_term={query}&limit={limit}"
-        await message.edit("Fetching....")
-        resp = requests.get(URL.format(query=_movie, limit=max_limit))
-        datas = resp.json()
+    URL = "https://yts.mx/api/v2/list_movies.json?query_term={query}&limit={limit}"
+    await message.edit("Fetching....")
+    resp = requests.get(URL.format(query=_movie, limit=max_limit))
+    datas = resp.json()
     if datas['status'] != "ok":
         await message.edit("WRONG STATUS")
         return
-    elif datas['data']['movie_count'] == 0 or len(datas['data']) == 3:
+    if datas['data']['movie_count'] == 0 or len(datas['data']) == 3:
         await message.edit(f"{_movie} Not Found!", del_in=5)
         return
-    else:
-        _matches = datas['data']['movie_count']
-        await message.edit(f"{_matches} Matches Found!, Sending {len(datas['data']['movies'])}.")
-        for data in datas['data']['movies']:
-            _title = data['title_long']
-            _rating = data['rating']
-            _language = data['language']
-            _torrents = data['torrents']
-            def_quality = "720p"
-            _qualities = []
-            for i in _torrents:
-                _qualities.append(i['quality'])
-            if qual in _qualities:
-                def_quality = qual
-            qualsize = [f"{j['quality']}: {j['size']}" for j in _torrents]
-            capts = f'''
+    _matches = datas['data']['movie_count']
+    await message.edit(f"{_matches} Matches Found!, Sending {len(datas['data']['movies'])}.")
+    for data in datas['data']['movies']:
+        _title = data['title_long']
+        _rating = data['rating']
+        _language = data['language']
+        _torrents = data['torrents']
+        def_quality = "720p"
+        _qualities = []
+        for i in _torrents:
+            _qualities.append(i['quality'])
+        if qual in _qualities:
+            def_quality = qual
+        qualsize = [f"{j['quality']}: {j['size']}" for j in _torrents]
+        capts = f'''
 Title: {_title}
 Rating: {_rating}
 Language: {_language}
@@ -67,17 +65,17 @@ Type: {_torrents[_qualities.index(def_quality)]['type']}
 Seeds: {_torrents[_qualities.index(def_quality)]['seeds']}
 Date Uploaded: {_torrents[_qualities.index(def_quality)]['date_uploaded']}
 Available in: {qualsize}'''
-            if def_quality in _qualities:
-                files = f"{_title}{_torrents[_qualities.index(def_quality)]['quality']}.torrent"
-                files = files.replace('/', '\\')
-                with open(files, 'wb') as f:
-                    f.write(requests.get(_torrents[_qualities.index(def_quality)]['url']).content)
-                await userge.send_document(chat_id=message.chat.id,
-                                    document=files,
-                                    caption=capts,
-                                    disable_notification=True)
-                os.remove(files)
-            else:
-                message.edit("NOT FOUND", del_in=5)
-                return
+        if def_quality in _qualities:
+            files = f"{_title}{_torrents[_qualities.index(def_quality)]['quality']}.torrent"
+            files = files.replace('/', '\\')
+            with open(files, 'wb') as f:
+                f.write(requests.get(_torrents[_qualities.index(def_quality)]['url']).content)
+            await userge.send_document(chat_id=message.chat.id,
+                                        document=files,
+                                        caption=capts,
+                                        disable_notification=True)
+            os.remove(files)
+        else:
+            message.edit("NOT FOUND", del_in=5)
+            return
     return
