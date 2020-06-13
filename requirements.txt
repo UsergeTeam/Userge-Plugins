@@ -2,8 +2,8 @@ cairosvg
 coffeehouse
 deezloader
 Google-Images-Search
+google
 gtts
 justwatch
 lottie
-lyrics-extractor
 spotdl
