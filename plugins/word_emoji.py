@@ -1,13 +1,13 @@
 """ enjoy word_emoji """
 
-# by @krishna_bolte
+# by @krishna_singhal
 # little help given by @gotstc thanx sir... 🙂
 
 from userge import userge, Message
 
 
 @userge.on_cmd("hii", about={
-    'header': "Use HI to greet someone.\nplugin - @krishna_bolte",
+    'header': "Use HI to greet someone.\nplugin - @krishna_singhal",
     'flags': {'-bnw': "Show as black and white as background.",
               '-wnb': "Show as white and black as background.",
               '-dnb': "Show as drops and black as background.",
@@ -58,7 +58,7 @@ async def hii_(message: Message):
 
 @userge.on_cmd("lol", about={
     'header': "Lol also known as lots of laugh used to indicate "
-              "smiling or slight amusement.\nplugin - @krishna_bolte",
+              "smiling or slight amusement.\nplugin - @krishna_singhal",
     'flags': {'-bnw': "Show as black and white as background.",
               '-wnb': "Show as white and black as background.",
               '-dnb': "Show as drops and black as background.",
@@ -107,7 +107,7 @@ async def lol_(message: Message):
 
 
 @userge.on_cmd("wtf", about={
-    'header': "WTF Generally stands for 'What the fuck'.\nplugin - @krishna_bolte",
+    'header': "WTF Generally stands for 'What the fuck'.\nplugin - @krishna_singhal",
     'flags': {'-bnw': "Show as black and white as background.",
               '-wnb': "Show as white and black as background.",
               '-dnb': "Show as drops and black as background.",

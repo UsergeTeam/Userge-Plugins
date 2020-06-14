@@ -12,7 +12,7 @@ from userge import userge, Message
 @userge.on_cmd("app", about={
     'header': "Search application details of any app\n"
               "in play store.\n"
-              "Plugin by - @kirito6969 , @krishna_bolte"})
+              "Plugin by - @kirito6969,@krishna_singhal"})
 async def app(message: Message):
     try:
         await message.edit("`searching...`")
