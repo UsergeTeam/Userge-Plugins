@@ -54,7 +54,7 @@ async def spotify_dl(message: Message):
         if not os.path.lexists(TEMP_DIR):
             await message.err("Download Failed")
             raise Exception(stdout + stderr)
-        if os.path.lexists:
+        if os.path.lexists(TEMP_DIR):
             await message.delete()
             for track in os.listdir(TEMP_DIR):
                 track_loc = TEMP_DIR + track
