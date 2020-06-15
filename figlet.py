@@ -1,6 +1,9 @@
+# by Alone
+
 from pyfiglet import Figlet
 from userge import userge, Message
-# by Alone
+
+
 @userge.on_cmd("figlet", about={
     'header': "Figlet",
     'description': "Make Fancy Style text using Figlet",
