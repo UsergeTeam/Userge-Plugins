@@ -26,7 +26,7 @@ async def walld(strin: str):
     none_got = [
         'https://wall.alphacoders.com/finding_wallpapers.php',
         'https://wall.alphacoders.com/search-no-results.php'
-        ]
+               ]
     page_link = 'https://wall.alphacoders.com/search.php?search={}&page={}'
     resp = requests.get(f'{url}{strin}')
     if resp.url in none_got:
