@@ -103,10 +103,10 @@ async def idk_sir(message: Message):
                 idl = await dlimg(link[0])
                 if link[0].endswith('png'):
                     im = Image.open(idl)
+                    os.remove(idl)
                     idl = idl.replace('png', 'jpeg')
                     im = im.convert('RGB')
                     im.save(idl, 'jpeg')
-                    os.remove(idl)
                 await message.edit('**Uploading...**')
                 if not len(link[1].split()) < 11:
                     capo = '**' + ' '.join(link[1].split()[:11]) + '**'
