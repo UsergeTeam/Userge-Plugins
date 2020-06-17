@@ -1,6 +1,7 @@
 # by Alone
 
 from pyfiglet import Figlet
+
 from userge import userge, Message
 
 
@@ -14,9 +15,10 @@ from userge import userge, Message
 async def figlet_(message: Message):
     args = message.input_or_reply_str
     if not args:
-        await message.edit("**Do You think this is Funny?**\n\n"
-        "__Try this Blek Mejik:__\n\n"
-        "```.help .figlet```")
+        await message.edit(
+            "**Do You think this is Funny?**\n\n"
+            "__Try this Blek Mejik:__\n\n"
+            "```.help .figlet```")
         await message.reply_sticker(sticker="CAADBAAD1AIAAnV4kzMWpUTkTJ9JwRYE")
         return
     if "|" in message.input_or_reply_str:
