@@ -34,8 +34,8 @@ async def add_(message: Message):
 
         result = (int(number_1.strip()) + int(number_2.strip()))
 
-        await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-        parse_mode='html')
+        await message.edit(
+            "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
     except Exception as e:
         await message.err(e)
 
@@ -66,8 +66,8 @@ async def subtract_(message: Message):
 
         result = (int(number_1.strip()) - int(number_2.strip()))
 
-        await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-        parse_mode='html')
+        await message.edit(
+            "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
     except Exception as e:
         await message.err(e)
 
@@ -97,8 +97,8 @@ async def multiply_(message: Message):
     try:
         result = (int(number_1.strip()) * int(number_2.strip()))
 
-        await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-        parse_mode='html')
+        await message.edit(
+            "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
     except Exception as e:
         await message.err(e)
 
@@ -128,8 +128,8 @@ async def divide_(message: Message):
     try:
         result = (int(number_1.strip()) / int(number_2.strip()))
 
-        await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-        parse_mode='html')
+        await message.edit(
+            "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
     except Exception as e:
         await message.err(e)
 
@@ -159,16 +159,16 @@ async def fdivide_(message: Message):
     try:
         result = (int(number_1.strip()) // int(number_2.strip()))
 
-        await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-        parse_mode='html')
+        await message.edit(
+            "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
     except Exception as e:
         await message.err(e)
 
 
 @userge.on_cmd("modulo", about={
     'header': "Modulo operation finds the\n"
-    "remainder or signed remainder after\n"
-    "division of one number by another.",
+              "remainder or signed remainder after\n"
+              "division of one number by another.",
     'usage': "{tr}modulo [ X % Y ]\n\n{tr}modulo 6969 % 6969"})
 async def modulo_(message: Message):
     """Use to get only remainder of two numbers"""
@@ -192,8 +192,8 @@ async def modulo_(message: Message):
     try:
         result = (int(number_1.strip()) % int(number_2.strip()))
 
-        await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-        parse_mode='html')
+        await message.edit(
+            "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
     except Exception as e:
         await message.err(e)
 
@@ -213,8 +213,8 @@ async def factorial_(message: Message):
     await asyncio.sleep(1)
 
     result = math.factorial(int(number))
-    await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-    parse_mode='html')
+    await message.edit(
+        "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
 
 
 @userge.on_cmd("power", about={
@@ -243,8 +243,8 @@ async def power_(message: Message):
 
         result = math.pow(int(number_1.strip()), int(number_2.strip()))
 
-        await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-        parse_mode='html')
+        await message.edit(
+            "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
     except Exception as e:
         await message.err(e)
 
@@ -264,8 +264,8 @@ async def sqrt_(message: Message):
     await asyncio.sleep(1)
 
     result = math.sqrt(int(number))
-    await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-    parse_mode='html')
+    await message.edit(
+        "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
 
 
 @userge.on_cmd("sin", about={
@@ -283,8 +283,8 @@ async def sin_(message: Message):
     await asyncio.sleep(1)
 
     result = math.sin(float(number))
-    await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-    parse_mode='html')
+    await message.edit(
+        "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
 
 
 @userge.on_cmd("cos", about={
@@ -302,8 +302,8 @@ async def cos_(message: Message):
     await asyncio.sleep(1)
 
     result = math.cos(float(number))
-    await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-    parse_mode='html')
+    await message.edit(
+        "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
 
 
 @userge.on_cmd("tan", about={
@@ -321,8 +321,8 @@ async def tan_(message: Message):
     await asyncio.sleep(1)
 
     result = math.tan(float(number))
-    await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-    parse_mode='html')
+    await message.edit(
+        "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
 
 
 @userge.on_cmd("deg", about={
@@ -340,8 +340,8 @@ async def deg_(message: Message):
     await asyncio.sleep(1)
 
     result = math.degrees(float(number))
-    await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-    parse_mode='html')
+    await message.edit(
+        "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
 
 
 @userge.on_cmd("rad", about={
@@ -359,8 +359,8 @@ async def rad_(message: Message):
     await asyncio.sleep(1)
 
     result = math.radians(float(number))
-    await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-    parse_mode='html')
+    await message.edit(
+        "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
 
 
 @userge.on_cmd("log", about={
@@ -378,5 +378,5 @@ async def log_(message: Message):
     await asyncio.sleep(1)
 
     result = math.degrees(float(number))
-    await message.edit("<b>OUTPUT:</b>\n<code>{}</code>".format(result),
-parse_mode='html')
+    await message.edit(
+        "<b>OUTPUT:</b>\n<code>{}</code>".format(result), parse_mode='html')
