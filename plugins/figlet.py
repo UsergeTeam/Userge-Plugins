@@ -10,8 +10,8 @@ from userge import userge, Message
     'description': "Make Fancy Style text using Figlet",
     'usage': "{tr}figlet font_name | [text | reply]",
     'Available Fonts': "To know the font name list run command \n\n"
-    "```.term pyfiglet --list_fonts```\n\n"
-    "**By the Way Plugin by:**\n\nAlone , @krishna_singhal"})
+    "<code>{tr}term pyfiglet --list_fonts</code>\n\n"
+    "<b>By the Way Plugin by:</b>\n\nAlone , @krishna_singhal"})
 async def figlet_(message: Message):
     args = message.input_or_reply_str
     if not args:
