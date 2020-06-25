@@ -1,9 +1,10 @@
+""" set or view profile picture """
+
 import os
 import time
 from datetime import datetime
 
 from userge import userge, Config, Message
-
 from userge.utils import progress
 
 PHOTO = Config.DOWN_PATH + "profile_pic.jpg"
@@ -16,9 +17,8 @@ async def set_profile_picture(message: Message):
     """ Set Profile Picture """
     await message.edit("```processing ...```")
     replied = message.reply_to_message
-    if (replied and replied.media
-            and (replied.photo
-                 or (replied.document and "image" in replied.document.mime_type))):
+    if (replied and replied.media and (
+            replied.photo or (replied.document and "image" in replied.document.mime_type))):
         s_time = datetime.now()
         c_time = time.time()
 
@@ -38,7 +38,8 @@ async def set_profile_picture(message: Message):
         t_time = (e_time - s_time).seconds
 
         await message.edit(
-            "<code>Profile picture set in {} seconds.</code>".format(t_time), parse_mode='html', del_in=5)
+            "<code>Profile picture set in {} seconds.</code>".format(t_time),
+            parse_mode='html', del_in=5)
     else:
         await message.edit("```Reply to any photo to set profile pic```", del_in=5)
 
@@ -63,6 +64,7 @@ async def view_profile_picture(message: Message):
     await userge.download_media(user.photo.big_file_id, file_name=PHOTO)
 
     await userge.send_photo(message.chat.id, PHOTO)
+    await message.delete()
 
     if os.path.exists(PHOTO):
         os.remove(PHOTO)
