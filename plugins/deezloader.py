@@ -4,7 +4,7 @@ import shutil
 import deezloader
 from pathlib import Path
 
-from userge import userge, Message
+from userge import userge, Message, pool
 from userge.plugins.misc.upload import doc_upload, audio_upload
 
 ARL_TOKEN = os.environ.get("ARL_TOKEN", None)
@@ -96,7 +96,7 @@ async def deezload(message: Message):
     if '-dsong' in flags:
         await message.edit("Searching for Song 🔍")
         try:
-            track = loader.download_name(
+            track = await pool.run_in_thread(loader.download_name)(
                 artist=artist,
                 song=song,
                 output=TEMP_PATH,
@@ -116,7 +116,7 @@ async def deezload(message: Message):
 async def proper_trackdl(link, qual, msg, client, dir_):
     if 'spotify' in link:
         await msg.edit("Trying to download song via Spotify Link 🥴")
-        track = client.download_trackspo(
+        track = await pool.run_in_thread(client.download_trackspo)(
             link,
             output=dir_,
             quality=qual,
@@ -128,7 +128,7 @@ async def proper_trackdl(link, qual, msg, client, dir_):
         await audio_upload(msg.chat.id, Path(track), True)
     elif 'deezer' in link:
         await msg.edit("Trying to download song via Deezer Link 🥴")
-        track = client.download_trackdee(
+        track = await pool.run_in_thread(client.download_trackdee)(
             link,
             output=dir_,
             quality=qual,
@@ -145,7 +145,7 @@ async def batch_dl(link, qual, msg, client, dir_, allow_zip):
         if 'album/' in link:
             await msg.edit("Trying to download album 🤧")
             if allow_zip:
-                _, zip_ = client.download_albumspo(
+                _, zip_ = await pool.run_in_thread(client.download_albumspo)(
                     link,
                     output=dir_,
                     quality=qual,
@@ -157,7 +157,7 @@ async def batch_dl(link, qual, msg, client, dir_, allow_zip):
                 await msg.edit("Sending as Zip File 🗜")
                 await doc_upload(msg.chat.id, Path(zip_), True)
             else:
-                album_list = client.download_albumspo(
+                album_list = await pool.run_in_thread(client.download_albumspo)(
                     link,
                     output=dir_,
                     quality=qual,
@@ -171,7 +171,7 @@ async def batch_dl(link, qual, msg, client, dir_, allow_zip):
         if 'playlist/' in link:
             await msg.edit("Trying to download Playlist 🎶")
             if allow_zip:
-                _, zip_ = client.download_playlistspo(
+                _, zip_ = await pool.run_in_thread(client.download_playlistspo)(
                     link,
                     output=dir_,
                     quality=qual,
@@ -183,7 +183,7 @@ async def batch_dl(link, qual, msg, client, dir_, allow_zip):
                 await msg.edit("Sending as Zip 🗜", del_in=5)
                 await doc_upload(msg.chat.id, Path(zip_), True)
             else:
-                album_list = client.download_playlistspo(
+                album_list = await pool.run_in_thread(client.download_playlistspo)(
                     link,
                     output=dir_,
                     quality=qual,
@@ -200,7 +200,7 @@ async def batch_dl(link, qual, msg, client, dir_, allow_zip):
         if 'album/' in link:
             await msg.edit("Trying to download album 🤧")
             if allow_zip:
-                _, zip_ = client.download_albumdee(
+                _, zip_ = await pool.run_in_thread(client.download_albumdee)(
                     link,
                     output=dir_,
                     quality=qual,
@@ -212,7 +212,7 @@ async def batch_dl(link, qual, msg, client, dir_, allow_zip):
                 await msg.edit("Uploading as Zip File 🗜", del_in=5)
                 await doc_upload(msg.chat.id, Path(zip_), True)
             else:
-                album_list = client.download_albumdee(
+                album_list = await pool.run_in_thread(client.download_albumdee)(
                     link,
                     output=dir_,
                     quality=qual,
@@ -227,7 +227,7 @@ async def batch_dl(link, qual, msg, client, dir_, allow_zip):
         elif 'playlist/' in link:
             await msg.edit("Trying to download Playlist 🎶")
             if allow_zip:
-                _, zip_ = client.download_playlistdee(
+                _, zip_ = await pool.run_in_thread(client.download_playlistdee)(
                     link,
                     output=dir_,
                     quality=qual,
@@ -239,7 +239,7 @@ async def batch_dl(link, qual, msg, client, dir_, allow_zip):
                 await msg.edit("Sending as Zip File 🗜", del_in=5)
                 await doc_upload(msg.chat.id, Path(zip_), True)
             else:
-                album_list = client.download_playlistdee(
+                album_list = await pool.run_in_thread(client.download_playlistdee)(
                     link,
                     output=dir_,
                     quality=qual,
