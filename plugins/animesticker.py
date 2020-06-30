@@ -3,8 +3,6 @@
 # by @krishna_singhal
 
 import random
-from asyncio import sleep
-from random import choice
 
 from userge import userge, Message
 
