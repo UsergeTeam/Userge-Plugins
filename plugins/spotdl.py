@@ -58,5 +58,5 @@ async def spotify_dl(message: Message):
             await message.delete()
             for track in os.listdir(TEMP_DIR):
                 track_loc = TEMP_DIR + track
-                await audio_upload(message.chat.id, Path(track_loc), True)
+                await audio_upload(message, Path(track_loc), True)
     shutil.rmtree(TEMP_DIR, ignore_errors=True)
