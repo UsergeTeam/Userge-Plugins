@@ -7,18 +7,11 @@ import os
 import time
 from datetime import datetime
 
-from userge.utils import progress
-
 from pyrogram.errors.exceptions.bad_request_400 import (
-    UsernameOccupied,
-    AboutTooLong,
-    UsernameNotOccupied
-)
-from userge import (
-    userge,
-    Config,
-    Message
-)
+    UsernameOccupied, AboutTooLong, UsernameNotOccupied)
+
+from userge import userge, Config, Message
+from userge.utils import progress
 
 PHOTO = Config.DOWN_PATH + "profile_pic.jpg"
 USER_DATA = {}
@@ -152,7 +145,7 @@ async def set_profile_picture(message: Message):
         '-pp': "Print only profile picture"},
     'usage': "{tr}vpf [flags]\n{tr}vpf [flags] [reply to any user]",
     'note': "<b> -> Use 'me' after flags to print own profile</b>\n"
-    "<code>{tr}vpf [flags] me</code>"})
+            "<code>{tr}vpf [flags] me</code>"})
 async def view_profile(message: Message):
     """ View Profile  """
 
@@ -178,7 +171,6 @@ async def view_profile(message: Message):
     if not user.photo:
         await message.err("profile photo not found!")
         return
-        await message.delete()
     if '-fname' in message.flags:
         await message.edit("```checking, wait plox !...```")
         first_name = user.first_name
@@ -208,9 +200,8 @@ async def view_profile(message: Message):
         await message.edit("```checking pfp, wait plox !...```")
         await userge.download_media(user.photo.big_file_id, file_name=PHOTO)
         await userge.send_photo(message.chat.id, PHOTO)
-        return
-    if os.path.exists(PHOTO):
-        os.remove(PHOTO)
+        if os.path.exists(PHOTO):
+            os.remove(PHOTO)
 
 
 @userge.on_cmd("delpfp", about={
@@ -223,8 +214,8 @@ async def del_pfp(message: Message):
     if message.input_str:
         try:
             del_c = int(message.input_str)
-        except ValueError as e:
-            await message.err(text=e)
+        except ValueError as v_e:
+            await message.err(v_e)
             return
         await message.edit("```Deleting first {del_c} Profile Photos ...```")
         async for photo in userge.iter_profile_photos("me", limit=del_c):
@@ -311,20 +302,17 @@ async def clone_(message: Message):
             await message.err("```First Revert ! ...```", del_in=3)
             return
         mychat = await userge.get_chat(me.id)
-        USER_DATA.update(
-            {'first_name': me.first_name or '',
+        USER_DATA.update({
+            'first_name': me.first_name or '',
             'last_name': me.last_name or '',
-            'bio': mychat.description or ''}
-        )
+            'bio': mychat.description or ''})
         await userge.update_profile(
             first_name=user.first_name or '',
             last_name=user.last_name or '',
-            bio=chat.description or ''
-        )
+            bio=chat.description or '')
         if not user.photo:
             await message.edit(
-                "`User not have profile photo, I only cloning Name nad bio ...`", del_in=5
-            )
+                "`User not have profile photo, I only cloning Name nad bio ...`", del_in=5)
             return
         await userge.download_media(user.photo.big_file_id, file_name=PHOTO)
         await userge.set_profile_photo(PHOTO)
