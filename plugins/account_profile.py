@@ -1,4 +1,4 @@
-""" Full account settings for user """
+""" All Account Settings for User """
 
 # by krishna
 # del_pfp by phyco-ninja
@@ -14,7 +14,11 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     AboutTooLong,
     UsernameNotOccupied
 )
-from userge import userge, Config, Message
+from userge import (
+    userge,
+    Config,
+    Message
+)
 
 PHOTO = Config.DOWN_PATH + "profile_pic.jpg"
 USER_DATA = {}
@@ -230,7 +234,6 @@ async def del_pfp(message: Message):
             await message.reply_sticker(sticker="CAADAQAD0wAD976IR_CYoqvCwXhyFgQ")
 
 
-
 @userge.on_cmd("clone", about={
     'header': "Clone first name, last name, bio and profile picture of any user",
     'flags': {
@@ -267,7 +270,7 @@ async def clone_(message: Message):
         chat = await userge.get_chat(input_)
         user = await userge.get_users(input_)
     except UsernameNotOccupied:
-        await message.err("```Username not exist !...```")
+        await message.err("```Username not exist !...```", del_in=5)
         return
     me = await userge.get_me()
 
@@ -310,7 +313,9 @@ async def clone_(message: Message):
         mychat = await userge.get_chat(me.id)
         USER_DATA.update(
             {'first_name': me.first_name or '',
-            'last_name': me.last_name or '', 'bio': mychat.description or ''})
+            'last_name': me.last_name or '',
+            'bio': mychat.description or ''}
+        )
         await userge.update_profile(
             first_name=user.first_name or '',
             last_name=user.last_name or '',
