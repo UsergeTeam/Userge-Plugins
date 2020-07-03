@@ -219,13 +219,13 @@ async def del_pfp(message: Message):
     if message.input_str:
         try:
             del_c = int(message.input_str)
-	except ValueError as e:
+        except ValueError as e:
             await message.err(text=e)
             return
         await message.edit("```Deleting first {del_c} Profile Photos ...```")
         async for photo in userge.iter_profile_photos("me", limit=del_c):
             await userge.delete_profile_photos(photo.file_id)
-	else:
+        else:
             await message.edit("```What am i supposed to delete nothing !...```")
             await message.reply_sticker(sticker="CAADAQAD0wAD976IR_CYoqvCwXhyFgQ")
 
@@ -316,8 +316,9 @@ async def clone_(message: Message):
             last_name=user.last_name or '',
             bio=chat.description or ''
         )
-        await message.edit(
-                "`User not have profile photo, I only clone Name nad bio ...`", del_in=5
+        if not user.photo:
+            await message.edit(
+                "`User not have profile photo, I only cloning Name nad bio ...`", del_in=5
             )
             return
         await userge.download_media(user.photo.big_file_id, file_name=PHOTO)
