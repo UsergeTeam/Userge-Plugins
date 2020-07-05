@@ -37,7 +37,7 @@ async def ss_gen(message: Message):
             return
         await message.edit("Downloading Video to my Local")
         c_time = time.time()
-        vid = await userge.download_media(
+        vid = await message.client.download_media(
             message=replied,
             file_name=Config.DOWN_PATH,
             progress=progress,
@@ -58,7 +58,7 @@ async def ss_gen(message: Message):
     try:
         for frames in random.sample(range(vid_len), ss_c):
             capture = await take_screen_shot(vid_loc, int(frames), "ss_cap.jpeg")
-            await userge.send_photo(chat_id=message.chat.id, photo=capture)
+            await message.client.send_photo(chat_id=message.chat.id, photo=capture)
             os.remove(capture)
         await message.edit("Uploaded")
     except Exception as e:

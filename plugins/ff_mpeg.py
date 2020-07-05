@@ -20,7 +20,7 @@ async def ffmpegsave(message: Message):
             reply_message = message.reply_to_message
             try:
                 c_time = time.time()
-                downloaded_file_name = await userge.download_media(
+                downloaded_file_name = await message.client.download_media(
                     message=reply_message,
                     file_name=FF_MPEG_DOWN_LOAD_MEDIA_PATH,
                     progress=progress,
@@ -65,7 +65,7 @@ async def ffmpegtrim(message: Message):
             end_time
         )
         try:
-            await userge.send_video(
+            await message.client.send_video(
                 chat_id=message.chat.id,
                 video=o,
                 caption=" ".join(cmt[1:])
@@ -83,7 +83,7 @@ async def ffmpegtrim(message: Message):
         )
 
         try:
-            await userge.send_photo(
+            await message.client.send_photo(
                 chat_id=message.chat.id,
                 photo=o,
                 caption=" ".join(cmt[1:])

@@ -24,7 +24,7 @@ async def google_rs(message: Message):
             await message.edit('Bruh, Searching Animated Sticker is no(T YET) implemented')
             return
         if message_.photo or message_.animation or message_.sticker:
-            dis = await userge.download_media(
+            dis = await message.client.download_media(
                 message=message_,
                 file_name=Config.DOWN_PATH
             )

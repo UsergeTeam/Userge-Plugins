@@ -18,7 +18,7 @@ async def memify(message: Message):
     replied = message.reply_to_message
     if not replied:
         await message.err("LMAO no one's gonna help you, if u use .help now then u **Gey**")
-        await userge.send_sticker(
+        await message.client.send_sticker(
             sticker="CAADAQADhAAD3gkwRviGxMVn5813FgQ", chat_id=message.chat.id)
         return
     if not (replied.photo or replied.sticker or replied.animation):
@@ -28,7 +28,7 @@ async def memify(message: Message):
         os.makedirs(Config.DOWN_PATH)
     await message.edit("He he, let me use my skills")
     c_time = time.time()
-    dls = await userge.download_media(
+    dls = await message.client.download_media(
         message=message.reply_to_message,
         file_name=Config.DOWN_PATH,
         progress=progress,
@@ -58,9 +58,9 @@ async def memify(message: Message):
         dls_loc = jpg_file
     await message.edit("Decoration Time ≧∇≦, I'm an Artist")
     webp_file = await draw_meme_text(dls_loc, message.input_str)
-    await userge.send_sticker(chat_id=message.chat.id,
-                              sticker=webp_file,
-                              reply_to_message_id=replied.message_id)
+    await message.client.send_sticker(chat_id=message.chat.id,
+                                      sticker=webp_file,
+                                      reply_to_message_id=replied.message_id)
     await message.delete()
     os.remove(webp_file)
 

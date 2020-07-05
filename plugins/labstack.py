@@ -94,7 +94,7 @@ async def labstack(message: Message):
 
     if message.reply_to_message and message.reply_to_message.media:
         c_time = time.time()
-        dl_loc = await userge.download_media(
+        dl_loc = await message.client.download_media(
             message=message.reply_to_message,
             file_name=Config.DOWN_PATH,
             progress=progress,

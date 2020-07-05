@@ -30,11 +30,11 @@ async def spam(message: Message):
                 return
             await message.edit(f"Spamming {sc} Time")
             for _ in range(sc):
-                await userge.send_sticker(sticker=to_spam, chat_id=message.chat.id)
+                await message.client.send_sticker(sticker=to_spam, chat_id=message.chat.id)
                 await asyncio.sleep(0.1)
             await S_LOG.log(f"Spammed Sticker in Chat» {message.chat.title}, {sc} times")
         elif (replied.animation or replied.video or replied.photo):
-            dls = await userge.download_media(
+            dls = await message.client.download_media(
                 message=message.reply_to_message,
                 file_name=Config.DOWN_PATH
             )
@@ -48,11 +48,11 @@ async def spam(message: Message):
             await message.edit(f"Spamming {sc} times")
             if (replied.video or replied.animation):
                 for _ in range(sc):
-                    await userge.send_video(video=to_spam, chat_id=message.chat.id)
+                    await message.client.send_video(video=to_spam, chat_id=message.chat.id)
                     await asyncio.sleep(0.1)
             elif replied.photo:
                 for _ in range(sc):
-                    await userge.send_photo(photo=to_spam, chat_id=message.chat.id)
+                    await message.client.send_photo(photo=to_spam, chat_id=message.chat.id)
                     await asyncio.sleep(0.1)
             await S_LOG.log(f"Spammed Media in Chat» {message.chat.title}, {sc} times")
     elif is_str:
@@ -65,7 +65,7 @@ async def spam(message: Message):
             return
         await message.edit(f"Spamming {sc} times")
         for _ in range(sc):
-            await userge.send_message(text=spam_text, chat_id=message.chat.id)
+            await message.client.send_message(text=spam_text, chat_id=message.chat.id)
             await asyncio.sleep(0.1)
         await S_LOG.log(f"Spammed Text in Chat» {message.chat.title}, {sc} times")
     else:

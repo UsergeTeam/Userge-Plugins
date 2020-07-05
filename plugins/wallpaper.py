@@ -113,8 +113,8 @@ async def idk_sir(message: Message):
                 else:
                     capo = '**' + link[1] + '**'
                 try:
-                    await userge.send_photo(cat_id, idl, caption=capo)
-                    await userge.send_document(cat_id, idl)
+                    await message.client.send_photo(cat_id, idl, caption=capo)
+                    await message.client.send_document(cat_id, idl)
                     os.remove(idl)
                 except Exception as e:
                     await message.edit(e)
@@ -124,4 +124,4 @@ async def idk_sir(message: Message):
         await message.delete()
     else:
         await message.edit('**Give me Something to search.**')
-        await userge.send_sticker(cat_id, 'CAADAQADmQADTusQR6fPCVZ3EhDoFgQ')
+        await message.client.send_sticker(cat_id, 'CAADAQADmQADTusQR6fPCVZ3EhDoFgQ')

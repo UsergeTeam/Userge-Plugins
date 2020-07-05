@@ -92,7 +92,7 @@ async def imdb(message: Message):
     if os.path.exists(THUMB_PATH):
         if len(des_) > 1024:
             des_ = des_[:1021] + "..."
-        await userge.send_photo(
+        await message.client.send_photo(
             chat_id=message.chat.id,
             photo=THUMB_PATH,
             caption=des_,
@@ -104,7 +104,7 @@ async def imdb(message: Message):
         img_path = wget.download(image, os.path.join(Config.DOWN_PATH, 'imdb_thumb.jpg'))
         if len(des_) > 1024:
             des_ = des_[:1021] + "..."
-        await userge.send_photo(
+        await message.client.send_photo(
             chat_id=message.chat.id,
             photo=img_path,
             caption=des_,

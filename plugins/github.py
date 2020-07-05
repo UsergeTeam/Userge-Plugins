@@ -28,7 +28,7 @@ async def fetch_github_info(message: Message):
         followers = b["followers"]
         following = b["following"]
         created_at = b["created_at"]
-        await userge.send_photo(
+        await message.client.send_photo(
             message.chat.id,
             caption="""Name: [{}]({})
 Type: {}

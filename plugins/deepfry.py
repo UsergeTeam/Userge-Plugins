@@ -30,7 +30,7 @@ async def deepfryer(message: Message):
         os.makedirs(Config.DOWN_PATH)
     await message.edit("*turns on fryer*")
     c_time = time.time()
-    dls = await userge.download_media(
+    dls = await message.client.download_media(
         message=message.reply_to_message,
         file_name=Config.DOWN_PATH,
         progress=progress,
@@ -65,9 +65,9 @@ async def deepfryer(message: Message):
         for _ in range(fry_c):
             fried_file = await deepfry(fried_file)
 
-    await userge.send_photo(chat_id=message.chat.id,
-                            photo=fried_file,
-                            reply_to_message_id=replied.message_id)
+    await message.client.send_photo(chat_id=message.chat.id,
+                                    photo=fried_file,
+                                    reply_to_message_id=replied.message_id)
     await message.delete()
     os.remove(fried_file)
 

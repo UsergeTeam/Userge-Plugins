@@ -33,7 +33,7 @@ USER_DATA = {}
         "{tr}setname -lname singhal",
         "{tr}setname krishna | singhal",
         "{tr}setname -uname username",
-        "{tr}setname -duname"]})
+        "{tr}setname -duname"]}, allow_via_bot=False)
 async def setname_(message: Message):
     """ set or delete profile name and username """
     if not message.input_str:
@@ -83,7 +83,7 @@ async def setname_(message: Message):
              "{tr}bio [Bio]",
     'examples': [
         "{tr}bio -delbio",
-        "{tr}bio  My name is krishna :-)"]})
+        "{tr}bio  My name is krishna :-)"]}, allow_via_bot=False)
 async def bio_(message: Message):
     """ Set or delete profile bio """
     if not message.input_str:
@@ -104,7 +104,7 @@ async def bio_(message: Message):
 
 @userge.on_cmd('setpfp', about={
     'header': "Set profile picture",
-    'usage': "{tr}setpfp [reply to any photo]"})
+    'usage': "{tr}setpfp [reply to any photo]"}, allow_via_bot=False)
 async def set_profile_picture(message: Message):
     """ Set Profile Picture """
     await message.edit("```processing ...```")
@@ -163,11 +163,11 @@ async def view_profile(message: Message):
         await message.err("```Flags Required```")
         return
     if "me" in message.filtered_input_str:
-        user = await userge.get_me()
-        bio = await userge.get_chat("me")
+        user = await message.client.get_me()
+        bio = await message.client.get_chat("me")
     else:
-        user = await userge.get_users(input_)
-        bio = await userge.get_chat(input_)
+        user = await message.client.get_users(input_)
+        bio = await message.client.get_chat(input_)
     if not user.photo:
         await message.err("profile photo not found!")
         return
@@ -198,8 +198,8 @@ async def view_profile(message: Message):
             await message.edit("<code>{}</code>".format(about), parse_mode='html')
     elif '-pp' in message.flags:
         await message.edit("```checking pfp, wait plox !...```")
-        await userge.download_media(user.photo.big_file_id, file_name=PHOTO)
-        await userge.send_photo(message.chat.id, PHOTO)
+        await message.client.download_media(user.photo.big_file_id, file_name=PHOTO)
+        await message.client.send_photo(message.chat.id, PHOTO)
         if os.path.exists(PHOTO):
             os.remove(PHOTO)
 
@@ -208,7 +208,7 @@ async def view_profile(message: Message):
     'header': "Delete Profile Pics",
     'description': "Delete profile pic in one blow"
                    " [NOTE: May Cause Flood Wait]",
-    'usage': "{tr}delpfp [pfp count]"})
+    'usage': "{tr}delpfp [pfp count]"}, allow_via_bot=False)
 async def del_pfp(message: Message):
     """ delete profile pics """
     if message.input_str:
@@ -239,7 +239,7 @@ async def del_pfp(message: Message):
         "{tr}clone -pp username", "{tr}clone -bio username",
         "{tr}clone username"],
     'note': "<code>● Use revert after clone to get original profile</code>\n"
-            "<code>● Don't use @ while giving username</code>"})
+            "<code>● Don't use @ while giving username</code>"}, allow_via_bot=False)
 async def clone_(message: Message):
     """ Clone first name, last name, bio and profile picture """
     if not message.input_or_reply_str:
@@ -321,7 +321,7 @@ async def clone_(message: Message):
 
 @userge.on_cmd("revert", about={
     'header': "Returns original profile",
-    'usage': "{tr}revert"})
+    'usage': "{tr}revert"}, allow_via_bot=False)
 async def revert_(message: Message):
     """ Returns Original Profile """
     if not (USER_DATA or os.path.exists(PHOTO)):

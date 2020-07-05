@@ -24,7 +24,7 @@ async def web(message: Message):
         file_name = input_str
     else:
         c_time = time.time()
-        file_name = await userge.download_media(
+        file_name = await message.client.download_media(
             message=message.reply_to_message,
             file_name=Config.DOWN_PATH,
             progress=progress,

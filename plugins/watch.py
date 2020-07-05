@@ -95,10 +95,10 @@ async def fetch_watch_sources(message: Message):
             link = link.replace(" ", "%20")
         output_ += f"[{pretty(provider)}]({link})\n"
 
-    await userge.send_photo(chat_id=message.chat.id,
-                            photo=thumb_link,
-                            caption=output_,
-                            disable_notification=True)
+    await message.client.send_photo(chat_id=message.chat.id,
+                                    photo=thumb_link,
+                                    caption=output_,
+                                    disable_notification=True)
     await message.delete()
 
 

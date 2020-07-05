@@ -10,7 +10,7 @@ from userge import userge, Message
     'header': "Get a Random RGB Sticker",
     'description': "Generates A RGB Sticker with provided text",
     'usage': "{tr}plet [text | reply]",
-    'examples': "{tr}plet @theUserge"})
+    'examples': "{tr}plet @theUserge"}, allow_via_bot=False)
 async def sticklet(message: Message):
     R = random.randint(0, 256)
     G = random.randint(0, 256)

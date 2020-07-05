@@ -10,7 +10,7 @@ from userge import userge, Message
 @userge.on_cmd("sticker", about={
     'header': "Its a joke with anime sticker",
     'usage': "{tr}sticker [text | reply to message]",
-    'example': "{tr}sticker I am fool"})
+    'example': "{tr}sticker I am fool"}, allow_via_bot=False)
 async def anisti(message: Message):
     """ Creates random anime sticker! """
 

@@ -58,7 +58,7 @@ async def carb(message: Message):
         carbon_result = requests.get(
             "https://sjprojectsapi.herokuapp.com/carbon/?"
             f"text={text}&theme={theme}&bg={bg}").json()
-        await userge.send_photo(chat_id=message.chat.id, photo=carbon_result['link'])
+        await message.client.send_photo(chat_id=message.chat.id, photo=carbon_result['link'])
         await message.delete()
     except Exception:
         await message.edit("API is Down! Try again later.")
