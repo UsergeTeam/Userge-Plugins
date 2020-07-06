@@ -7,6 +7,7 @@ LOG = userge.getLogger(__name__)  # logger object
 
 COUNTRY_CITY = os.environ.get("COUNTRY_CITY", None)
 
+
 @userge.on_cmd("dt", about={
     'header': "Get the time and date of a City/Country/Timezone.",
     'flags': {
