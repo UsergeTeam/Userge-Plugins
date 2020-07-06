@@ -1,7 +1,7 @@
 import os
 from datetime import datetime as dt
 from pytz import timezone
-from userge import userge, Message, Config
+from userge import userge, Message
 
 LOG = userge.getLogger(__name__)  # logger object
 
@@ -30,13 +30,13 @@ async def grabTime(message: Message):
                            parse_mode="html", del_in=30)
         return
 
-    if not Config.COUNTRY_CITY:
+    if not COUNTRY_CITY:
         LOG.info("Time: No Config Set")
         await message.edit(defaultMessage, disable_web_page_preview=True,
                            parse_mode="html", del_in=30)
         return
 
-    tz = Config.COUNTRY_CITY
+    tz = COUNTRY_CITY
     tzDateTime = dt.now(timezone(tz))
     date = tzDateTime.strftime('%d-%m-%Y')
     militaryTime = tzDateTime.strftime('%H:%M')
