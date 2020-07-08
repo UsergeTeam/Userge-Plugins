@@ -53,7 +53,7 @@ async def _init():
               '-off': "Disable AI on replied user",
               '-list': "List All users",
               '-info': "Get Info about Lydia"},
-    'usage': "{tr}lydia [flag] [reply to user]"}, allow_via_bot=False)
+    'usage': "{tr}lydia [flag] [reply to user]"})
 async def lydia_session(message: Message):
     """ lydia command handler """
     if CH_LYDIA_API is None:
@@ -152,7 +152,7 @@ async def lydia_session(message: Message):
 
 @userge.on_filters(
     ~Filters.me & ~Filters.edited & (Filters.mentioned | Filters.private),
-    group=2, allow_via_bot=False)
+    group=2, check_client=True)
 async def lydia_ai_chat(message: Message):
     """ incomming message handler """
     if CH_LYDIA_API is None:
@@ -188,9 +188,9 @@ async def lydia_ai_chat(message: Message):
 @userge.add_task
 async def lydia_queue() -> None:
     """ queue handler """
+    msg: Message
+    out: str
     while True:
-        msg: Message
-        out: str
         msg, out = await QUEUE.get()
         if (msg is None) or (out is None):
             break
@@ -219,13 +219,14 @@ async def _custom_media_reply(message: Message):
                     file_ref=cus_msg.sticker.file_ref
                 )
             if (cus_msg.photo or cus_msg.video or cus_msg.animation):
-                dls = await userge.download_media(message=cus_msg, file_name=Config.DOWN_PATH)
+                dls = await message.client.download_media(
+                    message=cus_msg, file_name=Config.DOWN_PATH)
                 if cus_msg.photo:
                     await message.reply_photo(dls)
                 if cus_msg.video:
                     await message.reply_video(dls)
                 if cus_msg.animation:
-                    await userge.send_animation(
+                    await message.client.send_animation(
                         chat_id=message.chat.id,
                         animation=dls,
                         unsave=True,
