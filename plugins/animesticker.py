@@ -12,7 +12,7 @@ from userge import userge, Message
     'flags': {
         '-f': "To get only girls in anime",
         '-ggl': "To get google search sticker",
-        'mock': "get mock text in sticker"},
+        '-mock': "get mock text in sticker"},
     'usage': "{tr}sticker [text | reply to message]\n"
              "{tr}sticker [flags] [text | reply to message]",
     'examples': [
