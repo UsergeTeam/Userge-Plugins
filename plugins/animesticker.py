@@ -41,7 +41,7 @@ async def anime_sticker(message: Message):
     try:
         stickers = await userge.get_inline_bot_results(
             "stickerizerbot",
-            f"#{random.choice(animus)}{text}"
+            f"#{animus}{text}"
         )
         await userge.send_inline_bot_result(
             chat_id=message.chat.id,
