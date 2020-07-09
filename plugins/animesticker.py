@@ -29,14 +29,14 @@ async def anime_sticker(message: Message):
         return
     if '-f' in message.flags:
         k = [20, 32, 33, 40, 41, 42, 58]
-    	animus = random.choice(k)
+        animus = random.choice(k)
     elif '-ggl' in message.flags:
-    	animus = 12
+        animus = 12
     elif '-mock' in message.flags:
-    	animus = 7
+        animus = 7
     else:
-    	k = [1, 3, 7, 9, 13, 22, 34, 35, 36, 37, 43, 44, 45, 52, 53, 55]
-    	animus = random.choice(k)
+        k = [1, 3, 7, 9, 13, 22, 34, 35, 36, 37, 43, 44, 45, 52, 53, 55]
+        animus = random.choice(k)
     await message.edit("```Lemme create a sticker ...```")
     try:
         stickers = await userge.get_inline_bot_results(
