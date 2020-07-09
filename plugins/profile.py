@@ -225,7 +225,7 @@ async def del_pfp(message: Message):
         except ValueError as v_e:
             await message.err(v_e)
             return
-        await message.edit("```Deleting first {del_c} Profile Photos ...```")
+        await message.edit(f"```Deleting first {del_c} Profile Photos ...```")
         async for photo in userge.iter_profile_photos("me", limit=del_c):
             await userge.delete_profile_photos(photo.file_id)
         else:
