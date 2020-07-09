@@ -1,48 +1,27 @@
 """ enjoy word_emoji """
 
 # by @krishna_singhal
-# little help given by @gotstc thanx sir... 🙂
 
 from userge import userge, Message
 
 
 @userge.on_cmd("hii", about={
-    'header': "Use HI to greet someone.\nplugin - @krishna_singhal",
-    'flags': {'-bnw': "Show as black and white as background.",
-              '-wnb': "Show as white and black as background.",
-              '-dnb': "Show as drops and black as background.",
-              '-mnb': "Show as monster and black as background.",
-              '-fns': "Show as flower and shine as background."},
-    'usage': "{tr}hii [emoji]\n{tr}hii [flags]"})
+    'header': "Use HI to greet someone",
+    'usage': "{tr}hii [foreground emoji] , [background emoji]"})
 async def hii_(message: Message):
     """hii"""
-    if '-bnw' in message.flags:
-        paytext = '⬛️'
-        filler = '⬜️'
-    elif '-wnb' in message.flags:
-        paytext = '⬜️'
-        filler = '⬛️'
-    elif '-dnb' in message.flags:
-        paytext = '💦'
-        filler = '⬛️'
-    elif '-mnb' in message.flags:
-        paytext = '🐲'
-        filler = '⬛️'
-    elif '-fns' in message.flags:
-        paytext = '🌺'
-        filler = '✨'
-    elif message.input_str:
-        args = message.input_str.split()
-        if len(args) == 2:
-            paytext, filler = args
-        else:
-            paytext = args[0]
-            filler = '✨'
-    else:
-        await message.edit(
-            "`Don't feel bad. A lot of people have no brain! and they blame to others.`")
-        await message.reply_sticker(sticker="CAADAgADEAADTLa2EO03s8D-kSlOFgQ")
+    if not message.input_str:
+        await message.edit("```That's why u Peru ,```", del_in=5)
         return
+    if ',' not in message.input_str:
+        await message.edit("```Two emoji required as foreground , background ```", del_in=5)
+        return
+    paytext, filler = message.input_str.split(',', maxsplit=1)
+    if not filler:
+        await message.edit("```Second emoji not found ...```", del_in=5)
+        return
+    paytext = paytext.strip()
+    filler = filler.strip()
     pay = "{}\n{}\n{}\n{}\n{}".format(
         paytext + filler * 2 + paytext +
         filler + paytext * 3,
@@ -58,42 +37,22 @@ async def hii_(message: Message):
 
 @userge.on_cmd("lol", about={
     'header': "Lol also known as lots of laugh used to indicate "
-              "smiling or slight amusement.\nplugin - @krishna_singhal",
-    'flags': {'-bnw': "Show as black and white as background.",
-              '-wnb': "Show as white and black as background.",
-              '-dnb': "Show as drops and black as background.",
-              '-mnb': "Show as monster and black as background.",
-              '-fns': "Show as flower and shine as background."},
-    'usage': "{tr}lol [emoji]\n{tr}lol [flags]"})
+              "smiling or slight amusement",
+    'usage': "{tr}lol [foreground emoji] , [background emoji]"})
 async def lol_(message: Message):
     """lol"""
-    if '-bnw' in message.flags:
-        paytext = '⬛️'
-        filler = '⬜️'
-    elif '-wnb' in message.flags:
-        paytext = '⬜️'
-        filler = '⬛️'
-    elif '-dnb' in message.flags:
-        paytext = '💦'
-        filler = '⬛️'
-    elif '-mnb' in message.flags:
-        paytext = '🐲'
-        filler = '⬛️'
-    elif '-fns' in message.flags:
-        paytext = '🌺'
-        filler = '✨'
-    elif message.input_str:
-        args = message.input_str.split()
-        if len(args) == 2:
-            paytext, filler = args
-        else:
-            paytext = args[0]
-            filler = '✨'
-    else:
-        await message.edit(
-            "`Don't feel bad. A lot of people have no brain! and they blame to others.`")
-        await message.reply_sticker(sticker="CAADAgADEAADTLa2EO03s8D-kSlOFgQ")
+    if not message.input_str:
+        await message.edit("```That's why u Peru ,```", del_in=5)
         return
+    if ',' not in message.input_str:
+        await message.edit("```Two emoji required as foreground , background ```", del_in=5)
+        return
+    paytext, filler = message.input_str.split(',', maxsplit=1)
+    if not filler:
+        await message.edit("```Second emoji not found ...```", del_in=5)
+        return
+    paytext = paytext.strip()
+    filler = filler.strip()
     pay = "{}\n{}\n{}\n{}".format(
         paytext + filler * 3 +
         paytext * 3 + filler + paytext + filler * 2,
@@ -107,42 +66,22 @@ async def lol_(message: Message):
 
 
 @userge.on_cmd("wtf", about={
-    'header': "WTF Generally stands for 'What the fuck'.\nplugin - @krishna_singhal",
-    'flags': {'-bnw': "Show as black and white as background.",
-              '-wnb': "Show as white and black as background.",
-              '-dnb': "Show as drops and black as background.",
-              '-mnb': "Show as monster and black as background.",
-              '-fns': "Show as flower and shine as background."},
-    'usage': "{tr}wtf [emoji]\n{tr}wtf [flags]"})
+    'header': "WTF Generally stands for 'What the fuck' use for fun",
+    'usage': "{tr}wtf [foreground emoji] , [background emoji]"})
 async def wtf_(message: Message):
     """wtf"""
-    if '-bnw' in message.flags:
-        paytext = '⬛️'
-        filler = '⬜️'
-    elif '-wnb' in message.flags:
-        paytext = '⬜️'
-        filler = '⬛️'
-    elif '-dnb' in message.flags:
-        paytext = '💦'
-        filler = '⬛️'
-    elif '-mnb' in message.flags:
-        paytext = '🐲'
-        filler = '⬛️'
-    elif '-fns' in message.flags:
-        paytext = '🌺'
-        filler = '✨'
-    elif message.input_str:
-        args = message.input_str.split()
-        if len(args) == 2:
-            paytext, filler = args
-        else:
-            paytext = args[0]
-            filler = '✨'
-    else:
-        await message.edit(
-            "`Don't feel bad. A lot of people have no brain! and they blame to others.`")
-        await message.reply_sticker(sticker="CAADAgADEAADTLa2EO03s8D-kSlOFgQ")
+    if not message.input_str:
+        await message.edit("```That's why u Peru ,```", del_in=5)
         return
+    if ',' not in message.input_str:
+        await message.edit("```Two emoji required as foreground , background ```", del_in=5)
+        return
+    paytext, filler = message.input_str.split(',', maxsplit=1)
+    if not filler:
+        await message.edit("```Second emoji not found ...```", del_in=5)
+        return
+    paytext = paytext.strip()
+    filler = filler.strip()
     pay = "{}\n{}\n{}\n{}".format(
         paytext + filler * 3 + paytext +
         filler + paytext * 3 + filler + paytext * 3,

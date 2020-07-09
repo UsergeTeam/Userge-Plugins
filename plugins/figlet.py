@@ -1,4 +1,4 @@
-# by Alone
+# by Alone and krishna
 
 from pyfiglet import Figlet
 
@@ -9,9 +9,9 @@ from userge import userge, Message
     'header': "Figlet",
     'description': "Make Fancy Style text using Figlet",
     'usage': "{tr}figlet font_name | [text | reply]",
-    'Available Fonts': "To know the font name list run command \n\n"
-    "<code>{tr}term pyfiglet --list_fonts</code>\n\n"
-    "<b>By the Way Plugin by:</b>\n\nAlone , @krishna_singhal"})
+    'Fonts': "<code>Check this</code> "
+    "<a href='https://telegra.ph/Figlet-List-Of-Fonts-07-03'>link</a>"
+    " <code>to know available fonts</code>"})
 async def figlet_(message: Message):
     args = message.input_or_reply_str
     if not args:
