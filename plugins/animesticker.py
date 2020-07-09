@@ -10,12 +10,14 @@ from userge import userge, Message
 @userge.on_cmd("sticker", about={
     'header': "Creates random anime sticker",
     'flags': {
-        '-f': "To get only girls in anime"},
+        '-f': "To get only girls in anime",
+        '-ggl': "To get google search sticker",
+        'mock': "get mock text in sticker"},
     'usage': "{tr}sticker [text | reply to message]\n"
-             "{tr}sticker -f [text | reply to message]",
+             "{tr}sticker [flags] [text | reply to message]",
     'examples': [
         "{tr}sticker Hello boys and girls",
-        "{tr}sticker -f Hello boys and girls"]}, allow_via_bot=False)
+        "{tr}sticker [flags] Hello boys and girls"]}, allow_via_bot=False)
 async def anime_sticker(message: Message):
     """ Creates random anime sticker! """
     if message.reply_to_message:
@@ -26,9 +28,15 @@ async def anime_sticker(message: Message):
         await message.err("```Input not found! ...```")
         return
     if '-f' in message.flags:
-        animus = [20, 32, 33, 40, 41, 42, 58]
+        k = [20, 32, 33, 40, 41, 42, 58]
+    	animus = random.choice(k)
+    elif '-ggl' in message.flags:
+    	animus = 12
+    elif '-mock' in message.flags:
+    	animus = 7
     else:
-        animus = [1, 3, 7, 9, 13, 22, 34, 35, 36, 37, 43, 44, 45, 52, 53, 55]
+    	k = [1, 3, 7, 9, 13, 22, 34, 35, 36, 37, 43, 44, 45, 52, 53, 55]
+    	animus = random.choice(k)
     await message.edit("```Lemme create a sticker ...```")
     try:
         stickers = await userge.get_inline_bot_results(
