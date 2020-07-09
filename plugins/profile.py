@@ -1,4 +1,4 @@
-""" All Account Settings for User """
+""" All Profile Settings for User """
 
 # by krishna
 # del_pfp by phyco-ninja
@@ -141,8 +141,9 @@ async def set_profile_picture(message: Message):
         '-fname': "Print only first name",
         '-lname': "Print only last name",
         '-flname': "Print full name",
-        '-bio': "Print only bio",
-        '-pp': "Print only profile picture"},
+        '-bio': "Print bio",
+        '-uname': "Print username",
+        '-pp': "Upload profile picture"},
     'usage': "{tr}vpf [flags]\n{tr}vpf [flags] [reply to any user]",
     'note': "<b> -> Use 'me' after flags to print own profile</b>\n"
             "<code>{tr}vpf [flags] me</code>"})
@@ -196,6 +197,13 @@ async def view_profile(message: Message):
             await message.edit("```checking, wait plox !...```")
             about = bio.description
             await message.edit("<code>{}</code>".format(about), parse_mode='html')
+    elif '-uname' in message.flags:
+        if not user.username:
+            await message.err("```User not hab username !...```")
+        else:
+            await message.edit("```checking, wait plox !...```")
+            username = user.username
+            await message.edit("<code>{}</code>".format(username), parse_mode='html')
     elif '-pp' in message.flags:
         await message.edit("```checking pfp, wait plox !...```")
         await message.client.download_media(user.photo.big_file_id, file_name=PHOTO)
@@ -312,7 +320,7 @@ async def clone_(message: Message):
             bio=chat.description or '')
         if not user.photo:
             await message.edit(
-                "`User not have profile photo, I only cloning Name nad bio ...`", del_in=5)
+                "`User not have profile photo, I only cloning Name and bio ...`", del_in=5)
             return
         await userge.download_media(user.photo.big_file_id, file_name=PHOTO)
         await userge.set_profile_photo(PHOTO)
