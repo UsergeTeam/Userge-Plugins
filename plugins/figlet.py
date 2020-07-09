@@ -9,8 +9,9 @@ from userge import userge, Message
     'header': "Figlet",
     'description': "Make Fancy Style text using Figlet",
     'usage': "{tr}figlet font_name | [text | reply]",
-    'Fonts': "[Check this link](https://telegra.ph/Figlet-List-Of-Fonts-07-03)"
-    " `to know available fonts`"})
+    'Fonts': "<code>Check this</code> "
+    "<a href='https://telegra.ph/Figlet-List-Of-Fonts-07-03'>link</a>"
+    " <code>to know available fonts</code>"})
 async def figlet_(message: Message):
     args = message.input_or_reply_str
     if not args:
