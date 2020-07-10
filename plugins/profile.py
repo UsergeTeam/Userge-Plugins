@@ -169,9 +169,6 @@ async def view_profile(message: Message):
     else:
         user = await message.client.get_users(input_)
         bio = await message.client.get_chat(input_)
-    if not user.photo:
-        await message.err("profile photo not found!")
-        return
     if '-fname' in message.flags:
         await message.edit("```checking, wait plox !...```")
         first_name = user.first_name
@@ -205,11 +202,14 @@ async def view_profile(message: Message):
             username = user.username
             await message.edit("<code>{}</code>".format(username), parse_mode='html')
     elif '-pp' in message.flags:
-        await message.edit("```checking pfp, wait plox !...```")
-        await message.client.download_media(user.photo.big_file_id, file_name=PHOTO)
-        await message.client.send_photo(message.chat.id, PHOTO)
-        if os.path.exists(PHOTO):
-            os.remove(PHOTO)
+        if not user.photo:
+            await message.err("```profile photo not found!```")
+        else:
+            await message.edit("```checking pfp, wait plox !...```")
+            await message.client.download_media(user.photo.big_file_id, file_name=PHOTO)
+            await message.client.send_photo(message.chat.id, PHOTO)
+            if os.path.exists(PHOTO):
+                os.remove(PHOTO)
 
 
 @userge.on_cmd("delpfp", about={
