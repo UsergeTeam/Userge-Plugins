@@ -134,7 +134,7 @@ async def fry_(message: Message):
         await message.err("```Need fry count from 1 - 8 only !...```", del_in=5)
         return
     args = int(args)
-    if not (0 < args < 9):
+    if not 0 < args < 9:
         await message.err("```Invalid range !...```", del_in=5)
         return
     if not os.path.isdir(Config.DOWN_PATH):
@@ -151,14 +151,14 @@ async def fry_(message: Message):
     )
     dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
     if replied.sticker and replied.sticker.file_name.endswith(".tgs"):
-    	await message.edit("```Ohh nice sticker, Lemme deepfry this Animated sticker ...```") 
-    	webp_file = os.path.join(Config.DOWN_PATH, "fry.png")
-    	cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {webp_file}"
-    	stdout, stderr = (await runcmd(cmd))[:2]
-    	if not os.path.lexists(webp_file):
-    		await message.err("```Media not found ...```", del_in=5)
-    		raise Exception(stdout + stderr)
-    	frying_file = webp_file
+        await message.edit("```Ohh nice sticker, Lemme deepfry this Animated sticker ...```") 
+        webp_file = os.path.join(Config.DOWN_PATH, "fry.png")
+        cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {webp_file}"
+        stdout, stderr = (await runcmd(cmd))[:2]
+        if not os.path.lexists(webp_file):
+            await message.err("```Media not found ...```", del_in=5)
+            raise Exception(stdout + stderr)
+        frying_file = webp_file
     elif replied.animation or replied.video:
         if replied.video:
             await message.edit("```Wait bruh, lemme deepfry this video ...```")
