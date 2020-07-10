@@ -59,6 +59,8 @@ async def google_img(message: Message):
     for img in os.listdir(PATH):
         imgs = PATH + img
         ss.append(InputMediaPhoto(str(imgs)))
+        if len(ss) == 9:
+            break
     await message.reply_chat_action("upload_photo")
     await message.reply_media_group(ss, True)
     shutil.rmtree(PATH, ignore_errors=True)
