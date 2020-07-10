@@ -170,18 +170,18 @@ async def view_profile(message: Message):
         user = await message.client.get_users(input_)
         bio = await message.client.get_chat(input_)
     if '-fname' in message.flags:
-        await message.edit("```checking, wait plox !...```")
+        await message.edit("```checking, wait plox !...```", del_in=3)
         first_name = user.first_name
         await message.edit("<code>{}</code>".format(first_name), parse_mode='html')
     elif '-lname' in message.flags:
         if not user.last_name:
-            await message.err("```User not hab last name !...```")
+            await message.err("```User not hab last name !...```", del_in=3)
         else:
-            await message.edit("```checking, wait plox !...```")
+            await message.edit("```checking, wait plox !...```", del_in=3)
             last_name = user.last_name
             await message.edit("<code>{}</code>".format(last_name), parse_mode='html')
     elif '-flname' in message.flags:
-        await message.edit("```checking, wait plox !...```")
+        await message.edit("```checking, wait plox !...```", del_in=3)
         if not user.last_name:
             await message.edit("<code>{}</code>".format(user.first_name), parse_mode='html')
         else:
@@ -189,23 +189,23 @@ async def view_profile(message: Message):
             await message.edit("<code>{}</code>".format(full_name), parse_mode='html')
     elif '-bio' in message.flags:
         if not bio.description:
-            await message.err("```User not hab bio !...```")
+            await message.err("```User not hab bio !...```", del_in=3)
         else:
-            await message.edit("```checking, wait plox !...```")
+            await message.edit("```checking, wait plox !...```", del_in=3)
             about = bio.description
             await message.edit("<code>{}</code>".format(about), parse_mode='html')
     elif '-uname' in message.flags:
         if not user.username:
-            await message.err("```User not hab username !...```")
+            await message.err("```User not hab username !...```", del_in=3)
         else:
-            await message.edit("```checking, wait plox !...```")
+            await message.edit("```checking, wait plox !...```", del_in=3)
             username = user.username
             await message.edit("<code>{}</code>".format(username), parse_mode='html')
     elif '-pp' in message.flags:
         if not user.photo:
-            await message.err("```profile photo not found!```")
+            await message.err("```profile photo not found!```", del_in=3)
         else:
-            await message.edit("```checking pfp, wait plox !...```")
+            await message.edit("```checking pfp, wait plox !...```", del_in=3)
             await message.client.download_media(user.photo.big_file_id, file_name=PHOTO)
             await message.client.send_photo(message.chat.id, PHOTO)
             if os.path.exists(PHOTO):
