@@ -38,7 +38,7 @@ def deEmojify(inputString: str) -> str:
              "{tr}sticker [flags] [text | reply to message]",
     'examples': [
         "{tr}sticker Hello boys and girls",
-        "{tr}sticker [flags] Hello boys and girls"]}, allow_via_bot=True)
+        "{tr}sticker [flags] Hello boys and girls"]}, allow_via_bot=False)
 async def anime_sticker(message: Message):
     """ Creates random anime sticker! """
     if message.reply_to_message:
