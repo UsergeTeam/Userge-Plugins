@@ -1,4 +1,4 @@
-import calendar
+import calendar  # pylint: disable=W0406
 
 from userge import userge, Message
 

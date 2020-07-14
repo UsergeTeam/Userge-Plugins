@@ -1,7 +1,7 @@
 import os
 import re
 import shutil
-import deezloader
+import deezloader  # pylint: disable=W0406
 from pathlib import Path
 
 from userge import userge, Message, pool

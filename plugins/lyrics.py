@@ -25,7 +25,7 @@ async def glyrics(message: Message):
     scp = BeautifulSoup(gen_page.text, 'html.parser')
     lyrics = scp.find("div", class_="lyrics").get_text()
     lyrics = re.sub(r'[\(\[].*?[\)\]]', '', lyrics)
-    lyrics = os.linesep.join([s for s in lyrics.splitlines() if s])
+    lyrics = os.linesep.join((s for s in lyrics.splitlines() if s))
     title = scp.find('title').get_text().split("|")
     writers_box = [
         writer
