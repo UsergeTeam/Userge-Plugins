@@ -3,10 +3,8 @@
 # by @krishna_singhal
 
 import random
-from random import choice
 from userge import userge, Message
 import re
-from re import sub
 
 EMOJI_PATTERN = re.compile(
     "["
@@ -23,11 +21,9 @@ EMOJI_PATTERN = re.compile(
     "\U00002702-\U000027B0"  # Dingbats 
     "]+")
 
-
 def deEmojify(inputString: str) -> str:
     """Remove emojis and other non-safe characters from string"""
     return re.sub(EMOJI_PATTERN, '', inputString)
-
 
 @userge.on_cmd("sticker", about={
     'header': "Creates random anime sticker",
