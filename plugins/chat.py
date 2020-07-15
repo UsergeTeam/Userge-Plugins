@@ -228,8 +228,7 @@ async def tadmins_(message: Message):
         '-title': "update chat title",
         '-uname': "update chat username",
         '-des': "update chat description",
-        '-ddes': "delete chat description",
-        '-dpic': "delete chat photo"},
+        '-ddes': "delete chat description"},
     'usage': "{tr}schat [flag]\n"
              "{tr}schat [flags] [input]"},
     allow_via_bot=False, allow_private=False)
@@ -238,27 +237,19 @@ async def set_chat(message: Message):
     can_set = await check_admin(message)
     if can_set:
         if not message.flags:
-            await message.err("```Flags required!...  ```", del_in=3)
+            await message.err("```Flags required!...```", del_in=3)
             return
         chat = await userge.get_chat(message.chat.id)
         if '-ddes' in message.flags:
             if not chat.description:
                 await message.edit(
-                    "```Chat already not have description... ```", del_in=5)
+                    "```Chat already not have description...```", del_in=5)
             else:
                 await userge.set_chat_description(message.chat.id, "")
                 await message.edit("```Chat Description is Successfully removed...```", del_in=3)
-        elif '-dpic' in message.flags:
-            if not chat.photo:
-                await message.edit(
-                    "``` Chat already not have any Photo...  ```", del_in=5)
-            else:
-                await userge.delete_chat_photo(message.chat.id)
-                await message.edit("```Chat photo is Successfully deleted...```", del_in=3)
-                return
         args = message.filtered_input_str
         if not args:
-            await message.edit("```Need Text to Update chat info... ```", del_in=5)
+            await message.edit("```Need Text to Update chat info...```", del_in=5)
             return
         if '-title' in message.flags:
             await userge.set_chat_title(message.chat.id, args.strip())
