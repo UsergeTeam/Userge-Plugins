@@ -7,8 +7,6 @@ import requests
 
 from userge import userge, Message, Config
 
-THUMB_PATH = Config.DOWN_PATH + "thumb_image.jpg"
-
 
 @userge.on_cmd("imdb", about={
     'header': "Scrap Movies & Tv Shows from IMDB",
@@ -89,17 +87,7 @@ async def imdb(message: Message):
 <b>Story Line : </b><em>{story_line}</em>"""
     except IndexError:
         await message.edit("Bruh, Plox enter **Valid movie name** kthx")
-    if os.path.exists(THUMB_PATH):
-        if len(des_) > 1024:
-            des_ = des_[:1021] + "..."
-        await message.client.send_photo(
-            chat_id=message.chat.id,
-            photo=THUMB_PATH,
-            caption=des_,
-            parse_mode="html"
-        )
-        await message.delete()
-    elif image is not None:
+    if image is not None:
         await message.edit("__downloading thumb ...__")
         img_path = wget.download(image, os.path.join(Config.DOWN_PATH, 'imdb_thumb.jpg'))
         if len(des_) > 1024:
