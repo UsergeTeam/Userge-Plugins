@@ -42,11 +42,12 @@ def deEmojify(inputString: str) -> str:
 async def anime_sticker(message: Message):
     """ Creates random anime sticker! """
     replied = message.reply_to_message
-    if replied:
-        text = replied.text
+    text = message.input_str
+    if text:
+        text = text
+    elif replied:
+        text = text if text else replied.text
     else:
-        text = message.filtered_input_str
-    if not text:
         await message.err("```Input not found!...```")
         return
     await message.edit("```Lemme create a sticker...```")
@@ -84,15 +85,15 @@ async def anime_sticker(message: Message):
             result_id=stickers.results[0].id,
             hide_via=True
         )
-        saved = await userge.get_messages("me", int(saved.updates[1].message.id))
+        Sticker = await userge.get_messages("me", int(saved.updates[1].message.id))
         message_id = replied.message_id if replied else None
         await userge.send_sticker(
             chat_id=message.chat.id,
-            sticker=str(saved.sticker.file_id),
-            file_ref=str(saved.sticker.file_ref),
+            sticker=str(Sticker.sticker.file_id),
+            file_ref=str(Sticker.sticker.file_ref),
             reply_to_message_id=message_id
         )
-        await userge.delete_messages("me", saved.message_id)
+        await saved.delete()
     except IndexError:
         await message.edit("```List index out of range```", del_in=3)
     else:
