@@ -42,11 +42,11 @@ def deEmojify(inputString: str) -> str:
 async def anime_sticker(message: Message):
     """ Creates random anime sticker! """
     replied = message.reply_to_message
-    text = message.input_str
-    if text:
-        text = text
+    args = message.input_str
+    if args:
+        text = args
     elif replied:
-        text = text if text else replied.text
+        text = args if args else replied.text
     else:
         await message.err("```Input not found!...```")
         return
