@@ -125,7 +125,7 @@ async def invite_link(message: Message):
             )
             return
     except Exception as e:
-        print(e)
+        LOG.error(e)
         await message.edit("```Chat Id, that you entered, is not valid... ^_^```", log=__name__)
 
 
