@@ -154,8 +154,12 @@ async def tagall_(message: Message):
         try:
             async for members in message.client.iter_chat_members(c_id, 100):
                 u_id = members.user.id
-                f_name = (await message.client.get_user_dict(u_id))['mention']
-                text += f"[{f_name}](tg://user?id={u_id}) "
+                u_name = members.user.username or None
+                f_name = (await message.client.get_user_dict(u_id))['fname']
+                if u_name:
+                    text += f"@{u_name} "
+                else:
+                    text += f"[{f_name}](tg://user?id={u_id}) "
         except Exception as e:
             text += " " + str(e)
         await message.client.send_message(c_id, text)
