@@ -115,10 +115,14 @@ async def invite_link(message: Message):
     except ChatAdminRequired:
         if chat.username:
             await message.edit(
-                f"```You is not admin in @{chat.username}, can't Generate invite link (-_-)```")
+                f"```You is not admin in @{chat.username}, can't Generate invite link (-_-)```",
+                log=__name__
+            )
         else:
             await message.edit(
-                f"```You is not admin in {chat.title}, Can't Generate invite link (-.-)```")
+                f"```You is not admin in {chat.title}, Can't Generate invite link (-.-)```",
+                log=__name__
+            )
             return
     except Exception as e:
         print(e)
