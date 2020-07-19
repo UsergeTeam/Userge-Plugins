@@ -12,8 +12,11 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     UsernameInvalid,
     UsernameNotOccupied,
     PeerIdInvalid)
+from pyrogram.errors import ChatAdminRequired
 
 from userge import userge, Config, Message
+
+CHANNEL = userge.getCLogger("Invite Error")
 
 PATH = Config.DOWN_PATH + "chat_pic.jpg"
 
@@ -103,17 +106,26 @@ async def invite_link(message: Message):
     try:
         chat = await userge.get_chat(chat_id)
         chat_name = chat.title
-        if message.chat.type in ['group', 'supergroup', 'private']:
+        if chat.type in ['group', 'supergroup', 'private']:
             link = await userge.export_chat_invite_link(chat_id)
             await message.edit(
                 "**Invite link Genrated Successfully for\n"
                 f"{chat_name}**\n[Click here to join]({link})",
                 disable_web_page_preview=True)
         else:
-            await message.edit("```Rquirements not met...```")
+            await message.edit("```Requirements not met...```")
+    except ChatAdminRequired:
+        if chat.username:
+            await CHANNEL.log(f"You is not admin in @{chat.username}, can't Generate invite link...")
+            await message.edit(f"```You is not admin in @{chat.username}, can't Generate invite link (-_-)```")
+        else:
+            await CHANNEL.log(f"You is not admin in {chat.title}, can't Generate invite link...")
+            await message.edit(f"```You is not admin in {chat.title}, Can't Generate invite link (-.-)```")
+            return
     except Exception as e:
         print(e)
-        await message.edit("```Either You is not admin or Chat Id is not valid...^_^```")
+        await CHANNEL.log("Chat id, that you entered, is not valid")
+        await message.edit("```Chat Id, that you entered, is not valid... ^_^```")
 
 
 @userge.on_cmd("tagall", about={
@@ -140,7 +152,7 @@ async def tagall_(message: Message):
             async for members in message.client.iter_chat_members(c_id, 100):
                 u_id = members.user.id
                 u_name = members.user.username or None
-                f_name = (await message.client.get_user_dict(u_id))['fname']
+                f_name = (await message.client.get_user_dict(u_id))['mention']
                 if u_name:
                     text += f"@{u_name} "
                 else:
@@ -160,26 +172,30 @@ async def tagall_(message: Message):
 async def stagall_(message: Message):
     chat_id = message.chat.id
     chat = await userge.get_chat(chat_id)
-    await message.edit(f"```tagging everyone in {chat.title}```")
-    replied = message.reply_to_message
-    if replied:
-        text = replied.text
+    can_stag = await check_admin(message)
+    if can_stag:
+        await message.edit(f"```tagging everyone in {chat.title}```")
+        replied = message.reply_to_message
+        if replied:
+            text = replied.text
+        else:
+            text = message.input_str
+        if not text:
+            await message.edit("```Without reason, I will not tag Members... (*>_<*)```", del_in=5)
+            return
+        text = f"<code>{text}</code>"
+        member = userge.iter_chat_members(chat_id)
+        async for members in member:
+            if not members.user.is_bot:
+                text += mention_html(members.user.id, "\u200b")
+        await message.delete()
+        if message.reply_to_message:
+            await userge.send_message(
+                chat_id, text, reply_to_message_id=replied.message_id, parse_mode="html")
+        else:
+            await userge.send_message(chat_id, text, parse_mode="html")
     else:
-        text = message.input_str
-    if not text:
-        await message.edit("```Without reason, I will not tag Members... (*>_<*)```", del_in=5)
-        return
-    text = f"<code>{text}</code>"
-    member = userge.iter_chat_members(chat_id)
-    async for members in member:
-        if not members.user.is_bot:
-            text += mention_html(members.user.id, "\u200b")
-    await message.delete()
-    if message.reply_to_message:
-        await userge.send_message(
-            chat_id, text, reply_to_message_id=replied.message_id, parse_mode="html")
-    else:
-        await userge.send_message(chat_id, text, parse_mode="html")
+        await message.edit("```You don't have enough Power to do that...(^ム^)```")
 
 
 @userge.on_cmd("tadmins", about={
