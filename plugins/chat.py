@@ -16,6 +16,8 @@ from pyrogram.errors import ChatAdminRequired
 
 from userge import userge, Config, Message
 
+LOG = userge.getLogger(__name__)
+
 PATH = Config.DOWN_PATH + "chat_pic.jpg"
 
 
