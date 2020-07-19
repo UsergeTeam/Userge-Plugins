@@ -16,8 +16,6 @@ from pyrogram.errors import ChatAdminRequired
 
 from userge import userge, Config, Message
 
-CHANNEL = userge.getCLogger("Invite Error")
-
 PATH = Config.DOWN_PATH + "chat_pic.jpg"
 
 
@@ -116,16 +114,15 @@ async def invite_link(message: Message):
             await message.edit("```Requirements not met...```")
     except ChatAdminRequired:
         if chat.username:
-            await CHANNEL.log(f"You is not admin in @{chat.username}, can't Generate invite link...")
-            await message.edit(f"```You is not admin in @{chat.username}, can't Generate invite link (-_-)```")
+            await message.edit(
+                f"```You is not admin in @{chat.username}, can't Generate invite link (-_-)```")
         else:
-            await CHANNEL.log(f"You is not admin in {chat.title}, can't Generate invite link...")
-            await message.edit(f"```You is not admin in {chat.title}, Can't Generate invite link (-.-)```")
+            await message.edit(
+                f"```You is not admin in {chat.title}, Can't Generate invite link (-.-)```")
             return
     except Exception as e:
         print(e)
-        await CHANNEL.log("Chat id, that you entered, is not valid")
-        await message.edit("```Chat Id, that you entered, is not valid... ^_^```")
+        await message.edit("```Chat Id, that you entered, is not valid... ^_^```", log=__name__)
 
 
 @userge.on_cmd("tagall", about={
@@ -151,12 +148,8 @@ async def tagall_(message: Message):
         try:
             async for members in message.client.iter_chat_members(c_id, 100):
                 u_id = members.user.id
-                u_name = members.user.username or None
                 f_name = (await message.client.get_user_dict(u_id))['mention']
-                if u_name:
-                    text += f"@{u_name} "
-                else:
-                    text += f"[{f_name}](tg://user?id={u_id}) "
+                text += f"[{f_name}](tg://user?id={u_id}) "
         except Exception as e:
             text += " " + str(e)
         await message.client.send_message(c_id, text)
