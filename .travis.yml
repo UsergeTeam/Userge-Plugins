@@ -12,5 +12,6 @@ install:
 before_script:
   - rm -rf Userge-Plugins/
   - cd Userge
+  - mkdir -p logs
 script:
   - python test.py
