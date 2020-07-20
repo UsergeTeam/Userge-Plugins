@@ -42,7 +42,7 @@ def deEmojify(inputString: str) -> str:
 async def anime_sticker(message: Message):
     """ Creates random anime sticker! """
     replied = message.reply_to_message
-    args = message.input_str
+    args = message.filtered_input_str
     if args:
         text = args
     elif replied:
@@ -85,12 +85,12 @@ async def anime_sticker(message: Message):
             result_id=stickers.results[0].id,
             hide_via=True
         )
-        Sticker = await userge.get_messages("me", int(saved.updates[1].message.id))
+        saved = await userge.get_messages("me", int(saved.updates[1].message.id))
         message_id = replied.message_id if replied else None
         await userge.send_sticker(
             chat_id=message.chat.id,
-            sticker=str(Sticker.sticker.file_id),
-            file_ref=str(Sticker.sticker.file_ref),
+            sticker=str(saved.sticker.file_id),
+            file_ref=str(saved.sticker.file_ref),
             reply_to_message_id=message_id
         )
         await saved.delete()
