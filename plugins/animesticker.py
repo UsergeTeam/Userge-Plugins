@@ -48,9 +48,8 @@ async def anime_sticker(message: Message):
     elif replied:
         text = args if args else replied.text
     else:
-        await message.err("```Input not found!...```")
+        await message.err("```Input not found!...```", del_in=3)
         return
-    await message.edit("```Lemme create a sticker...```")
     if '-ggl' in message.flags:
         try:
             stickers = await userge.get_inline_bot_results(
@@ -96,5 +95,3 @@ async def anime_sticker(message: Message):
         await saved.delete()
     except IndexError:
         await message.edit("```List index out of range```", del_in=3)
-    else:
-        await message.delete()
