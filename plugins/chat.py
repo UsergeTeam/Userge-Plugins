@@ -21,16 +21,6 @@ LOG = userge.getLogger(__name__)
 PATH = Config.DOWN_PATH + "chat_pic.jpg"
 
 
-async def check_admin(message: Message):
-    chat_id = message.chat.id
-    is_admin = await message.client.get_chat_member(chat_id, (await message.client.get_me()).id)
-    if is_admin.status == "creator":
-        return True
-    if is_admin.status == "administrator":
-        return True
-    return False
-
-
 def mention_html(user_id, name):
     return u'<a href="tg://user?id={}">{}</a>'.format(user_id, html.escape(name))
 
@@ -38,7 +28,7 @@ def mention_html(user_id, name):
 @userge.on_cmd("join", about={
     'header': "Join chat",
     'usage': "{tr}join [chat username | reply to Chat username Text]",
-    'examples': "{tr}join UserGeOt"}, allow_via_bot=True)
+    'examples': "{tr}join UserGeOt"})
 async def join_chat(message: Message):
     """ Join chat """
     replied = message.reply_to_message
@@ -70,7 +60,7 @@ async def join_chat(message: Message):
     'usage': "{tr}leave\n{tr}leave [chat username | reply to Chat username text]",
     'examples': [
         "{tr}leave", "{tr}leave UserGeOt"]},
-    allow_via_bot=True, allow_private=False)
+    allow_private=False)
 async def leave_chat(message: Message):
     """ Leave chat """
     replied = message.reply_to_message
@@ -97,8 +87,9 @@ async def leave_chat(message: Message):
 @userge.on_cmd("invite", about={
     'header': "Generate chat Invite link",
     'usage': "{tr}invite\n{tr}invite [Chat Id | Chat Username]"},
-    allow_channels=False)
+    allow_channels=False, only_admins=True)
 async def invite_link(message: Message):
+    """ Generate invite link """
     if message.input_str:
         chat_id = message.input_str
     else:
@@ -134,79 +125,72 @@ async def invite_link(message: Message):
 @userge.on_cmd("tagall", about={
     'header': "Tagall recent 100 members with caption",
     'usage': "{tr}tagall [Text | reply to text Msg]"},
-    allow_via_bot=False, allow_private=False, allow_channels=True)
+    allow_via_bot=False, allow_private=False, only_admins=True)
 async def tagall_(message: Message):
     """ Tag recent members """
-    can_tag = await check_admin(message)
-    if can_tag:
-        replied = message.reply_to_message
-        if replied:
-            text = replied.text
-        else:
-            text = message.input_str
-        if not text:
-            await message.edit("```Without reason, I will not tag Members...(=_=)```", del_in=5)
-            return
-        c_title = message.chat.title
-        c_id = message.chat.id
-        await message.edit(f"```Tagging recent members in {c_title}...```")
-        text = f"**{text}**\n"
-        try:
-            async for members in message.client.iter_chat_members(c_id, 100):
-                u_id = members.user.id
-                u_name = members.user.username or None
-                f_name = (await message.client.get_user_dict(u_id))['fname']
-                if u_name:
-                    text += f"@{u_name} "
-                else:
-                    text += f"[{f_name}](tg://user?id={u_id}) "
-        except Exception as e:
-            text += " " + str(e)
-        await message.client.send_message(c_id, text)
-        await message.edit("```Tagged recent Members Successfully...```", del_in=3)
+    replied = message.reply_to_message
+    if replied:
+        text = replied.text
     else:
-        await message.edit("```You don't have enough Power to do that...(^ム^)```")
+        text = message.input_str
+    if not text:
+        await message.edit("```Without reason, I will not tag Members...(=_=)```", del_in=5)
+        return
+    c_title = message.chat.title
+    c_id = message.chat.id
+    await message.edit(f"```Tagging recent members in {c_title}...```")
+    text = f"**{text}**\n"
+    try:
+        async for members in message.client.iter_chat_members(c_id, 100):
+            u_id = members.user.id
+            u_name = members.user.username or None
+            f_name = (await message.client.get_user_dict(u_id))['fname']
+            if u_name:
+                text += f"@{u_name} "
+            else:
+                text += f"[{f_name}](tg://user?id={u_id}) "
+    except Exception as e:
+        text += " " + str(e)
+    await message.client.send_message(c_id, text)
+    await message.edit("```Tagged recent Members Successfully...```", del_in=3)
 
 
 @userge.on_cmd("stagall", about={
     'header': "Silent tag recent 100 members with caption",
     'usage': "{tr}stagall [Text | reply to text Msg]"},
-    allow_private=False, allow_via_bot=False)
+    allow_private=False, allow_via_bot=False, only_admins=True)
 async def stagall_(message: Message):
+    """ tag recent members without spam """
     chat_id = message.chat.id
     chat = await userge.get_chat(chat_id)
-    can_stag = await check_admin(message)
-    if can_stag:
-        await message.edit(f"```tagging everyone in {chat.title}```")
-        replied = message.reply_to_message
-        if replied:
-            text = replied.text
-        else:
-            text = message.input_str
-        if not text:
-            await message.edit("```Without reason, I will not tag Members... (*>_<*)```", del_in=5)
-            return
-        text = f"<code>{text}</code>"
-        member = userge.iter_chat_members(chat_id)
-        async for members in member:
-            if not members.user.is_bot:
-                text += mention_html(members.user.id, "\u200b")
-        await message.delete()
-        if message.reply_to_message:
-            await userge.send_message(
-                chat_id, text, reply_to_message_id=replied.message_id, parse_mode="html")
-        else:
-            await userge.send_message(chat_id, text, parse_mode="html")
+    await message.edit(f"```tagging everyone in {chat.title}```")
+    replied = message.reply_to_message
+    if replied:
+        text = replied.text
     else:
-        await message.edit("```You don't have enough Power to do that...(^ム^)```")
+        text = message.input_str
+    if not text:
+        await message.edit("```Without reason, I will not tag Members... (*>_<*)```", del_in=5)
+        return
+    text = f"<code>{text}</code>"
+    member = userge.iter_chat_members(chat_id)
+    async for members in member:
+        if not members.user.is_bot:
+            text += mention_html(members.user.id, "\u200b")
+    await message.delete()
+    if message.reply_to_message:
+        await userge.send_message(
+            chat_id, text, reply_to_message_id=replied.message_id, parse_mode="html")
+    else:
+        await userge.send_message(chat_id, text, parse_mode="html")
 
 
 @userge.on_cmd("tadmins", about={
     'header': "Tag admins in group",
     'usage': "{tr}tadmins [Text | reply to text Msg]"},
-    allow_via_bot=True, allow_private=False)
+    allow_private=False)
 async def tadmins_(message: Message):
-    """ Tag admins """
+    """ Tag admins in a group """
     replied = message.reply_to_message
     if replied:
         text = replied.text
@@ -250,57 +234,52 @@ async def tadmins_(message: Message):
         '-ddes': "delete chat description"},
     'usage': "{tr}schat [flag]\n"
              "{tr}schat [flags] [input]"},
-    allow_via_bot=False, allow_private=False)
+    allow_via_bot=False, allow_private=False, only_admins=True)
 async def set_chat(message: Message):
     """ Set or delete chat info """
-    can_set = await check_admin(message)
-    if can_set:
-        if not message.flags:
-            await message.err("```Flags required!...```", del_in=3)
-            return
-        chat = await userge.get_chat(message.chat.id)
-        if '-ddes' in message.flags:
-            if not chat.description:
-                await message.edit(
-                    "```Chat already not have description...```", del_in=5)
-            else:
-                await userge.set_chat_description(message.chat.id, "")
-                await message.edit("```Chat Description is Successfully removed...```", del_in=3)
-        args = message.filtered_input_str
-        if not args:
-            await message.edit("```Need Text to Update chat info...```", del_in=5)
-            return
-        if '-title' in message.flags:
-            await userge.set_chat_title(message.chat.id, args.strip())
-            await message.edit("```Chat Title is Successfully Updated...```", del_in=3)
-        elif '-uname' in message.flags:
-            try:
-                await userge.update_chat_username(message.chat.id, args.strip())
-            except ValueError:
-                await message.edit("```I think its a private chat...(^_-)```", del_in=3)
-                return
-            except UsernameInvalid:
-                await message.edit("```Username, you entered, is invalid... ```", del_in=3)
-                return
-            except UsernameOccupied:
-                await message.edit(
-                    "```Username, you entered, is already Occupied... ```", del_in=3)
-                return
-            else:
-                await message.edit("```Chat Username is Successfully Updated...```", del_in=3)
-        elif '-des' in message.flags:
-            try:
-                await userge.set_chat_description(message.chat.id, args.strip())
-            except BadRequest:
-                await message.edit(
-                    "```Chat description is Too Long...  ```", del_in=3)
-            else:
-                await message.edit("```Chat description is Successfully Updated...```", del_in=3)
+    if not message.flags:
+        await message.err("```Flags required!...```", del_in=3)
+        return
+    chat = await userge.get_chat(message.chat.id)
+    if '-ddes' in message.flags:
+        if not chat.description:
+            await message.edit(
+                "```Chat already not have description...```", del_in=5)
         else:
-            await message.edit("```Invalid args, Exiting...  ```", del_in=5)
+            await userge.set_chat_description(message.chat.id, "")
+            await message.edit("```Chat Description is Successfully removed...```", del_in=3)
+    args = message.filtered_input_str
+    if not args:
+        await message.edit("```Need Text to Update chat info...```", del_in=5)
+        return
+    if '-title' in message.flags:
+        await userge.set_chat_title(message.chat.id, args.strip())
+        await message.edit("```Chat Title is Successfully Updated...```", del_in=3)
+    elif '-uname' in message.flags:
+        try:
+            await userge.update_chat_username(message.chat.id, args.strip())
+        except ValueError:
+            await message.edit("```I think its a private chat...(^_-)```", del_in=3)
+            return
+        except UsernameInvalid:
+            await message.edit("```Username, you entered, is invalid... ```", del_in=3)
+            return
+        except UsernameOccupied:
+            await message.edit(
+                "```Username, you entered, is already Occupied... ```", del_in=3)
+            return
+        else:
+            await message.edit("```Chat Username is Successfully Updated...```", del_in=3)
+    elif '-des' in message.flags:
+        try:
+            await userge.set_chat_description(message.chat.id, args.strip())
+        except BadRequest:
+            await message.edit(
+                "```Chat description is Too Long...  ```", del_in=3)
+        else:
+            await message.edit("```Chat description is Successfully Updated...```", del_in=3)
     else:
-        await message.edit(
-            "```You don't have enough power to do that...(≧▽≦)```", del_in=5)
+        await message.edit("```Invalid args, Exiting...  ```", del_in=5)
 
 
 @userge.on_cmd('vchat', about={
@@ -312,7 +291,7 @@ async def set_chat(message: Message):
     'usage': [
         "{tr}vchat [flags]",
         "{tr}vchat : upload chat photo"]},
-    allow_via_bot=True, allow_private=False)
+    allow_private=False)
 async def view_chat(message: Message):
     """ View chat info """
     chat_id = message.chat.id
