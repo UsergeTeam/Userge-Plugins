@@ -50,6 +50,7 @@ async def anime_sticker(message: Message):
     else:
         await message.err("```Input not found!...```", del_in=3)
         return
+    await message.delete()
     if '-ggl' in message.flags:
         try:
             stickers = await userge.get_inline_bot_results(
