@@ -101,9 +101,7 @@ async def check_creds(token_file, event):
             replies=0
         )
         if confidential_message and confidential_message.document:
-            await confidential_message.download(
-                file=token_file
-            )
+            await confidential_message.download(file_name=token_file)
 
     if os.path.exists(token_file):
         pho_storage = file.Storage(token_file)
