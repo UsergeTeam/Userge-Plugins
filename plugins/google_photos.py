@@ -45,8 +45,6 @@ if G_PHOTOS_AUTH_TOKEN_ID:
 
 @userge.on_cmd("gphoto setup", about="no one gonna help you 🤣🤣🤣🤣")
 async def setup_google_photos(message: Message):
-    if message.chat.id != Config.LOG_CHANNEL_ID:
-        return
     token_file = TOKEN_FILE_NAME
     is_cred_exists, _ = await check_creds(token_file, message)
     if not is_cred_exists:
