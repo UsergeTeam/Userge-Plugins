@@ -10,7 +10,6 @@
 """Google Photos
 """
 
-import asyncio
 import aiohttp
 import aiofiles
 import os
@@ -19,7 +18,7 @@ import time
 from apiclient.discovery import build
 from mimetypes import guess_type
 from httplib2 import Http
-from oauth2client import file, client, tools
+from oauth2client import file, client
 
 from userge import userge, Message, Config
 from userge.utils import progress
@@ -41,7 +40,7 @@ LOG = userge.getLogger(__name__)  # logger object
 CHANNEL = userge.getCLogger(__name__)  # channel logger object
 G_PHOTOS_AUTH_TOKEN_ID = os.environ.get("G_PHOTOS_AUTH_TOKEN_ID", None)
 if G_PHOTOS_AUTH_TOKEN_ID:
-    G_PHOTOS_AUTH_TOKEN_ID= int(G_PHOTOS_AUTH_TOKEN_ID)
+    G_PHOTOS_AUTH_TOKEN_ID = int(G_PHOTOS_AUTH_TOKEN_ID)
 
 
 
@@ -52,7 +51,7 @@ async def setup_google_photos(message: Message):
     token_file = TOKEN_FILE_NAME
     is_cred_exists, _ = await check_creds(token_file, message)
     if not is_cred_exists:
-        pho_storage = await create_token_file(
+        await create_token_file(
             token_file,
             message
         )
@@ -127,7 +126,7 @@ async def check_creds(token_file, event):
 @userge.on_cmd("gphoto upload", about="no one gonna help you 🤣🤣🤣🤣")
 async def upload_google_photos(message: Message):
     if not message.reply_to_message:
-        await event.edit(
+        await message.edit_text(
             "©️ <b>[Forwarded from utubebot]</b>\nno one gonna help you 🤣🤣🤣🤣",
             parse_mode="html"
         )
@@ -169,7 +168,7 @@ async def upload_google_photos(message: Message):
     LOG.info(file_path)
 
     if not file_path:
-        await event.edit(
+        await message.edit_text(
             "<b>[stop spamming]</b>",
             parse_mode="html"
         )
