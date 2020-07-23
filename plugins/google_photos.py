@@ -69,9 +69,7 @@ async def create_token_file(token_file, event):
         redirect_uri=REDIRECT_URI
     )
     authorize_url = flow.step1_get_authorize_url()
-    async with userge.conversation(
-        event.chat.id
-    ) as conv:
+    async with userge.conversation(event.chat.id, timeout=60) as conv:
         await conv.send_message(
             "Go to "
             "the following link in "
@@ -84,9 +82,7 @@ async def create_token_file(token_file, event):
         credentials = flow.step2_exchange(code)
         storage = file.Storage(token_file)
         storage.put(credentials)
-        imp_gsem = await conv.send_document(
-            document=token_file
-        )
+        imp_gsem = await conv.send_document(document=token_file)
         await imp_gsem.reply_text(
             "please set "
             "<code>G_PHOTOS_AUTH_TOKEN_ID</code> "
