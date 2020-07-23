@@ -2,25 +2,17 @@
 # Author: Nageen (https://github.com/archie9211) (@archie9211)
 # All rights reserved
 
-import requests
-from userge import userge, Message
 import re
 
+import requests
 
-def getsize(len_of_file):
-    len_of_file = int(len_of_file)
-    depth = 0
-    while(len_of_file > 1024):
-        len_of_file /= 1024
-        depth += 1
-    ext = ["B", "KB", "MB", "GB", "TB", "PB"]
-    return "{:.2f} {}".format(len_of_file, ext[depth])
-
+from userge import userge, Message
+from userge.utils import humanbytes
 
 @userge.on_cmd("tstp", about={
     'header': "Torrent Search On torrent-paradise.ml ",
-    'description': '''Search torrent from different websites
-         offered by torrent-paradise, by default limit is 10''',
+    'description': "Search torrent from different websites"
+                   "offered by torrent-paradise, by default limit is 10",
     'usage': "{tr}tstp [query] [-limit]",
     'examples': "{tr}tstp The vampire diaries -l5"})
 async def torr_search(message: Message):
@@ -41,10 +33,10 @@ async def torr_search(message: Message):
             if len(reply_) < 4096 and torrent["s"] > 0:
                 try:
                     reply_ = (reply_ + f"\n\n<b>{torrent['text']}</b>\n"
-                        f"<b>Size:</b> {getsize(torrent['len'])}\n"
-                        f"<b>Seeders:</b> {torrent['s']}\n"
-                        f"<b>Leechers:</b> {torrent['l']}\n"
-                        f"<code>magnet:?xt=urn:btih:{torrent['id']}</code>")
+                              f"<b>Size:</b> {humanbytes(torrent['len'])}\n"
+                              f"<b>Seeders:</b> {torrent['s']}\n"
+                              f"<b>Leechers:</b> {torrent['l']}\n"
+                              f"<code>magnet:?xt=urn:btih:{torrent['id']}</code>")
                 except Exception:
                     pass
         if reply_ == "":
