@@ -43,7 +43,6 @@ if G_PHOTOS_AUTH_TOKEN_ID:
     G_PHOTOS_AUTH_TOKEN_ID = int(G_PHOTOS_AUTH_TOKEN_ID)
 
 
-
 @userge.on_cmd("gphoto setup", about="no one gonna help you 🤣🤣🤣🤣")
 async def setup_google_photos(message: Message):
     if message.chat.id != Config.LOG_CHANNEL_ID:
@@ -102,7 +101,7 @@ async def create_token_file(token_file, event):
 
 async def check_creds(token_file, event):
     if Config.G_PHOTOS_AUTH_TOKEN_ID:
-        confidential_message = await event._client.get_messages(
+        confidential_message = await event._client.get_messages( #noqa
             chat_id=Config.LOG_CHANNEL_ID,
             message_ids=Config.G_PHOTOS_AUTH_TOKEN_ID,
             replies=0
