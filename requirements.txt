@@ -7,3 +7,4 @@ gtts
 justwatch
 lottie
 spotdl
+qrcode
