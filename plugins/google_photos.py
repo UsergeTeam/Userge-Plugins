@@ -101,7 +101,7 @@ async def create_token_file(token_file, event):
 
 async def check_creds(token_file, event):
     if Config.G_PHOTOS_AUTH_TOKEN_ID:
-        confidential_message = await event._client.get_messages(  # noqa
+        confidential_message = await event.client.get_messages(  # noqa
             chat_id=Config.LOG_CHANNEL_ID,
             message_ids=Config.G_PHOTOS_AUTH_TOKEN_ID,
             replies=0
