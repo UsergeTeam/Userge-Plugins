@@ -10,10 +10,10 @@ from userge.utils import take_screen_shot, runcmd
 Converted = Config.DOWN_PATH + "sticker.webp"
 
 
-@userge.on_cmd("ghost", about={
-    'header': "Invert media as looking lika a ghost",
+@userge.on_cmd("(ghost|invert)", about={
+    'header': "Invert media as looking like a ghost",
     'usage': "{tr}ghost [reply to any media]\n"
-             "{tr}invert [reply to any media]"})
+             "{tr}invert [reply to any media]"}, name="ghost")
 async def ghost_invert(message: Message):
     """ Transform IMG as looking like a ghost """
     replied = message.reply_to_message
