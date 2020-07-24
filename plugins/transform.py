@@ -64,9 +64,11 @@ async def ghost_invert(message: Message):
     im = Image.open(ghost_file).convert('RGB')
     im_invert = ImageOps.invert(im)
     im_invert.save(Converted)
-    await message.client.send_sticker(message.chat.id,
+    await message.client.send_sticker(
+        message.chat.id,
         sticker=Converted,
-        reply_to_message_id=replied.message_id)
+        reply_to_message_id=replied.message_id
+        )
     await message.delete()
     for files in (dls_loc, ghost_file, Converted):
         if files and os.path.exists(files):
@@ -125,9 +127,11 @@ async def mirror_flip(message: Message):
     else:
         IMG = ImageOps.flip(im)
     IMG.save(Converted, quality=95)
-    await message.client.send_sticker(message.chat.id,
+    await message.client.send_sticker(
+        message.chat.id,
         sticker=Converted,
-        reply_to_message_id=replied.message_id)
+        reply_to_message_id=replied.message_id
+        )
     await message.delete()
     for files in (dls_loc, mirror_flip_file, Converted):
         if files and os.path.exists(files):
@@ -192,9 +196,11 @@ async def rotate_(message: Message):
     im = Image.open(rotate_file).convert('RGB')
     IMG = im.rotate(args, expand=1)
     IMG.save(Converted, quality=95)
-    await message.client.send_sticker(message.chat.id,
+    await message.client.send_sticker(
+        message.chat.id,
         sticker=Converted,
-        reply_to_message_id=replied.message_id)
+        reply_to_message_id=replied.message_id
+        )
     await message.delete()
     for files in (dls_loc, rotate_file, Converted):
         if files and os.path.exists(files):
