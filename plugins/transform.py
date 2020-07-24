@@ -67,8 +67,7 @@ async def ghost_invert(message: Message):
     await message.client.send_sticker(
         message.chat.id,
         sticker=Converted,
-        reply_to_message_id=replied.message_id
-        )
+        reply_to_message_id=replied.message_id)
     await message.delete()
     for files in (dls_loc, ghost_file, Converted):
         if files and os.path.exists(files):
@@ -130,8 +129,7 @@ async def mirror_flip(message: Message):
     await message.client.send_sticker(
         message.chat.id,
         sticker=Converted,
-        reply_to_message_id=replied.message_id
-        )
+        reply_to_message_id=replied.message_id)
     await message.delete()
     for files in (dls_loc, mirror_flip_file, Converted):
         if files and os.path.exists(files):
@@ -199,8 +197,7 @@ async def rotate_(message: Message):
     await message.client.send_sticker(
         message.chat.id,
         sticker=Converted,
-        reply_to_message_id=replied.message_id
-        )
+        reply_to_message_id=replied.message_id)
     await message.delete()
     for files in (dls_loc, rotate_file, Converted):
         if files and os.path.exists(files):
