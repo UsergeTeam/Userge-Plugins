@@ -150,9 +150,7 @@ async def lydia_session(message: Message):
         )
 
 
-@userge.on_filters(
-    ~Filters.me & ~Filters.edited & (Filters.mentioned | Filters.private),
-    group=2, check_client=True)
+@userge.on_filters(~Filters.me & ~Filters.edited & (Filters.mentioned | Filters.private), group=2)
 async def lydia_ai_chat(message: Message):
     """ incomming message handler """
     if CH_LYDIA_API is None:
