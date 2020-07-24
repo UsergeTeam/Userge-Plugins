@@ -77,7 +77,7 @@ async def ghost_invert(message: Message):
 @userge.on_cmd("(mirror|flip)", about={
     'header': "Mirror and flip any media",
     'usage': "{tr}mirror [reply to any media]\n"
-             "{tr}flip [reply to any media]"}, name=mirror)
+             "{tr}flip [reply to any media]"}, name="mirror")
 async def mirror_flip(message: Message):
     """ Mirror or flip IMG """
     replied = message.reply_to_message
