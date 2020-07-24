@@ -1,4 +1,4 @@
-""" Invert, filp/mirror, rotate """
+""" Ghost, filp/mirror, rotate """
 
 # By @Krishna_Singhal
 
@@ -10,7 +10,7 @@ from userge.utils import take_screen_shot, runcmd
 Converted = Config.DOWN_PATH + "sticker.webp"
 
 
-@userge.on_cmd("(ghost|invert)", about={
+@userge.on_cmd("ghost", about={
     'header': "Invert media as looking lika a ghost",
     'usage': "{tr}ghost [reply to any media]\n"
              "{tr}invert [reply to any media]"})
@@ -77,9 +77,9 @@ async def ghost_invert(message: Message):
 @userge.on_cmd("(mirror|flip)", about={
     'header': "Mirror and flip any media",
     'usage': "{tr}mirror [reply to any media]\n"
-             "{tr}flip [reply to any media]"})
+             "{tr}flip [reply to any media]"}, name=mirror)
 async def mirror_flip(message: Message):
-    """ Mirror of flip IMG """
+    """ Mirror or flip IMG """
     replied = message.reply_to_message
     if not (replied and (
             replied.photo or replied.sticker or replied.video or replied.animation)):
