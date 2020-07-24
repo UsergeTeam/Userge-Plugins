@@ -1,4 +1,4 @@
-""" Invert, filp/mirror, rotate """
+""" Ghost, filp/mirror, rotate """
 
 # By @Krishna_Singhal
 
@@ -11,9 +11,9 @@ Converted = Config.DOWN_PATH + "sticker.webp"
 
 
 @userge.on_cmd("(ghost|invert)", about={
-    'header': "Invert media as looking lika a ghost",
+    'header': "Invert media as looking like a ghost",
     'usage': "{tr}ghost [reply to any media]\n"
-             "{tr}invert [reply to any media]"})
+             "{tr}invert [reply to any media]"}, name="ghost")
 async def ghost_invert(message: Message):
     """ Transform IMG as looking like a ghost """
     replied = message.reply_to_message
@@ -77,9 +77,9 @@ async def ghost_invert(message: Message):
 @userge.on_cmd("(mirror|flip)", about={
     'header': "Mirror and flip any media",
     'usage': "{tr}mirror [reply to any media]\n"
-             "{tr}flip [reply to any media]"})
+             "{tr}flip [reply to any media]"}, name="mirror")
 async def mirror_flip(message: Message):
-    """ Mirror of flip IMG """
+    """ Mirror or flip IMG """
     replied = message.reply_to_message
     if not (replied and (
             replied.photo or replied.sticker or replied.video or replied.animation)):
@@ -138,7 +138,8 @@ async def mirror_flip(message: Message):
 
 @userge.on_cmd("rotate", about={
     'header': "Rotate any media",
-    'usage': "{tr}rotate [angle to rotate] [reply to media]"})
+    'usage': "{tr}rotate [angle to rotate] [reply to media]\n"
+             "angle = 0 to 360(default is 90)"})
 async def rotate_(message: Message):
     """ Rotate IMG to any angle """
     replied = message.reply_to_message
