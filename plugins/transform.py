@@ -138,7 +138,8 @@ async def mirror_flip(message: Message):
 
 @userge.on_cmd("rotate", about={
     'header': "Rotate any media",
-    'usage': "{tr}rotate [angle to rotate] [reply to media]"})
+    'usage': "{tr}rotate [angle to rotate] [reply to media]\n"
+             "angle = 0 to 360(default is 90)"})
 async def rotate_(message: Message):
     """ Rotate IMG to any angle """
     replied = message.reply_to_message
