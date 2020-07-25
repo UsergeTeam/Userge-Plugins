@@ -24,14 +24,14 @@ async def glitch_(message: Message):
     replied = message.reply_to_message
     if not (replied and (
             replied.photo or replied.sticker or replied.video or replied.animation)):
-        await message.err("```Media not found...```")
+        await message.edit("```Media not found...```")
         await message.reply_sticker('CAADBQADVAUAAjZgsCGE7PH3Wt1wSRYE')
         return
     if message.filtered_input_str:
-        input_ = int(message.filtered_input_str)
         if not message.filtered_input_str.isdigit():
             await message.err("```You input is invalid, check help...```", del_in=5)
             return
+        input_ = int(message.filtered_input_str)
         if not 0 < input_ < 9:
             await message.err("```Invalid Range...```", del_in=5)
             return
