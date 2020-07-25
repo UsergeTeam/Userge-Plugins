@@ -9,3 +9,5 @@ lottie
 spotdl
 qrcode
 glitch-this
+numpy
+colour
