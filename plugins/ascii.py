@@ -110,5 +110,5 @@ def asciiart_(in_f, SC, GCF, out_f, color1, color2, bgcolor):
 
 def random_color():
     color = ["#" + ''.join([random.choice('0123456789ABCDEF') for k in range(6)])
-        for i in range(2)]
+    for i in range(2)]
     return color
