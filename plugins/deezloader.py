@@ -33,7 +33,7 @@ After getting Arl token Config `ARL_TOKEN` var in heroku"""
                 "{tr}deezload -ddl https://www.deezer.com/track/3824710 FLAC \n"
                 "{tr}deezload -ddl https://www.deezer.com/album/1240787 FLAC \n"
                 "{tr}deezload -ddl -zip https://www.deezer.com/album/1240787 \n"
-                "{tr}deezload -dsong Ed Sheeran - Shape of You"})
+                "{tr}deezload -dsong Ed Sheeran-Shape of You"})
 async def deezload(message: Message):
     if not os.path.exists(TEMP_PATH):
         os.makedirs(TEMP_PATH)
@@ -105,10 +105,10 @@ async def deezload(message: Message):
         await message.edit(f"Searching Results for {song}")
         try:
             track = await pool.run_in_thread(loader.download_name)(
-                artist=artist,
-                song=song,
+                artist=artist.strip(),
+                song=song.strip(),
                 output=TEMP_PATH,
-                quality=quality,
+                quality=quality.strip(),
                 recursive_quality=True,
                 recursive_download=True,
                 not_interface=True
