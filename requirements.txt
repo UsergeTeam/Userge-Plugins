@@ -8,3 +8,4 @@ justwatch
 lottie
 spotdl
 qrcode
+glitch-this
