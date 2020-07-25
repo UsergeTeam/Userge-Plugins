@@ -1,7 +1,7 @@
 """Reply to an Media to convert to ascii sticker"""
 # Module by @deleteduser420 (https://github.com/code-rgb)
 # Copyright 2017, Shanshan Wang, MIT license
-# Based on https://gist.github.com/wshanshan/c825efca4501a491447056849dd207d6 
+# Based on https://gist.github.com/wshanshan/c825efca4501a491447056849dd207d6
 
 import os
 import time
@@ -70,12 +70,14 @@ async def ascii_(message: Message):
     color2 = c_list[1]
     bgcolor = "#080808"
     webp_file = asciiart(dls_loc, 0.1, 1.9, color1, color2, bgcolor, ascii_type)
-    await message.client.send_sticker(chat_id=message.chat.id,
+    await message.client.send_sticker(
+                                    chat_id=message.chat.id,
                                     sticker=webp_file,
                                     reply_to_message_id=replied.message_id)
     await message.delete()
     os.remove(webp_file)
 
+    
 def asciiart(in_f, SC, GCF, color1, color2, bgcolor, ascii_type):
     chars = np.asarray(list(' .,:irs?@9B&#'))
     font = ImageFont.load_default()
@@ -85,7 +87,7 @@ def asciiart(in_f, SC, GCF, color1, color2, bgcolor, ascii_type):
     img = Image.open(in_f)
     if ascii_type == "alt":
         img = ImageOps.invert(img)
-    widthByLetter=round(img.size[0] * SC * WCF)
+    widthByLetter = round(img.size[0] * SC * WCF)
     heightByLetter = round(img.size[1] * SC)
     S = (widthByLetter, heightByLetter)
     img = img.resize(S)
@@ -95,7 +97,7 @@ def asciiart(in_f, SC, GCF, color1, color2, bgcolor, ascii_type):
     lines = ("\n".join(("".join(r) for r in chars[img.astype(int)]))).split("\n")
     nbins = len(lines)
     colorRange = list(Color(color1).range_to(Color(color2), nbins))
-    newImg_width= letter_width * widthByLetter
+    newImg_width = letter_width * widthByLetter
     newImg_height = letter_height * heightByLetter
     newImg = Image.new("RGBA", (newImg_width, newImg_height), bgcolor)
     draw = ImageDraw.Draw(newImg)
@@ -105,7 +107,7 @@ def asciiart(in_f, SC, GCF, color1, color2, bgcolor, ascii_type):
     for line in lines:
         color = colorRange[lineIdx]
         lineIdx += 1
-        draw.text((leftpadding, y), line, color.hex, font=font)
+        draw.text((leftpadding, y), line, color.hex, font = font)
         y += letter_height
     image_name = "ascii.webp"
     webp_file = os.path.join(Config.DOWN_PATH, image_name)
@@ -115,6 +117,6 @@ def asciiart(in_f, SC, GCF, color1, color2, bgcolor, ascii_type):
 
 def random_color():
     number_of_colors = 2
-    color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
-    for i in range(number_of_colors)]
+    color = ["#"+''.join(
+    [random.choice('0123456789ABCDEF') for j in range(6)]) for i in range(number_of_colors)]
     return color
