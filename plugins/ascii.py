@@ -71,9 +71,9 @@ async def ascii_(message: Message):
     bgcolor = "#080808"
     webp_file = asciiart(dls_loc, 0.1, 1.9, color1, color2, bgcolor, ascii_type)
     await message.client.send_sticker(
-                                    chat_id=message.chat.id,
-                                    sticker=webp_file,
-                                    reply_to_message_id=replied.message_id)
+        chat_id=message.chat.id,
+        sticker=webp_file,
+        reply_to_message_id=replied.message_id)
     await message.delete()
     os.remove(webp_file)
 
@@ -93,7 +93,7 @@ def asciiart(in_f, SC, GCF, color1, color2, bgcolor, ascii_type):
     img = img.resize(S)
     img = np.sum(np.asarray(img), axis=2)
     img -= img.min()
-    img = (1.0 - img/img.max()) ** GCF * (chars.size - 1)
+    img = (1.0 - img / img.max()) ** GCF * (chars.size - 1)
     lines = ("\n".join(("".join(r) for r in chars[img.astype(int)]))).split("\n")
     nbins = len(lines)
     colorRange = list(Color(color1).range_to(Color(color2), nbins))
@@ -117,6 +117,6 @@ def asciiart(in_f, SC, GCF, color1, color2, bgcolor, ascii_type):
 
 def random_color():
     number_of_colors = 2
-    color = [
-    "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in range(number_of_colors)]
+    color = ['#' + ''.join([random.choice('0123456789ABCDEF') for j in
+             range(6)]) for i in range(number_of_colors)]
     return color
