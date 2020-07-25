@@ -77,7 +77,7 @@ async def ascii_(message: Message):
     await message.delete()
     os.remove(webp_file)
 
-    
+
 def asciiart(in_f, SC, GCF, color1, color2, bgcolor, ascii_type):
     chars = np.asarray(list(' .,:irs?@9B&#'))
     font = ImageFont.load_default()
@@ -101,13 +101,13 @@ def asciiart(in_f, SC, GCF, color1, color2, bgcolor, ascii_type):
     newImg_height = letter_height * heightByLetter
     newImg = Image.new("RGBA", (newImg_width, newImg_height), bgcolor)
     draw = ImageDraw.Draw(newImg)
-    leftpadding = 0 
+    leftpadding = 0
     y = 0
     lineIdx = 0
     for line in lines:
         color = colorRange[lineIdx]
         lineIdx += 1
-        draw.text((leftpadding, y), line, color.hex, font = font)
+        draw.text((leftpadding, y), line, color.hex, font=font)
         y += letter_height
     image_name = "ascii.webp"
     webp_file = os.path.join(Config.DOWN_PATH, image_name)
@@ -117,6 +117,6 @@ def asciiart(in_f, SC, GCF, color1, color2, bgcolor, ascii_type):
 
 def random_color():
     number_of_colors = 2
-    color = ["#"+''.join(
-    [random.choice('0123456789ABCDEF') for j in range(6)]) for i in range(number_of_colors)]
+    color = [
+    "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in range(number_of_colors)]
     return color
