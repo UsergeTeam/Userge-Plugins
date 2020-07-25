@@ -12,6 +12,7 @@
 
 import os
 import time
+import asyncio
 from mimetypes import guess_type
 
 import aiohttp
@@ -113,6 +114,7 @@ async def upload_google_photos(message: Message):
     if not creds:
         await message.edit_text("😏 <code>gphoto setup</code> first 😡😒😒", parse_mode="html")
         return
+    await message.edit("`proccesing ...`")
     service = build("photoslibrary", "v1", http=creds.authorize(Http()))
     # create directory if not exists
     if not os.path.isdir(Config.DOWN_PATH):
@@ -159,14 +161,14 @@ async def upload_google_photos(message: Message):
         number_of_req_s = int(file_size / upload_granularity)
         # LOG.info(number_of_req_s)
         c_time = time.time()
+        loop = asyncio.get_event_loop()
         async with aiofiles.open(file_path, mode="rb") as f_d:
             for i in range(number_of_req_s):
-                offset = i * upload_granularity
-                await progress(
-                    offset or 1, file_size, "uploading(gphoto)🧐?", userge, message, c_time)
                 current_chunk = await f_d.read(upload_granularity)
+                offset = i * upload_granularity
+                part_size = len(current_chunk)
                 headers = {
-                    "Content-Length": str(len(current_chunk)),
+                    "Content-Length": str(part_size),
                     "X-Goog-Upload-Command": "upload",
                     "X-Goog-Upload-Offset": str(offset),
                     "Authorization": "Bearer " + creds.access_token,
@@ -174,6 +176,8 @@ async def upload_google_photos(message: Message):
                 # LOG.info(i)
                 # LOG.info(headers)
                 response = await session.post(real_upload_url, headers=headers, data=current_chunk)
+                loop.create_task(progress(offset + part_size, file_size,
+                                          "uploading(gphoto)🧐?", userge, message, c_time))
                 # LOG.info(response.headers)
                 # https://github.com/SpEcHiDe/UniBorg/commit/8267811b1248c00cd1e34041e2ae8c82b207970f
                 # await f_d.seek(upload_granularity)
