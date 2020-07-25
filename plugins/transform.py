@@ -19,7 +19,7 @@ async def ghost_invert(message: Message):
     replied = message.reply_to_message
     if not (replied and (
             replied.photo or replied.sticker or replied.video or replied.animation)):
-        await message.err("```Media not found...```")
+        await message.edit("```Media not found...```")
         await message.reply_sticker('CAADBQADVAUAAjZgsCGE7PH3Wt1wSRYE')
         return
     if not os.path.isdir(Config.DOWN_PATH):
@@ -83,7 +83,7 @@ async def mirror_flip(message: Message):
     replied = message.reply_to_message
     if not (replied and (
             replied.photo or replied.sticker or replied.video or replied.animation)):
-        await message.err("```Media not found...```")
+        await message.edit("```Media not found...```")
         await message.reply_sticker('CAADBQADVAUAAjZgsCGE7PH3Wt1wSRYE')
         return
     if not os.path.isdir(Config.DOWN_PATH):
@@ -145,14 +145,14 @@ async def rotate_(message: Message):
     replied = message.reply_to_message
     if not (replied and (
             replied.photo or replied.sticker or replied.video or replied.animation)):
-        await message.err("```Media not found...```")
+        await message.edit("```Media not found...```")
         await message.reply_sticker('CAADBQADVAUAAjZgsCGE7PH3Wt1wSRYE')
         return
     if message.input_str:
-        input_ = int(message.input_str)
         if not message.input_str.isdigit():
             await message.err("```You input is invalid, check help...```", del_in=5)
             return
+        input_ = int(message.input_str)
         if not 0 < input_ < 360:
             await message.err("```Invalid Angle...```", del_in=5)
             return
