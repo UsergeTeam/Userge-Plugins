@@ -7,11 +7,14 @@ import requests
 
 from userge import userge, Message, Config
 
-THUMB_PATH = Config.DOWN_PATH + "thumb_image.jpg"
+THUMB_PATH = Config.DOWN_PATH + "imdb_thumb.jpg"
 
 
 @userge.on_cmd("imdb", about={
     'header': "Scrap Movies & Tv Shows from IMDB",
+    'description': "Get info about a Movie on IMDB.\n"
+                   "[NOTE: To use a custom poster, download "
+                   "the poster with name imdb_thumb.jpg]",
     'usage': "{tr}imdb [Movie Name]"})
 async def imdb(message: Message):
     try:
@@ -89,6 +92,7 @@ async def imdb(message: Message):
 <b>Story Line : </b><em>{story_line}</em>"""
     except IndexError:
         await message.edit("Bruh, Plox enter **Valid movie name** kthx")
+        return
     if os.path.exists(THUMB_PATH):
         if len(des_) > 1024:
             des_ = des_[:1021] + "..."

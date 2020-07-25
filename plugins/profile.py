@@ -1,7 +1,7 @@
 """ All Profile Settings for User """
 
 # by krishna
-# del_pfp by phyco-ninja
+# del_pfp by Phyco-Ninja
 
 import os
 import time
@@ -226,11 +226,17 @@ async def del_pfp(message: Message):
             await message.err(v_e)
             return
         await message.edit(f"```Deleting first {del_c} Profile Photos ...```")
+        start = datetime.now()
+        ctr = 0
         async for photo in userge.iter_profile_photos("me", limit=del_c):
             await userge.delete_profile_photos(photo.file_id)
-        else:
-            await message.edit("```What am i supposed to delete nothing !...```")
-            await message.reply_sticker(sticker="CAADAQAD0wAD976IR_CYoqvCwXhyFgQ")
+            ctr += 1
+        end = datetime.now()
+        difff = (end - start).seconds
+        await message.edit(f"Deleted {ctr} Profile Pics in {difff} seconds!")
+    else:
+        await message.edit("```What am i supposed to delete nothing !...```")
+        await message.reply_sticker(sticker="CAADAQAD0wAD976IR_CYoqvCwXhyFgQ")
 
 
 @userge.on_cmd("clone", about={
