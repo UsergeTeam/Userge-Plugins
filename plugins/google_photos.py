@@ -162,7 +162,8 @@ async def upload_google_photos(message: Message):
         async with aiofiles.open(file_path, mode="rb") as f_d:
             for i in range(number_of_req_s):
                 offset = i * upload_granularity
-                await progress(offset, file_size, "uploading(gphoto)🧐?", userge, message, c_time)
+                await progress(
+                    offset or 1, file_size, "uploading(gphoto)🧐?", userge, message, c_time)
                 current_chunk = await f_d.read(upload_granularity)
                 headers = {
                     "Content-Length": str(len(current_chunk)),
