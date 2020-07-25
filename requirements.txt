@@ -9,3 +9,4 @@ lottie
 spotdl
 qrcode
 glitch-this
+colour
