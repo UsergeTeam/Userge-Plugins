@@ -6,15 +6,13 @@ import os
 import re
 import requests
 
-
 from PIL import Image
 from validators.url import url
 
 from userge import userge, Config, Message
 
-Converted_img = Config.DOWN_PATH + "img.png"
-Converted_stikr = Config.DOWN_PATH + "sticker.webp"
-
+CONVERTED_IMG = Config.DOWN_PATH + "img.png"
+CONVERTED_STIKR = Config.DOWN_PATH + "sticker.webp"
 
 EMOJI_PATTERN = re.compile(
     "["
@@ -32,11 +30,6 @@ EMOJI_PATTERN = re.compile(
     "]+")
 
 
-def deEmojify(inputString: str) -> str:
-    """Remove emojis and other non-safe characters from string"""
-    return re.sub(EMOJI_PATTERN, '', inputString)
-
-
 @userge.on_cmd("trump", about={
     'header': "Custom Sticker of Trump Tweet",
     'flags': {
@@ -45,33 +38,16 @@ def deEmojify(inputString: str) -> str:
 async def trump_tweet(msg: Message):
     """ Fun sticker of Trump Tweet """
     replied = msg.reply_to_message
-    args = msg.filtered_input_str
-    if args:
-        text = args
-    elif replied:
-        text = args if args else replied.text
+    if replied and not msg.filtered_input_str:
+        text = replied.text
     else:
-        await msg.err(
-            "```Trump Need some Text for Tweet 🙄```", del_in=3)
+        text = msg.filtered_input_str
+    if not text:
+        await msg.err("```Trump Need some Text for Tweet 🙄```", del_in=3)
         return
     await msg.edit("```Requesting trump to tweet... 😃```")
-    text = deEmojify(text)
-    await trumptweet(text)
-    await msg.delete()
-    msg_id = replied.message_id if replied else None
-    if '-s' in msg.flags:
-        await msg.client.send_sticker(
-            msg.chat.id,
-            Converted_stikr,
-            reply_to_message_id=msg_id)
-    else:
-        await msg.client.send_photo(
-            msg.chat.id,
-            Converted_img,
-            reply_to_message_id=msg_id)
-    for files in (Converted_img, Converted_stikr):
-        if files and os.path.exists(files):
-            os.remove(files)
+    await _tweets(text, type_="trumptweet")
+    await _finalize(msg)
 
 
 @userge.on_cmd("modi", about={
@@ -82,33 +58,16 @@ async def trump_tweet(msg: Message):
 async def modi_tweet(msg: Message):
     """ Fun Sticker of Modi Tweet """
     replied = msg.reply_to_message
-    args = msg.filtered_input_str
-    if args:
-        text = args
-    elif replied:
-        text = args if args else replied.text
+    if replied and not msg.filtered_input_str:
+        text = replied.text
     else:
-        await msg.err(
-            "```Modi Need some Text for Tweet 😗```", del_in=3)
+        text = msg.filtered_input_str
+    if not text:
+        await msg.err("```Modi Need some Text for Tweet 😗```", del_in=3)
         return
     await msg.edit("```Requesting Modi to tweet... 😉```")
-    text = deEmojify(text)
-    await moditweet(text)
-    await msg.delete()
-    msg_id = replied.message_id if replied else None
-    if '-s' in msg.flags:
-        await msg.client.send_sticker(
-            msg.chat.id,
-            Converted_stikr,
-            reply_to_message_id=msg_id)
-    else:
-        await msg.client.send_photo(
-            msg.chat.id,
-            Converted_img,
-            reply_to_message_id=msg_id)
-    for files in (Converted_img, Converted_stikr):
-        if files and os.path.exists(files):
-            os.remove(files)
+    await _tweets(text, "narendramodi")
+    await _finalize(msg)
 
 
 @userge.on_cmd("cmm", about={
@@ -119,33 +78,16 @@ async def modi_tweet(msg: Message):
 async def Change_My_Mind(msg: Message):
     """ Custom Sticker or Banner of Change My Mind """
     replied = msg.reply_to_message
-    args = msg.filtered_input_str
-    if args:
-        text = args
-    elif replied:
-        text = args if args else replied.text
+    if replied and not msg.filtered_input_str:
+        text = replied.text
     else:
-        await msg.err(
-            "```Need some Text to Change My Mind 🙂```", del_in=3)
+        text = msg.filtered_input_str
+    if not text:
+        await msg.err("```Need some Text to Change My Mind 🙂```", del_in=3)
         return
     await msg.edit("```Writing Banner of Change My Mind 😁```")
-    text = deEmojify(text)
-    await changemymind(text)
-    await msg.delete()
-    msg_id = replied.message_id if replied else None
-    if '-s' in msg.flags:
-        await msg.client.send_sticker(
-            msg.chat.id,
-            Converted_stikr,
-            reply_to_message_id=msg_id)
-    else:
-        await msg.client.send_photo(
-            msg.chat.id,
-            Converted_img,
-            reply_to_message_id=msg_id)
-    for files in (Converted_img, Converted_stikr):
-        if files and os.path.exists(files):
-            os.remove(files)
+    await _tweets(text, type_="changemymind")
+    await _finalize(msg)
 
 
 @userge.on_cmd("kanna", about={
@@ -156,33 +98,16 @@ async def Change_My_Mind(msg: Message):
 async def kanna(msg: Message):
     """ Fun sticker of Kanna """
     replied = msg.reply_to_message
-    args = msg.filtered_input_str
-    if args:
-        text = args
-    elif replied:
-        text = args if args else replied.text
+    if replied and not msg.filtered_input_str:
+        text = replied.text
     else:
-        await msg.err(
-            "```Kanna Need some text to Write 😚```", del_in=3)
+        text = msg.filtered_input_str
+    if not text:
+        await msg.err("```Kanna Need some text to Write 😚```", del_in=3)
         return
     await msg.edit("```Kanna is writing for You 😀```")
-    text = deEmojify(text)
-    await kannagen(text)
-    await msg.delete()
-    msg_id = replied.message_id if replied else None
-    if '-s' in msg.flags:
-        await msg.client.send_sticker(
-            msg.chat.id,
-            Converted_stikr,
-            reply_to_message_id=msg_id)
-    else:
-        await msg.client.send_photo(
-            msg.chat.id,
-            Converted_img,
-            reply_to_message_id=msg_id)
-    for files in (Converted_img, Converted_stikr):
-        if files and os.path.exists(files):
-            os.remove(files)
+    await _tweets(text, type_="kannagen")
+    await _finalize(msg)
 
 
 @userge.on_cmd("carry", about={
@@ -193,33 +118,16 @@ async def kanna(msg: Message):
 async def carry_minati(msg: Message):
     """ Fun Sticker of Carryminati Tweet """
     replied = msg.reply_to_message
-    args = msg.filtered_input_str
-    if args:
-        text = args
-    elif replied:
-        text = args if args else replied.text
+    if replied and not msg.filtered_input_str:
+        text = replied.text
     else:
-        await msg.err(
-            "```Carry Need some text to Write 😚```", del_in=3)
+        text = msg.filtered_input_str
+    if not text:
+        await msg.err("```Carry Need some text to Write 😚```", del_in=3)
         return
     await msg.edit("```Carry Minati is writing for You 😀```")
-    text = deEmojify(text)
-    await carryminati(text)
-    await msg.delete()
-    msg_id = replied.message_id if replied else None
-    if '-s' in msg.flags:
-        await msg.client.send_sticker(
-            msg.chat.id,
-            Converted_stikr,
-            reply_to_message_id=msg_id)
-    else:
-        await msg.client.send_photo(
-            msg.chat.id,
-            Converted_img,
-            reply_to_message_id=msg_id)
-    for files in (Converted_img, Converted_stikr):
-        if files and os.path.exists(files):
-            os.remove(files)
+    await _tweets(text, "carryminati")
+    await _finalize(msg)
 
 
 @userge.on_cmd("tweet", about={
@@ -232,154 +140,59 @@ async def carry_minati(msg: Message):
 async def tweet(msg: Message):
     """ Tweet with your own Username """
     replied = msg.reply_to_message
-    args = msg.filtered_input_str
-    if args:
-        text = args
-    elif replied:
-        text = args if args else replied.text
+    if replied and not msg.filtered_input_str:
+        text = replied.text
     else:
+        text = msg.filtered_input_str
+    if not text:
         await msg.err("```Give Me some text to Tweet 😕```", del_in=3)
         return
+    username = ''
+    if ',' in text:
+        text, username = text.split(',')
+    if not username:
+        if replied:
+            username = replied.from_user.username or replied.from_user.first_name
+        else:
+            username = msg.from_user.username or msg.from_user.first_name
     await msg.edit("```Creating a Tweet Sticker 😏```")
-    if replied:
-        u_id = replied.from_user.id
-    else:
-        u_id = msg.from_user.id
-    u_name = (await msg.client.get_users(u_id)).username
-    if u_name:
-        User_name = u_name
-    else:
-        User_name = (await msg.client.get_users(u_id)).first_name
-    msg_id = replied.message_id if replied else None
-    if ',' in msg.filtered_input_str:
-        text1, text2 = msg.filtered_input_str.split(',')
-        if not text2:
-            await msg.err(
-                "```Give me Your Custom Username for Tweet... 🙄```"
-            )
-            return
-        Text1 = deEmojify(text1.strip())
-        Text2 = deEmojify(text2.strip())
-        await tweets(Text1, Text2)
-    else:
-        Text_1 = deEmojify(text)
-        Text_2 = deEmojify(User_name)
-        await tweets(Text_1, Text_2)
+    await _tweets(text.strip(), username.strip())
+    await _finalize(msg)
+
+
+def _deEmojify(inputString: str) -> str:
+    """Remove emojis and other non-safe characters from string"""
+    return re.sub(EMOJI_PATTERN, '', inputString)
+
+
+async def _tweets(text: str, username: str = '', type_: str = "tweet") -> None:
+    api_url = f"https://nekobot.xyz/api/imagegen?type={type_}&text={_deEmojify(text)}"
+    if username:
+        api_url += f"&username={_deEmojify(username)}"
+    res = requests.get(api_url).json()
+    tweets_ = res.get("message")
+    if not url(tweets_):
+        return "```Invalid Syntax, Exiting...```"
+    tmp_file = Config.DOWN_PATH + "temp.png"
+    with open(tmp_file, "wb") as t_f:
+        t_f.write(requests.get(tweets_).content)
+    img = Image.open(tmp_file)
+    img.save(CONVERTED_IMG)
+    img.save(CONVERTED_STIKR)
+    os.remove(tmp_file)
+
+
+async def _finalize(msg: Message) -> None:
     await msg.delete()
+    msg_id = msg.reply_to_message.message_id if msg.reply_to_message else None
     if '-s' in msg.flags:
-        await msg.client.send_sticker(
-            msg.chat.id,
-            Converted_stikr,
-            reply_to_message_id=msg_id)
+        await msg.client.send_sticker(chat_id=msg.chat.id,
+                                      sticker=CONVERTED_STIKR,
+                                      reply_to_message_id=msg_id)
     else:
-        await msg.client.send_photo(
-            msg.chat.id,
-            Converted_img,
-            reply_to_message_id=msg_id)
-    for files in (Converted_img, Converted_stikr):
+        await msg.client.send_photo(chat_id=msg.chat.id,
+                                    photo=CONVERTED_IMG,
+                                    reply_to_message_id=msg_id)
+    for files in (CONVERTED_IMG, CONVERTED_STIKR):
         if files and os.path.exists(files):
             os.remove(files)
-
-
-async def trumptweet(text):
-    r = requests.get(
-        f"https://nekobot.xyz/api/imagegen?type=trumptweet&text={text}").json()
-    twEEts = r.get("message")
-    tweeturl = url(twEEts)
-    if not tweeturl:
-        return "```Invalid Syntax, Exiting...```"
-    file = Config.DOWN_PATH + "temp.png"
-    with open(file, "wb") as twEEt:
-        twEEt.write(requests.get(twEEts).content)
-    img = Image.open(file)
-    img.save(Converted_img)
-    img.save(Converted_stikr)
-    os.remove(file)
-    return Converted_img, Converted_stikr
-
-
-async def changemymind(text):
-    r = requests.get(
-        f"https://nekobot.xyz/api/imagegen?type=changemymind&text={text}").json()
-    tweEts = r.get("message")
-    tweeturl = url(tweEts)
-    if not tweeturl:
-        return "```Invalid Syntax, Exiting...```"
-    file = Config.DOWN_PATH + "temp.png"
-    with open(file, "wb") as twEet:
-        twEet.write(requests.get(tweEts).content)
-    img = Image.open(file)
-    img.save(Converted_img)
-    img.save(Converted_stikr)
-    os.remove(file)
-    return Converted_img, Converted_stikr
-
-
-async def kannagen(text):
-    r = requests.get(
-        f"https://nekobot.xyz/api/imagegen?type=kannagen&text={text}").json()
-    tweetS = r.get("message")
-    tweeturl = url(tweetS)
-    if not tweeturl:
-        return "```Invalid Syntax, Exiting...```"
-    file = Config.DOWN_PATH + "temp.png"
-    with open(file, "wb") as tweET:
-        tweET.write(requests.get(tweetS).content)
-    img = Image.open(file)
-    img.save(Converted_img)
-    img.save(Converted_stikr)
-    os.remove(file)
-    return Converted_img, Converted_stikr
-
-
-async def moditweet(text):
-    user = "narendramodi"
-    k = f"https://nekobot.xyz/api/imagegen?type=tweet&text={text}&username={user}"
-    r = requests.get(k).json()
-    tweeTs = r.get("message")
-    tweeturl = url(tweeTs)
-    if not tweeturl:
-        return "```Invalid Syntax, Exiting...```"
-    file = Config.DOWN_PATH + "temp.png"
-    with open(file, "wb") as tweeT:
-        tweeT.write(requests.get(tweeTs).content)
-    img = Image.open(file)
-    img.save(Converted_img)
-    img.save(Converted_stikr)
-    os.remove(file)
-    return Converted_img, Converted_stikr
-
-
-async def carryminati(text):
-    user = "carryminati"
-    k = f"https://nekobot.xyz/api/imagegen?type=tweet&text={text}&username={user}"
-    r = requests.get(k).json()
-    Tweets = r.get("message")
-    tweeturl = url(Tweets)
-    if not tweeturl:
-        return "```Invalid Syntax, Exiting...```"
-    file = Config.DOWN_PATH + "temp.png"
-    with open(file, "wb") as Tweet:
-        Tweet.write(requests.get(Tweets).content)
-    img = Image.open(file)
-    img.save(Converted_img)
-    img.save(Converted_stikr)
-    os.remove(file)
-    return Converted_img, Converted_stikr
-
-
-async def tweets(text1, text2):
-    k = f"https://nekobot.xyz/api/imagegen?type=tweet&text={text1}&username={text2}"
-    r = requests.get(k).json()
-    TWEETS = r.get("message")
-    tweeturl = url(TWEETS)
-    if not tweeturl:
-        return "```Invalid Syntax, Exiting...```"
-    file = Config.DOWN_PATH + "temp.png"
-    with open(file, "wb") as TWEET:
-        TWEET.write(requests.get(TWEETS).content)
-    img = Image.open(file)
-    img.save(Converted_img)
-    img.save(Converted_stikr)
-    os.remove(file)
-    return Converted_img, Converted_stikr
