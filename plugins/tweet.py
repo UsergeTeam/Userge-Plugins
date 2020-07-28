@@ -118,8 +118,8 @@ async def modi_tweet(msg: Message):
     'usage': "{tr}cmm [text | reply to text]"})
 async def Change_My_Mind(msg: Message):
     """ Custom Sticker or Banner of Change My Mind """
-    replied = msg.filtered_reply_to_message
-    args = msg.input_str
+    replied = msg.reply_to_message
+    args = msg.filtered_input_str
     if args:
         text = args
     elif replied:
