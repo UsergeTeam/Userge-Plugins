@@ -45,7 +45,7 @@ def deEmojify(inputString: str) -> str:
 async def trump_tweet(msg: Message):
     """ Fun sticker of Trump Tweet """
     replied = msg.reply_to_message
-    args = msg.input_str
+    args = msg.filtered_input_str
     if args:
         text = args
     elif replied:
@@ -82,7 +82,7 @@ async def trump_tweet(msg: Message):
 async def modi_tweet(msg: Message):
     """ Fun Sticker of Modi Tweet """
     replied = msg.reply_to_message
-    args = msg.input_str
+    args = msg.filtered_input_str
     if args:
         text = args
     elif replied:
@@ -118,7 +118,7 @@ async def modi_tweet(msg: Message):
     'usage': "{tr}cmm [text | reply to text]"})
 async def Change_My_Mind(msg: Message):
     """ Custom Sticker or Banner of Change My Mind """
-    replied = msg.reply_to_message
+    replied = msg.filtered_reply_to_message
     args = msg.input_str
     if args:
         text = args
@@ -156,7 +156,7 @@ async def Change_My_Mind(msg: Message):
 async def kanna(msg: Message):
     """ Fun sticker of Kanna """
     replied = msg.reply_to_message
-    args = msg.input_str
+    args = msg.filtered_input_str
     if args:
         text = args
     elif replied:
@@ -193,7 +193,7 @@ async def kanna(msg: Message):
 async def carry_minati(msg: Message):
     """ Fun Sticker of Carryminati Tweet """
     replied = msg.reply_to_message
-    args = msg.input_str
+    args = msg.filtered_input_str
     if args:
         text = args
     elif replied:
@@ -232,7 +232,7 @@ async def carry_minati(msg: Message):
 async def tweet(msg: Message):
     """ Tweet with your own Username """
     replied = msg.reply_to_message
-    args = msg.input_str
+    args = msg.filtered_input_str
     if args:
         text = args
     elif replied:
@@ -251,8 +251,8 @@ async def tweet(msg: Message):
     else:
         User_name = (await msg.client.get_users(u_id)).first_name
     msg_id = replied.message_id if replied else None
-    if '-' in msg.input_str:
-        text1, text2 = msg.input_str.split('-')
+    if ',' in msg.filtered_input_str:
+        text1, text2 = msg.filtered_input_str.split(',')
         if not text2:
             await msg.err(
                 "```Give me Your Custom Username for Tweet... 🙄```"
