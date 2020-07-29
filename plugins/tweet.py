@@ -54,7 +54,7 @@ async def trump_tweet(msg: Message):
     'header': "Custom Sticker of Modi Tweet",
     'flags': {
         '-s': "To get tweet in Sticker"},
-    'usage': "{tr}trump [text | reply to text]"})
+    'usage': "{tr}modi [text | reply to text]"})
 async def modi_tweet(msg: Message):
     """ Fun Sticker of Modi Tweet """
     replied = msg.reply_to_message
