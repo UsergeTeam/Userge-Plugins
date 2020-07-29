@@ -46,7 +46,8 @@ async def trump_tweet(msg: Message):
         await msg.err("```Trump Need some Text for Tweet 🙄```", del_in=3)
         return
     await msg.edit("```Requesting trump to tweet... 😃```")
-    await _tweets(text, type_="trumptweet")
+    text_ = _deEmojify(text)
+    await _tweets(text_, "trumptweet")
     await _finalize(msg)
 
 
@@ -66,7 +67,8 @@ async def modi_tweet(msg: Message):
         await msg.err("```Modi Need some Text for Tweet 😗```", del_in=3)
         return
     await msg.edit("```Requesting Modi to tweet... 😉```")
-    await _tweets(text, "narendramodi")
+    text_ = _deEmojify(text)
+    await _tweets(text_, "narendramodi")
     await _finalize(msg)
 
 
@@ -86,7 +88,8 @@ async def Change_My_Mind(msg: Message):
         await msg.err("```Need some Text to Change My Mind 🙂```", del_in=3)
         return
     await msg.edit("```Writing Banner of Change My Mind 😁```")
-    await _tweets(text, type_="changemymind")
+    text_ = _deEmojify(text)
+    await _tweets(text_, "changemymind")
     await _finalize(msg)
 
 
@@ -106,7 +109,8 @@ async def kanna(msg: Message):
         await msg.err("```Kanna Need some text to Write 😚```", del_in=3)
         return
     await msg.edit("```Kanna is writing for You 😀```")
-    await _tweets(text, type_="kannagen")
+    text_ = _deEmojify(text)
+    await _tweets(text_, "kannagen")
     await _finalize(msg)
 
 
@@ -126,7 +130,8 @@ async def carry_minati(msg: Message):
         await msg.err("```Carry Need some text to Write 😚```", del_in=3)
         return
     await msg.edit("```Carry Minati is writing for You 😀```")
-    await _tweets(text, "carryminati")
+    text_ = _deEmojify(text)
+    await _tweets(text_, "carryminati")
     await _finalize(msg)
 
 
@@ -150,13 +155,17 @@ async def tweet(msg: Message):
     username = ''
     if ',' in text:
         text, username = text.split(',')
-    if not username:
+    if username:
         if replied:
             username = replied.from_user.username or replied.from_user.first_name
         else:
             username = msg.from_user.username or msg.from_user.first_name
+    else:
+        await message.err("```Give me your Custom Username for Tweet...```")
     await msg.edit("```Creating a Tweet Sticker 😏```")
-    await _tweets(text.strip(), username.strip())
+    text_ = _deEmojify(text.strip())
+    type_ = _deEmojify(username.strip())
+    await _tweets(text_, type_)
     await _finalize(msg)
 
 
@@ -165,11 +174,9 @@ def _deEmojify(inputString: str) -> str:
     return re.sub(EMOJI_PATTERN, '', inputString)
 
 
-async def _tweets(text: str, username: str = '', type_: str = "tweet") -> None:
-    api_url = f"https://nekobot.xyz/api/imagegen?type={type_}&text={_deEmojify(text)}"
-    if username:
-        api_url += f"&username={_deEmojify(username)}"
-    res = requests.get(api_url).json()
+async def _tweets(text, type_)
+    k = f"https://nekobot.xyz/api/imagegen?type=tweet&text={text}&username={type_}"
+    res = requests.get(k).json()
     tweets_ = res.get("message")
     if not url(tweets_):
         return "```Invalid Syntax, Exiting...```"
@@ -180,6 +187,7 @@ async def _tweets(text: str, username: str = '', type_: str = "tweet") -> None:
     img.save(CONVERTED_IMG)
     img.save(CONVERTED_STIKR)
     os.remove(tmp_file)
+    return CONVERTED_IMG, CONVERTED_STIKR
 
 
 async def _finalize(msg: Message) -> None:
