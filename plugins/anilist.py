@@ -3,13 +3,13 @@
 # Module Capable of fetching Anime, Airing, Character Info &
 # Anime Reverse Search made for UserGe.
 # AniList Api (GitHub: https://github.com/AniList/ApiV2-GraphQL-Docs)
-# Anime Reverse Search Powered by tracemoepy. 
+# Anime Reverse Search Powered by tracemoepy.
 # TraceMoePy (GitHub: https://github.com/DragSama/tracemoepy)
 # (C) Author: Phyco-Ninja (https://github.com/Phyco-Ninja) (@PhycoNinja13b)
 
 import json
 import asyncio
-from datetime import datetime 
+from datetime import datetime
 
 import flag
 import humanize
@@ -300,7 +300,7 @@ async def anim_arch(message: Message):
         html_ += f"<h3>{character['name']['full']}</h3>"
         html_ += f"<em>{c_flag} {character['name']['native']}</em><br>"
         html_ += f"<b>Character ID</b>: {character['id']}<br>"
-        html_ += f"<h4>About Character and Role:</h4>{character.get('description', "N/A")}"
+        html_ += f"<h4>About Character and Role:</h4>{character.get('description', 'N/A')}"
         html_char += f"{html_}<br><br>"
 
     studios = ""
@@ -359,11 +359,11 @@ async def airing_anim(message: Message):
         'type': "ANIME"
     }
     if query.isdigit():
-       vars = {
-          'id': int(query),
-          'asHtml': True,
-          'type': "ANIME"
-       }
+        vars = {
+            'id': int(query),
+            'asHtml': True,
+            'type': "ANIME"
+        }
     result = await return_json_senpai(anime_query, vars)
     error = result.get('errors')
     if error:
@@ -465,8 +465,8 @@ async def get_schuled(message: Message):
             await message.edit(out)
             edited_ = True
         await CLOG.log(out, name="SCHEDULED_ANIME")
-    
-    
+
+
 @userge.on_cmd("character", about={
     'header': "Anime Character",
     'description': "Get Info about a Character and much more",
