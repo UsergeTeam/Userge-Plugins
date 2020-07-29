@@ -174,7 +174,7 @@ def _deEmojify(inputString: str) -> str:
     return re.sub(EMOJI_PATTERN, '', inputString)
 
 
-async def _tweets(text, type_)
+async def _tweets(text, type_):
     k = f"https://nekobot.xyz/api/imagegen?type=tweet&text={text}&username={type_}"
     res = requests.get(k).json()
     tweets_ = res.get("message")
