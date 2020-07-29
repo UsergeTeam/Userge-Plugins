@@ -26,9 +26,9 @@ CLOG = userge.getCLogger(__name__)
 # Default templates for Query Formatting
 ANIME_TEMPLATE = """[{c_flag}]**{romaji}**
 
-**ID | MAL ID:** `{id}` | `{idmal}`
+**ID | MAL ID:** `{idm}` | `{idmal}`
 **SOURCE:** `{source}`
-🆎 **TYPE:** `{format}`
+🆎 **TYPE:** `{formats}`
 🎭 **GENRES:** `{genre}`
 🎋 **SEASON:** `{season}`
 🔢 **EPISODES:** `{episodes}`
@@ -178,16 +178,17 @@ query ($search: String, $asHtml: Boolean) {
 
 
 async def _init():
+    global ANIME_TEMPLATE  # pylint: disable=global-statement
     template = await SAVED.find_one({'_id': "ANIME_TEPLATE"})
     if template:
         ANIME_TEMPLATE = template['anime_data']
 
 
-async def return_json_senpai(query, vars):
+async def return_json_senpai(query, vars_):
     """ Makes a Post to https://graphql.anilist.co. """
     URL = "https://graphql.anilist.co"
     async with ClientSession() as AS:
-        post_con = await AS.post(URL, json={'query': query, 'variables': vars})
+        post_con = await AS.post(URL, json={'query': query, 'variables': vars_})
         json_data = await post_con.json()
         return json_data
 
@@ -229,25 +230,25 @@ async def anim_arch(message: Message):
     query = message.filtered_input_str
     if not query:
         return
-    vars = {
+    vars_ = {
         'search': query,
         'asHtml': True,
         'type': "ANIME"
     }
     if query.isdigit():
-        vars = {
+        vars_ = {
             'id': int(query),
             'asHtml': True,
             'type': "ANIME"
         }
         if '-mid' in message.flags:
-            vars = {
+            vars_ = {
                 'idMal': int(query),
                 'asHtml': True,
                 'type': "ANIME"
             }
 
-    result = await return_json_senpai(anime_query, vars)
+    result = await return_json_senpai(anime_query, vars_)
     error = result.get('errors')
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
@@ -259,12 +260,12 @@ async def anim_arch(message: Message):
     data = data.get('Media')
 
     # Data of all fields in returned json
-    id = data.get('id')
+    idm = data.get('id')
     idmal = data.get('idMal')
     romaji = data['title']['romaji']
     english = data['title']['english']
     native = data['title']['native']
-    format = data.get('format')
+    formats = data.get('format')
     status = data.get('status')
     synopsis = data.get('description')
     season = data.get('season')
@@ -353,18 +354,18 @@ async def anim_arch(message: Message):
 async def airing_anim(message: Message):
     """ Get Airing Detail of Anime """
     query = message.input_str
-    vars = {
+    vars_ = {
         'search': query,
         'asHtml': True,
         'type': "ANIME"
     }
     if query.isdigit():
-        vars = {
+        vars_ = {
             'id': int(query),
             'asHtml': True,
             'type': "ANIME"
         }
-    result = await return_json_senpai(anime_query, vars)
+    result = await return_json_senpai(anime_query, vars_)
     error = result.get('errors')
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
@@ -376,7 +377,7 @@ async def airing_anim(message: Message):
     data = data.get('Media')
 
     # Airing Details
-    id = data.get('id')
+    mid = data.get('id')
     romaji = data['title']['romaji']
     english = data['title']['english']
     native = data['title']['native']
@@ -399,7 +400,7 @@ async def airing_anim(message: Message):
 
     title_ = english if english else romaji
     out = f"[{c_flag}] {native} \n   ({title_})"
-    out += f"\n\n**ID:** `{id}`"
+    out += f"\n\n**ID:** `{mid}`"
     out += f"\n**Status:** `{status}`\n"
     out += f"**Source:** `{source}`\n"
     out += f"**Score:** `{score}`\n"
@@ -423,8 +424,8 @@ async def get_schuled(message: Message):
     """ Get List of Scheduled Anime """
     var = {'notYetAired': True}
     await message.edit("`Fetching Scheduled Animes`\n\n"
-        "[**NOTE:** __If Scheduled Animes exceeds limit. "
-        "They will be forwarded to Log Channel to avoid spam.__]")
+                       "[**NOTE:** __If Scheduled Animes exceeds limit. "
+                       "They will be forwarded to Log Channel to avoid spam.__]")
     result = await return_json_senpai(airing_query, var)
     error = result.get('errors')
     if error:
