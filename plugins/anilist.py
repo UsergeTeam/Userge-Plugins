@@ -7,7 +7,8 @@
 # TraceMoePy (GitHub: https://github.com/DragSama/tracemoepy)
 # (C) Author: Phyco-Ninja (https://github.com/Phyco-Ninja) (@PhycoNinja13b)
 
-import json
+import os
+import time
 import asyncio
 from datetime import datetime
 
@@ -17,7 +18,7 @@ import tracemoepy
 from telegraph import Telegraph
 from aiohttp import ClientSession
 
-from userge import userge, Message, get_collection
+from userge import userge, Message, get_collection, Config
 from userge.utils import progress, take_screen_shot
 
 # Logging Errors
@@ -566,14 +567,14 @@ async def trace_bek(message: Message):
     if replied.animation or replied.video:
         img_loc = os.path.join(Config.DOWN_PATH, "trace.png")
         await take_screen_shot(dls_loc, 0, img_loc)
-        if not os.path.lexists(file_2):
+        if not os.path.lexists(img_loc):
             await message.err("`Media not found...`", del_in=5)
             return
         os.remove(dls_loc)
         dls_loc = img_loc
     if dls_loc:
         tracemoe = tracemoepy.async_trace.Async_Trace()
-        search = await tracemoe.search(dis_loc, encode=True)
+        search = await tracemoe.search(dls_loc, encode=True)
         os.remove(dls_loc)
         result = search['docs'][0]
         caption = (f"**Title**: `{result['title_english']}`\n"
@@ -598,7 +599,7 @@ async def trace_bek(message: Message):
     'usage': "{tr}setemp [Reply to text Message | Content]"})
 async def ani_save_template(message: Message):
     text = message.input_str
-    replied = massage.reply_to_message
+    replied = message.reply_to_message
     if replied:
         text = replied.text
     template = await SAVED.find_one({'_id': "ANIME_TEMPLATE"})
