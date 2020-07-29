@@ -18,19 +18,19 @@ async def sangmata_(message: Message):
     """ Get User's Updated previous Names and Usernames """
     replied = message.reply_to_message
     if not replied:
-       await message.err("```Reply to get Name and Username History...```", del_in=5)
-       return
+        await message.err("```Reply to get Name and Username History...```", del_in=5)
+        return
     user = replied.from_user.id
     chat = "@Sangmatainfo_bot"
     await message.edit("```Getting info, Wait plox ...```")
     msgs = []
+    ERROR_MSG = "For your kind information, you blocked @Sangmatainfo_bot, Unblock it"
     try:
         async with userge.conversation(chat) as conv:
             try:
                 await conv.send_message("/search_id {}".format(user))
             except YouBlockedUser:
-                await message.err(
-                    "**For your kind information, you blocked @Sangmatainfo_bot, Unblock it**", del_in=5)
+                await message.err(<b>ERROR_MSG</b>, parse_mode='html', del_in=5)
                 return
             msgs.append(await conv.get_response(mark_read=True))
             msgs.append(await conv.get_response(mark_read=True))
