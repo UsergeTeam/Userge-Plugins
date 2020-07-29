@@ -139,7 +139,7 @@ async def carry_minati(msg: Message):
     'header': "Tweet With Custom text Sticker",
     'flags': {
         '-s': "To get tweet in Sticker"},
-    'usage': "{tr}tweet Text - Username\n"
+    'usage': "{tr}tweet Text , Username\n"
              "{tr}tweet Text\n"
              "{tr}tweet [Text | with reply to User]"})
 async def tweet(msg: Message):
