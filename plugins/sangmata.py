@@ -30,7 +30,7 @@ async def sangmata_(message: Message):
             try:
                 await conv.send_message("/search_id {}".format(user))
             except YouBlockedUser:
-                await message.err(f**{ERROR_MSG}**, del_in=5)
+                await message.err(f"**{ERROR_MSG}**", del_in=5)
                 return
             msgs.append(await conv.get_response(mark_read=True))
             msgs.append(await conv.get_response(mark_read=True))
