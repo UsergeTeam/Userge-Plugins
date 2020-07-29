@@ -152,21 +152,26 @@ async def tweet(msg: Message):
     if not text:
         await msg.err("```Give Me some text to Tweet 😕```", del_in=3)
         return
-    username = ''
-    if ',' in text:
-        text, username = text.split(',')
-    if username:
-        if replied:
-            username = replied.from_user.username or replied.from_user.first_name
-        else:
-            username = msg.from_user.username or msg.from_user.first_name
+    if replied:
+        User_name = replied.from_user.username or replied.from_user.first_name
     else:
-        await msg.err("```Give me your Custom Username for Tweet...```")
-    await msg.edit("```Creating a Tweet Sticker 😏```")
-    text_ = _deEmojify(text.strip())
-    type_ = _deEmojify(username.strip())
-    await _tweets(text_, type_)
-    await _finalize(msg)
+        User_name = msg.from_user.username or msg.from_user.first_name
+    if ',' in text:
+        text, username = text.split('-')
+        if not username:
+            await msg.err(
+                "```Give me Your Custom Username for Tweet... 🙄```"
+            )
+            return
+        text_ = _deEmojify(text.strip())
+        type_ = _deEmojify(username.strip())
+        await _tweets(text_, type_)
+        await _finalize(msg)
+    else:
+        text_ = _deEmojify(text)
+        type_ = _deEmojify(User_name)
+        await _tweets(text_, type_)
+        await _finalize(msg)
 
 
 def _deEmojify(inputString: str) -> str:
