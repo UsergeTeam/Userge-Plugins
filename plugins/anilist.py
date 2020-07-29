@@ -9,7 +9,6 @@
 
 import os
 import time
-import asyncio
 from datetime import datetime
 
 import flag
@@ -399,10 +398,11 @@ async def airing_anim(message: Message):
         air_on = make_it_rw(nextAir, True)
 
     title_ = english if english else romaji
-    out = f"[c_flag] {native} \n   ({title_})"
+    out = f"[{c_flag}] {native} \n   ({title_})"
     out += f"\n\n**ID:** `{id}`"
     out += f"\n**Status:** `{status}`\n"
     out += f"**Source:** `{source}`\n"
+    out += f"**Score:** `{score}`\n"
     out += f"**Genres:** `{genre}`\n"
     if air_on:
         out += f"**Airing Episode:** `[{episode}/{episodes}]`\n"
@@ -519,7 +519,7 @@ async def character_search(message: Message):
 
     html_cntnt = f"<img scr='{img}' title={name}/>"
     html_cntnt += f"<h1>[🇯🇵] {native}</h1>"
-    html_cntnt += f"<h3>About Character:</h3>"
+    html_cntnt += "<h3>About Character:</h3>"
     html_cntnt += description
     html_cntnt += "<br>"
     if cntnt:
