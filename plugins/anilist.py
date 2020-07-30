@@ -42,7 +42,7 @@ ANIME_TEMPLATE = """[{c_flag}]**{romaji}**
 SAVED = get_collection("TEMPLATES")
 
 # GraphQL Queries.
-anime_query = """
+ANIME_QUERY = """
 query ($id: Int, $idMal:Int, $search: String, $type: MediaType, $asHtml: Boolean) {
   Media (id: $id, idMal: $idMal, search: $search, type: $type) {
     id
@@ -107,7 +107,7 @@ query ($id: Int, $idMal:Int, $search: String, $type: MediaType, $asHtml: Boolean
 }
 """
 
-airing_query = """
+AIRING_QUERY = """
 query ($id: Int, $mediaId: Int, $notYetAired: Boolean) {
   Page(page: 1, perPage: 50) {
     airingSchedules (id: $id, mediaId: $mediaId, notYetAired: $notYetAired) {
@@ -140,7 +140,7 @@ query ($id: Int, $mediaId: Int, $notYetAired: Boolean) {
 }
 """
 
-character_query = """
+CHARACTER_QUERY = """
 query ($search: String, $asHtml: Boolean) {
   Character (search: $search) {
     id
@@ -250,7 +250,7 @@ async def anim_arch(message: Message):
                 'type': "ANIME"
             }
 
-    result = await return_json_senpai(anime_query, vars_)
+    result = await return_json_senpai(ANIME_QUERY, vars_)
     error = result.get('errors')
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n`{error}`")
@@ -261,6 +261,7 @@ async def anim_arch(message: Message):
     data = result['data']['Media']
 
     # Data of all fields in returned json
+    # pylint: disable=possibly-unused-variable
     idm = data.get('id')
     idmal = data.get('idMal')
     romaji = data['title']['romaji']
@@ -367,7 +368,7 @@ async def airing_anim(message: Message):
             'asHtml': True,
             'type': "ANIME"
         }
-    result = await return_json_senpai(anime_query, vars_)
+    result = await return_json_senpai(ANIME_QUERY, vars_)
     error = result.get('errors')
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n`{error}`")
@@ -430,7 +431,7 @@ async def get_schuled(message: Message):
     await message.edit("`Fetching Scheduled Animes`\n\n"
                        "[**NOTE:** __If Scheduled Animes exceeds limit. "
                        "They will be forwarded to Log Channel to avoid spam.__]")
-    result = await return_json_senpai(airing_query, var)
+    result = await return_json_senpai(AIRING_QUERY, var)
     error = result.get('errors')
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
@@ -488,7 +489,7 @@ async def character_search(message: Message):
         'search': query,
         'asHtml': True
     }
-    result = await return_json_senpai(character_query, var)
+    result = await return_json_senpai(CHARACTER_QUERY, var)
     error = result.get('errors')
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n`{error}`")
