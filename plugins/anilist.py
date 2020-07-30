@@ -428,9 +428,7 @@ async def airing_anim(message: Message):
 async def get_schuled(message: Message):
     """ Get List of Scheduled Anime """
     var = {'notYetAired': True}
-    await message.edit("`Fetching Scheduled Animes`\n\n"
-                       "[**NOTE:** __If Scheduled Animes exceeds limit. "
-                       "They will be forwarded to Log Channel to avoid spam.__]")
+    await message.edit("`Fetching Scheduled Animes`")
     result = await return_json_senpai(AIRING_QUERY, var)
     error = result.get('errors')
     if error:
@@ -451,11 +449,11 @@ async def get_schuled(message: Message):
         air_at = make_it_rw(air['airingAt'], True)
         site = air['media']['siteUrl']
         title_ = english or romaji
-        out += f"<h2>[🇯🇵]{title_}</h2>"
+        out += f"<h3>[🇯🇵]{title_}</h3>"
         out += f" • <b>ID:</b> {mid}<br>"
         out += f" • <b>Airing Episode:</b> {epi_air}<br>"
         out += f" • <b>Next Airing:</b> {air_at}<br>"
-        out += f" • <a href='{site}'>[Visit on anilist.co]</a><br>"
+        out += f" • <a href='{site}'>[Visit on anilist.co]</a><br><br>"
         c += 1
     if out:
         out_p = f"<h1>Showing [{c}/{totl_schld}] Scheduled Animes:<h1><br><br>{out}"
