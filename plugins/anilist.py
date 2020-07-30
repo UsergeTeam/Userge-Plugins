@@ -333,7 +333,7 @@ async def anim_arch(message: Message):
     title_h = english or romaji
     synopsis_link = post_to_tp(title_h, html_pc)
     try:
-        finals_ = ANIME_TEMPLATE.foramt(**locals())
+        finals_ = ANIME_TEMPLATE.format(**locals())
     except KeyError as kys:
         await message.err(kys)
         return
@@ -461,7 +461,7 @@ async def get_schuled(message: Message):
         if c > 9:
             if not edited_:
                 out = f"**Showing `[{c}/{totl_schld}]` Scheduled Animes:**\n\n{out}"
-                await message.edit(out)
+                await message.edit(out, disable_web_page_preview=True)
                 edited_ = True
             await CLOG.log(out, name="SCHEDULED_ANIME")
             c = 0
@@ -469,7 +469,7 @@ async def get_schuled(message: Message):
     if out:
         if not edited_:
             out = f"**Showing `[{c}/{totl_schld}]` Scheduled Animes:**\n\n{out}"
-            await message.edit(out)
+            await message.edit(out, disable_web_page_preview=True)
             edited_ = True
         await CLOG.log(out, name="SCHEDULED_ANIME")
 
@@ -512,7 +512,7 @@ async def character_search(message: Message):
     cntnt = ""
     for cf in featured:
         out = "<br>"
-        out += f'''<img scr="{cf['coverImage']['extraLarge']}"/>'''
+        out += f'''<img src="{cf['coverImage']['extraLarge']}"/>'''
         out += "<br>"
         title = cf['title']['english'] if cf['title']['english'] else cf['title']['romaji']
         out += f"<h3>{title}</h3>"
@@ -527,7 +527,7 @@ async def character_search(message: Message):
         if sp > 5:
             break
 
-    html_cntnt = f"<img scr='{img}' title={name}/>"
+    html_cntnt = f"<img src='{img}' title={name}/>"
     html_cntnt += f"<h1>[🇯🇵] {native}</h1>"
     html_cntnt += "<h3>About Character:</h3>"
     html_cntnt += description
@@ -588,8 +588,8 @@ async def trace_bek(message: Message):
         search = await tracemoe.search(dls_loc, encode=True)
         os.remove(dls_loc)
         result = search['docs'][0]
-        caption = (f"**Title**: `{result['title_english']}`\n"
-                   f"   🇯🇵 (**{result['title_romaji']} - {result['title_native']}**)\n"
+        caption = (f"**Title**: **{result['title_english']}**\n"
+                   f"   🇯🇵 (`{result['title_romaji']} - {result['title_native']}`)\n"
                    f"\n**Anilist ID:** `{result['anilist_id']}`"
                    f"\n**Similarity**: `{result['similarity']*100}`"
                    f"\n**Episode**: `{result['episode']}`")
@@ -628,9 +628,12 @@ async def ani_save_template(message: Message):
     'usage': "{tr}anitemp [A valid flag]"})
 async def view_del_ani(message: Message):
     """ View or Delete .anime Template """
+    if not message.flags:
+        await message.err("Flag Required")
+        return
     template = await SAVED.find_one({'_id': "ANIME_TEMPLATE"})
     if not template:
-        await message.edit("No Custom Anime Template Saved Peru")
+        await message.err("No Custom Anime Template Saved Peru")
         return
     if "-d" in message.flags:
         await SAVED.delete_one({'_id': "ANIME_TEMPLATE"})
