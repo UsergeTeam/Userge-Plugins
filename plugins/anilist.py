@@ -442,7 +442,6 @@ async def get_schuled(message: Message):
     data = result['data']['Page']['airingSchedules']
     c = 0
     totl_schld = len(data)
-    edited_ = False
     out = ""
     for air in data:
         romaji = air['media']['title']['romaji']
@@ -452,26 +451,16 @@ async def get_schuled(message: Message):
         air_at = make_it_rw(air['airingAt'], True)
         site = air['media']['siteUrl']
         title_ = english or romaji
-        out += f"[🇯🇵]**{title_}**\n"
-        out += f" • **ID:** `{mid}`\n"
-        out += f" • **Airing Episode:** `{epi_air}`\n"
-        out += f" • **Next Airing:** `{air_at}`\n"
-        out += f" • [Visit on anilist.co]({site}))\n\n"
+        out += f"<h2>[🇯🇵]{title_}</h2>"
+        out += f" • <b>ID:</b> {mid}<br>"
+        out += f" • <b>Airing Episode:</b> {epi_air}<br>"
+        out += f" • <b>Next Airing:</b> {air_at}<br>"
+        out += f" • <a href='{site}'>[Visit on anilist.co]</a><br>"
         c += 1
-        if c > 9:
-            if not edited_:
-                out = f"**Showing `[{c}/{totl_schld}]` Scheduled Animes:**\n\n{out}"
-                await message.edit(out, disable_web_page_preview=True)
-                edited_ = True
-            await CLOG.log(out, name="SCHEDULED_ANIME")
-            c = 0
-            out = ""
     if out:
-        if not edited_:
-            out = f"**Showing `[{c}/{totl_schld}]` Scheduled Animes:**\n\n{out}"
-            await message.edit(out, disable_web_page_preview=True)
-            edited_ = True
-        await CLOG.log(out, name="SCHEDULED_ANIME")
+        out_p = f"<h1>Showing [{c}/{totl_schld}] Scheduled Animes:<h1><br><br>{out}"
+        link = post_to_tp("Scheduled Animes", out_p)
+        await message.edit(f"[Open in Telegraph]({link})")
 
 
 @userge.on_cmd("character", about={
