@@ -14,8 +14,8 @@ from datetime import datetime
 import flag as cflag
 import humanize
 import tracemoepy
-from telegraph import Telegraph
 from aiohttp import ClientSession
+from html_telegraph_poster import TelegraphPoster
 
 from userge import userge, Message, get_collection, Config
 from userge.utils import progress, take_screen_shot
@@ -195,15 +195,16 @@ async def return_json_senpai(query, vars_):
 
 def post_to_tp(a_title, content):
     """ Create a Telegram Post using HTML Content """
-    tp = Telegraph()
-    tp.create_account(short_name=a_title)
-    post = tp.create_page(
+    post_client = TelegraphPoster(use_api=True)
+    auth_name = "@PhycoNinja13b"
+    post_client.create_api_token(auth_name)
+    post_page = post_client.post(
         title=a_title,
-        html_content=content,
-        author_name="@PhycoNinja13b",
-        author_url="https://t.me/PhycoNinja13b"
+        author=auth_name,
+        author_url="https://t.me/PhycoNinja13b",
+        text=content
     )
-    return f"https://telegra.ph/{post['path']}"
+    return post_page['url']
 
 
 def make_it_rw(time_stamp, as_countdown=False):
@@ -477,6 +478,7 @@ async def get_schuled(message: Message):
     'usage': "{tr}character [Name of Character]",
     'examples': "{tr}character Subaru Natsuki"})
 async def character_search(message: Message):
+    """ Get Info about a Character """
     query = message.input_str
     if not query:
         await message.err("NameError: 'query' not defined")
@@ -550,6 +552,7 @@ async def character_search(message: Message):
                    "a snap, or short clip of anime.",
     'usage': "{tr}ars [reply to Photo/Gif/Video]"})
 async def trace_bek(message: Message):
+    """ Reverse Search Anime Clips/Photos """
     replied = message.reply_to_message
     if not replied:
         await message.edit("Ara Ara... Reply to a Media Senpai")
@@ -604,6 +607,7 @@ async def trace_bek(message: Message):
                    "proper key to be entered in curly braces]",
     'usage': "{tr}setemp [Reply to text Message | Content]"})
 async def ani_save_template(message: Message):
+    """ Set Custom Template for .anime """
     text = message.input_or_reply_str
     if not text:
         await message.err("Invalid Syntax")
@@ -621,6 +625,7 @@ async def ani_save_template(message: Message):
         '-v': "View Saved Template"},
     'usage': "{tr}anitemp [A valid flag]"})
 async def view_del_ani(message: Message):
+    """ View or Delete .anime Template """
     template = await SAVED.find_one({'_id': "ANIME_TEMPLATE"})
     if not template:
         await message.edit("No Custom Anime Template Saved Peru")
