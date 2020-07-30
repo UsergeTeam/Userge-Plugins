@@ -37,7 +37,7 @@ ANIME_TEMPLATE = """[{c_flag}]**{romaji}**
 💯 **SCORE:** `{score}/100`
 🔞 **ADULT RATED:** `{adult}`
 🎬 {trailer_link}
-[📖 Synopsis & More]({synopsis_link})"""
+📖 [Synopsis & More]({synopsis_link})"""
 
 SAVED = get_collection("TEMPLATES")
 
@@ -253,7 +253,7 @@ async def anim_arch(message: Message):
     result = await return_json_senpai(anime_query, vars_)
     error = result.get('errors')
     if error:
-        await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
+        await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n`{error}`")
         error_sts = error[0].get('message')
         await message.err(f"`[{error_sts}]`")
         return
@@ -370,7 +370,7 @@ async def airing_anim(message: Message):
     result = await return_json_senpai(anime_query, vars_)
     error = result.get('errors')
     if error:
-        await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
+        await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n`{error}`")
         error_sts = error[0].get('message')
         await message.err(f"`[{error_sts}]`")
         return
@@ -400,7 +400,7 @@ async def airing_anim(message: Message):
         air_on = make_it_rw(nextAir, True)
 
     title_ = english or romaji
-    out = f"[{c_flag}] {native} \n   ({title_})"
+    out = f"[{c_flag}] **{native}** \n   (`{title_}`)"
     out += f"\n\n**ID:** `{mid}`"
     out += f"\n**Status:** `{status}`\n"
     out += f"**Source:** `{source}`\n"
@@ -451,10 +451,11 @@ async def get_schuled(message: Message):
         air_at = make_it_rw(air['airingAt'], True)
         site = air['media']['siteUrl']
         title_ = english or romaji
-        out += f"[{title_}]({site})\n"
-        out += f"**ID:** `{mid}`\n"
-        out += f"**Airing Episode:** `{epi_air}`\n"
-        out += f"**Next Airing:** `{air_at}`\n\n"
+        out += f"[🇯🇵]**{title_}**\n"
+        out += f" • **ID:** `{mid}`\n"
+        out += f" • **Airing Episode:** `{epi_air}`\n"
+        out += f" • **Next Airing:** `{air_at}`\n"
+        out += f" • [Visit on anilist.co]({site}))\n\n"
         c += 1
         if c > 9:
             if not edited_:
@@ -490,7 +491,7 @@ async def character_search(message: Message):
     result = await return_json_senpai(character_query, var)
     error = result.get('errors')
     if error:
-        await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
+        await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n`{error}`")
         error_sts = error[0].get('message')
         await message.err(f"`[{error_sts}]`")
         return
