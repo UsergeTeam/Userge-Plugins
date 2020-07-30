@@ -11,7 +11,7 @@ import os
 import time
 from datetime import datetime
 
-import flag
+import flag as cflag
 import humanize
 import tracemoepy
 from telegraph import Telegraph
@@ -186,9 +186,9 @@ async def _init():
 
 async def return_json_senpai(query, vars_):
     """ Makes a Post to https://graphql.anilist.co. """
-    URL = "https://graphql.anilist.co"
-    async with ClientSession() as AS:
-        post_con = await AS.post(URL, json={'query': query, 'variables': vars_})
+    url_ = "https://graphql.anilist.co"
+    async with ClientSession() as api_:
+        post_con = await api_.post(url_, json={'query': query, 'variables': vars_})
         json_data = await post_con.json()
         return json_data
 
@@ -229,6 +229,7 @@ async def anim_arch(message: Message):
     """ Search Anime Info """
     query = message.filtered_input_str
     if not query:
+        await message.err("NameError: 'query' not defined")
         return
     vars_ = {
         'search': query,
@@ -253,11 +254,10 @@ async def anim_arch(message: Message):
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
         error_sts = error[0].get('message')
-        await message.edit(f"**Error:** `[{error_sts}]`")
+        await message.err(f"`[{error_sts}]`")
         return
 
-    data = result.get('data')
-    data = data.get('Media')
+    data = result['data']['Media']
 
     # Data of all fields in returned json
     idm = data.get('id')
@@ -272,14 +272,14 @@ async def anim_arch(message: Message):
     episodes = data.get('episodes')
     duration = data.get('duration')
     country = data.get('countryOfOrigin')
-    c_flag = flag.flag(country)
+    c_flag = cflag.flag(country)
     source = data.get('source')
     coverImg = data.get('coverImage')['extraLarge']
     bannerImg = data.get('bannerImage')
     genres = data.get('genres')
     genre = genres[0]
     if len(genres) != 1:
-        genre = genres[0] + ", " + ", ".join(genres[1:])
+        genre = ", ".join(genres)
     score = data.get('averageScore')
     air_on = None
     if data['nextAiringEpisode']:
@@ -309,7 +309,7 @@ async def anim_arch(message: Message):
         studios += "<a href='{}'>• {}</a> ".format(studio['siteUrl'], studio['name'])
     url = data.get('siteUrl')
 
-    title_img = coverImg if coverImg else bannerImg
+    title_img = coverImg or bannerImg
     # Telegraph Post mejik
     html_pc = ""
     html_pc += f"<img src='{title_img}' title={romaji}/>"
@@ -328,14 +328,12 @@ async def anim_arch(message: Message):
     html_pc += f"<a href='{url}'> View on anilist.co</a>"
     html_pc += f"<img src='{bannerImg}'/>"
 
-    title_h = romaji
-    if english:
-        title_h = english
+    title_h = english or romaji
     synopsis_link = post_to_tp(title_h, html_pc)
     try:
         finals_ = ANIME_TEMPLATE.foramt(**locals())
     except KeyError as kys:
-        await message.edit(f"**ERROR:** {kys}")
+        await message.err(f"{kys}")
         return
 
     if '-wp' in message.flags:
@@ -354,6 +352,9 @@ async def anim_arch(message: Message):
 async def airing_anim(message: Message):
     """ Get Airing Detail of Anime """
     query = message.input_str
+    if not query:
+        await message.err("NameError: 'query' not defined")
+        return
     vars_ = {
         'search': query,
         'asHtml': True,
@@ -370,11 +371,10 @@ async def airing_anim(message: Message):
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
         error_sts = error[0].get('message')
-        await message.edit(f"**Error:** `[{error_sts}]`")
+        await message.err(f"`[{error_sts}]`")
         return
 
-    data = result.get('data')
-    data = data.get('Media')
+    data = result['data']['Media']
 
     # Airing Details
     mid = data.get('id')
@@ -384,13 +384,13 @@ async def airing_anim(message: Message):
     status = data.get('status')
     episodes = data.get('episodes')
     country = data.get('countryOfOrigin')
-    c_flag = flag.flag(country)
+    c_flag = cflag.flag(country)
     source = data.get('source')
     coverImg = data.get('coverImage')['extraLarge']
     genres = data.get('genres')
     genre = genres[0]
     if len(genres) != 1:
-        genre = genres[0] + ", " + ", ".join(genres[1:])
+        genre = ", ".join(genres)
     score = data.get('averageScore')
     air_on = None
     if data['nextAiringEpisode']:
@@ -398,7 +398,7 @@ async def airing_anim(message: Message):
         episode = data['nextAiringEpisode']['episode']
         air_on = make_it_rw(nextAir, True)
 
-    title_ = english if english else romaji
+    title_ = english or romaji
     out = f"[{c_flag}] {native} \n   ({title_})"
     out += f"\n\n**ID:** `{mid}`"
     out += f"\n**Status:** `{status}`\n"
@@ -408,6 +408,9 @@ async def airing_anim(message: Message):
     if air_on:
         out += f"**Airing Episode:** `[{episode}/{episodes}]`\n"
         out += f"\n`{air_on}`"
+    if len(out) > 1024:
+        await message.edit(out)
+        return
     await message.reply_photo(coverImg, caption=out)
     await message.delete()
 
@@ -431,11 +434,10 @@ async def get_schuled(message: Message):
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
         error_sts = error[0].get('message')
-        await message.edit(f"**Error:** `[{error_sts}]`")
+        await message.err(f"`[{error_sts}]`")
         return
 
-    data = result.get('data')
-    data = data['Page']['airingSchedules']
+    data = result['data']['Page']['airingSchedules']
     c = 0
     totl_schld = len(data)
     edited_ = False
@@ -447,7 +449,7 @@ async def get_schuled(message: Message):
         epi_air = air['episode']
         air_at = make_it_rw(air['airingAt'], True)
         site = air['media']['siteUrl']
-        title_ = english if english else romaji
+        title_ = english or romaji
         out += f"[{title_}]({site})\n"
         out += f"**ID:** `{mid}`\n"
         out += f"**Airing Episode:** `{epi_air}`\n"
@@ -476,6 +478,9 @@ async def get_schuled(message: Message):
     'examples': "{tr}character Subaru Natsuki"})
 async def character_search(message: Message):
     query = message.input_str
+    if not query:
+        await message.err("NameError: 'query' not defined")
+        return
     var = {
         'search': query,
         'asHtml': True
@@ -485,7 +490,7 @@ async def character_search(message: Message):
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
         error_sts = error[0].get('message')
-        await message.edit(f"**Error:** `[{error_sts}]`")
+        await message.err(f"`[{error_sts}]`")
         return
 
     data = result['data']['Character']
@@ -599,15 +604,11 @@ async def trace_bek(message: Message):
                    "proper key to be entered in curly braces]",
     'usage': "{tr}setemp [Reply to text Message | Content]"})
 async def ani_save_template(message: Message):
-    text = message.input_str
-    replied = message.reply_to_message
-    if replied:
-        text = replied.text
-    template = await SAVED.find_one({'_id': "ANIME_TEMPLATE"})
-    if not template:
-        await SAVED.insert_one({'_id': "ANIME_TEMPLATE", 'anime_data': text})
-    else:
-        await SAVED.update_one({'_id': "ANIME_TEMPLATE"}, {"$set": {'anime_data': text}})
+    text = message.input_or_reply_str
+    if not text:
+        await message.err("Invalid Syntax")
+        return
+    await SAVED.update_one({'_id': "ANIME_TEMPLATE"}, {"$set": {'anime_data': text}}, upsert=True)
     await message.edit("Custom Anime Template Saved")
 
 
