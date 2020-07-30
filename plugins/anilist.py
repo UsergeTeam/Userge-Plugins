@@ -456,7 +456,7 @@ async def get_schuled(message: Message):
         out += f" • <a href='{site}'>[Visit on anilist.co]</a><br><br>"
         c += 1
     if out:
-        out_p = f"<h1>Showing [{c}/{totl_schld}] Scheduled Animes:<h1><br><br>{out}"
+        out_p = f"<h1>Showing [{c}/{totl_schld}] Scheduled Animes:</h1><br><br>{out}"
         link = post_to_tp("Scheduled Animes", out_p)
         await message.edit(f"[Open in Telegraph]({link})")
 
