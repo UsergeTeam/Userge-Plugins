@@ -66,17 +66,19 @@ async def info(msg: Message):
 
 
 def LastOnline(User):
+    LastOnline = ""
     if User.is_bot:
-        return "🤖 Bot :("
+        LastOnline += "🤖 Bot :("
     elif User.status == 'recently':
-        return "Recently"
+        LastOnline += "Recently"
     elif User.status == 'within_week':
-        return "Within the last week"
+        LastOnline += "Within the last week"
     elif User.status == 'within_month':
-        return "Within the last month"
+        LastOnline += "Within the last month"
     elif User.status == 'long_time_ago':
-        return "A long time ago :("
+        LastOnline += "A long time ago :("
     elif User.status == 'online':
-        return "Currently Online"
+        LastOnline += "Currently Online"
     elif User.status == 'offline':
-        return datetime.fromtimestamp(User.status.date).strftime("%a, %d %b %Y, %H:%M:%S")
+        LastOnline += datetime.fromtimestamp(User.status.date).strftime("%a, %d %b %Y, %H:%M:%S")
+    return LastOnline
