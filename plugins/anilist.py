@@ -255,7 +255,7 @@ async def anim_arch(message: Message):
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n`{error}`")
         error_sts = error[0].get('message')
-        await message.err(f"`[{error_sts}]`")
+        await message.err(f"[{error_sts}]")
         return
 
     data = result['data']['Media']
@@ -334,7 +334,7 @@ async def anim_arch(message: Message):
     try:
         finals_ = ANIME_TEMPLATE.foramt(**locals())
     except KeyError as kys:
-        await message.err(f"{kys}")
+        await message.err(kys)
         return
 
     if '-wp' in message.flags:
@@ -372,7 +372,7 @@ async def airing_anim(message: Message):
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n`{error}`")
         error_sts = error[0].get('message')
-        await message.err(f"`[{error_sts}]`")
+        await message.err(f"[{error_sts}]")
         return
 
     data = result['data']['Media']
@@ -435,7 +435,7 @@ async def get_schuled(message: Message):
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
         error_sts = error[0].get('message')
-        await message.err(f"`[{error_sts}]`")
+        await message.err(f"[{error_sts}]")
         return
 
     data = result['data']['Page']['airingSchedules']
@@ -493,7 +493,7 @@ async def character_search(message: Message):
     if error:
         await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n`{error}`")
         error_sts = error[0].get('message')
-        await message.err(f"`[{error_sts}]`")
+        await message.err(f"[{error_sts}]")
         return
 
     data = result['data']['Character']
@@ -578,7 +578,7 @@ async def trace_bek(message: Message):
         img_loc = os.path.join(Config.DOWN_PATH, "trace.png")
         await take_screen_shot(dls_loc, 0, img_loc)
         if not os.path.lexists(img_loc):
-            await message.err("`Media not found...`", del_in=5)
+            await message.err("Media not found...", del_in=5)
             return
         os.remove(dls_loc)
         dls_loc = img_loc
