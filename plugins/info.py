@@ -19,37 +19,27 @@ GBAN_USER_BASE = get_collection("GBAN_USER")
 async def info(msg: Message):
     """ To check User's info """
     await msg.edit("```Checking...```")
-    args = msg.input_str
+    user_id = msg.input_str
     replied = msg.reply_to_message
-    if args:
-        user_id = args
-    elif replied:
-        if replied.forward_from:
-            user_id = args or replied.forward_from.id
+    if not user_id:
+        if replied:
+            user_id = replied.forward_from.id if replied.forward_from else replied.from_user.id
         else:
-            user_id = args or replied.from_user.id
-    else:
-        user_id = msg.from_user.id
+            user_id = msg.from_user.id
     try:
         user = await msg.client.get_users(user_id)
     except Exception:
         await msg.edit("```I don't know that User...```", del_in=5)
         return
     await msg.edit("```Getiing Info...```")
-    if user.last_name:
-        l_name = user.last_name
-    else:
-        l_name = ''
-    if user.username:
-        username = '@' + user.username
-    else:
-        username = ''
+    l_name = user.last_name or ''
+    username = user.username or ''
     common_chats = await msg.client.get_common_chats(user.id)
     user_info = f"""
 **About [{user.first_name} {l_name}](tg://user?id={user.id})**:
   - **UserID**: `{user.id}`
-  - **Username**: {username}
-  - **Last Online**: `{LastOnline(user)}`
+  - **Username**: {'@'+username}
+  - **Last Online**: `{last_online(user)}`
   - **Common Groups**: `{len(common_chats)}`
   - **Contact**: `{user.is_contact}`
         """
@@ -80,7 +70,7 @@ async def info(msg: Message):
         await msg.edit(user_info, disable_web_page_preview=True)
 
 
-def LastOnline(user):
+def last_online(user):
     time = ""
     if user.is_bot:
         time += "🤖 Bot :("
