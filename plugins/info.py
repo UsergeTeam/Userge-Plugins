@@ -15,7 +15,7 @@ GBAN_USER_BASE = get_collection("GBAN_USER")
     'header': "To check User's info",
     'usage': "{tr}info [for own info]\n"
              "{tr}info [Username | User Id]\n"
-             "{tr}info [reply to User]"})
+             "{tr}info [reply to User]"}, allow_via_bot=False)
 async def info(msg: Message):
     """ To check User's info """
     await msg.edit("```Checking...```")
@@ -33,7 +33,7 @@ async def info(msg: Message):
     try:
         user = await msg.client.get_users(user_id)
     except Exception:
-        await msg.edit("```I don't know about that User...```", del_in=5)
+        await msg.edit("```I don't know that User...```", del_in=5)
         return
     await msg.edit("```Getiing Info...```")
     if user.last_name:
@@ -49,14 +49,14 @@ async def info(msg: Message):
 **About [{user.first_name} {l_name}](tg://user?id={user.id})**:
   - **UserID**: `{user.id}`
   - **Username**: {username}
-  - **Last Online**: `{Online(user)}`
+  - **Last Online**: `{LastOnline(user)}`
   - **Common Groups**: `{len(common_chats)}`
   - **Contact**: `{user.is_contact}`
         """
     if user:
         if Config.SPAM_WATCH_API:
             status = spamwatch.Client(Config.SPAM_WATCH_API).get_ban(user.id)
-            if status == False:
+            if status is False:
                 user_info += "\n**SpamWatch Banned** : `False`\n"
             else:
                 user_info += "\n**SpamWatch Banned** : `True`\n"
@@ -80,20 +80,20 @@ async def info(msg: Message):
         await msg.edit(user_info, disable_web_page_preview=True)
 
 
-def Online(user):
-    LastOnline = ""
+def LastOnline(user):
+    time = ""
     if user.is_bot:
-        LastOnline += "🤖 Bot :("
+        time += "🤖 Bot :("
     elif user.status == 'recently':
-        LastOnline += "Recently"
+        time += "Recently"
     elif user.status == 'within_week':
-        LastOnline += "Within the last week"
+        time += "Within the last week"
     elif user.status == 'within_month':
-        LastOnline += "Within the last month"
+        time += "Within the last month"
     elif user.status == 'long_time_ago':
-        LastOnline += "A long time ago :("
+       time += "A long time ago :("
     elif user.status == 'online':
-        LastOnline += "Currently Online"
+        time += "Currently Online"
     elif user.status == 'offline':
-        LastOnline += datetime.fromtimestamp(user.status.date).strftime("%a, %d %b %Y, %H:%M:%S")
-    return LastOnline
+        time += datetime.fromtimestamp(user.last_online_date).strftime("%a, %d %b %Y, %H:%M:%S")
+    return time
