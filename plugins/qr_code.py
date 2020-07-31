@@ -29,8 +29,8 @@ async def make_qr(message: Message):
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=5,
-        border=2,
+        box_size=10,
+        border=4,
     )
     qr.add_data(text)
     qr.make(fit=True)
@@ -74,11 +74,17 @@ async def get_qr(message: Message):
         stderr=asyncio.subprocess.PIPE,
     )
     stdout = await process.communicate()
+    stderr = await process.communicate()
     out_response = stdout.decode().strip()
+    err_response = stderr.decode().strip()
     os.remove(down_load)
-    if not out_response:
+    if not (out_response or err_response):
         await message.err("```Couldn't get data of this QR Code...```")
         return
-    soup = BeautifulSoup(out_response, "html.parser")
-    qr_contents = soup.find_all("pre")[0].text
-    await message.edit(f"`{qr_contents}`")
+    try:
+        soup = BeautifulSoup(out_response, "html.parser")
+        qr_contents = soup.find_all("pre")[0].text
+    except IndexError:
+        await message.err("List Index Out Of Range")
+        return
+    await message.edit(f"**Data Found in this QrCode:**\n`{qr_contents}`")
