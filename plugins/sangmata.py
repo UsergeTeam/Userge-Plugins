@@ -42,13 +42,13 @@ async def sangmata_(message: Message):
     for msg in msgs:
         if '-u' in message.flags:
             if msg.text.startswith("No records found"):
-                await message.edit("```User never changed his Name...```", del_in=5)
+                await message.edit("```User never changed his Username...```", del_in=5)
                 return
             if msg.text.startswith(username):
                 await message.edit(f"`{msg.text}`")
         else:
             if msg.text.startswith("No records found"):
-                await message.edit("```User never changed his Username...```", del_in=5)
+                await message.edit("```User never changed his Name...```", del_in=5)
                 return
             if msg.text.startswith(name):
                 await message.edit(f"`{msg.text}`")
