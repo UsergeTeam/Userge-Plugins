@@ -1,4 +1,4 @@
-""" plugin for tgs to GiF """
+""" Plugin for tgs to GiF """
 
 # By @Krishna_Singhal
 
@@ -38,7 +38,11 @@ async def gifify(msg: Message):
                           "This may takes upto few mins...```")
     dls = await msg.client.download_media(replied, file_name=Config.DOWN_PATH)
     converted_gif = await _tgs_to_gif(dls, quality)
-    await msg.client.send_animation(msg.chat.id, converted_gif)
+    await msg.client.send_animation(
+        msg.chat.id,
+        converted_gif,
+        unsave=True,
+        reply_to_message_id=replied.message_id)
     await msg.delete()
     os.remove(converted_gif)
 
