@@ -16,17 +16,13 @@ async def ffmpegsave(message: Message):
             os.makedirs(Config.DOWN_PATH)
         if message.reply_to_message.media:
             start = datetime.now()
-            c_time = time.time()
             reply_message = message.reply_to_message
             try:
-                c_time = time.time()
                 downloaded_file_name = await message.client.download_media(
                     message=reply_message,
                     file_name=FF_MPEG_DOWN_LOAD_MEDIA_PATH,
                     progress=progress,
-                    progress_args=(
-                        "trying to download", userge, message, c_time
-                    )
+                    progress_args=(message, "trying to download")
                 )
             except Exception as e:  # pylint:disable=C0103,W0703
                 await message.edit(str(e))

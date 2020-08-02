@@ -3,15 +3,16 @@
 # All rights reserved.
 
 import os
-import requests
-import time
 import re
 import math
 import asyncio
 import string
 import random
 from urllib.parse import unquote_plus
+
+import requests
 from pySmartDL import SmartDL
+
 from userge import userge, Config, Message
 from userge.utils import progress, humanbytes
 
@@ -93,14 +94,11 @@ async def labstack(message: Message):
                 dl_loc = new_path
 
     if message.reply_to_message and message.reply_to_message.media:
-        c_time = time.time()
         dl_loc = await message.client.download_media(
             message=message.reply_to_message,
             file_name=Config.DOWN_PATH,
             progress=progress,
-            progress_args=(
-                "Downloading", userge, message, c_time
-            )
+            progress_args=(message, "Downloading")
         )
 
     filesize = os.path.getsize(dl_loc)

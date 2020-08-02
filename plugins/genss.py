@@ -1,5 +1,4 @@
 import os
-import time
 import random
 import asyncio
 
@@ -36,14 +35,11 @@ async def ss_gen(message: Message):
             await message.edit("I doubt it is a video")
             return
         await message.edit("Downloading Video to my Local")
-        c_time = time.time()
         vid = await message.client.download_media(
             message=replied,
             file_name=Config.DOWN_PATH,
             progress=progress,
-            progress_args=(
-                "Downloading🧐? W8 plox", userge, message, c_time
-            )
+            progress_args=(message, "Downloading🧐? W8 plox")
         )
         vid_loc = os.path.join(Config.DOWN_PATH, os.path.basename(vid))
         should_clean = True

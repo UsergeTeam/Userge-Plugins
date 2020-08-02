@@ -11,7 +11,6 @@
 """
 
 import os
-import time
 import asyncio
 from mimetypes import guess_type
 
@@ -120,13 +119,10 @@ async def upload_google_photos(message: Message):
     if not os.path.isdir(Config.DOWN_PATH):
         os.makedirs(Config.DOWN_PATH)
     file_path = None
-    c_time = time.time()
     vid = await message.reply_to_message.download(
         file_name=Config.DOWN_PATH,
         progress=progress,
-        progress_args=(
-            "downloading🧐?", userge, message, c_time
-        )
+        progress_args=(message, "downloading🧐?")
     )
     file_path = os.path.join(Config.DOWN_PATH, os.path.basename(vid))
     # LOG.info(file_path)
@@ -160,7 +156,6 @@ async def upload_google_photos(message: Message):
         # https://t.me/c/1279877202/74
         number_of_req_s = int(file_size / upload_granularity)
         # LOG.info(number_of_req_s)
-        c_time = time.time()
         loop = asyncio.get_event_loop()
         async with aiofiles.open(file_path, mode="rb") as f_d:
             for i in range(number_of_req_s):
@@ -177,7 +172,7 @@ async def upload_google_photos(message: Message):
                 # LOG.info(headers)
                 response = await session.post(real_upload_url, headers=headers, data=current_chunk)
                 loop.create_task(progress(offset + part_size, file_size,
-                                          "uploading(gphoto)🧐?", userge, message, c_time))
+                                          message, "uploading(gphoto)🧐?"))
                 # LOG.info(response.headers)
                 # https://github.com/SpEcHiDe/UniBorg/commit/8267811b1248c00cd1e34041e2ae8c82b207970f
                 # await f_d.seek(upload_granularity)

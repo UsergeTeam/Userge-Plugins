@@ -1,7 +1,6 @@
 import os
 import re
 import shlex
-import time
 import asyncio
 
 from userge import userge, Message, Config
@@ -23,14 +22,11 @@ async def web(message: Message):
     if input_str:
         file_name = input_str
     else:
-        c_time = time.time()
         file_name = await message.client.download_media(
             message=message.reply_to_message,
             file_name=Config.DOWN_PATH,
             progress=progress,
-            progress_args=(
-                "trying to download", userge, message, c_time
-            )
+            progress_args=(message, "trying to download")
         )
         if message.process_is_canceled:
             await message.err("Process Canceled!")

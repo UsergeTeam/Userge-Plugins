@@ -14,4 +14,4 @@ before_script:
   - cd Userge
   - mkdir -p logs
 script:
-  - python test.py
+  - python -m tests

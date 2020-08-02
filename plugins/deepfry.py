@@ -1,7 +1,6 @@
 """ deepfry and fry for frying any media """
 
 import os
-import time
 import random
 
 from pyrogram.errors.exceptions.bad_request_400 import YouBlockedUser
@@ -34,14 +33,11 @@ async def deepfryer(message: Message):
     if not os.path.isdir(Config.DOWN_PATH):
         os.makedirs(Config.DOWN_PATH)
     await message.edit("*turns on fryer*")
-    c_time = time.time()
     dls = await message.client.download_media(
         message=message.reply_to_message,
         file_name=Config.DOWN_PATH,
         progress=progress,
-        progress_args=(
-            "Lemme add some seasonings", userge, message, c_time
-        )
+        progress_args=(message, "Lemme add some seasonings")
     )
     dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
     if replied.sticker and replied.sticker.file_name.endswith(".tgs"):
@@ -140,14 +136,11 @@ async def fry_(message: Message):
     if not os.path.isdir(Config.DOWN_PATH):
         os.makedirs(Config.DOWN_PATH)
     await message.edit("```Frying, Wait plox ...```")
-    c_time = time.time()
     dls = await message.client.download_media(
         message=replied,
         file_name=Config.DOWN_PATH,
         progress=progress,
-        progress_args=(
-            "Downloading to my local", userge, message, c_time
-        )
+        progress_args=(message, "Downloading to my local")
     )
     dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
     if replied.sticker and replied.sticker.file_name.endswith(".tgs"):

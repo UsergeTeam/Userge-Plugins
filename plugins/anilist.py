@@ -8,7 +8,6 @@
 # (C) Author: Phyco-Ninja (https://github.com/Phyco-Ninja) (@PhycoNinja13b)
 
 import os
-import time
 from datetime import datetime
 
 import flag as cflag
@@ -552,14 +551,11 @@ async def trace_bek(message: Message):
     if not os.path.isdir(Config.DOWN_PATH):
         os.makedirs(Config.DOWN_PATH)
     await message.edit("He he, let me use my skills")
-    c_time = time.time()
     dls = await message.client.download_media(
         message=message.reply_to_message,
         file_name=Config.DOWN_PATH,
         progress=progress,
-        progress_args=(
-            "Downloading Media", userge, message, c_time
-        )
+        progress_args=(message, "Downloading Media")
     )
     dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
     if replied.animation or replied.video:

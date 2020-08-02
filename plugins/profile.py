@@ -4,7 +4,6 @@
 # del_pfp by Phyco-Ninja
 
 import os
-import time
 from datetime import datetime
 
 from pyrogram.errors.exceptions.bad_request_400 import (
@@ -112,14 +111,12 @@ async def set_profile_picture(message: Message):
     if (replied and replied.media and (
             replied.photo or (replied.document and "image" in replied.document.mime_type))):
         s_time = datetime.now()
-        c_time = time.time()
 
         await userge.download_media(message=replied,
                                     file_name=PHOTO,
                                     progress=progress,
                                     progress_args=(
-                                        "trying to download and set profile picture",
-                                        userge, message, c_time))
+                                        message, "trying to download and set profile picture"))
 
         await userge.set_profile_photo(PHOTO)
 
