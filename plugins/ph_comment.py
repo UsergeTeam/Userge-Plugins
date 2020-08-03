@@ -47,8 +47,6 @@ async def ph_comment(message: Message):
         os.remove(picture)
     else:
         loc_f = "https://telegra.ph/file/9844536dbba404c227181.jpg"
-
-
     async def phcomment(text1, text2, text3):
         r = requests.get(
             f"https://nekobot.xyz/api/imagegen?type=phcomment&image={text1}&text={text2}&username={text3}"
