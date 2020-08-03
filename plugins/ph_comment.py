@@ -2,11 +2,12 @@
 
 # BY code-rgb [https://github.com/code-rgb]
 
-
-import requests , os
+import os
+import requests
 from validators.url import url
 from html_telegraph_poster.upload_images import upload_image
 from userge import userge, Message, Config
+
 
 @userge.on_cmd("ph", about={
     'header': "P*rnhub Comment",
@@ -19,7 +20,6 @@ from userge import userge, Message, Config
 
 async def ph_comment(message: Message):
     """Create P*rnhub Comment for Replied User"""
-
     replied = message.reply_to_message
     args = message.input_str
     if replied:
@@ -52,7 +52,7 @@ async def ph_comment(message: Message):
 
     async def phcomment(text1, text2, text3):
         r = requests.get(
-                f"https://nekobot.xyz/api/imagegen?type=phcomment&image={text1}&text={text2}&username={text3}").json()
+            f"https://nekobot.xyz/api/imagegen?type=phcomment&image={text1}&text={text2}&username={text3}").json()
         urlx = r.get("message")
         ph_url = url(urlx)
         if not ph_url:
