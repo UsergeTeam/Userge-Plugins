@@ -17,9 +17,8 @@ from userge import userge, Message, Config
         "{tr}ph Did they ever get the pizza?",
         "{tr}ph David | Did they ever get the pizza?",
         "{tr}ph David | "]}, check_downpath=True)
-
 async def ph_comment(message: Message):
-    """Create P*rnhub Comment for Replied User"""
+    """ Create P*rnhub Comment for Replied User """
     replied = message.reply_to_message
     args = message.input_str
     if replied:
@@ -52,7 +51,8 @@ async def ph_comment(message: Message):
 
     async def phcomment(text1, text2, text3):
         r = requests.get(
-            f"https://nekobot.xyz/api/imagegen?type=phcomment&image={text1}&text={text2}&username={text3}").json()
+            f"https://nekobot.xyz/api/imagegen?type=phcomment&image={text1}&text={text2}&username={text3}"
+            ).json()
         urlx = r.get("message")
         ph_url = url(urlx)
         if not ph_url:
