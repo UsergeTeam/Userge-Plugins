@@ -21,17 +21,16 @@ async def ph_comment(message: Message):
     """ Create P*rnhub Comment for Replied User """
     replied = message.reply_to_message
     args = message.input_str
-    if replied:
-        if "|" in message.input_str:
-            u_name, msg_text = message.input_str.split('|')
-            name = u_name.strip()
-            comment = msg_text if msg_text else replied.text
+    if replied and "|" in message.input_str:
+        u_name, msg_text = message.input_str.split('|')
+        name = u_name.strip()
+        comment = msg_text if msg_text else replied.text
+    elif replied:
+        comment = args if args else replied.text
+        if replied.from_user.last_name:
+            name = replied.from_user.first_name + " " + replied.from_user.last_name
         else:
-            comment = args if args else replied.text
-            if replied.from_user.last_name:
-                name = replied.from_user.first_name + " " + replied.from_user.last_name
-            else:
-                name = replied.from_user.first_name
+            name = replied.from_user.first_name
     else:
         await message.err("```Input not found!...```", del_in=3)
         return
@@ -41,25 +40,26 @@ async def ph_comment(message: Message):
         pfp_photo = replied.from_user.photo.small_file_id
         file_name = os.path.join(Config.DOWN_PATH, "profile_pic.jpg")
         picture = await userge.download_media(
-            pfp_photo,
-            file_name=file_name)
+                pfp_photo,
+                file_name=file_name)
         loc_f = upload_image(picture)
         os.remove(picture)
     else:
         loc_f = "https://telegra.ph/file/9844536dbba404c227181.jpg"
-    async def phcomment(text1, text2, text3):
-        r = requests.get(
-            f"https://nekobot.xyz/api/imagegen?type=phcomment&image={text1}&text={text2}&username={text3}"
-            ).json()
-        urlx = r.get("message")
-        ph_url = url(urlx)
-        if not ph_url:
-            return await message.edit("😔 Something Wrong see Help!", del_in=2)
-        return urlx
     path = await phcomment(loc_f, comment, name)
     chat_id = message.chat.id
     await message.delete()
     await message.client.send_photo(
-        chat_id=chat_id,
-        photo=path,
-        reply_to_message_id=replied.message_id)
+            chat_id=chat_id,
+            photo=path,
+            reply_to_message_id=replied.message_id)
+
+async def phcomment(text1, text2, text3):
+    r = requests.get(
+        f"https://nekobot.xyz/api/imagegen?type=phcomment&image={text1}&text={text2}&username={text3}"
+        ).json()
+    urlx = r.get("message")
+    ph_url = url(urlx)
+    if not ph_url:
+        return await message.edit("😔 Something Wrong see Help!", del_in=2)
+    return urlx
