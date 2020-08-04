@@ -40,21 +40,23 @@ async def ph_comment(message: Message):
         pfp_photo = replied.from_user.photo.small_file_id
         file_name = os.path.join(Config.DOWN_PATH, "profile_pic.jpg")
         picture = await userge.download_media(
-          pfp_photo,
-          file_name=file_name)
+            pfp_photo,
+            file_name=file_name
+        )
         loc_f = upload_image(picture)
         os.remove(picture)
     else:
         loc_f = "https://telegra.ph/file/9844536dbba404c227181.jpg"
     path = await phcomment(loc_f, comment, name)
     if path == "ERROR":
-        return await message.edit("😔 Something Wrong see Help!", del_in=2)        
+        return await message.edit("😔 Something Wrong see Help!", del_in=2)
     chat_id = message.chat.id
     await message.delete()
     await message.client.send_photo(
-      chat_id=chat_id,
-      photo=path,
-      reply_to_message_id=replied.message_id)
+        chat_id=chat_id,
+        photo=path,
+        reply_to_message_id=replied.message_id
+    )
 
 
 async def phcomment(text1, text2, text3):
@@ -64,5 +66,4 @@ async def phcomment(text1, text2, text3):
     ph_url = url(urlx)
     if not ph_url:
         return "ERROR"
-    else:
-        return urlx
+    return urlx
