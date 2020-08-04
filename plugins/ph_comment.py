@@ -20,17 +20,17 @@ from userge import userge, Message, Config
 async def ph_comment(message: Message):
     """ Create P*rnhub Comment for Replied User """
     replied = message.reply_to_message
-    args = message.input_str
-    if replied and "|" in message.input_str:
-        u_name, msg_text = message.input_str.split('|')
-        name = u_name.strip()
-        comment = msg_text if msg_text else replied.text
-    elif replied:
-        comment = args if args else replied.text
-        if replied.from_user.last_name:
-            name = replied.from_user.first_name + " " + replied.from_user.last_name
+    if replied:
+        if "|" in message.input_str:
+            u_name, msg_text = message.input_str.split('|')
+            name = u_name.strip()
+            comment = msg_text or replied.text
         else:
-            name = replied.from_user.first_name
+            if replied.from_user.last_name:
+                name = replied.from_user.first_name + " " + replied.from_user.last_name
+            else:
+                name = replied.from_user.first_name
+            comment = message.input_str or replied.text
     else:
         await message.err("```Input not found!...```", del_in=3)
         return
