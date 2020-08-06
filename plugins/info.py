@@ -9,6 +9,7 @@ from datetime import datetime
 from userge import userge, Config, Message, get_collection
 
 GBAN_USER_BASE = get_collection("GBAN_USER")
+GMUTE_USER_BASE = get_collection("GMUTE_USER")
 
 
 @userge.on_cmd("info", about={
@@ -64,6 +65,12 @@ async def info(msg: Message):
             user_info += f"**•Reason** : `{reason}`\n"
         else:
             user_info += "**AntiSpam Banned** : `False`\n"
+        user_gmuted = await GMUTE_USER_BASE.find_one({'user_id': user.id})
+        if user_gmuted:
+            user_info += "**User GMuted** : `True`\n"
+            user_info += f"**•Reason** : `{user_gmuted['reason'] or None}`\n"
+        else:
+            user_info += "**User GMuted** : `False`\n"
         user_gbanned = await GBAN_USER_BASE.find_one({'user_id': user.id})
         if user_gbanned:
             user_info += "**User GBanned** : `True`\n"
