@@ -118,7 +118,7 @@ async def set_profile_picture(message: Message):
                                     progress_args=(
                                         message, "trying to download and set profile picture"))
 
-        await userge.set_profile_photo(PHOTO)
+        await userge.set_profile_photo(photo=PHOTO)
 
         if os.path.exists(PHOTO):
             os.remove(PHOTO)
@@ -306,7 +306,7 @@ async def clone_(message: Message):
             await message.err("```User not have any profile pic ...```", del_in=5)
             return
         await userge.download_media(user.photo.big_file_id, file_name=PHOTO)
-        await userge.set_profile_photo(PHOTO)
+        await userge.set_profile_photo(photo=PHOTO)
         await message.edit("```Profile photo is Successfully Cloned ...```", del_in=3)
     else:
         if USER_DATA or os.path.exists(PHOTO):
@@ -326,7 +326,7 @@ async def clone_(message: Message):
                 "`User not have profile photo, I only cloning Name and bio ...`", del_in=5)
             return
         await userge.download_media(user.photo.big_file_id, file_name=PHOTO)
-        await userge.set_profile_photo(PHOTO)
+        await userge.set_profile_photo(photo=PHOTO)
         await message.edit("```Profile is Successfully Cloned ...```", del_in=3)
 
 
