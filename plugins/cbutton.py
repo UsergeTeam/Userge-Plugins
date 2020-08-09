@@ -2,8 +2,7 @@
 
 # By @Krishna_Singhal
 
-from pyrogram.errors.exceptions.bad_request_400 import (
-    UserIsBot, BadRequest, MessageEmpty)
+from pyrogram.errors.exceptions.bad_request_400 import UserIsBot, BadRequest
 
 from userge import userge, Config, Message
 from userge.utils import parse_buttons as pb
@@ -22,22 +21,26 @@ async def create_button(msg: Message):
     if Config.BOT_TOKEN is None:
         await msg.err("First Create a Bot via @Botfather to Create Buttons...")
         return
-    replied = msg.reply_to_message
-    if not (replied and replied.text):
-        await msg.err("Reply a text Msg")
+    string = msg.input_or_reply_raw
+    if not string:
+        await msg.err("`need an input!`")
         return
-    text, buttons = pb(replied.text)
+    text, markup = pb(string)
+    if not text:
+        await msg.err("`need text too!`")
+        return
+    replied = msg.reply_to_message
+    message_id = replied.message_id if replied else msg.message_id
+    client = msg.client if msg.client.is_bot else msg.client.bot
     try:
-        await userge.bot.send_message(
-            chat_id=msg.chat.id, text=text,
-            reply_to_message_id=replied.message_id,
-            reply_markup=buttons)
+        await client.send_message(chat_id=msg.chat.id,
+                                  text=text,
+                                  reply_to_message_id=message_id,
+                                  reply_markup=markup)
     except UserIsBot:
         await msg.err("oops, your Bot is not here to send Msg!")
     except BadRequest:
         await msg.err("Check Syntax of Your Message for making buttons!")
-    except MessageEmpty:
-        await msg.err("Message Object is Empty!")
     except Exception as error:
         await msg.edit(f"`Something went Wrong! 😁`\n\n**ERROR:** `{error}`")
     else:
