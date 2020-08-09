@@ -6,8 +6,7 @@ from pyrogram import InlineKeyboardMarkup as keyboard
 from pyrogram.errors.exceptions.bad_request_400 import (
     UserIsBot, BadRequest, MessageEmpty)
 
-from userge import userge, Config, Message
-from userge.core.types.new.channel_logger import _parse_buttons as pb
+from userge import userge, Config, Message, _parse_buttons as pb
 
 
 @userge.on_cmd("cbutton", about={
