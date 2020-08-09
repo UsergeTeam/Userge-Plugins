@@ -3,7 +3,6 @@
 # by @krishna_singhal
 
 import random
-import re
 
 from userge.utils import demojify
 from userge import userge, Message
