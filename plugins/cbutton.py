@@ -5,7 +5,8 @@
 from pyrogram.errors.exceptions.bad_request_400 import (
     UserIsBot, BadRequest, MessageEmpty)
 
-from userge import userge, Config, Message, parse_buttons as pb
+from userge import userge, Config, Message
+from userge.utils import parse_buttons as pb
 
 
 @userge.on_cmd("cbutton", about={
