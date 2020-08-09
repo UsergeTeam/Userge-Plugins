@@ -8,7 +8,6 @@ google
 glitch-this
 gtts
 humanize
-html-telegraph-poster
 justwatch
 lottie
 qrcode
