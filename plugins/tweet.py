@@ -14,6 +14,9 @@ from userge import userge, Config, Message
 CONVERTED_IMG = Config.DOWN_PATH + "img.png"
 CONVERTED_STIKR = Config.DOWN_PATH + "sticker.webp"
 
+# idea of short name of celebrities by @ravana
+# modded by @Krishna_Singhal
+
 CELEBRITIES = {
     "ab": "SrBachchan",
     "ambani": "Asliambani",
