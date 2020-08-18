@@ -33,6 +33,7 @@ async def spam(message: Message):
                 await message.client.send_sticker(sticker=to_spam, chat_id=message.chat.id)
                 await asyncio.sleep(0.1)
             await S_LOG.log(f"Spammed Sticker in Chat» {message.chat.title}, {sc} times")
+            await message.delete()
         elif (replied.animation or replied.video or replied.photo):
             dls = await message.client.download_media(
                 message=message.reply_to_message,
@@ -55,6 +56,20 @@ async def spam(message: Message):
                     await message.client.send_photo(photo=to_spam, chat_id=message.chat.id)
                     await asyncio.sleep(0.1)
             await S_LOG.log(f"Spammed Media in Chat» {message.chat.title}, {sc} times")
+            await message.delete()
+    elif replied.text:
+        try:
+            sc = int(message.input_str)
+        except ValueError as e:
+            await message.edit(e)
+            await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
+            return
+        await message.edit(f"Spamming {sc} times")
+        for _ in range(sc):
+            await message.client.send_message(text=replied.text, chat_id=message.chat.id)
+            await asyncio.sleep(0.1)
+        await S_LOG.log(f"Spammed Text in Chat» {message.chat.title}, {sc} times")
+        await message.delete()
     elif is_str:
         spam_count, spam_text = message.input_str.split("|")
         try:
@@ -68,6 +83,7 @@ async def spam(message: Message):
             await message.client.send_message(text=spam_text, chat_id=message.chat.id)
             await asyncio.sleep(0.1)
         await S_LOG.log(f"Spammed Text in Chat» {message.chat.title}, {sc} times")
+        await message.delete()
     else:
         await message.edit("Well it doesn't work that way")
         await message.reply_sticker(sticker="CAADAQAD6gADfAVQRnyVSb3GhGT4FgQ")
