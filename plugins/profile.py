@@ -60,7 +60,7 @@ async def setname_(message: Message):
         try:
             await userge.update_username(username=arg.strip())
         except UsernameOccupied:
-            await message.err("Username is Not Available...|)
+            await message.err("Username is Not Available...")
         else:
             await message.edit("```Username is Successfully Updated ...```", del_in=3)
     elif '|' in message.input_str:
