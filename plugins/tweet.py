@@ -144,9 +144,9 @@ async def carry_minati(msg: Message):
 
 @userge.on_cmd("tweet", about={
     'header': "Tweet With Custom text Sticker",
-    'available celebrities': "<code>Check this</code> "
-             "<a href='https://telegra.ph/dogbin---crollokoph-08-09'>link</a>"
-             " <code>to know available Celebrities.</code>",
+    'available celebrities': "<code>Check this</code> <a"
+                             "href='https://telegra.ph/dogbin---crollokoph-08-09'>link"
+                             "</a> <code>to know available Celebrities.</code>",
     'flags': {
         '-s': "To get tweet in Sticker"},
     'usage': "{tr}tweet text , username\n"
