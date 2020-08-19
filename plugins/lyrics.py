@@ -23,7 +23,11 @@ async def glyrics(message: Message):
     gen_surl = list(search(to_search, num=1, stop=1))[0]
     gen_page = requests.get(gen_surl)
     scp = BeautifulSoup(gen_page.text, 'html.parser')
-    lyrics = scp.find("div", class_="lyrics").get_text()
+    lyrics = scp.find("div", class_="lyrics")
+    if not lyrics:
+        await message.edit(f"No Results Found for: `{song}`")
+        return
+    lyrics = lyrics.get_text()
     lyrics = re.sub(r'[\(\[].*?[\)\]]', '', lyrics)
     lyrics = os.linesep.join((s for s in lyrics.splitlines() if s))
     title = scp.find('title').get_text().split("|")
