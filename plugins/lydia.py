@@ -209,6 +209,8 @@ async def _custom_media_reply(message: Message):
         await asyncio.sleep(1)
         cus_msg = int(random.choice(CUSTOM_REPLIES_IDS))
         cus_msg = await userge.get_messages(chat_id=CUSTOM_REPLY_CHANNEL, message_id=cus_msg)
+        if cus_msg.service:
+            await _custom_media_reply(message)
         if cus_msg.media:
             file_id, file_ref = get_file_id_and_ref(cus_msg)
             try:
@@ -221,12 +223,18 @@ async def _custom_media_reply(message: Message):
                     )
                 else:
                     action = None
-                    action = "upload_audio" if cus_msg.audio
-                    action = "upload_document" if cus_msg.document
-                    action = "upload_photo" if cus_msg.photo
-                    action = "upload_audio" if cus_msg.video
-                    action = "record_audio" if cus_msg.voice
-                    action = "upload_video_note" if cus_msg.video_note
+                    if cus_msg.audio:
+                        action = "upload_audio"
+                    elif cus_msg.document:
+                        action = "upload_document"
+                    elif cus_msg.photo:
+                        action = "upload_photo"
+                    elif cus_msg.video:
+                        action = "upload_audio"
+                    elif cus_msg.voice:
+                        action = "record_audio"
+                    elif cus_msg.video_note:
+                        action = "upload_video_note"
                     if action:
                         await message.reply_chat_action(action)
                     await asyncio.sleep(5)
