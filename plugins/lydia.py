@@ -5,6 +5,7 @@
 # Author: Phyco-Ninja (https://github.com/Phyco-Ninja) (@PhycoNinja13b)
 # Thanks to @Intellivoid For Creating CoffeeHouse API
 
+import os
 import random
 import asyncio
 from time import time
@@ -205,10 +206,11 @@ async def lydia_queue() -> None:
 # saved in a channel and reply it to message.
 # Idea arised from here (https://t.me/usergeot/157629) thnx 👍
 async def _custom_media_reply(message: Message):
-    if CUSTOM_REPLIES:
+    if CUSTOM_REPLIES_IDS:
         await asyncio.sleep(1)
         cus_msg = int(random.choice(CUSTOM_REPLIES_IDS))
-        cus_msg = await message.client.get_messages(chat_id=CUSTOM_REPLY_CHANNEL, message_id=cus_msg)
+        cus_msg = await message.client.get_messages(chat_id=CUSTOM_REPLY_CHANNEL,
+                                                    message_id=cus_msg)
         if cus_msg.service:
             await _custom_media_reply(message)
         if cus_msg.media:
