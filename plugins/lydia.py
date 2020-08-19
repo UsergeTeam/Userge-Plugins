@@ -5,7 +5,6 @@
 # Author: Phyco-Ninja (https://github.com/Phyco-Ninja) (@PhycoNinja13b)
 # Thanks to @Intellivoid For Creating CoffeeHouse API
 
-import os
 import random
 import asyncio
 from time import time
@@ -178,8 +177,8 @@ async def lydia_ai_chat(message: Message):
             if not message.media and message.text:
                 out = await _think_lydia(ses_id, message.text)
             QUEUE.put_nowait((message, out))
-        except CoffeeHouseError:
-            pass
+        except CoffeeHouseError as cfe:
+            LOGGER.log(f"#CoffeeHouseError {cfe}")
     message.continue_propagation()
 
 
@@ -215,7 +214,7 @@ async def _custom_media_reply(message: Message):
             file_id, file_ref = get_file_id_and_ref(cus_msg)
             try:
                 if cus_msg.animation:
-                    await userge.send_animation(
+                    await message.client.send_animation(
                         chat_id=message.chat.id,
                         animation=file_id,
                         file_ref=file_ref,
