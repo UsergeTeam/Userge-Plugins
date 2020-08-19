@@ -15,6 +15,7 @@ from coffeehouse.exception import CoffeeHouseError
 from pyrogram.errors.exceptions.bad_request_400 import PeerIdInvalid
 
 from userge import userge, get_collection, Message, Filters, Config, pool
+from userge.utils import get_file_id_and_ref
 
 LOGGER = userge.getCLogger(__name__)
 LYDIA_CHATS = get_collection("LYDIA_CHATS")
@@ -207,7 +208,7 @@ async def _custom_media_reply(message: Message):
     if CUSTOM_REPLIES:
         await asyncio.sleep(1)
         cus_msg = int(random.choice(CUSTOM_REPLIES_IDS))
-        cus_msg = await userge.get_messages(chat_id=CUSTOM_REPLY_CHANNEL, message_id=cus_msg)
+        cus_msg = await message.client.get_messages(chat_id=CUSTOM_REPLY_CHANNEL, message_id=cus_msg)
         if cus_msg.service:
             await _custom_media_reply(message)
         if cus_msg.media:
