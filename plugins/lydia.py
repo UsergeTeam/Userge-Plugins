@@ -17,7 +17,7 @@ from pyrogram.errors.exceptions.bad_request_400 import PeerIdInvalid
 
 from userge import userge, get_collection, Message, Filters, Config, pool
 
-
+LOGGER = userge.getCLogger(__name__)
 LYDIA_CHATS = get_collection("LYDIA_CHATS")
 CH_LYDIA_API = os.environ.get("CH_LYDIA_API", None)
 CUSTOM_REPLY_CHANNEL = int(os.environ.get("CUSTOM_REPLY_CHANNEL", 0))
@@ -25,7 +25,7 @@ if CH_LYDIA_API is not None:
     LYDIA = LydiaAI(API(CH_LYDIA_API))
 
 ACTIVE_CHATS = {}
-CUSTOM_REPLIES = []
+CUSTOM_REPLIES_IDS = []
 QUEUE = asyncio.Queue()
 
 LYDIA_API_INFO = """This module uses Lydia AI
@@ -41,7 +41,7 @@ async def _init():
         ACTIVE_CHATS[chat['_id']] = (chat['session_id'], chat['session_exp'])
     if CUSTOM_REPLY_CHANNEL:
         async for message in userge.iter_history(chat_id=CUSTOM_REPLY_CHANNEL, limit=300):
-            CUSTOM_REPLIES.append(message)
+            CUSTOM_REPLIES_IDS.append(message.message_id)
 
 
 @userge.on_cmd("lydia", about={
@@ -207,30 +207,36 @@ async def lydia_queue() -> None:
 async def _custom_media_reply(message: Message):
     if CUSTOM_REPLIES:
         await asyncio.sleep(1)
-        cus_msg = random.choice(CUSTOM_REPLIES)
-        replied = message.message_id
+        cus_msg = int(random.choice(CUSTOM_REPLIES_IDS))
+        cus_msg = await userge.get_messages(chat_id=CUSTOM_REPLY_CHANNEL, message_id=cus_msg)
         if cus_msg.media:
-            if cus_msg.sticker:
-                await asyncio.sleep(1)
-                await message.reply_sticker(
-                    sticker=cus_msg.sticker.file_id,
-                    file_ref=cus_msg.sticker.file_ref
-                )
-            if (cus_msg.photo or cus_msg.video or cus_msg.animation):
-                dls = await message.client.download_media(
-                    message=cus_msg, file_name=Config.DOWN_PATH)
-                if cus_msg.photo:
-                    await message.reply_photo(dls)
-                if cus_msg.video:
-                    await message.reply_video(dls)
+            file_id, file_ref = get_file_id_and_ref(cus_msg)
+            try:
                 if cus_msg.animation:
-                    await message.client.send_animation(
+                    await userge.send_animation(
                         chat_id=message.chat.id,
-                        animation=dls,
-                        unsave=True,
-                        reply_to_message_id=replied
+                        animation=file_id,
+                        file_ref=file_ref,
+                        unsave=True
                     )
-                os.remove(dls)
+                else:
+                    action = None
+                    action = "upload_audio" if cus_msg.audio
+                    action = "upload_document" if cus_msg.document
+                    action = "upload_photo" if cus_msg.photo
+                    action = "upload_audio" if cus_msg.video
+                    action = "record_audio" if cus_msg.voice
+                    action = "upload_video_note" if cus_msg.video_note
+                    if action:
+                        await message.reply_chat_action(action)
+                    await asyncio.sleep(5)
+                    await message.reply_cached_media(
+                        file_id=file_id,
+                        file_ref=file_ref
+                    )
+            except Exception as idk:  # pylint: disable=W0703
+                LOGGER.log(f"#ERROR: `{idk}`")
+                await _custom_media_reply(message)
         if cus_msg.text:
             await _send_text_like_a_human(message, cus_msg.text)
 
