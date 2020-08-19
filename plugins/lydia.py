@@ -219,7 +219,8 @@ async def _custom_media_reply(message: Message):
                         chat_id=message.chat.id,
                         animation=file_id,
                         file_ref=file_ref,
-                        unsave=True
+                        unsave=True,
+                        reply_to_message_id=message.message_id
                     )
                 else:
                     action = None
