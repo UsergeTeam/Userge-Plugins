@@ -8,7 +8,7 @@ import asyncio
 from pyrogram.errors import FloodWait
 
 from resources.quotes import ENGLISH_QUOTES, HINDI_QUOTES
-from userge import userge, Message
+from userge import userge, Message, get_collection
 
 BIO_UPDATION = False
 AUTOBIO_TIMEOUT = 86400
@@ -16,6 +16,7 @@ USER_DATA = get_collection("CONFIGS")
 
 CHANNEL = userge.getCLogger(__name__)
 LOG = userge.getLogger(__name__)
+
 
 async def _init() -> None:
     global BIO_UPDATION
@@ -35,7 +36,7 @@ async def auto_bio(msg: Message):
             BIO_UPDATION.cancel()
         BIO_UPDATION = False
         USER_DATA.update_one({'_id': 'BIO_UPDATION'},
-                                  {"$set": {'on': False}}, upsert=True)
+                             {"$set": {'on': False}}, upsert=True)
         await asyncio.sleep(1)
 
         await msg.edit(
@@ -51,7 +52,7 @@ async def auto_bio(msg: Message):
         return
 
     USER_DATA.update_one({'_id': 'BIO_UPDATION'},
-                              {"$set": {'on': True}}, upsert=True)
+                         {"$set": {'on': True}}, upsert=True)
     await msg.edit(
         "Auto Bio Updation is **Started** Successfully...", log=__name__, del_in=3)
     BIO_UPDATION = asyncio.get_event_loop().create_task(autobio_worker(msg, bio_quotes))
