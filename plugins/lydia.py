@@ -210,7 +210,7 @@ async def _custom_media_reply(message: Message):
         await asyncio.sleep(1)
         cus_msg = int(random.choice(CUSTOM_REPLIES_IDS))
         cus_msg = await message.client.get_messages(chat_id=CUSTOM_REPLY_CHANNEL,
-                                                    message_id=cus_msg)
+                                                    message_ids=cus_msg)
         if cus_msg.service:
             await _custom_media_reply(message)
             return
