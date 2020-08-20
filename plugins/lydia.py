@@ -213,6 +213,7 @@ async def _custom_media_reply(message: Message):
                                                     message_id=cus_msg)
         if cus_msg.service:
             await _custom_media_reply(message)
+            return
         if cus_msg.media:
             file_id, file_ref = get_file_id_and_ref(cus_msg)
             try:
@@ -248,6 +249,7 @@ async def _custom_media_reply(message: Message):
             except Exception as idk:  # pylint: disable=W0703
                 LOGGER.log(f"#ERROR: `{idk}`")
                 await _custom_media_reply(message)
+                return
         if cus_msg.text:
             await _send_text_like_a_human(message, cus_msg.text)
 
