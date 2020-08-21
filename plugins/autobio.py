@@ -19,7 +19,7 @@ LOG = userge.getLogger(__name__)
 
 
 async def _init() -> None:
-    global BIO_UPDATION
+    global BIO_UPDATION  # pylint: disable=global-statement
     data = await USER_DATA.find_one({'_id': 'BIO_UPDATION'})
     if data:
         BIO_UPDATION = data['on']
@@ -30,7 +30,7 @@ async def _init() -> None:
     'usage': "{tr}autobio (for eng)\n{tr}autobio Hi (for hindi)"})
 async def auto_bio(msg: Message):
     """ Auto Update Your Bio """
-    global BIO_UPDATION
+    global BIO_UPDATION  # pylint: disable=global-statement
     if BIO_UPDATION:
         if isinstance(BIO_UPDATION, asyncio.Task):
             BIO_UPDATION.cancel()
