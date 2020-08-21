@@ -8,22 +8,32 @@ from userge import userge, Message
 
 @userge.on_cmd("poll", about={
     'header': "Create Poll of Suggestion to get opinion",
+    'flags': {'-n': "Use to Make poll non-anonymous"},
     'usage': "{tr}poll [reply to ques text]"},
     allow_private=False)
 async def create_poll(msg: Message):
     """" Create poll """
-
     options = ["Yes, Sure 😎", "No interest 🙄", "What..? 😳😳🤔🤔"]
-
+    anonymous = True
+    if '-n' in msg.flags:
+        anonymous = False
     replied = msg.reply_to_message
     if replied:
         query = "Do you agree with that replied Suggestion..?"
         msg_id = replied.message_id
-        await userge.send_poll(msg.chat.id, query, options,
+        await userge.send_poll(
+            chat_id=msg.chat.id,
+            question=query,
+            options=options,
+            is_anonymous=anonymous,
             reply_to_message_id=msg_id)
     else:
         query = "Do you agree with that Suggestion..?"
-        await userge.send_poll(msg.chat.id, query, options)
+        await userge.send_poll(
+            chat_id=msg.chat.id,
+            question=query,
+            options=options,
+            is_anonymous=anonymous)
     await msg.delete()
 
 
