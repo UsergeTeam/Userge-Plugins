@@ -173,7 +173,7 @@ async def tweet(msg: Message):
     else:
         await msg.err("Input not found!")
         return
-    if username in CELEBRITIES:
+    if CELEBRITIES.get(username):
         celebrity = CELEBRITIES[username]
     else:
         celebrity = username
