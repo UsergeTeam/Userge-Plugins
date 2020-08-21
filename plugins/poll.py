@@ -20,7 +20,7 @@ async def create_poll(msg: Message):
         query = "Do you agree with that replied Suggestion..?"
         msg_id = replied.message_id
         await userge.send_poll(msg.chat.id, query, options,
-                           reply_to_message_id=msg_id)
+            reply_to_message_id=msg_id)
     else:
         query = "Do you agree with that Suggestion..?"
         await userge.send_poll(msg.chat.id, query, options)
@@ -29,11 +29,9 @@ async def create_poll(msg: Message):
 
 @userge.on_cmd("vote", about={
     'header': "Vote poll",
-    'description': "Options are in numeric "
-                   "(Count start in Python from 0) "
-                   "see example to vote option no. 1",
+    'description': "Options Should be in numeric",
     'usage': "{tr}vote [option | reply to poll]",
-    'examples': "{tr}vote 0 (with reply to poll)"},
+    'examples': "{tr}vote 1 (with reply to poll)"},
     allow_private=False)
 async def vote_poll(msg: Message):
     """ vote poll """
@@ -41,7 +39,7 @@ async def vote_poll(msg: Message):
     replied = msg.reply_to_message
     if replied and replied.poll:
         if msg.input_str and msg.input_str.isnumeric():
-            option = int(msg.input_str)
+            option = int(msg.input_str) - 1
         else:
             option = random.randint(0, len(replied.poll.options) - 1)
 
