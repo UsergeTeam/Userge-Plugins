@@ -173,10 +173,7 @@ async def tweet(msg: Message):
     else:
         await msg.err("Input not found!")
         return
-    if CELEBRITIES.get(username):
-        celebrity = CELEBRITIES[username]
-    else:
-        celebrity = username
+    celebrity = CELEBRITIES.get(username, username)
     await msg.edit(f"`{celebrity} is tweeting 😏`")
     await _tweets(msg, text, celebrity)
 
