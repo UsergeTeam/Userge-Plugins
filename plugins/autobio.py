@@ -58,7 +58,7 @@ async def auto_bio(msg: Message):
     BIO_UPDATION = asyncio.get_event_loop().create_task(autobio_worker(msg, bio_quotes))
 
 
-@userge.add_task
+# @userge.add_task
 async def autobio_worker(msg: Message, bio_quotes: list):
     quotes = bio_quotes
     while BIO_UPDATION:
