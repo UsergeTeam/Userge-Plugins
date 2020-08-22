@@ -101,4 +101,3 @@ async def retract_vote(msg: Message):
             await msg.edit("`Vote retracted...`")
     else:
         await msg.err("How can I retract your vote without reply a poll")
-        
