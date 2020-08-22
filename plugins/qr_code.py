@@ -73,11 +73,12 @@ async def get_qr(message: Message):
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    stdout = await process.communicate()
-    stderr = await process.communicate()
+    stdout, stderr = await process.communicate()
+
     out_response = stdout.decode().strip()
     err_response = stderr.decode().strip()
     os.remove(down_load)
+
     if not (out_response or err_response):
         await message.err("```Couldn't get data of this QR Code...```")
         return

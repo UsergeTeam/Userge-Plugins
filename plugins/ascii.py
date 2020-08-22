@@ -1,6 +1,9 @@
 """ ASCII Sticker """
 
-# By @Krishna_Singhal
+# Copyright 2017, Shanshan Wang, MIT license
+# (C) Author: Krishna-Singhal < https://github.com/krishna-singhal >  <@Krishna_Singhal>
+#
+# All Rights Reserved.
 
 import os
 import numpy as np

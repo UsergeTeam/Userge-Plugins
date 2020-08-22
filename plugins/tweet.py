@@ -3,31 +3,56 @@
 # By @Krishna_Singhal
 
 import os
-import re
 import requests
 
 from PIL import Image
 from validators.url import url
 
+from userge.utils import demojify
 from userge import userge, Config, Message
 
 CONVERTED_IMG = Config.DOWN_PATH + "img.png"
 CONVERTED_STIKR = Config.DOWN_PATH + "sticker.webp"
 
-EMOJI_PATTERN = re.compile(
-    "["
-    "\U0001F1E0-\U0001F1FF"  # flags (iOS)
-    "\U0001F300-\U0001F5FF"  # symbols & pictographs
-    "\U0001F600-\U0001F64F"  # emoticons
-    "\U0001F680-\U0001F6FF"  # transport & map symbols
-    "\U0001F700-\U0001F77F"  # alchemical symbols
-    "\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
-    "\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
-    "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
-    "\U0001FA00-\U0001FA6F"  # Chess Symbols
-    "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
-    "\U00002702-\U000027B0"  # Dingbats
-    "]+")
+# idea of short name of celebrities by @ravana
+# modded by @Krishna_Singhal
+
+CELEBRITIES = {
+    "ab": "SrBachchan",
+    "ambani": "Asliambani",
+    "ananya": "ananyapandayy",
+    "android": "Android",
+    "apple": "apple",
+    "arnab": "ArnabGoswamiRTV",
+    "ashish": "ashchanchlani",
+    "bb": "Bhuvan_Bam",
+    "bjp": "bjp4india",
+    "chris": "chrishhemsworth",
+    "elvish": "ElvishYadav",
+    "fb": "facebook",
+    "hashmi": "Emraanhashmi",
+    "harsh": "iamharshbeniwal",
+    "ht": "htTweets",
+    "jio": "reliancejio",
+    "karan": "karanjohar",
+    "kiara": "advani_kiara",
+    "netflix": "netflix",
+    "osama": "ItstherealOsama",
+    "ph": "pornhub",
+    "rahul": "RahulGandhi",
+    "rajni": "rajinikanth",
+    "ramdev": "yogrishiramdev",
+    "rdj": "RobertDowneyJr",
+    "salman": "BeingSalmanKhan",
+    "setu": "Arogyasetu",
+    "sonakshi": "Aslisonagold",
+    "sonam": "sonamakapoor",
+    "srk": "iamsrk",
+    "telegram": "telegram",
+    "whatsapp": "WhatsApp",
+    "yogi": "myogiadityanath",
+    "yt": "youtube",
+    "zee": "ZeeNews"}
 
 
 @userge.on_cmd("trump", about={
@@ -122,41 +147,41 @@ async def carry_minati(msg: Message):
 
 @userge.on_cmd("tweet", about={
     'header': "Tweet With Custom text Sticker",
+    'available celebrities': "<code>Check this</code> <a"
+                             "href='https://telegra.ph/dogbin---crollokoph-08-09'>link"
+                             "</a> <code>to know available Celebrities.</code>",
     'flags': {
         '-s': "To get tweet in Sticker"},
-    'usage': "{tr}tweet Text , Username\n"
-             "{tr}tweet Text\n"
-             "{tr}tweet [Text | with reply to User]"})
+    'usage': "{tr}tweet text , username\n"
+             "{tr}tweet username [reply to text]\n"})
 async def tweet(msg: Message):
-    """ Tweet with your own Username """
+    """ Create Tweets of given celebrities """
     replied = msg.reply_to_message
-    text = msg.filtered_input_str
-    if replied and not text:
+    args = msg.filtered_input_str
+    if replied and replied.text:
         text = replied.text
-    if not text:
-        await msg.err("Give Me some text to Tweet 😕")
-        return
-    username = ''
-    if ',' in text:
-        text, username = text.split(',')
-    if not username:
-        if replied:
+        username = args
+        if not username:
             username = replied.from_user.username or replied.from_user.first_name
-        else:
+    elif args:
+        if ',' in args:
+            text, user_name = args.split(',', maxsplit=1)
+            text = text.strip()
+            username = user_name.strip()
+        if not user_name:
             username = msg.from_user.username or msg.from_user.first_name
-    await msg.edit("```Creating a Tweet Sticker 😏```")
-    await _tweets(msg, text.strip(), username.strip())
-
-
-def _deEmojify(inputString: str) -> str:
-    """Remove emojis and other non-safe characters from string"""
-    return re.sub(EMOJI_PATTERN, '', inputString)
+    else:
+        await msg.err("Input not found!")
+        return
+    celebrity = CELEBRITIES.get(username, username)
+    await msg.edit(f"`{celebrity} is tweeting 😏`")
+    await _tweets(msg, text, celebrity)
 
 
 async def _tweets(msg: Message, text: str, username: str = '', type_: str = "tweet") -> None:
-    api_url = f"https://nekobot.xyz/api/imagegen?type={type_}&text={_deEmojify(text)}"
+    api_url = f"https://nekobot.xyz/api/imagegen?type={type_}&text={demojify(text)}"
     if username:
-        api_url += f"&username={_deEmojify(username)}"
+        api_url += f"&username={demojify(username)}"
     res = requests.get(api_url).json()
     tweets_ = res.get("message")
     if not url(tweets_):
