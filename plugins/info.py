@@ -37,12 +37,12 @@ async def info(msg: Message):
     if user.username:
         username = '@' + user.username
     else:
-        username = None
+        username = '`None`'
     common_chats = await msg.client.get_common_chats(user.id)
     user_info = f"""
 **About [{user.first_name} {l_name}](tg://user?id={user.id})**:
   - **UserID**: `{user.id}`
-  - **Username**: `{username}`
+  - **Username**: {username}
   - **Last Online**: `{last_online(user)}`
   - **Common Groups**: `{len(common_chats)}`
   - **Contact**: `{user.is_contact}`
@@ -54,8 +54,8 @@ async def info(msg: Message):
                 user_info += "\n**SpamWatch Banned** : `False`\n"
             else:
                 user_info += "\n**SpamWatch Banned** : `True`\n"
-                user_info += f"**•Reason** : `str({status.reason or None})`\n"
-                user_info += f"**•Message** : `str({status.message or None})`\n"
+                user_info += f"**•Reason** : `{status.reason or None}`\n"
+                user_info += f"**•Message** : `{status.message or None}`\n"
         else:
             user_info += "\n**SpamWatch Banned** : `To get this Info, Set Var`\n"
         cas_banned = requests.get(f'https://api.cas.chat/check?user_id={user.id}').json()
