@@ -14,46 +14,6 @@ from userge import userge, Config, Message
 CONVERTED_IMG = Config.DOWN_PATH + "img.png"
 CONVERTED_STIKR = Config.DOWN_PATH + "sticker.webp"
 
-# idea of short name of celebrities by @ravana
-# modded by @Krishna_Singhal
-
-CELEBRITIES = {
-    "ab": "SrBachchan",
-    "ambani": "Asliambani",
-    "ananya": "ananyapandayy",
-    "android": "Android",
-    "apple": "apple",
-    "arnab": "ArnabGoswamiRTV",
-    "ashish": "ashchanchlani",
-    "bb": "Bhuvan_Bam",
-    "bjp": "bjp4india",
-    "chris": "chrishhemsworth",
-    "elvish": "ElvishYadav",
-    "fb": "facebook",
-    "hashmi": "Emraanhashmi",
-    "harsh": "iamharshbeniwal",
-    "ht": "htTweets",
-    "jio": "reliancejio",
-    "karan": "karanjohar",
-    "kiara": "advani_kiara",
-    "netflix": "netflix",
-    "osama": "ItstherealOsama",
-    "ph": "pornhub",
-    "rahul": "RahulGandhi",
-    "rajni": "rajinikanth",
-    "ramdev": "yogrishiramdev",
-    "rdj": "RobertDowneyJr",
-    "salman": "BeingSalmanKhan",
-    "setu": "Arogyasetu",
-    "sonakshi": "Aslisonagold",
-    "sonam": "sonamakapoor",
-    "srk": "iamsrk",
-    "telegram": "telegram",
-    "whatsapp": "WhatsApp",
-    "yogi": "myogiadityanath",
-    "yt": "youtube",
-    "zee": "ZeeNews"}
-
 
 @userge.on_cmd("trump", about={
     'header': "Custom Sticker of Trump Tweet",
@@ -147,9 +107,6 @@ async def carry_minati(msg: Message):
 
 @userge.on_cmd("tweet", about={
     'header': "Tweet With Custom text Sticker",
-    'available celebrities': "<code>Check this</code> <a"
-                             "href='https://telegra.ph/dogbin---crollokoph-08-09'>link"
-                             "</a> <code>to know available Celebrities.</code>",
     'flags': {
         '-s': "To get tweet in Sticker"},
     'usage': "{tr}tweet text , username\n"
@@ -173,9 +130,8 @@ async def tweet(msg: Message):
     else:
         await msg.err("Input not found!")
         return
-    celebrity = CELEBRITIES.get(username, username)
-    await msg.edit(f"`{celebrity} is tweeting 😏`")
-    await _tweets(msg, text, celebrity)
+    await msg.edit("```Creating a Tweet Sticker 😏```")
+    await _tweets(msg, text, username)
 
 
 async def _tweets(msg: Message, text: str, username: str = '', type_: str = "tweet") -> None:
