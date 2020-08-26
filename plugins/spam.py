@@ -57,7 +57,7 @@ async def spam(message: Message):
                     await asyncio.sleep(0.1)
             await S_LOG.log(f"Spammed Media in Chat» {message.chat.title}, {sc} times")
             await message.delete()
-    elif replied.text:
+    elif (replied and replied.text and not is_str):
         try:
             sc = int(message.input_str)
         except ValueError as e:
