@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from pyrogram import InputMediaPhoto
+from pyrogram.types import InputMediaPhoto
 from google_images_search import GoogleImagesSearch as GIS
 
 from userge import userge, Message
