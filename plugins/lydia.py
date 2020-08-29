@@ -15,7 +15,7 @@ from coffeehouse.lydia import LydiaAI, Session
 from coffeehouse.exception import CoffeeHouseError
 from pyrogram.errors.exceptions.bad_request_400 import PeerIdInvalid
 
-from userge import userge, get_collection, Message, Filters, pool
+from userge import userge, get_collection, Message, filters, pool
 from userge.utils import get_file_id_and_ref
 
 LOGGER = userge.getCLogger(__name__)
@@ -151,7 +151,7 @@ async def lydia_session(message: Message):
         )
 
 
-@userge.on_filters(~Filters.me & ~Filters.edited & (Filters.mentioned | Filters.private), group=2)
+@userge.on_filters(~filters.me & ~filters.edited & (filters.mentioned | filters.private), group=2)
 async def lydia_ai_chat(message: Message):
     """ incomming message handler """
     if CH_LYDIA_API is None:
