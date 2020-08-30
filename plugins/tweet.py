@@ -101,8 +101,6 @@ async def carry_minati(msg: Message):
              "{tr}tweet [reply]"})
 async def tweet(msg: Message):
     """ Create Tweets of given celebrities """
-    replied = msg.reply_to_message
-    args = msg.input_str
     username, text = msg.extract_user_and_text
     if not (username or text):
         await msg.err("`input not found!`")
