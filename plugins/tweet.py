@@ -12,18 +12,15 @@ from userge.utils import demojify
 from userge import userge, Config, Message
 
 CONVERTED_IMG = Config.DOWN_PATH + "img.png"
-CONVERTED_STIKR = Config.DOWN_PATH + "sticker.webp"
 
 
 @userge.on_cmd("trump", about={
     'header': "Custom Sticker of Trump Tweet",
-    'flags': {
-        '-s': "To get tweet in Sticker"},
     'usage': "{tr}trump [text | reply to text]"})
 async def trump_tweet(msg: Message):
     """ Fun sticker of Trump Tweet """
     replied = msg.reply_to_message
-    text = msg.filtered_input_str
+    text = msg.input_str
     if replied and not text:
         text = replied.text
     if not text:
@@ -35,13 +32,11 @@ async def trump_tweet(msg: Message):
 
 @userge.on_cmd("modi", about={
     'header': "Custom Sticker of Modi Tweet",
-    'flags': {
-        '-s': "To get tweet in Sticker"},
     'usage': "{tr}modi [text | reply to text]"})
 async def modi_tweet(msg: Message):
     """ Fun Sticker of Modi Tweet """
     replied = msg.reply_to_message
-    text = msg.filtered_input_str
+    text = msg.input_str
     if replied and not text:
         text = replied.text
     if not text:
@@ -53,13 +48,11 @@ async def modi_tweet(msg: Message):
 
 @userge.on_cmd("cmm", about={
     'header': "Custom Sticker of Change My Mind",
-    'flags': {
-        '-s': "To get tweet in Sticker"},
     'usage': "{tr}cmm [text | reply to text]"})
 async def Change_My_Mind(msg: Message):
     """ Custom Sticker or Banner of Change My Mind """
     replied = msg.reply_to_message
-    text = msg.filtered_input_str
+    text = msg.input_str
     if replied and not text:
         text = replied.text
     if not text:
@@ -71,13 +64,11 @@ async def Change_My_Mind(msg: Message):
 
 @userge.on_cmd("kanna", about={
     'header': "Custom text Sticker of kanna",
-    'flags': {
-        '-s': "To get tweet in Sticker"},
     'usage': "{tr}kanna [text | reply to text]"})
 async def kanna(msg: Message):
     """ Fun sticker of Kanna """
     replied = msg.reply_to_message
-    text = msg.filtered_input_str
+    text = msg.input_str
     if replied and not text:
         text = replied.text
     if not text:
@@ -89,13 +80,11 @@ async def kanna(msg: Message):
 
 @userge.on_cmd("carry", about={
     'header': "Custom text Sticker of Carryminati",
-    'flags': {
-        '-s': "To get tweet in Sticker"},
     'usage': "{tr}carry [text | reply to text]"})
 async def carry_minati(msg: Message):
     """ Fun Sticker of Carryminati Tweet """
     replied = msg.reply_to_message
-    text = msg.filtered_input_str
+    text = msg.input_str
     if replied and not text:
         text = replied.text
     if not text:
@@ -107,28 +96,14 @@ async def carry_minati(msg: Message):
 
 @userge.on_cmd("tweet", about={
     'header': "Tweet With Custom text Sticker",
-    'flags': {
-        '-s': "To get tweet in Sticker"},
-    'usage': "{tr}tweet text , username\n"
-             "{tr}tweet username [reply to text]\n"})
+    'usage': "{tr}tweet username text\n"
+             "{tr}tweet text [reply to user]\n"
+             "{tr}tweet [reply]"})
 async def tweet(msg: Message):
     """ Create Tweets of given celebrities """
-    replied = msg.reply_to_message
-    args = msg.filtered_input_str
-    if replied and replied.text:
-        text = replied.text
-        username = args
-        if not username:
-            username = replied.from_user.username or replied.from_user.first_name
-    elif args:
-        if ',' in args:
-            text, user_name = args.split(',', maxsplit=1)
-            text = text.strip()
-            username = user_name.strip()
-        if not user_name:
-            username = msg.from_user.username or msg.from_user.first_name
-    else:
-        await msg.err("Input not found!")
+    username, text = msg.extract_user_and_text
+    if not (username or text):
+        await msg.err("`input not found!`")
         return
     await msg.edit("```Creating a Tweet Sticker 😏```")
     await _tweets(msg, text, username)
@@ -148,17 +123,10 @@ async def _tweets(msg: Message, text: str, username: str = '', type_: str = "twe
         t_f.write(requests.get(tweets_).content)
     img = Image.open(tmp_file)
     img.save(CONVERTED_IMG)
-    img.save(CONVERTED_STIKR)
     await msg.delete()
     msg_id = msg.reply_to_message.message_id if msg.reply_to_message else None
-    if '-s' in msg.flags:
-        await msg.client.send_sticker(chat_id=msg.chat.id,
-                                      sticker=CONVERTED_STIKR,
-                                      reply_to_message_id=msg_id)
-    else:
-        await msg.client.send_photo(chat_id=msg.chat.id,
-                                    photo=CONVERTED_IMG,
-                                    reply_to_message_id=msg_id)
+    await msg.client.send_photo(chat_id=msg.chat.id,
+                                photo=CONVERTED_IMG,
+                                reply_to_message_id=msg_id)
     os.remove(tmp_file)
     os.remove(CONVERTED_IMG)
-    os.remove(CONVERTED_STIKR)
