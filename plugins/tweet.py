@@ -20,7 +20,7 @@ CONVERTED_IMG = Config.DOWN_PATH + "img.png"
 async def trump_tweet(msg: Message):
     """ Fun sticker of Trump Tweet """
     replied = msg.reply_to_message
-    text = msg.filtered_input_str
+    text = msg.input_str
     if replied and not text:
         text = replied.text
     if not text:
@@ -36,7 +36,7 @@ async def trump_tweet(msg: Message):
 async def modi_tweet(msg: Message):
     """ Fun Sticker of Modi Tweet """
     replied = msg.reply_to_message
-    text = msg.filtered_input_str
+    text = msg.input_str
     if replied and not text:
         text = replied.text
     if not text:
@@ -52,7 +52,7 @@ async def modi_tweet(msg: Message):
 async def Change_My_Mind(msg: Message):
     """ Custom Sticker or Banner of Change My Mind """
     replied = msg.reply_to_message
-    text = msg.filtered_input_str
+    text = msg.input_str
     if replied and not text:
         text = replied.text
     if not text:
@@ -68,7 +68,7 @@ async def Change_My_Mind(msg: Message):
 async def kanna(msg: Message):
     """ Fun sticker of Kanna """
     replied = msg.reply_to_message
-    text = msg.filtered_input_str
+    text = msg.input_str
     if replied and not text:
         text = replied.text
     if not text:
@@ -84,7 +84,7 @@ async def kanna(msg: Message):
 async def carry_minati(msg: Message):
     """ Fun Sticker of Carryminati Tweet """
     replied = msg.reply_to_message
-    text = msg.filtered_input_str
+    text = msg.input_str
     if replied and not text:
         text = replied.text
     if not text:
