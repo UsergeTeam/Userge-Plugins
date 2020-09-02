@@ -11,7 +11,8 @@ from userge.utils import progress
                "|megaupload|bayfiles|vshare|0x0|fileio)",
                about={
                    'header': "upload files to web",
-                   'usage': "{tr}web [site name]",
+                   'usage': "{tr}web [file path | reply to media] [site name]",
+                   'examples': "{tr}web downloads/test.mp3 anonymousfiles"
                    'types': [
                        'anonfiles', 'transfer', 'filebin', 'anonymousfiles',
                        'megaupload', 'bayfiles', 'vshare', '0x0', 'fileio']})
