@@ -12,7 +12,6 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     UsernameInvalid,
     UsernameNotOccupied,
     PeerIdInvalid)
-from pyrogram.errors import ChatAdminRequired
 
 from userge import userge, Config, Message
 
@@ -87,39 +86,32 @@ async def leave_chat(message: Message):
 @userge.on_cmd("invite", about={
     'header': "Generate chat Invite link",
     'usage': "{tr}invite\n{tr}invite [Chat Id | Chat Username]"},
-    allow_channels=False, only_admins=True)
+    allow_channels=False, allow_private=False)
 async def invite_link(message: Message):
     """ Generate invite link """
-    if message.input_str:
-        chat_id = message.input_str
+    chat_id = message.chat.id
+    user_id = message.input_str
+    if not user_id and message.reply_to_message:
+        user_id = message.reply_to_message.from_user.id
+    if not user_id:
+        try:
+            chat = await userge.get_chat(chat_id)
+            chat_name = chat.title
+            if chat.type in ['group', 'supergroup']:
+                link = await userge.export_chat_invite_link(chat_id)
+                await message.edit(
+                    "**Invite link Genrated Successfully for\n"
+                    f"{chat_name}**\n[Click here to join]({link})",
+                    disable_web_page_preview=True)
+            else:
+                await message.err("Requirements not met...")
+        except Exception as e_f:
+            await message.err(e_f)
     else:
-        chat_id = message.chat.id
-    try:
-        chat = await userge.get_chat(chat_id)
-        chat_name = chat.title
-        if chat.type in ['group', 'supergroup', 'private']:
-            link = await userge.export_chat_invite_link(chat_id)
-            await message.edit(
-                "**Invite link Genrated Successfully for\n"
-                f"{chat_name}**\n[Click here to join]({link})",
-                disable_web_page_preview=True)
-        else:
-            await message.edit("```Requirements not met...```")
-    except ChatAdminRequired:
-        if chat.username:
-            await message.edit(
-                f"```You is not admin in @{chat.username}, can't Generate invite link (-_-)```",
-                log=__name__
-            )
-        else:
-            await message.edit(
-                f"```You is not admin in {chat.title}, Can't Generate invite link (-.-)```",
-                log=__name__
-            )
-            return
-    except Exception as e:
-        LOG.error(e)
-        await message.edit("```Chat Id, that you entered, is not valid... ^_^```", log=__name__)
+        try:
+            await userge.add_chat_members(chat_id, user_id)
+        except Exception as e_f:
+            await message.err(e_f)
 
 
 @userge.on_cmd("tagall", about={
@@ -141,14 +133,15 @@ async def tagall_(message: Message):
     await message.edit(f"```Tagging recent members in {c_title}...```")
     text = f"**{text}**\n"
     try:
-        async for members in message.client.iter_chat_members(c_id, 100):
-            u_id = members.user.id
-            u_name = members.user.username or None
-            f_name = (await message.client.get_user_dict(u_id))['fname']
-            if u_name:
-                text += f"@{u_name} "
-            else:
-                text += f"[{f_name}](tg://user?id={u_id}) "
+        async for members in message.client.iter_chat_members(c_id, filter="recent"):
+            if not members.is_bot:
+                u_id = members.user.id
+                u_name = members.user.username or None
+                f_name = (await message.client.get_user_dict(u_id))['fname']
+                if u_name:
+                    text += f"@{u_name} "
+                else:
+                    text += f"[{f_name}](tg://user?id={u_id}) "
     except Exception as e:
         text += " " + str(e)
     await message.client.send_message(c_id, text)

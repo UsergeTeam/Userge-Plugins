@@ -128,7 +128,8 @@ async def set_profile_picture(message: Message):
         t_time = (e_time - s_time).seconds
         await message.edit(f"`Profile picture set in {t_time} seconds.`")
 
-    elif replied and replied.media and replied.video:
+    elif (replied and replied.media and (
+             replied.video or replied.animation):
 
         VIDEO = Config.DOWN_PATH + "profile_vid.mp4"
         await userge.download_media(message=replied,
