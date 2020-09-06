@@ -12,7 +12,6 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     UsernameInvalid,
     UsernameNotOccupied,
     PeerIdInvalid)
-from pyrogram.errors import ChatAdminRequired
 
 from userge import userge, Config, Message
 
