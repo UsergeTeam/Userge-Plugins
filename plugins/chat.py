@@ -134,7 +134,7 @@ async def tagall_(message: Message):
     text = f"**{text}**\n"
     try:
         async for members in message.client.iter_chat_members(c_id, filter="recent"):
-            if not members.is_bot:
+            if not members.user.is_bot:
                 u_id = members.user.id
                 u_name = members.user.username or None
                 f_name = (await message.client.get_user_dict(u_id))['fname']
