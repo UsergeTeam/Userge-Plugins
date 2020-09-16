@@ -2,24 +2,21 @@
 # Author: Sumanjay (https://github.com/cyberboysumanjay) (@cyberboysumanjay)
 # All rights reserved.
 
+import os
+
 from justwatch import JustWatch
 
 from userge import userge, Message, Config
 
 LOGGER = userge.getLogger(__name__)
+WATCH_COUNTRY = os.environ.get("WATCH_COUNTRY", "IN")
 
 
 def get_stream_data(query):
     stream_data = {}
 
-    # Compatibility for Current Userge Users
-    try:
-        country = Config.WATCH_COUNTRY
-    except Exception:
-        country = "IN"
-
     # Cooking Data
-    just_watch = JustWatch(country=country)
+    just_watch = JustWatch(country=WATCH_COUNTRY)
     results = just_watch.search_for_item(query=query)
     movie = results['items'][0]
     stream_data['title'] = movie['title']
