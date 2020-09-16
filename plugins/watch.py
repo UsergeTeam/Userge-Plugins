@@ -4,9 +4,12 @@
 
 import os
 
-from justwatch import JustWatch
+from justwatch import JustWatch, justwatchapi
 
 from userge import userge, Message
+
+# https://github.com/dawoudt/JustWatchAPI/issues/47#issuecomment-691357371
+justwatchapi.__dict__['HEADER'] = {'User-Agent':'JustWatch client (github.com/dawoudt/JustWatchAPI)'}
 
 LOGGER = userge.getLogger(__name__)
 WATCH_COUNTRY = os.environ.get("WATCH_COUNTRY", "IN")
