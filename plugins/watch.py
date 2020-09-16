@@ -6,7 +6,7 @@ import os
 
 from justwatch import JustWatch
 
-from userge import userge, Message, Config
+from userge import userge, Message
 
 LOGGER = userge.getLogger(__name__)
 WATCH_COUNTRY = os.environ.get("WATCH_COUNTRY", "IN")
