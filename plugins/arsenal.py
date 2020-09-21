@@ -21,9 +21,9 @@ async def banager(message: Message, chat_id: int, user_id: int, until_date: int)
         return await banager(message, chat_id, user_id, until_date)
     except Exception as u_e:
         if hasattr(u_e, 'NAME'):
-            log_msg = f'ERROR:- {u_e.NAME} >> {u_e.__name__} > {u_e.MESSAGE}'
+            log_msg = f'ERROR:- {u_e.NAME} >> {type(u_e).__name__} > {u_e.MESSAGE}'
         else:
-            log_msg = f'ERROR:- {u_e.__name__} > {str(u_e)}'
+            log_msg = f'ERROR:- {type(u_e).__name__} > {str(u_e)}'
     return log_msg
 
 
@@ -42,7 +42,7 @@ async def snapper(message: Message):
     s_c = 0
     e_c = 0
     async for member in message.client.iter_chat_members(chat_id):
-        if member.user.status in ("administrator", "creator") or member.user.is_self:
+        if member.status in ("administrator", "creator") or member.user.is_self:
             continue
         until = int(time.time()) + 45 if '-k' in message.flags else 0
         log_msg = await banager(message, chat_id, member.user.id, until)
