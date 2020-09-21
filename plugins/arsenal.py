@@ -1,36 +1,55 @@
 import time
 import asyncio
 
-from userge import userge, Message
+from pyrogram.errors import FloodWait
+
+from userge import userge, logging, Message
+
+_LOG = logging.getLogger(__name__)
 
 
-@userge.on_cmd("benall", about={
+async def banager(message: Message, chat_id: int, user_id: int, until_date: int) -> str:
+    log_msg = ''
+    try:
+        await message.client.kick_chat_member(chat_id=chat_id,
+                                              user_id=user_id,
+                                              until_date=until_date)
+        log_msg = 'Success'
+    except FloodWait as fw:
+        _LOG.info("Sleeping for some time due to flood wait")
+        await asyncio.sleep(fw.x + 10)
+        return await banager(message, chat_id, user_id, until_date)
+    except Exception as u_e:
+        if hasattr(u_e, 'NAME'):
+            log_msg = f'ERROR:- {u_e.NAME} >> {u_e.__name__} > {u_e.MESSAGE}'
+        else:
+            log_msg = f'ERROR:- {u_e.__name__} > {str(u_e)}'
+    return log_msg
+
+
+@userge.on_cmd("snap", about={
     'header': "Ban All",
-    'description': "Bans All Members of a SuperGroup",
-    'usage': "{tr}benall"}, allow_private=False, only_admins=True)
-async def ban_all(message: Message):
-    chat = message.chat.id
-    ben_c = 0
-    await message.edit("Hold on Trying to ban all Members")
-    async for to_ban in message.client.iter_chat_members(chat):
-        user = to_ban.user.id
-        await message.client.kick_chat_member(chat, user)
-        ben_c += 1
-        await asyncio.sleep(0.5)
-    await message.edit(f"Banned {ben_c} members in {message.chat.title}")
-
-
-@userge.on_cmd("keckall", about={
-    'header': "Kick All",
-    'description': "Kicks All Members of a SuperGroup",
-    'usage': "{tr}keckall"}, allow_private=False, only_admins=True)
-async def keck_all(message: Message):
-    chat = message.chat.id
-    keck_c = 0
-    await message.edit("Hold on Trying to kick all Members")
-    async for to_kick in message.client.iter_chat_members(chat):
-        user = to_kick.user.id
-        await message.client.kick_chat_member(chat, user, int(time.time() + 60))
-        keck_c += 1
-        await asyncio.sleep(0.5)
-    await message.edit(f"Kicked {keck_c} members in {message.chat.title}")
+    'description': "Haha, a Mighty Thanos snap to Ban All Members of a SuperGroup",
+    'flags': {'-k': "Kick Members instead of banning"},
+    'usage': "{tr}snap [(optional flag)]"}, allow_private=False, only_admins=True)
+async def snapper(message: Message):
+    chat_id = message.chat.id
+    act = 'Banning'
+    if '-k' in message.flags:
+        act = 'Kicking'
+    await message.edit(f"{act} all Members of the chat. [`Check application logs for status`]")
+    _LOG.info(f'Wiping out Members in {message.chat.title}')
+    s_c = 0
+    e_c = 0
+    async for member in message.client.iter_chat_members(chat_id):
+        if member.user.status in ("administrator", "creator") or member.user.is_self:
+            continue
+        until = int(time.time()) + 45 if '-k' in message.flags else 0
+        log_msg = await banager(message, chat_id, member.user.id, until)
+        user_tag = f"[{member.user.first_name}]: Ban Status --> "
+        if log_msg.lower() == 'success':
+            s_c += 1
+        else:
+            e_c += 1
+        _LOG.info(user_tag + log_msg)
+    await message.edit(f"[<b>{act} Completed</b>]:\nSuccess: `{s_c}`\nFailed: `{e_c}`")
