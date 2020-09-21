@@ -1,6 +1,8 @@
 import time
 import asyncio
 
+from pyrogram.errors import FloodWait
+
 from userge import userge, logging, Message
 
 _LOG = logging.getLogger(__name__)
@@ -14,7 +16,7 @@ async def banager(message: Message, chat_id: int, user_id: int, until_date: int)
                                               until_date=until_date)
         log_msg = 'Success'
     except FloodWait as fw:
-        _LOG.info(f"Sleeping for some time due to flood wait")
+        _LOG.info("Sleeping for some time due to flood wait")
         await asyncio.sleep(fw.x + 10)
         return await banager(message, chat_id, user_id, until_date)
     except Exception as u_e:
