@@ -51,14 +51,14 @@ async def walld(strin: str):
     a_s = resp.find_all('a')
     list_a_s = []
     tit_links = []
-    r = ['thumb', '350', 'img', 'big.php?i', 'data-src', 'title']
+    r = ['thumb', '350', 'img', 'big.php?i', 'src', 'title']
     for a_tag in a_s:
         if all(d in str(a_tag) for d in r):
             list_a_s.append(a_tag)
     try:
         for df in list_a_s:
             imgi = df.find('img')
-            li = str(imgi['data-src']).replace('thumb-350-', '')
+            li = str(imgi['src']).replace('thumb-350-', '')
             titl = str(df['title']).replace('|', '')
             titl = titl.replace('  ', '')
             titl = titl.replace('Image', '')
