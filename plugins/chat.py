@@ -62,9 +62,9 @@ async def join_chat(message: Message):
     allow_private=False)
 async def leave_chat(message: Message):
     """ Leave chat """
-    input = message.input_str
-    if input:
-        text = input
+    input_str = message.input_str
+    if input_str:
+        text = input_str
     else:
         text = message.chat.id
     try:
