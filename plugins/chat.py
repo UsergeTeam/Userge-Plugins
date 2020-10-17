@@ -62,21 +62,19 @@ async def join_chat(message: Message):
     allow_private=False)
 async def leave_chat(message: Message):
     """ Leave chat """
-    replied = message.reply_to_message
-    if replied:
-        text = replied.text
+    input = message.input_str
+    if input:
+        text = input
     else:
-        text = message.input_str
-    if not text:
         text = message.chat.id
     try:
         await userge.send_message(text, "```Good bye, Cruel World... :-) ```")
         await userge.leave_chat(text)
     except UsernameNotOccupied:
-        await message.edit("```Username, you entered, is not exist... ```", del_in=3)
+        await message.edit("```Username that you entered, doesn't exist... ```", del_in=3)
         return
     except PeerIdInvalid:
-        await message.edit("```Chat id, you entered, is not exist...```", del_in=3)
+        await message.edit("```Chat id which you entered seems not to be exist...```", del_in=3)
         return
     else:
         await message.delete()
