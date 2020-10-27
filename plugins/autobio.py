@@ -24,6 +24,9 @@ async def _init() -> None:
     data = await USER_DATA.find_one({'_id': 'BIO_UPDATION'})
     if data:
         BIO_UPDATION = data['on']
+    b_t = await USER_DATA.find_one({'_id': 'AUTOBIO_TIMEOUT'})
+    if b_t:
+        Config.AUTOBIO_TIMEOUT = b_t['data']
 
 
 @userge.on_cmd("autobio", about={
@@ -54,6 +57,32 @@ async def auto_bio(msg: Message):
     await msg.edit(
         "Auto Bio Updation is **Started** Successfully...", log=__name__, del_in=3)
     BIO_UPDATION = asyncio.get_event_loop().create_task(autobio_worker())
+
+
+@userge.on_cmd("sabto", about={
+    'header': "Set auto bio timeout",
+    'usage': "{tr}sabto [timeout in seconds]",
+    'examples': "{tr}sabto 500"})
+async def set_bio_timeout(message: Message):
+    """ set auto bio timeout """
+    t_o = int(message.input_str)
+    if t_o < 60:
+        await message.err("too short! (minimum 60 sec)")
+        return
+    await message.edit("`Setting auto bio timeout...`")
+    Config.AUTOBIO_TIMEOUT = t_o
+    await SAVED_SETTINGS.update_one(
+        {'_id': 'AUTOBIO_TIMEOUT'}, {"$set": {'data': t_o}}, upsert=True)
+    await message.edit(
+        f"`Set auto bio timeout as {t_o} seconds!`", del_in=5)
+
+
+@userge.on_cmd("vabto", about={'header': "View auto bio timeout"})
+async def view_bio_timeout(message: Message):
+    """ view bio timeout """
+    await message.edit(
+        f"`Profile picture will be updated after {Config.AUTOBIO_TIMEOUT} seconds!`",
+        del_in=5)
 
 
 @userge.add_task
