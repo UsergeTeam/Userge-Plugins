@@ -71,7 +71,7 @@ async def set_bio_timeout(message: Message):
         return
     await message.edit("`Setting auto bio timeout...`")
     Config.AUTOBIO_TIMEOUT = t_o
-    await SAVED_SETTINGS.update_one(
+    await USER_DATA.update_one(
         {'_id': 'AUTOBIO_TIMEOUT'}, {"$set": {'data': t_o}}, upsert=True)
     await message.edit(
         f"`Set auto bio timeout as {t_o} seconds!`", del_in=5)
