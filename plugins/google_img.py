@@ -2,9 +2,11 @@ import os
 import shutil
 
 from pyrogram.types import InputMediaPhoto
+from PIL import Image
 from google_images_search import GoogleImagesSearch as GIS
 
 from userge import userge, Message
+
 
 PATH = "temp_img_down/"
 GCS_API_KEY = os.environ.get("GCS_API_KEY", None)
@@ -58,6 +60,14 @@ async def google_img(message: Message):
     ss = []
     for img in os.listdir(PATH):
         imgs = PATH + img
+        image = Image.open(imgs)
+        if not (image.height <= 1280 and image.width <= 1280):
+            image.thumbnail((1280, 1280), Image.ANTIALIAS)
+            a_dex = image.mode.find("A")
+            if a_dex != -1:
+                new_im = Image.new('RGB', image.size, (255, 255, 255))
+                new_im.paste(image, mask=image.split()[a_dex])
+                new_im.save(imgs, 'JPEG')
         ss.append(InputMediaPhoto(str(imgs)))
         if len(ss) == 9:
             break

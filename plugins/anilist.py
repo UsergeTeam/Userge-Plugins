@@ -26,15 +26,15 @@ CLOG = userge.getCLogger(__name__)
 ANIME_TEMPLATE = """[{c_flag}]**{romaji}**
 
 **ID | MAL ID:** `{idm}` | `{idmal}`
-**SOURCE:** `{source}`
-🆎 **TYPE:** `{formats}`
-🎭 **GENRES:** `{genre}`
-🎋 **SEASON:** `{season}`
-🔢 **EPISODES:** `{episodes}`
-📡 **STATUS:** `{status}`
-📺 **NEXT AIRING:** `{air_on}`
-💯 **SCORE:** `{score}/100`
-🔞 **ADULT RATED:** `{adult}`
+➤ **SOURCE:** `{source}`
+➤ **TYPE:** `{formats}`
+➤ **GENRES:** `{genre}`
+➤ **SEASON:** `{season}`
+➤ **EPISODES:** `{episodes}`
+➤ **STATUS:** `{status}`
+➤ **NEXT AIRING:** `{air_on}`
+➤ **SCORE:** `{score}%` 🌟
+➤ **ADULT RATED:** `{adult}`
 🎬 {trailer_link}
 📖 [Synopsis & More]({synopsis_link})"""
 

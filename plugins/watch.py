@@ -39,19 +39,21 @@ def get_stream_data(query):
     stream_data['type'] = movie['object_type']
 
     available_streams = {}
-    for provider in movie['offers']:
-        provider_ = get_provider(provider['urls']['standard_web'])
-        available_streams[provider_] = provider['urls']['standard_web']
+    if movie.get("offers"):
+        for provider in movie['offers']:
+            provider_ = get_provider(provider['urls']['standard_web'])
+            available_streams[provider_] = provider['urls']['standard_web']
 
     stream_data['providers'] = available_streams
 
     scoring = {}
-    for scorer in movie['scoring']:
-        if scorer['provider_type'] == "tmdb:score":
-            scoring['tmdb'] = scorer['value']
+    if movie.get("scoring"):
+        for scorer in movie['scoring']:
+            if scorer['provider_type'] == "tmdb:score":
+                scoring['tmdb'] = scorer['value']
 
-        if scorer['provider_type'] == "imdb:score":
-            scoring['imdb'] = scorer['value']
+            if scorer['provider_type'] == "imdb:score":
+                scoring['imdb'] = scorer['value']
     stream_data['score'] = scoring
     return stream_data
 

@@ -55,7 +55,10 @@ async def google_rs(message: Message):
         }
         response = requests.get(the_location, headers=headers)
         soup = BeautifulSoup(response.text, "html.parser")
-        prs_div = soup.find_all("div", {"class": "r5a77d"})[0]
+        try:
+            prs_div = soup.find_all("div", {"class": "r5a77d"})[0]
+        except IndexError:
+            return await message.err("Index went out of range, Maybe no results were found")
         prs_anchor_element = prs_div.find("a")
         prs_url = base_url + prs_anchor_element.get("href")
         prs_text = prs_anchor_element.text
