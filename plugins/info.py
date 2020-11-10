@@ -42,6 +42,7 @@ async def info(msg: Message):
     user_info = f"""
 **About [{user.first_name} {l_name}](tg://user?id={user.id})**:
   - **UserID**: `{user.id}`
+  - **Data Center**: `{user.dc_id}`
   - **Username**: {username}
   - **Last Online**: `{last_online(user)}`
   - **Common Groups**: `{len(common_chats)}`
