@@ -37,8 +37,9 @@ async def snapper(message: Message):
     act = 'Banning'
     if '-k' in message.flags:
         act = 'Kicking'
-    await message.edit(f"⚠️ {act} all Members of the chat. [`Check application logs for status`]"
-                       f"\nUse {Config.CMD_TRIGGER}cancel as reply to this message to stop this process")
+    await message.edit(f"⚠️ {act} all Members of the chat. [`Check application logs"
+                       f" for status`]\nUse `{Config.CMD_TRIGGER}cancel` as reply to "
+                       "this message to stop this process.")
     _LOG.info(f'Wiping out Members in {message.chat.title}')
     s_c = 0
     e_c = 0
