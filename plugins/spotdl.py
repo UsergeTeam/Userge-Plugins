@@ -1,10 +1,11 @@
 import os
 import shutil
+import asyncio
 from pathlib import Path
 
-from userge.utils import runcmd
 from userge import userge, Message
 from userge.plugins.misc.upload import audio_upload
+from userge.plugins.tools.executor import Term
 
 TEMP_DIR = "spotdl/"
 
@@ -48,15 +49,19 @@ async def spotify_dl(message: Message):
             return
         await message.edit("Downloading")
         quality = quality.strip()  # Just for Precautions 🤷‍♂
-        cmd = f"spotdl --song {song_n} -o {quality} -f {TEMP_DIR}"
+        cmd = f"cd {TEMP_DIR} && spotdl {song_n}"
     if cmd:
-        stdout, stderr = (await runcmd(cmd))[:2]
-        if not os.path.lexists(TEMP_DIR):
-            await message.err("Download Failed")
-            raise Exception(stdout + stderr)
-        if os.path.lexists(TEMP_DIR):
+        runn = await Term.execute(cmd)
+        while not runn.finished:
+            await asyncio.sleep(0.5)
+            await message.try_to_edit(f"<code>{runn.read_line}</code>")
+        if len(os.listdir(TEMP_DIR)) <= 1:
+            await message.err("Download Failed.")
+        else:
             await message.delete()
             for track in os.listdir(TEMP_DIR):
+                if track.startswith("Temp"):
+                    continue
                 track_loc = TEMP_DIR + track
                 await audio_upload(message, Path(track_loc), True)
     shutil.rmtree(TEMP_DIR, ignore_errors=True)
