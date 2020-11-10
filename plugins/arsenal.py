@@ -3,7 +3,7 @@ import asyncio
 
 from pyrogram.errors import FloodWait
 
-from userge import userge, logging, Message
+from userge import userge, logging, Message, Config
 
 _LOG = logging.getLogger(__name__)
 
@@ -37,11 +37,16 @@ async def snapper(message: Message):
     act = 'Banning'
     if '-k' in message.flags:
         act = 'Kicking'
-    await message.edit(f"{act} all Members of the chat. [`Check application logs for status`]")
+    await message.edit(f"⚠️ {act} all Members of the chat. [`Check application logs"
+                       f" for status`]\nUse `{Config.CMD_TRIGGER}cancel` as reply to "
+                       "this message to stop this process.")
     _LOG.info(f'Wiping out Members in {message.chat.title}')
     s_c = 0
     e_c = 0
     async for member in message.client.iter_chat_members(chat_id):
+        if message.process_is_canceled:
+            await message.edit("`Exiting snap...`")
+            break
         if member.status in ("administrator", "creator") or member.user.is_self:
             continue
         until = int(time.time()) + 45 if '-k' in message.flags else 0
