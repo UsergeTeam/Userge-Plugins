@@ -25,7 +25,8 @@ async def spotify_dl(message: Message):
     runn = await Term.execute(cmd)
     while not runn.finished:
         await asyncio.sleep(1)
-        await message.try_to_edit(f"<code>{runn.read_line}</code>")
+        if runn.read_line:
+            await message.try_to_edit(f">><code>{runn.read_line}</code>")
     if len(os.listdir(TEMP_DIR)) <= 1:
         await message.err("Download Failed.")
     else:
