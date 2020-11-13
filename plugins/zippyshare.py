@@ -51,4 +51,4 @@ def _generate_zippylink(url):
             raise ValueError("Invalid Response!")
         val, name = int(match.group(1)), match.group(2)
         d_l = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server, id_, val**3+3, name)
-    return d_l
+    return d_l, name
