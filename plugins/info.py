@@ -19,20 +19,20 @@ GMUTE_USER_BASE = get_collection("GMUTE_USER")
              "{tr}info [reply to User]"}, allow_via_bot=False)
 async def info(msg: Message):
     """ To check User's info """
-    await msg.edit("```Checking...```")
+    await msg.edit("`Checking...`")
     user_id = msg.input_str
     replied = msg.reply_to_message
     if not user_id:
         if replied:
-            user_id = replied.forward_from.id if replied.forward_from else replied.from_user.id
+            user_id = replied.forward_from.id or replied.from_user.id
         else:
             user_id = msg.from_user.id
     try:
         user = await msg.client.get_users(user_id)
     except Exception:
-        await msg.edit("```I don't know that User...```", del_in=5)
+        await msg.edit("I don't know that User...")
         return
-    await msg.edit("```Getiing Info...```")
+    await msg.edit("`Getting Info...`")
     l_name = user.last_name or ''
     if user.username:
         username = '@' + user.username
@@ -78,7 +78,7 @@ async def info(msg: Message):
             user_info += f"**•Reason** : `{user_gbanned['reason'] or None}`"
         else:
             user_info += "**User Gbanned** : `False`"
-        await msg.edit(user_info, disable_web_page_preview=True)
+        await msg.edit_or_send_as_file(text=user_info, disable_web_page_preview=True)
 
 
 def last_online(user):
