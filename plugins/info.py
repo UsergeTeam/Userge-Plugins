@@ -24,7 +24,7 @@ async def info(msg: Message):
     replied = msg.reply_to_message
     if not user_id:
         if replied:
-            user_id = replied.forward_from.id or replied.from_user.id
+            user_id = replied.forward_from.id if replied.forward_from else replied.from_user.id
         else:
             user_id = msg.from_user.id
     try:
