@@ -47,7 +47,7 @@ async def snapper(message: Message):
         if message.process_is_canceled:
             await message.edit("`Exiting snap...`")
             break
-        if member.status in ("administrator", "creator") or member.user.is_self:
+        if member.status in ("administrator", "creator") or member.user.is_self or member.user.id in Config.OWNER_ID:
             continue
         until = int(time.time()) + 45 if '-k' in message.flags else 0
         log_msg = await banager(message, chat_id, member.user.id, until)
