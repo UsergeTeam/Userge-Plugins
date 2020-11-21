@@ -1,6 +1,6 @@
 """ Chat info, Join and leave chat, tagall and tag admins """
 
-# by @krishna_singhal
+# by @Krishna_Singhal
 
 import html
 import os
@@ -108,6 +108,7 @@ async def invite_link(message: Message):
     else:
         try:
             await userge.add_chat_members(chat_id, user_id)
+            await message.edit("`Invited Successfully...`")
         except Exception as e_f:
             await message.err(e_f)
 
@@ -119,17 +120,15 @@ async def invite_link(message: Message):
 async def tagall_(message: Message):
     """ Tag recent members """
     replied = message.reply_to_message
-    if replied:
-        text = replied.text
-    else:
-        text = message.input_str
-    if not text:
-        await message.edit("```Without reason, I will not tag Members...(=_=)```", del_in=5)
+    text = message.input_str
+    if not (text or replied):
+        await message.err("Without reason, I will not tag Members...(=_=)")
         return
     c_title = message.chat.title
     c_id = message.chat.id
-    await message.edit(f"```Tagging recent members in {c_title}...```")
-    text = f"**{text}**\n"
+    await message.edit(f"`Tagging recent members in {c_title}...`")
+    text = f"**{text}**\n" if text else ""
+    message_id = replied.message_id if replied else None
     try:
         async for members in message.client.iter_chat_members(c_id, filter="recent"):
             if not members.user.is_bot:
@@ -142,7 +141,7 @@ async def tagall_(message: Message):
                     text += f"[{f_name}](tg://user?id={u_id}) "
     except Exception as e:
         text += " " + str(e)
-    await message.client.send_message(c_id, text)
+    await message.client.send_message(c_id, text, reply_to_message_id=message_id)
     await message.edit("```Tagged recent Members Successfully...```", del_in=3)
 
 
@@ -156,24 +155,19 @@ async def stagall_(message: Message):
     chat = await userge.get_chat(chat_id)
     await message.edit(f"```tagging everyone in {chat.title}```")
     replied = message.reply_to_message
-    if replied:
-        text = replied.text
-    else:
-        text = message.input_str
-    if not text:
-        await message.edit("```Without reason, I will not tag Members... (*>_<*)```", del_in=5)
+    text = message.input_str
+    if not (text or replied):
+        await message.err("Without reason, I will not tag Members...(=_=)")
         return
-    text = f"<code>{text}</code>"
+    text = f"`{text}`" if text else ""
+    message_id = replied.message_id if replied else None
     member = userge.iter_chat_members(chat_id)
     async for members in member:
         if not members.user.is_bot:
             text += mention_html(members.user.id, "\u200b")
     await message.delete()
-    if message.reply_to_message:
-        await userge.send_message(
-            chat_id, text, reply_to_message_id=replied.message_id, parse_mode="html")
-    else:
-        await userge.send_message(chat_id, text, parse_mode="html")
+    await userge.send_message(
+        chat_id, text, reply_to_message_id=message_id)
 
 
 @userge.on_cmd("tadmins", about={
@@ -183,17 +177,15 @@ async def stagall_(message: Message):
 async def tadmins_(message: Message):
     """ Tag admins in a group """
     replied = message.reply_to_message
-    if replied:
-        text = replied.text
-    else:
-        text = message.input_str
-    if not text:
-        await message.edit("```Without reason, I will not tag admins...```", del_in=5)
+    text = message.input_str
+    if not (text or replied):
+        await message.err("Without reason, I will not tag Admins...(=_=)")
         return
     c_title = message.chat.title
     c_id = message.chat.id
     await message.edit(f"```Tagging admins in {c_title}...```")
-    text = f"**{text}**\n"
+    text = f"**{text}**\n" if text else ""
+    message_id = replied.message_id if replied else None
     try:
         async for members in message.client.iter_chat_members(c_id, filter="administrators"):
             status = members.status
@@ -212,7 +204,7 @@ async def tadmins_(message: Message):
                     text += f"[{f_name}](tg://user?id={u_id}) "
     except Exception as e:
         text += " " + str(e)
-    await message.client.send_message(c_id, text)
+    await message.client.send_message(c_id, text, reply_to_message_id=message_id)
     await message.edit("```Admins tagged Successfully...```", del_in=3)
 
 
