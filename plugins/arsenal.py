@@ -8,7 +8,9 @@ from userge import userge, logging, Message, Config
 _LOG = logging.getLogger(__name__)
 
 
-async def banager(message: Message, chat_id: int, user_id: int, until_date: int) -> str:
+async def banager(
+    message: Message, chat_id: int, user_id: int, until_date: int
+) -> str:
     log_msg = ''
     try:
         await message.client.kick_chat_member(chat_id=chat_id,
@@ -21,7 +23,10 @@ async def banager(message: Message, chat_id: int, user_id: int, until_date: int)
         return await banager(message, chat_id, user_id, until_date)
     except Exception as u_e:
         if hasattr(u_e, 'NAME'):
-            log_msg = f'ERROR:- {u_e.NAME} >> {type(u_e).__name__} > {u_e.MESSAGE}'
+            log_msg = (
+                f"ERROR:- {u_e.NAME} >>"
+                f" {type(u_e).__name__} > {u_e.MESSAGE}"
+            )
         else:
             log_msg = f'ERROR:- {type(u_e).__name__} > {str(u_e)}'
     return log_msg
@@ -29,17 +34,21 @@ async def banager(message: Message, chat_id: int, user_id: int, until_date: int)
 
 @userge.on_cmd("snap", about={
     'header': "Ban All",
-    'description': "Haha, a Mighty Thanos snap to Ban All Members of a SuperGroup",
+    'description': "Haha, a Mighty Thanos snap to Ban"
+    " All Members of a SuperGroup",
     'flags': {'-k': "Kick Members instead of banning"},
-    'usage': "{tr}snap [(optional flag)]"}, allow_private=False, only_admins=True)
+    'usage': "{tr}snap [(optional flag)]"},
+    allow_private=False, only_admins=True)
 async def snapper(message: Message):
     chat_id = message.chat.id
     act = 'Banning'
     if '-k' in message.flags:
         act = 'Kicking'
-    await message.edit(f"⚠️ {act} all Members of the chat. [`Check application logs"
-                       f" for status`]\nUse `{Config.CMD_TRIGGER}cancel` as reply to "
-                       "this message to stop this process.")
+    await message.edit(
+        f"⚠️ {act} all Members of the chat. [`Check application logs"
+        f" for status`]\nUse `{Config.CMD_TRIGGER}cancel` as reply to "
+        "this message to stop this process."
+    )
     _LOG.info(f'Wiping out Members in {message.chat.title}')
     s_c = 0
     e_c = 0
@@ -47,7 +56,11 @@ async def snapper(message: Message):
         if message.process_is_canceled:
             await message.edit("`Exiting snap...`")
             break
-        if member.status in ("administrator", "creator") or member.user.is_self:
+        if (
+            member.status in ("administrator", "creator") or
+            member.user.is_self or
+            member.user.id in Config.OWNER_ID
+        ):
             continue
         until = int(time.time()) + 45 if '-k' in message.flags else 0
         log_msg = await banager(message, chat_id, member.user.id, until)
@@ -57,4 +70,6 @@ async def snapper(message: Message):
         else:
             e_c += 1
         _LOG.info(user_tag + log_msg)
-    await message.edit(f"[<b>{act} Completed</b>]:\nSuccess: `{s_c}`\nFailed: `{e_c}`")
+    await message.edit(
+        f"[<b>{act} Completed</b>]:\nSuccess: `{s_c}`\nFailed: `{e_c}`"
+    )
