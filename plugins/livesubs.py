@@ -11,7 +11,7 @@ from userge import userge, Message
     'usage': "{tr}livesubs [chat id]"})
 async def live_subs(msg: Message):
     input_ = msg.input_str
-    chat = msg.chat if not msg.chat.type is "private" else None
+    chat = msg.chat if msg.chat.type != "private" else None
     if input_:
         try:
             chat = await msg.client.get_chat(input_)
