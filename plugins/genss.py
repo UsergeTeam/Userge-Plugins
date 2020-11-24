@@ -19,6 +19,7 @@ async def ss_gen(message: Message):
     replied = message.reply_to_message
     vid_loc = ''
     ss_c = 5
+    should_clean = False
     await message.edit("Checking you Input?🧐🤔😳")
     if message.input_str:
         if '|' in message.input_str:
@@ -30,8 +31,8 @@ async def ss_gen(message: Message):
                 vid_loc = message.input_str
                 should_clean = False
 
-    if replied:
-        if not replied.video:
+    if not vid_loc and replied:
+        if not (replied.video or replied.animation):
             await message.edit("I doubt it is a video")
             return
         await message.edit("Downloading Video to my Local")
@@ -52,7 +53,7 @@ async def ss_gen(message: Message):
         return
     await message.edit("Done, Generating Screen Shots and uploading")
     try:
-        for frames in random.sample(range(vid_len), ss_c):
+        for frames in random.sample(range(vid_len), int(ss_c)):
             capture = await take_screen_shot(vid_loc, int(frames), "ss_cap.jpeg")
             await message.client.send_photo(chat_id=message.chat.id, photo=capture)
             os.remove(capture)
