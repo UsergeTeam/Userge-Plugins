@@ -6,10 +6,10 @@
 # 0) original: https://github.com/SpEcHiDe/UniBorg/raw/master/stdplugins/google_photos.py
 # വിവരണം അടിച്ചുമാറ്റിക്കൊണ്ട് പോകുന്നവർ ക്രെഡിറ്റ് വെച്ചാൽ സന്തോഷമേ ഉള്ളു..!
 
-
 """Google Photos
 """
 
+import re
 import os
 import asyncio
 from mimetypes import guess_type
@@ -22,7 +22,7 @@ from oauth2client import file, client
 
 from userge import userge, Message, Config
 from userge.utils import progress
-
+from userge.plugins.misc.download import tg_download, url_download
 
 # setup the gPhotos v1 API
 OAUTH_SCOPE = [
@@ -31,29 +31,34 @@ OAUTH_SCOPE = [
 ]
 # Redirect URI for installed apps, can be left as is
 REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
-#
 PHOTOS_BASE_URI = "https://photoslibrary.googleapis.com"
-G_PHOTOS_CLIENT_ID = os.environ.get("G_PHOTOS_CLIENT_ID", None)
-G_PHOTOS_CLIENT_SECRET = os.environ.get("G_PHOTOS_CLIENT_SECRET", None)
-TOKEN_FILE_NAME = os.path.join(Config.DOWN_PATH, "gPhoto_credentials_UniBorg.json")
-LOG = userge.getLogger(__name__)  # logger object
-CHANNEL = userge.getCLogger(__name__)  # channel logger object
+
+G_PHOTOS_CLIENT_ID = os.environ.get(
+    "G_PHOTOS_CLIENT_ID", os.environ.get("G_DRIVE_CLIENT_ID", None))
+G_PHOTOS_CLIENT_SECRET = os.environ.get(
+    "G_PHOTOS_CLIENT_SECRET", os.environ.get("G_DRIVE_CLIENT_SECRET", None))
+TOKEN_FILE_NAME = os.path.join(Config.DOWN_PATH, "gPhoto_credentials_UserGe.json")
 G_PHOTOS_AUTH_TOKEN_ID = int(os.environ.get("G_PHOTOS_AUTH_TOKEN_ID", 0))
 
+LOG = userge.getLogger(__name__)
+CHANNEL = userge.getCLogger(__name__)
 
-@userge.on_cmd("gphoto setup", about="no one gonna help you 🤣🤣🤣🤣",
-               allow_groups=False, allow_channels=False)
+
+@userge.on_cmd("gpsetup", about={'header': "setup gphotos"})
 async def setup_google_photos(message: Message):
+    if G_PHOTOS_CLIENT_ID is None or G_PHOTOS_CLIENT_SECRET is None:
+        await message.err("first fill gphoto id and secret")
+        return
     creds = await check_creds(message)
     if not creds:
-        await create_token_file(message)
-        await CHANNEL.log("#GPHOTOS #setup #completed")
+        await message.edit("**Check** `log channel`")
+        await create_token_file()
         await message.edit("CREDS created. 😕😖😖")
     else:
         await message.edit("CREDS already created. 😕")
 
 
-async def create_token_file(message):
+async def create_token_file():
     # Run through the OAuth flow and retrieve credentials
     flow = client.OAuth2WebServerFlow(
         G_PHOTOS_CLIENT_ID,
@@ -62,7 +67,7 @@ async def create_token_file(message):
         redirect_uri=REDIRECT_URI
     )
     authorize_url = flow.step1_get_authorize_url()
-    async with userge.conversation(message.chat.id, timeout=60) as conv:
+    async with userge.conversation(Config.LOG_CHANNEL_ID, timeout=150) as conv:
         await conv.send_message(
             "Go to the following link in "
             f"your browser: {authorize_url} and reply the code"
@@ -75,6 +80,7 @@ async def create_token_file(message):
         storage.put(credentials)
         imp_gsem = await conv.send_document(document=TOKEN_FILE_NAME)
         await imp_gsem.reply_text(
+            "#GPHOTOS #setup #completed\n\n"
             "please set <code>G_PHOTOS_AUTH_TOKEN_ID</code> = "
             f"<u>{imp_gsem.message_id}</u> ..!"
             "\n\n<i>This is only required, "
@@ -103,33 +109,31 @@ async def check_creds(message):
     return None
 
 
-@userge.on_cmd("gphoto upload", about="no one gonna help you 🤣🤣🤣🤣")
+@userge.on_cmd("gpupload", about={
+    'header': "upload files to gphoto",
+    'usage': "{tr}gphoto upload [link | path | reply to media]",
+    'examples': [
+        "{tr}gpupload downloads/img.jpg",
+        "{tr}gpupload https://imgur.com/download/Inyeb1S"]}, check_down_path=True)
 async def upload_google_photos(message: Message):
-    if not message.reply_to_message:
-        await message.edit_text(
-            "©️ <b>[Forwarded from utubebot]</b>\nno one gonna help you 🤣🤣🤣🤣", parse_mode="html")
-        return
     creds = await check_creds(message)
     if not creds:
-        await message.edit_text("😏 <code>gphoto setup</code> first 😡😒😒", parse_mode="html")
+        await message.edit_text("😏 <code>gpsetup</code> first 😡😒😒", parse_mode="html")
+        return
+    path_ = ""
+    if message.input_str:
+        if re.search(r"(?:https?|ftp)://[^|\s]+\.[^|\s]+", message.input_str):
+            path_, _ = await url_download(message, message.input_str)
+        elif os.path.exists(message.input_str):
+            path_ = message.input_str
+    elif message.reply_to_message and message.reply_to_message.media:
+        path_, _ = await tg_download(message, message.reply_to_message)
+    if not path_:
+        await message.err("what should i upload ?")
         return
     await message.edit("`proccesing ...`")
     service = build("photoslibrary", "v1", http=creds.authorize(Http()))
-    # create directory if not exists
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.makedirs(Config.DOWN_PATH)
-    file_path = None
-    vid = await message.reply_to_message.download(
-        file_name=Config.DOWN_PATH,
-        progress=progress,
-        progress_args=(message, "downloading🧐?")
-    )
-    file_path = os.path.join(Config.DOWN_PATH, os.path.basename(vid))
-    # LOG.info(file_path)
-    if not file_path:
-        await message.edit_text("<b>[stop spamming]</b>", parse_mode="html")
-        return
-    file_name, mime_type, file_size = file_ops(file_path)
+    file_name, mime_type, file_size = file_ops(path_)
     await message.edit_text("file downloaded, gathering upload informations ")
     async with aiohttp.ClientSession() as session:
         headers = {
@@ -157,7 +161,7 @@ async def upload_google_photos(message: Message):
         number_of_req_s = int(file_size / upload_granularity)
         # LOG.info(number_of_req_s)
         loop = asyncio.get_event_loop()
-        async with aiofiles.open(file_path, mode="rb") as f_d:
+        async with aiofiles.open(path_, mode="rb") as f_d:
             for i in range(number_of_req_s):
                 current_chunk = await f_d.read(upload_granularity)
                 offset = i * upload_granularity
