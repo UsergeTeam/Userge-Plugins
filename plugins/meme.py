@@ -59,7 +59,7 @@ async def meme_(message: Message):
         meme_file = file_3
     if meme_file is None:
         meme_file = dls_loc
-    chat = "@MemeAutobot"
+    chat = "@MemeAuto_bot"
     async with userge.conversation(chat) as conv:
         try:
             args = message.input_str
@@ -73,11 +73,11 @@ async def meme_(message: Message):
         await conv.send_message(args)
         response = await conv.get_response(mark_read=True)
         if "Okay..." in response.text:
-            await message.edit("```Sending gay media to gay...```")
+            await message.edit("`Sending gay media to gay...`")
         await userge.send_photo(chat, meme_file)
         response = await conv.get_response(mark_read=True)
         if not response.photo:
-            await message.err("Bot is Down, try to restart Bot !...", del_in=5)
+            await message.err("Bot is Down, try to restart Bot !...")
             return
         message_id = replied.message_id
         Meme_file = None
