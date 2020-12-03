@@ -3,7 +3,7 @@ import shutil
 import asyncio
 from pathlib import Path
 
-from userge import userge, Message
+from userge import userge, Message, Config
 from userge.plugins.misc.upload import audio_upload
 from userge.plugins.tools.executor import Term
 
@@ -25,7 +25,7 @@ async def spotify_dl(message: Message):
     runn = await Term.execute(cmd)
     while not runn.finished:
         await asyncio.sleep(1)
-        if runn.read_line:
+        if runn.read_line and len(runn.read_line) <= Config.MAX_MESSAGE_LENGTH:
             await message.try_to_edit(f">><code>{runn.read_line}</code>")
     if len(os.listdir(TEMP_DIR)) <= 1:
         await message.err("Download Failed.")
