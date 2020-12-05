@@ -25,7 +25,7 @@ async def create_button(msg: Message):
     replied = msg.reply_to_message
     file_id, file_ref, message = None, None, None
     if replied:
-        message = await msg.client.get_messages(msg.chat.id, replied_message.id)
+        message = await msg.client.get_messages(msg.chat.id, replied.message_id)
         if message.caption:
             string = message.caption.html
         elif message.text:
@@ -41,7 +41,7 @@ async def create_button(msg: Message):
     message_id = replied.message_id if replied else None
     client = msg.client if msg.client.is_bot else msg.client.bot
     try:
-        if replied and message and message.media and file_id and file_ref:
+        if message and message.media and file_id and file_ref:
             await client.send_cached_media(
                 chat_id=msg.chat.id,
                 file_id=file_id,
