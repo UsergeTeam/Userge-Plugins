@@ -25,7 +25,7 @@ async def create_button(msg: Message):
     replied = msg.reply_to_message
     file_id, file_ref, message = None, None, None
     if replied:
-        message = await client.get_messages(msg.chat.id, replied.message.id)
+        message = await msg.client.get_messages(msg.chat.id, replied.message.id)
         if message.caption:
             string = message.caption.html
         elif message.text:
