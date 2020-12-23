@@ -66,7 +66,7 @@ async def meme_(message: Message):
             return
         await conv.send_message(message.input_str)
         response = await conv.get_response(mark_read=True)
-        if not "Okay..." in response.text:
+        if "Okay..." not in response.text:
             await message.err("Bot is Down, try to restart Bot !...")
             return
         if should_forward:
