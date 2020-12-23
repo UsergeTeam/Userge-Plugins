@@ -1,8 +1,11 @@
-# By @Krishna_Singhal
+# By @krishna_singhal
 
-from pyrogram.errors import YouBlockedUser
+import os
 
-from userge import userge, Message
+from pyrogram.errors.exceptions.bad_request_400 import YouBlockedUser
+
+from userge import userge, Message, Config
+from userge.utils import take_screen_shot, runcmd
 
 
 @userge.on_cmd("meme", about={
@@ -13,30 +16,67 @@ async def meme_(message: Message):
     """ meme for media """
     replied = message.reply_to_message
     if not (replied and message.input_str):
-        await message.err("`Nibba, reply to Media and Give some input...`")
+        await message.err("Nibba, reply to Media and give some input...")
         return
     if not (replied.photo or replied.sticker or replied.video or replied.animation):
-        await message.err("`reply to only media...`")
+        await message.err("reply to only media...")
         return
-    await message.edit("`memifying...`")
+    if not os.path.isdir(Config.DOWN_PATH):
+        os.makedirs(Config.DOWN_PATH)
+    await message.edit("`Memifying...`")
+
+    meme_file = None
+    should_forward = False
+    dls_loc = None
+
+    if (replied.photo or (
+        replied.sticker and replied.sticker.file_name.endswith(".webp")
+    )):
+        should_forward = True
+    else:
+        dls = await message.client.download_media(
+            message=replied,
+            file_name=Config.DOWN_PATH)
+        dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
+        if replied.sticker and replied.sticker.file_name.endswith(".tgs"):
+            file_1 = os.path.join(Config.DOWN_PATH, "meme.png")
+            cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {file_1}"
+            stdout, stderr = (await runcmd(cmd))[:2]
+            if not os.path.lexists(file_1):
+                await message.err("Sticker not found, cuz its gay...")
+                raise Exception(stdout + stderr)
+            meme_file = file_1
+        elif replied.animation or replied.video:
+            file_2 = os.path.join(Config.DOWN_PATH, "meme.png")
+            await take_screen_shot(dls_loc, 0, file_2)
+            if not os.path.lexists(file_2):
+                await message.err("Media not found...")
+                return
+            meme_file = file_2
+
     chat = "@MemeAuto_bot"
     async with userge.conversation(chat) as conv:
         try:
-            args = message.input_str
             await conv.send_message("/start")
             await conv.get_response(mark_read=True)
         except YouBlockedUser:
             await message.err(
-                "`This cmd not for you, If you want to use, Unblock` **@MemeAutobot**"
-            )
+                "this cmd not for you, If you want to use, Unblock **@MemeAutobot**",
+                del_in=5)
             return
-        await conv.send_message(args)
+        await conv.send_message(message.input_str)
         response = await conv.get_response(mark_read=True)
-        if "Okay..." not in response.text:
-            await message.edit("`Bot is down, Try again Later...`")
+        if not "Okay..." in response.text:
+            await message.err("Bot is Down, try to restart Bot !...")
             return
-        await conv.forward_message(replied)
+        if should_forward:
+            await conv.forward_message(replied)
+        else:
+            await userge.send_photo(chat, meme_file)
         response = await conv.get_response(mark_read=True)
         if response.sticker:
             await response.forward(message.chat.id, as_copy=True)
-        await message.delete()
+    await message.delete()
+    for file in (meme_file, dls_loc):
+        if file and os.path.exists(file):
+            os.remove(file)
