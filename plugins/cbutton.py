@@ -23,14 +23,13 @@ async def create_button(msg: Message):
         return
     string = msg.input_raw
     replied = msg.reply_to_message
-    file_id, file_ref, message = None, None, None
+    file_id, file_ref = None, None
     if replied:
-        message = await msg.client.get_messages(msg.chat.id, replied.message_id)
-        if message.caption:
-            string = message.caption.html
-        elif message.text:
-            string = message.text.html
-        file_id, file_ref = get_file_id_and_ref(message)
+        if replied.caption:
+            string = replied.caption.html
+        elif replied.text:
+            string = replied.text.html
+        file_id, file_ref = get_file_id_and_ref(replied)
     if not string:
         await msg.err("`need an input!`")
         return
@@ -41,7 +40,7 @@ async def create_button(msg: Message):
     message_id = replied.message_id if replied else None
     client = msg.client if msg.client.is_bot else msg.client.bot
     try:
-        if message and message.media and file_id and file_ref:
+        if replied and replied.media and file_id and file_ref:
             await client.send_cached_media(
                 chat_id=msg.chat.id,
                 file_id=file_id,
