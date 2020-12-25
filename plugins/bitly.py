@@ -20,7 +20,7 @@ async def bitly(msg: Message):
     async with userge.conversation("Bitlyy_Bot") as conv:
         try:
             await conv.send_message("/start")
-            response = await conv.get_response(mark_read=True)
+            await conv.get_response(mark_read=True)
         except YouBlockedUser:
             await msg.edit("unblock @bitlyy_bot to shorten URLs.")
             return
