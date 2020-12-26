@@ -17,21 +17,19 @@ async def bitly(msg: Message):
     if not url:
         await msg.err("need url to shorten")
         return
-    async with userge.conversation("Bitlyy_Bot") as conv:
-        try:
+    try:
+        async with userge.conversation("Bitlyy_Bot") as conv:
             await conv.send_message("/start")
             await conv.get_response(mark_read=True)
-        except YouBlockedUser:
-            await msg.edit("unblock @bitlyy_bot to shorten URLs.")
-            return
-        except StopConversation:
-            await msg.err("bot is down")
-            return
-        await conv.send_message(url)
-        shorten_url = (
-            await conv.get_response(mark_read=True)
-        ).text.split('\n', maxsplit=1)[-1]
-        await msg.edit(f"`{shorten_url}`", disable_web_page_preview=True)
+            await conv.send_message(url)
+            shorten_url = (
+                await conv.get_response(mark_read=True)
+            ).text.split('\n', maxsplit=1)[-1]
+            await msg.edit(f"`{shorten_url}`", disable_web_page_preview=True)
+    except YouBlockedUser:
+        await msg.edit("unblock **@Bitlyy_Bot** to shorten URLs.")
+    except StopConversation:
+        await msg.err("bot is down")
 
 
 @userge.on_cmd("isgd", about={
