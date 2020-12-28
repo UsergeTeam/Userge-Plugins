@@ -1,6 +1,6 @@
 """ Creates random anime sticker """
 
-# by @krishna_singhal
+# By @Krishna_Singhal
 
 import random
 
@@ -70,7 +70,6 @@ async def anime_sticker(message: Message):
         await userge.send_sticker(
             chat_id=message.chat.id,
             sticker=str(saved.sticker.file_id),
-            file_ref=str(saved.sticker.file_ref),
             reply_to_message_id=message_id
         )
         await saved.delete()

@@ -180,10 +180,14 @@ async def view_profile(message: Message):
         return
     if "me" in message.filtered_input_str:
         user = await message.client.get_me()
-        bio = await message.client.get_chat("me")
+        bio = (await message.client.get_chat("me")).bio
     else:
-        user = await message.client.get_users(input_)
-        bio = await message.client.get_chat(input_)
+        try:
+            user = await message.client.get_users(input_)
+            bio = (await message.client.get_chat(input_)).bio
+        except Exception:
+            await message.err("invalid user_id!")
+            return
     if '-fname' in message.flags:
         await message.edit("```checking, wait plox !...```", del_in=3)
         first_name = user.first_name
@@ -203,12 +207,11 @@ async def view_profile(message: Message):
             full_name = user.first_name + " " + user.last_name
             await message.edit("<code>{}</code>".format(full_name), parse_mode='html')
     elif '-bio' in message.flags:
-        if not bio.description:
+        if not bio:
             await message.err("User not have bio...")
         else:
-            await message.edit("```checking, wait plox !...```", del_in=3)
-            about = bio.description
-            await message.edit("<code>{}</code>".format(about), parse_mode='html')
+            await message.edit("`checking, wait plox !...`", del_in=3)
+            await message.edit("<code>{}</code>".format(bio), parse_mode='html')
     elif '-uname' in message.flags:
         if not user.username:
             await message.err("User not have username...")
@@ -309,7 +312,7 @@ async def clone_(message: Message):
             await message.err("First Revert!...")
             return
         mychat = await userge.get_chat(me.id)
-        USER_DATA['bio'] = mychat.description or ''
+        USER_DATA['bio'] = mychat.bio or ''
         await userge.update_profile(bio=chat.description or '')
         await message.edit("```Bio is Successfully Cloned ...```", del_in=3)
     elif '-pp' in message.flags:
@@ -334,7 +337,7 @@ async def clone_(message: Message):
         await userge.update_profile(
             first_name=user.first_name or '',
             last_name=user.last_name or '',
-            bio=chat.description or '')
+            bio=chat.bio or '')
         if not user.photo:
             await message.edit(
                 "`User not have profile photo, Cloned Name and bio...`", del_in=5)

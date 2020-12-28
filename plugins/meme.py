@@ -75,7 +75,7 @@ async def meme_(message: Message):
             await userge.send_photo(chat, meme_file)
         response = await conv.get_response(mark_read=True)
         if response.sticker:
-            await response.forward(message.chat.id, as_copy=True)
+            await response.copy(message.chat.id, reply_to_message_id=replied.message_id)
     await message.delete()
     for file in (meme_file, dls_loc):
         if file and os.path.exists(file):

@@ -5,7 +5,7 @@
 from pyrogram.errors import UserIsBot, BadRequest
 
 from userge import userge, Config, Message
-from userge.utils import parse_buttons as pb, get_file_id_and_ref
+from userge.utils import parse_buttons as pb, get_file_id_of_media
 
 
 @userge.on_cmd("cbutton", about={
@@ -23,13 +23,13 @@ async def create_button(msg: Message):
         return
     string = msg.input_raw
     replied = msg.reply_to_message
-    file_id, file_ref = None, None
+    file_id = None
     if replied:
         if replied.caption:
             string = replied.caption.html
         elif replied.text:
             string = replied.text.html
-        file_id, file_ref = get_file_id_and_ref(replied)
+        file_id = get_file_id_of_media(replied)
     if not string:
         await msg.err("`need an input!`")
         return
@@ -40,11 +40,10 @@ async def create_button(msg: Message):
     message_id = replied.message_id if replied else None
     client = msg.client if msg.client.is_bot else msg.client.bot
     try:
-        if replied and replied.media and file_id and file_ref:
+        if replied and replied.media and file_id:
             await client.send_cached_media(
                 chat_id=msg.chat.id,
                 file_id=file_id,
-                file_ref=file_ref,
                 caption=text,
                 reply_to_message_id=message_id,
                 reply_markup=markup)
