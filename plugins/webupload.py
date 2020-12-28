@@ -15,7 +15,7 @@ from userge.utils import progress
                    'examples': "{tr}web downloads/test.mp3 anonymousfiles",
                    'types': [
                        'anonfiles', 'transfer', 'filebin', 'anonymousfiles',
-                       'megaupload', 'bayfiles', 'vshare', '0x0', 'fileio','ninja']})
+                       'megaupload', 'bayfiles', 'vshare', '0x0', 'fileio', 'ninja']})
 async def web(message: Message):
     await message.edit("`Processing ...`")
     input_str = message.matches[0].group(1)
