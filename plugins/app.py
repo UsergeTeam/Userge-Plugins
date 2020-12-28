@@ -29,7 +29,7 @@ async def app(message: Message):
         app_rating = results[0].findNext('div', 'Vpfmgd').findNext(
             'div', 'pf5lIe'
         ).find('div')['aria-label'].replace("Rated ", "⭐️ ").replace(
-                " out of ", "/"
+            " out of ", "/"
         ).replace(" stars", "", 1).replace(" stars", "⭐️").replace("five", "5")
         app_link = "https://play.google.com" + results[0].findNext(
             'div', 'Vpfmgd').findNext('div', 'vU6FJ p63iDd').a['href']
