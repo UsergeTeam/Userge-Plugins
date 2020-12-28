@@ -156,10 +156,10 @@ async def lydia_ai_chat(message: Message):
     """ incomming message handler """
     if CH_LYDIA_API is None:
         return
-    data = ACTIVE_CHATS.get(message.from_user.id, None)
+    data = ACTIVE_CHATS.get(message.from_user.id)
     chat_id = message.from_user.id
     if not data:
-        data = ACTIVE_CHATS.get(message.chat.id, None)
+        data = ACTIVE_CHATS.get(message.chat.id)
         chat_id = message.chat.id
     if data:
         ses_id, ses_time = data
