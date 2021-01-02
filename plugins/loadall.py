@@ -7,7 +7,7 @@ from userge.utils import get_import_path
 from userge.plugins import ROOT
 
 PLUGINS_CHAT_ID = int(os.environ.get("PLUGINS_CHAT_ID", 0))
-_CHANNEL = userge.get_CLogger(__name__)
+_CHANNEL = userge.getCLogger(__name__)
 _LOG = logging.getLogger(__name__)
 
 
