@@ -2,7 +2,7 @@
 
 import os
 
-from userge import userge, Message, Config
+from userge import userge, Message, Config, logging
 from userge.utils import get_import_path
 from userge.plugins import ROOT
 
@@ -21,7 +21,7 @@ async def loadall(msg: Message) -> None:
     if not PLUGINS_CHAT_ID:
         await msg.edit("Add `PLUGINS_CHAT_ID` var to Load Plugins from Plugins Channel")
         return
-    await message.edit("`Loading All Plugins...`")
+    await msg.edit("`Loading All Plugins...`")
     success = 0
     total = 0
     p_error = ''
@@ -51,7 +51,8 @@ async def loadall(msg: Message) -> None:
         if success == total:
             await msg.edit('`Loaded all Plugins`')
         else:
-            await msg.edit(f'`{sucess} Plugins loaded from {total}`\n__see log channel for more info__')
+            await msg.edit(
+                f'`{success} Plugins loaded from {total}`\n__see log channel for more info__')
             await _CHANNEL.log(p_error)
     else:
         await msg.edit(f'`0 Plugins loaded from {total}`\n__see log channel for more info__')
