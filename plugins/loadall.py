@@ -21,7 +21,7 @@ async def loadall(msg: Message) -> None:
     if not PLUGINS_CHAT_ID:
         await msg.edit("Add `PLUGINS_CHAT_ID` var to Load Plugins from Plugins Channel")
         return
-    await msg.edit("`Loading All Plugins...`")
+    await msg.edit("`Loading All Plugin(s)...`")
     success = 0
     total = 0
     p_error = ''
@@ -43,17 +43,17 @@ async def loadall(msg: Message) -> None:
                 await userge.finalize_load()
             except (ImportError, SyntaxError, NameError) as i_e:
                 os.remove(t_path)
-                p_error += f'\n\n**PLUGIN:** {file_.file_name}\n**ERROR:** {i_e}'
+                p_error += f'\n\n**PLUGIN:** `{file_.file_name}`\n**ERROR:** `{i_e}`'
             else:
                 success += 1
-                _LOG.info(f"`Loaded {plugin}`")
+                _LOG.info(f"Loaded {plugin}")
     if success:
         if success == total:
-            await msg.edit('`Loaded all Plugins`')
+            await msg.edit('`Loaded all Plugin(s)`')
         else:
             await msg.edit(
-                f'`{success} Plugins loaded from {total}`\n__see log channel for more info__')
+                f'`{success} Plugin(s) loaded from {total}`\n__see log channel for more info__')
             await _CHANNEL.log(p_error)
     else:
-        await msg.edit(f'`0 Plugins loaded from {total}`\n__see log channel for more info__')
+        await msg.edit(f'`0 Plugin(s) loaded from {total}`\n__see log channel for more info__')
         await _CHANNEL.log(p_error)
