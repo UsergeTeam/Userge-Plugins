@@ -16,9 +16,9 @@ Botsz = [i.strip() for i in os.environ.get("BOTSZ").split(',')]
 @userge.on_cmd("balive", about={
     'header': "Pings All Defined Bots",
     'description': "<b>Ping and Updates The Status Of All Defined Bots In 'BOTSZ' var</b>\n\n"
-                   "<b>Available Vars</b>:\n\n<i><code>UPDATES_CHANNEL</code> : Provide Your Channel Name With @"
+                   "Available Vars:\n\nUPDATES_CHANNEL : Provide Your Channel Name With @"
 
-                   "<code>BOTSZ</code> : Define All Your Bot's Username With Out @ And Seperate Each With ','\n\n"
+                   "BOTSZ : Define All Your Bot's Username With Out @ And Seperate Each With ','"
 })
 async def bots(message: Message):
     first_msg = f"<b>Bots Status @{UpdatesChannel}\n°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°</b>\n\n"
