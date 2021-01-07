@@ -2,48 +2,42 @@
 # @TheUnusualPsychopath | @Albert_Einetin_TG
 # @TrojanzHEX | @CrazyBotsz
 
-import os
 import time
 import pytz
 from datetime import datetime
 from userge import userge, Message
 
-UpdatesChannel = os.environ.get("UPDATES_CHANNEL")
-Botsz = [i.strip() for i in os.environ.get("BOTSZ").split(',')]
 
-
-@userge.on_cmd("balive", about={
-    'header': "Pings All Defined Bots",
-    'description': "<b>Ping and Updates The Status Of All Defined Bots In 'BOTSZ' var</b>\n\n"
-
-                   "Available Vars:\n\n"
-
-                   "UPDATES_CHANNEL : Provide Your Channel Name With @\n\n"
-
-                   "BOTSZ : Define All Your Bot's Username With Out @ And Seperate Each With ','"
-})
+@userge.on_cmd(
+    "balive", about={
+        'header': "Pings All Defined Bots",
+        'description': "<b>Ping and All bots and check their status.</b>\n\n"
+                       "[NOTE]: you can pass multiple ids, seprate them via new line",
+        'usage': "{tr}belive [bot id/username]"}, allow_via_bot=False)
 async def bots(message: Message):
-    first_msg = f"<b>Bots Status @{UpdatesChannel}\n°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°</b>\n\n"
-    reply = await message.reply_text(first_msg, parse_mode="html")
-    Listed = Botsz
-    for bot in Listed:
-        checking = f"<b>⚡ @{bot} Status : Checking...⌛</b>\n\n"
-        first_msg += checking
-        await reply.edit_text(first_msg, parse_mode="html")
+    _msg = "<b>Bots Status\n°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°</b>\n\n"
+    await message.edit(_msg, parse_mode="html")
+    if not message.input_str:
+        return await message.edit("Bots not found!")
+    Bot_List = [bot.strip() for bot in message.input_str.split('\n') if bot.strip()]
+    for bot in Bot_List:
+        checking = f"<b>⚡ {bot} Status : Checking...⌛</b>\n\n"
+        _msg += checking
+        await message.edit(_msg, parse_mode="html")
         snt = await userge.send_message(bot, '/start')
         time.sleep(5)
         msg = await userge.get_history(bot, 1)
         if snt.message_id == msg[0].message_id:
-            nice = f"<b>⚡ @{bot} Status : ❎</b>\n\n"
+            nice = f"<b>⚡ {bot} Status : ❎</b>\n\n"
         else:
-            nice = f"<b>⚡ @{bot} Status : ✅</b>\n\n"
-        first_msg = first_msg.replace(checking, nice)
-        await reply.edit_text(first_msg, parse_mode="html")
+            nice = f"<b>⚡ {bot} Status : ✅</b>\n\n"
+        _msg = _msg.replace(checking, nice)
+        await message.edit(_msg, parse_mode="html")
         await userge.read_history(bot)
     tz = pytz.timezone('Asia/Kolkata')
     time_now = datetime.utcnow().astimezone(tz=tz).strftime("%I:%M %p - %d %B %Y")
-    first_msg += f"<code>[Updated on : {time_now}]</code>"
-    await reply.edit_text(first_msg, parse_mode="html")
+    _msg += f"<code>[Updated on : {time_now}]</code>"
+    await message.edit(_msg, parse_mode="html")
 
 
 # @CrazyBotsz
