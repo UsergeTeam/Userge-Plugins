@@ -5,8 +5,6 @@
 import os
 import time
 import pytz
-import pyrogram
-import asyncio
 from datetime import datetime
 from userge import userge, Message
 
@@ -45,7 +43,7 @@ async def bots(message: Message):
     tz = pytz.timezone('Asia/Kolkata')
     time_now = datetime.utcnow().astimezone(tz=tz).strftime("%I:%M %p - %d %B %Y")
     first_msg += f"<code>[Updated on : {time_now}]</code>"
-    await reply.edit_text(first_msg,parse_mode="html")
+    await reply.edit_text(first_msg, parse_mode="html")
 
 
 # @CrazyBotsz
