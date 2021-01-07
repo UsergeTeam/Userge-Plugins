@@ -2,21 +2,18 @@
 # @TheUnusualPsychopath | @Albert_Einetin_TG
 # @TrojanzHEX | @CrazyBotsz
 
-import os
 import time
 import pytz
 from datetime import datetime
 from userge import userge, Message
 
 
-@userge.on_cmd("balive",
-    about={
+@userge.on_cmd(
+    "balive", about={
         'header': "Pings All Defined Bots",
         'description': "<b>Ping and All bots and check their status.</b>\n\n"
                        "[NOTE]: you can pass multiple ids, seprate them via new line",
-        'usage': "{tr}belive [bot id/username]"
-    }, allow_via_bot=False
-)
+        'usage': "{tr}belive [bot id/username]"}, allow_via_bot=False)
 async def bots(message: Message):
     _msg = "<b>Bots Status\n°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°</b>\n\n"
     await message.edit(_msg, parse_mode="html")
@@ -39,7 +36,7 @@ async def bots(message: Message):
         await userge.read_history(bot)
     tz = pytz.timezone('Asia/Kolkata')
     time_now = datetime.utcnow().astimezone(tz=tz).strftime("%I:%M %p - %d %B %Y")
-    first_msg += f"<code>[Updated on : {time_now}]</code>"
+    _msg += f"<code>[Updated on : {time_now}]</code>"
     await message.edit(_msg, parse_mode="html")
 
 
