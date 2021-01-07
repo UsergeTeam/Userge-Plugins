@@ -8,38 +8,32 @@ import pytz
 from datetime import datetime
 from userge import userge, Message
 
-UpdatesChannel = os.environ.get("UPDATES_CHANNEL", None)
 
-
-@userge.on_cmd("balive", about={
-    'header': "Pings All Defined Bots",
-    'description': "<b>Ping and Updates The Status Of "
-                   "All Defined Bots In UpdatesChannel.</b>\n\n"
-                   "Available Vars:\n\n"
-                   "UPDATES_CHANNEL : Provide Your Channel id or Username."
-})
+@userge.on_cmd("balive",
+    about={
+        'header': "Pings All Defined Bots",
+        'description': "<b>Ping and All bots and check their status.</b>\n\n"
+                       "[NOTE]: you can pass multiple ids, seprate them via new line",
+        'usage': "{tr}belive [bot id/username]"
+    }, allow_via_bot=False
+)
 async def bots(message: Message):
-    first_msg = f"<b>Bots Status @{UpdatesChannel}\n°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°</b>\n\n"
+    msg = "<b>Bots Status\n°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°</b>\n\n"
     await message.edit(first_msg, parse_mode="html")
-    Bot_List = []
-    if UpdatesChannel:
-        async for guu in userge.get_chat_members(
-            chat="UpdatesChannel", filter="bots"
-        ):
-            Bot_List.append(guu.id)
-    if not Bot_List:
-        return await message.edit(f"Bots not found in {UpdatesChannel}!")
+    if not message.input_str:
+        return await message.edit("Bots not found!")
+    Bot_List = [bot.strip() for bot in message.input_str.split('\n') if bot.strip()]
     for bot in Bot_List:
-        checking = f"<b>⚡ @{bot} Status : Checking...⌛</b>\n\n"
-        first_msg += checking
+        checking = f"<b>⚡ {bot} Status : Checking...⌛</b>\n\n"
+        msg += checking
         await message.edit(first_msg, parse_mode="html")
         snt = await userge.send_message(bot, '/start')
         time.sleep(5)
         msg = await userge.get_history(bot, 1)
         if snt.message_id == msg[0].message_id:
-            nice = f"<b>⚡ @{bot} Status : ❎</b>\n\n"
+            nice = f"<b>⚡ {bot} Status : ❎</b>\n\n"
         else:
-            nice = f"<b>⚡ @{bot} Status : ✅</b>\n\n"
+            nice = f"<b>⚡ {bot} Status : ✅</b>\n\n"
         first_msg = first_msg.replace(checking, nice)
         await message.edit(first_msg, parse_mode="html")
         await userge.read_history(bot)
