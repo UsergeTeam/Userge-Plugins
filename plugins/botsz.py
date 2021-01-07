@@ -9,7 +9,7 @@ from datetime import datetime
 from userge import userge, Message
 
 UpdatesChannel = os.environ.get("UPDATES_CHANNEL")
-Botsz = [i.strip() for i in os.environ.get("BOTSZ").split(',')]
+Botsz = [i and i.strip() for i in os.environ.get("BOTSZ").split(',')]
 
 
 @userge.on_cmd("balive", about={
