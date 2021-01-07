@@ -19,14 +19,14 @@ from userge import userge, Message
 )
 async def bots(message: Message):
     _msg = "<b>Bots Status\n°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°</b>\n\n"
-    await message.edit(first_msg, parse_mode="html")
+    await message.edit(_msg, parse_mode="html")
     if not message.input_str:
         return await message.edit("Bots not found!")
     Bot_List = [bot.strip() for bot in message.input_str.split('\n') if bot.strip()]
     for bot in Bot_List:
         checking = f"<b>⚡ {bot} Status : Checking...⌛</b>\n\n"
         _msg += checking
-        await message.edit(first_msg, parse_mode="html")
+        await message.edit(_msg, parse_mode="html")
         snt = await userge.send_message(bot, '/start')
         time.sleep(5)
         msg = await userge.get_history(bot, 1)
@@ -35,12 +35,12 @@ async def bots(message: Message):
         else:
             nice = f"<b>⚡ {bot} Status : ✅</b>\n\n"
         _msg = _msg.replace(checking, nice)
-        await message.edit(first_msg, parse_mode="html")
+        await message.edit(_msg, parse_mode="html")
         await userge.read_history(bot)
     tz = pytz.timezone('Asia/Kolkata')
     time_now = datetime.utcnow().astimezone(tz=tz).strftime("%I:%M %p - %d %B %Y")
     first_msg += f"<code>[Updated on : {time_now}]</code>"
-    await message.edit(first_msg, parse_mode="html")
+    await message.edit(_msg, parse_mode="html")
 
 
 # @CrazyBotsz
