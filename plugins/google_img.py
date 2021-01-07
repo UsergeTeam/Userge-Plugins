@@ -67,7 +67,7 @@ async def google_img(message: Message):
             if a_dex != -1:
                 new_im = Image.new('RGB', image.size, (255, 255, 255))
                 new_im.paste(image, mask=image.split()[a_dex])
-                new_im.save(imgs, 'JPEG')
+                new_im.save(imgs, 'JPEG', optimize=True)
         ss.append(InputMediaPhoto(str(imgs)))
         if len(ss) == 9:
             break
