@@ -23,10 +23,10 @@ async def bots(message: Message):
     await message.edit(first_msg, parse_mode="html")
     Bot_List = []
     if UpdatesChannel:
-        async for bots in userge.get_chat_members(
+        async for guu in userge.get_chat_members(
             chat="UpdatesChannel", filter="bots"
         ):
-            Bot_List.append(bots.id)
+            Bot_List.append(guu.id)
     if not Bot_List:
         return await message.edit(f"Bots not found in {UpdatesChannel}!")
     for bot in Bot_List:
