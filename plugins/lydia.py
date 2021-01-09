@@ -16,7 +16,7 @@ from coffeehouse.exception import CoffeeHouseError
 from pyrogram.errors.exceptions.bad_request_400 import PeerIdInvalid
 
 from userge import userge, get_collection, Message, filters, pool
-from userge.utils import get_file_id_and_ref
+from userge.utils import get_file_id_of_media
 
 LOGGER = userge.getCLogger(__name__)
 LYDIA_CHATS = get_collection("LYDIA_CHATS")
@@ -156,10 +156,10 @@ async def lydia_ai_chat(message: Message):
     """ incomming message handler """
     if CH_LYDIA_API is None:
         return
-    data = ACTIVE_CHATS.get(message.from_user.id, None)
+    data = ACTIVE_CHATS.get(message.from_user.id)
     chat_id = message.from_user.id
     if not data:
-        data = ACTIVE_CHATS.get(message.chat.id, None)
+        data = ACTIVE_CHATS.get(message.chat.id)
         chat_id = message.chat.id
     if data:
         ses_id, ses_time = data
@@ -215,13 +215,12 @@ async def _custom_media_reply(message: Message):
             await _custom_media_reply(message)
             return
         if cus_msg.media:
-            file_id, file_ref = get_file_id_and_ref(cus_msg)
+            file_id = get_file_id_of_media(cus_msg)
             try:
                 if cus_msg.animation:
                     await message.client.send_animation(
                         chat_id=message.chat.id,
                         animation=file_id,
-                        file_ref=file_ref,
                         unsave=True,
                         reply_to_message_id=message.message_id
                     )
@@ -243,8 +242,7 @@ async def _custom_media_reply(message: Message):
                         await message.reply_chat_action(action)
                     await asyncio.sleep(5)
                     await message.reply_cached_media(
-                        file_id=file_id,
-                        file_ref=file_ref
+                        file_id=file_id
                     )
             except Exception as idk:  # pylint: disable=W0703
                 LOGGER.log(f"#ERROR: `{idk}`")
