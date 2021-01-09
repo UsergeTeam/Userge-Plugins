@@ -1,6 +1,7 @@
 language: python
 python:
   - "3.8"
+  - "3.9"
 before_install:
   - cd ..
   - git clone --depth=1 --branch=alpha https://github.com/UsergeTeam/Userge.git Userge
