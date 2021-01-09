@@ -4,14 +4,15 @@ colour
 deezloader
 emoji-country-flag
 gdshortener
-google-images-search==1.3.4
+# google-images-search==1.3.4
 google
 glitch-this
 gtts
 humanize
 justwatch
 lottie
-pillow==8.0
+# pillow==8.0
+pyfiglet
 qrcode
 spotdl
 tracemoepy
