@@ -18,7 +18,7 @@ async def bitly(msg: Message):
         await msg.err("need url to shorten")
         return
     try:
-        async with userge.conversation("Bitlyy_Bot") as conv:
+        async with userge.conversation("Sl_BitlyBot") as conv:
             await conv.send_message("/start")
             await conv.get_response(mark_read=True)
             await conv.send_message(url)
@@ -27,7 +27,7 @@ async def bitly(msg: Message):
             ).text.split('\n', maxsplit=1)[-1]
             await msg.edit(f"`{shorten_url}`", disable_web_page_preview=True)
     except YouBlockedUser:
-        await msg.edit("unblock **@Bitlyy_Bot** to shorten URLs.")
+        await msg.edit("unblock **@Sl_BitlyBot** to shorten URLs.")
     except StopConversation:
         await msg.err("bot is down")
 
