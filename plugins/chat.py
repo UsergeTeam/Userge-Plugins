@@ -98,7 +98,7 @@ async def invite_link(message: Message):
             if chat.type in ['group', 'supergroup']:
                 link = await userge.export_chat_invite_link(chat_id)
                 await message.edit(
-                    "**Invite link Genrated Successfully for\n"
+                    "**Invite link Generated Successfully for\n"
                     f"{chat_name}**\n[Click here to join]({link})",
                     disable_web_page_preview=True)
             else:
