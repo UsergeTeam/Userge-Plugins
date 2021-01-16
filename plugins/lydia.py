@@ -65,6 +65,11 @@ async def lydia_session(message: Message):
         return
     await message.edit("`processing lydia...`")
     replied = message.reply_to_message
+    if not replied.from_user:
+        return await asyncio.gather(
+            message.reply_sticker("CAADAQAEAQAC0rXRRju3sbCT07jIFgQ"),
+            message.delete()
+        )
     if '-on' in message.flags and replied:
         user_id = replied.from_user.id
         if user_id in ACTIVE_CHATS:
