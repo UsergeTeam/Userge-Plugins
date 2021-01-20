@@ -40,6 +40,11 @@ async def banager(
     'usage': "{tr}snap [(optional flag)]"},
     allow_private=False, only_admins=True)
 async def snapper(message: Message):
+    if not message.from_user:
+        return
+    if (await message.chat.get_member(message.from_user.id)).status != "creator":
+        await message.err("required chat creator !")
+        return
     chat_id = message.chat.id
     act = 'Banning'
     if '-k' in message.flags:
