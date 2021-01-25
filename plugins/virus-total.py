@@ -16,7 +16,7 @@ API_KEY = os.environ.get("VT_API_KEY", None)
     'header': "Virus-Total module to check virus in document files.",
     'description': "scan virus in document files which are less then 32MB.",
     'usage': "{tr}scan [reply to document file]"})
-async def scan_file(msg: Message):
+async def _scan_file(msg: Message):
     """ scan files and get scan id """
     if API_KEY is None:
         await msg.edit(
@@ -49,12 +49,12 @@ async def scan_file(msg: Message):
     if response is False:
         await msg.err("this file can't be scan")
         return
-    await msg.edit(f"`{response.json()['verbose_msg']}`")       
+    await msg.edit(f"`{response.json()['verbose_msg']}`")
     sha1 = response.json()['resource']
     await asyncio.sleep(3)
     que_msg = "Your resource is queued for analysis"
     viruslist = []
-    reasons=[]
+    reasons = []
     response = get_report(sha1).json()
     if "Invalid resource" in response.get('verbose_msg'):
         await msg.err(response.get('verbose_msg'))
@@ -76,7 +76,7 @@ async def scan_file(msg: Message):
             reasons.append('â¤ ' + report[i]['result'])
     if len(viruslist) > 0:
         names = ' , '.join(viruslist)
-        reason='\n'.join(reasons)
+        reason = '\n'.join(reasons)
         await msg.edit(f"""
 â£ __Threats have been detected !__ â£
 
