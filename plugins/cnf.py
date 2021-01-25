@@ -65,9 +65,12 @@ async def cnf(message: Message):
 
         # items
         for row in lst:
-            if row["class"][2] == "d-none":
+            try:
+                row["class"][2] == "d-none"
                 # ignore this its stil not implemented by Łukasz
                 continue
+            except IndexError:
+                pass
             os = row.dt.findAll(text=True, recursive=False)[-1].strip()
             command = row.dd.code.text
 
