@@ -60,7 +60,7 @@ async def _scan_file(msg: Message):
         await msg.err(response.get('verbose_msg'))
         return
     if response.get('verbose_msg') == que_msg:
-        await msg.edit('`que_msg`')
+        await msg.edit(f'`{que_msg}`')
         while response.get('verbose_msg') == que_msg:
             await asyncio.sleep(3)
             response = get_report(sha1).json()
@@ -78,14 +78,14 @@ async def _scan_file(msg: Message):
         names = ' , '.join(viruslist)
         reason = '\n'.join(reasons)
         await msg.edit(f"""
-â£ __Threats have been detected !__ â£
+☣ __Threats have been detected !__ ☣
 
 **{names}**\n\n__Description__\n\n`{reason}`
 
 [Detailed Report]({link})
 """)
     else:
-        await msg.edit('`File is clean â`')
+        await msg.edit('`File is clean ✅`')
 
 
 def scan_file(path: str) -> str:
