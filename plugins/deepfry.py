@@ -114,28 +114,28 @@ async def deepfry(img):
 @userge.on_cmd("fry", about={
     'header': "frying media",
     'usage': "{tr}fry [fry count (recommendation 3)] [reply to any media]",
-    'examples': "{tr}fry 3 [reply to any media]"})
+    'examples': "{tr}fry 3 [reply to any media]"}, allow_via_bot=False)
 async def fry_(message: Message):
     """ fryer for any media """
     frying_file = None
     replied = message.reply_to_message
     if not (replied and message.input_str):
-        await message.err("```Reply to Media and gib fry count to deepfry !...```", del_in=5)
+        await message.err("Reply to Media and gib fry count to deepfry !...")
         return
     if not (replied.photo or replied.sticker or replied.video or replied.animation):
-        await message.err("```Reply to Media only !...```", del_in=5)
+        await message.err("Reply to Media only !...")
         return
     args = message.input_str
     if not args.isdigit():
-        await message.err("```Need fry count from 1 - 8 only !...```", del_in=5)
+        await message.err("Need fry count from 1 - 8 only !...")
         return
     args = int(args)
     if not 0 < args < 9:
-        await message.err("```Invalid range !...```", del_in=5)
+        await message.err("Invalid range !...")
         return
     if not os.path.isdir(Config.DOWN_PATH):
         os.makedirs(Config.DOWN_PATH)
-    await message.edit("```Frying, Wait plox ...```")
+    await message.edit("`Frying, Wait plox ...`")
     dls = await message.client.download_media(
         message=replied,
         file_name=Config.DOWN_PATH,
@@ -200,10 +200,10 @@ async def fry_(message: Message):
             directory = Config.DOWN_PATH
             files_name = "fry.webp"
             deep_fry = os.path.join(directory, files_name)
-            await userge.download_media(
+            await message.client.download_media(
                 message=response,
                 file_name=deep_fry)
-            await userge.send_sticker(
+            await message.client.send_sticker(
                 message.chat.id,
                 sticker=deep_fry,
                 reply_to_message_id=message_id,
