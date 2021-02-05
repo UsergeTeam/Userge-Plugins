@@ -28,7 +28,7 @@ async def spam(message: Message):
                 count, delay = count.split(" ", maxsplit=1)
             try:
                 count = int(count)
-                delay = float(delay) in '.' in delay else int(delay)
+                delay = float(delay) if '.' in delay else int(delay)
             except ValueError as e:
                 await message.edit(e)
                 await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
@@ -50,7 +50,7 @@ async def spam(message: Message):
                 count, delay = count.split(" ", maxsplit=1)
             try:
                 count = int(count)
-                delay = float(delay) in '.' in delay else int(delay)
+                delay = float(delay) if '.' in delay else int(delay)
             except ValueError as e:
                 await message.edit(e)
                 await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
@@ -67,7 +67,7 @@ async def spam(message: Message):
             count, delay = count.split(" ", maxsplit=1)
         try:
             count = int(count)
-            delay = float(delay) in '.' in delay else int(delay)
+            delay = float(delay) if '.' in delay else int(delay)
         except ValueError as e:
             await message.edit(e)
             await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
@@ -84,7 +84,7 @@ async def spam(message: Message):
             spam_text, delay = spam_text.split("|", maxsplit=1)
         try:
             sc = int(spam_count)
-            delay = float(delay) in '.' in delay else int(delay)
+            delay = float(delay) if '.' in delay else int(delay)
         except ValueError as e:
             await message.edit(e)
             await message.reply_sticker(sticker="CAADAQADzAADiO9hRu2b2xyV4IbAFgQ")
