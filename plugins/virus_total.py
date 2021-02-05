@@ -4,6 +4,7 @@
 # Also see https://github.com/uaudith/VirusTotal-Telegram
 
 import os
+import json
 import asyncio
 import requests
 
