@@ -79,7 +79,7 @@ async def spam(message: Message):
         await S_LOG.log(f"Spammed Text in Chat» {message.chat.title}, {count} times")
         await message.delete()
     elif is_str:
-        spam_count, spam_text, delay = message.input_str.split("|", maxsplit=1)
+        spam_count, spam_text = message.input_str.split("|", maxsplit=1)
         if '|' in spam_text:
             spam_text, delay = spam_text.split("|", maxsplit=1)
         try:
