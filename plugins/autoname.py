@@ -3,7 +3,6 @@
 # By @Krishna_Singhal
 # Base Plugin by @Phyco-Ninja
 
-import time
 import asyncio
 from collections import deque
 
@@ -59,12 +58,12 @@ async def _init() -> None:
     'header': "Auto Updates your Profile name with Diffrent Fonts",
     'usage': "{tr}autoname\n{tr}autoname [new name]"}, allow_via_bot=False)
 async def auto_name(msg: Message):
-    global UPDATION, NAME  #pylint: disable=global-statement
+    global UPDATION, NAME  # pylint: disable=global-statement
     if UPDATION:
         if isinstance(UPDATION, asyncio.Task):
             UPDATION.cancel()
         UPDATION = False
-        
+
         await USER_DATA.update_one({'_id': 'UPDATION'},
                                    {"$set": {'on': False}},
                                    upsert=True)
@@ -126,7 +125,7 @@ async def view_name_timeout(message: Message):
 
 @userge.add_task
 async def _autoname_worker():
-    global UPDATION, NAME, FONTS_  #pylint: disable=global-statement
+    global UPDATION, NAME, FONTS_  # pylint: disable=global-statement
     animation = "|/-\\"
     anicount = 0
     FONTS_ = deque(FONTS_)
