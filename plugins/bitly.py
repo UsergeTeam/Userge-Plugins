@@ -11,7 +11,7 @@ from userge.utils.exceptions import StopConversation
 
 @userge.on_cmd("bitly", about={
     'header': "Shorten Any Url using bit.ly",
-    'usage': "{tr}bitly [link or reply]"})
+    'usage': "{tr}bitly [link or reply]"}, allow_via_bot=False)
 async def bitly(msg: Message):
     url = msg.input_or_reply_str
     if not url:

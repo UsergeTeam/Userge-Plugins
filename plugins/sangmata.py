@@ -13,7 +13,7 @@ from userge.utils.exceptions import StopConversation
     'flags': {
         '-u': "To get Username history of a User"},
     'usage': "{tr}sg [Reply to user]\n"
-             "{tr}sg -u [Reply to user]"})
+             "{tr}sg -u [Reply to user]"}, allow_via_bot=False)
 async def sangmata_(message: Message):
     """ Get User's Updated previous Names and Usernames """
     replied = message.reply_to_message
