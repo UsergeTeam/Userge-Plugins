@@ -1,6 +1,7 @@
 """ Virus-Total module to check virus in files """
 
 # By @Krishna_Singhal
+# Also see https://github.com/uaudith/VirusTotal-Telegram
 
 import os
 import asyncio
@@ -29,6 +30,10 @@ async def _scan_file(msg: Message):
     if not (replied and replied.document):
         await msg.err("you need to reply document file.")
         return
+    size_of_file = replied.document.file_size
+    if size_of_file > 32 * 1024 * 1024:
+        await msg.err("this document is greater than 32MB.")
+        return
     await msg.edit("`Downloading file to local...`")
     dls_loc = await msg.client.download_media(
         message=replied,
@@ -37,11 +42,6 @@ async def _scan_file(msg: Message):
         progress_args=(msg, "Downloading file to local...")
     )
     dls = os.path.join(Config.DOWN_PATH, os.path.basename(dls_loc))
-    size_of_file = os.path.getsize(dls)
-    if size_of_file > 32 * 1024 * 1024:
-        os.remove(dls)
-        await msg.err("this document is greater than 32MB.")
-        return
     await msg.edit(
         f"`Processing your file`, **File_size:** `{humanbytes(size_of_file)}`")
     response = scan_file(dls)
