@@ -63,7 +63,10 @@ async def _scan_file(msg: Message):
         await msg.edit(f'`{que_msg}`')
         while response.get('verbose_msg') == que_msg:
             await asyncio.sleep(3)
-            response = get_report(sha1).json()
+            try:
+                response = get_report(sha1).json()
+            except json.decoder.JSONDecodeError:
+                await asyncio.sleep(3)
     try:
         report = response['scans']
         link = response['permalink']
