@@ -21,7 +21,7 @@ After getting Arl token Config `ARL_TOKEN` var in heroku"""
 @userge.on_cmd("deezload", about={
     'header': "DeezLoader for Userge",
     'description': "Download Songs/Albums/Playlists via "
-                   "Sopitfy or Deezer Links. "
+                   "Spotify or Deezer Links. "
                    "\n<b>NOTE:</b> Music Quality is optional",
     'flags': {'-sdl': "Download via Spotify Link",
               '-ddl': "Download via Deezers Link",
