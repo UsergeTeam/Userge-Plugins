@@ -11,7 +11,9 @@ gtts
 humanize
 justwatch
 lottie
+newspaper3k
 # pillow==8.0
+pydub
 pyfiglet
 qrcode
 spotdl
