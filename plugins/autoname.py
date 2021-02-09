@@ -129,7 +129,7 @@ async def _autoname_worker():
     animation = "|/-\\"
     anicount = 0
     FONTS_ = deque(FONTS_)
-    while UPDATION:
+    while UPDATION and NAME:
         F = list(FONTS_)
         cur_list = list(F[0])
         to_rep_list = list(F[1])
