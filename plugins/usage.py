@@ -1,7 +1,6 @@
 import math
 import asyncio
 
-import heroku3
 import requests
 
 from userge import Config, userge, Message
@@ -32,14 +31,14 @@ async def usage(message: Message):
     quota = result['account_quota']
     quota_used = result['quota_used']
 
-    """ - Used - """
+    # Used
     remaining_quota = quota - quota_used
     percentage = math.floor(remaining_quota / quota * 100)
     minutes_remaining = remaining_quota / 60
     hours = math.floor(minutes_remaining / 60)
     minutes = math.floor(minutes_remaining % 60)
 
-    """ - Current - """
+    # Current
     App = result['apps']
     try:
         App[0]['quota_used']
