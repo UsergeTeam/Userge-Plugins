@@ -45,10 +45,12 @@ FONTS_ = [
 
 
 async def _init() -> None:
-    global UPDATION, AUTONAME_TIMEOUT  # pylint: disable=global-statement
+    global UPDATION, AUTONAME_TIMEOUT, NAME  # pylint: disable=global-statement
     data = await USER_DATA.find_one({'_id': 'UPDATION'})
     if data:
         UPDATION = data['on']
+    if UPDATION:
+        NAME = data['NametoUpdate']
     a_t = await USER_DATA.find_one({'_id': 'AUTONAME_TIMEOUT'})
     if a_t:
         AUTONAME_TIMEOUT = a_t['data']
@@ -85,7 +87,7 @@ async def auto_name(msg: Message):
     first_name = (await userge.get_me()).first_name
     await USER_DATA.update_one(
         {'_id': 'UPDATION'},
-        {"$set": {'on': True, 'fname': first_name}},
+        {"$set": {'on': True, 'fname': first_name, 'NametoUpdate': NAME}},
         upsert=True
     )
     await msg.edit(
