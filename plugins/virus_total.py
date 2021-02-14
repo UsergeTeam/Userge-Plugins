@@ -24,7 +24,7 @@ async def _scan_file(msg: Message):
         await msg.edit(
             "You have to sign up on `virustotal.com` and get `API_KEY` "
             "and paste in `VT_API_KEY` var.\nFor more info "
-            "[see this](https://t.me/UnofficialPluginsHelp/103)."
+            "[see this](https://t.me/UnofficialPluginsHelp/114)."
         )
         return
     replied = msg.reply_to_message
