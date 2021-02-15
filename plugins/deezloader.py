@@ -11,7 +11,8 @@ from userge.plugins.misc.upload import doc_upload, audio_upload
 Clogger = userge.getCLogger(__name__)
 ARL_TOKEN = os.environ.get("ARL_TOKEN")
 TEMP_PATH = 'deezdown_temp/'
-REX = re.compile(r"https?:\/\/(open\.spotify|www\.deezer)\.com\/(track|album|playlist)\/[A-Z0-9a-z]{3,}")
+REX = re.compile(r"https?:\/\/(open\.spotify|www\.deezer)\.com\/"
+                 r"(track|album|playlist)\/[A-Z0-9a-z]{3,}")
 ARL_HELP = """**Oops, Time to Help Yourself**
 [Here Help Yourself](https://www.google.com/search?q=how+to+get+deezer+arl+token)
 
@@ -36,9 +37,6 @@ async def deezload(message: Message):
     cmd = str(message.text)[0]
     if not os.path.exists(TEMP_PATH):
         os.makedirs(TEMP_PATH)
-    if not message.flags:
-        await message.edit(f"Hello🙂, This Plugin requires a proper flag to be passed. Check `{cmd}help deezload`.")
-        return
     await message.edit("Checking your Token.")
     if ARL_TOKEN is None:
         await message.edit(ARL_HELP, disable_web_page_preview=True)
@@ -81,7 +79,7 @@ async def deezload(message: Message):
                 artist, song = input_.split('-')
                 quality = d_quality
             else:
-                await message.edit("🙂K!!")
+                await message.edit(f"🙂K!! Check `{cmd}help deezload`")
                 return
         await message.edit(f"Searching Results for {song}")
         try:
