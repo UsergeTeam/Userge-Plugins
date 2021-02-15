@@ -9,9 +9,9 @@ from userge import userge, Message, pool
 from userge.plugins.misc.upload import doc_upload, audio_upload
 
 Clogger = userge.getCLogger(__name__)
-ARL_TOKEN = os.environ.get("ARL_TOKEN", None)
+ARL_TOKEN = os.environ.get("ARL_TOKEN")
 TEMP_PATH = 'deezdown_temp/'
-rex = r"(http:|https:)\/\/(open.spotify|www.deezer).com\/(track|album|playlist)\/[A-Z0-9a-z]{3,}"
+REX = re.compile(r"https?:\/\/(open\.spotify|www\.deezer)\.com\/(track|album|playlist)\/[A-Z0-9a-z]{3,}")
 ARL_HELP = """**Oops, Time to Help Yourself**
 [Here Help Yourself](https://www.google.com/search?q=how+to+get+deezer+arl+token)
 
@@ -23,22 +23,21 @@ After getting Arl token Config `ARL_TOKEN` var in heroku"""
     'description': "Download Songs/Albums/Playlists via "
                    "Spotify or Deezer Links. "
                    "\n<b>NOTE:</b> Music Quality is optional",
-    'flags': {'-sdl': "Download via Spotify Link",
-              '-ddl': "Download via Deezers Link",
-              '-dsong': "Download a Song by passing Artist Name and Song Name",
+    'flags': {'-dsong': "Download a Song by passing Artist Name and Song Name",
               '-zip': "Get a zip archive for Albums/Playlist Download"},
     'options': "Available Sound Quality: <code>FLAC | MP3_320 | MP3_256 | MP3_128</code>",
     'usage': "{tr}deezload [flag] [link | quality (default MP3_320)]",
-    'examples': "{tr}deezload -ddl https://www.deezer.com/track/142750222 \n"
-                "{tr}deezload -ddl https://www.deezer.com/track/3824710 FLAC \n"
-                "{tr}deezload -ddl https://www.deezer.com/album/1240787 FLAC \n"
-                "{tr}deezload -ddl -zip https://www.deezer.com/album/1240787 \n"
+    'examples': "{tr}deezload https://www.deezer.com/track/142750222 \n"
+                "{tr}deezload https://www.deezer.com/track/3824710 FLAC \n"
+                "{tr}deezload https://www.deezer.com/album/1240787 FLAC \n"
+                "{tr}deezload -zip https://www.deezer.com/album/1240787 \n"
                 "{tr}deezload -dsong Ed Sheeran-Shape of You"})
 async def deezload(message: Message):
+    cmd = str(message.text)[0]
     if not os.path.exists(TEMP_PATH):
         os.makedirs(TEMP_PATH)
     if not message.flags:
-        await message.edit("Hello🙂, This Plugin requires a proper flag to be passed.")
+        await message.edit(f"Hello🙂, This Plugin requires a proper flag to be passed. Check `{cmd}help deezload`.")
         return
     await message.edit("Checking your Token.")
     if ARL_TOKEN is None:
@@ -71,10 +70,10 @@ async def deezload(message: Message):
             else:
                 await message.edit("Invalid Syntax Detected. 🙂")
                 return
-        if not re.search(rex, input_link):
+        if not REX.search(input_link):
             await message.edit("As per my Blek Mejik Regex, this link is not supported.")
             return
-    elif '-dsong' in flags:
+    else:
         try:
             artist, song, quality = input_.split('-')
         except ValueError:
@@ -84,24 +83,6 @@ async def deezload(message: Message):
             else:
                 await message.edit("🙂K!!")
                 return
-    try:
-        if '-sdl' in flags:
-            if 'track/' in input_link:
-                await proper_trackdl(input_link, quality, message, loader, TEMP_PATH)
-            elif 'album/' or 'playlist/' in input_link:
-                await batch_dl(input_link, quality, message, loader, TEMP_PATH, to_zip)
-        elif '-ddl' in flags:
-            if 'track/' in input_link:
-                await proper_trackdl(input_link, quality, message, loader, TEMP_PATH)
-            elif 'album/' or 'playlist/' in input_link:
-                await batch_dl(input_link, quality, message, loader, TEMP_PATH, to_zip)
-    except NoDataApi as nd:
-        await message.edit("No Data is available for input link")
-        await Clogger.log(f"#ERROR\n\n{nd}")
-    except Exception as e_r:
-        await Clogger.log(f"#ERROR\n\n{e_r}")
-
-    if '-dsong' in flags:
         await message.edit(f"Searching Results for {song}")
         try:
             track = await pool.run_in_thread(loader.download_name)(
@@ -118,6 +99,20 @@ async def deezload(message: Message):
         except Exception as e_r:
             await message.edit("Song not Found 🚫")
             await Clogger.log(f"#ERROR\n\n{e_r}")
+        await message.delete()
+        shutil.rmtree(TEMP_PATH, ignore_errors=True)
+        return
+
+    try:
+        if 'track/' in input_link:
+            await proper_trackdl(input_link, quality, message, loader, TEMP_PATH)
+        elif 'album/' or 'playlist/' in input_link:
+            await batch_dl(input_link, quality, message, loader, TEMP_PATH, to_zip)
+    except NoDataApi as nd:
+        await message.edit("No Data is available for input link")
+        await Clogger.log(f"#ERROR\n\n{nd}")
+    except Exception as e_r:
+        await Clogger.log(f"#ERROR\n\n{e_r}")
 
     await message.delete()
     shutil.rmtree(TEMP_PATH, ignore_errors=True)
