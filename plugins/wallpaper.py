@@ -25,9 +25,7 @@ async def wall_(msg: Message):
     if os.path.exists("wallpapers/"):
         shutil.rmtree("wallpapers/", ignore_errors=True)
 
-    limit = int(msg.flags.get('-l', 5))
-    if limit > 10:
-        limit = 10
+    limit = min(int(msg.flags.get('-l', 8)), 10)
 
     if msg.filtered_input_str:
         qu = msg.filtered_input_str
