@@ -28,8 +28,10 @@ async def zippyshare(message: Message):
 
 
 _REGEX_LINK = r'https://www(\d{1,3}).zippyshare.com/v/(\w{8})/file.html'
-_REGEX_RESULT = (r'var a = (\d+);[\s\S]+document.getElementById\(\'dlbutton\'\).href'
-                 r' = "/d/\w{8}/.+/(.*)";')
+_REGEX_RESULT = (
+    r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" '
+    r'\+ \((\d+) % (\d+) \+ (\d+) % (\d+)\) \+ "\/(.+)";'
+)
 _HEADERS = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                           "AppleWebKit/537.36 (KHTML, like Gecko) Chrome"
                           "/75.0.3770.100 Safari/537.36"}
@@ -49,6 +51,11 @@ def _generate_zippylink(url):
         match = re.search(_REGEX_RESULT, res.text)
         if not match:
             raise ValueError("Invalid Response!")
-        val, name = int(match.group(1)), match.group(2)
-        d_l = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server, id_, val**3+3, name)
+        val_1 = int(match.group(1))
+        val_2 = int(match.group(2))
+        val_3 = int(match.group(3))
+        val_4 = int(match.group(4))
+        val = val_1 % val_2 + val_3 % val_4
+        name = match.group(5)
+        d_l = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server, id_, val, name)
     return d_l, name
