@@ -14,7 +14,7 @@ async def torr_search(message: Message):
     await message.edit("`Searching for available Torrents!`")
     query = message.input_or_reply_str
     r = requests.get(
-        "https://sjprojectsapi.herokuapp.com/torrent/?query=" + query)
+        "https://api.sumanjay.cf/torrent/?query=" + query)
     try:
         torrents = r.json()
         reply_ = ""
