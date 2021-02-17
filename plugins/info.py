@@ -55,8 +55,8 @@ async def info(msg: Message):
                 user_info += "\n**SpamWatch Banned** : `False`\n"
             else:
                 user_info += "\n**SpamWatch Banned** : `True`\n"
-                user_info += f"**\t\t•Reason** : `{status.reason or None}`\n"
-                user_info += f"**\t\t•Message** : `{status.message or None}`\n"
+                user_info += f"    **● Reason** : `{status.reason or None}`\n"
+                user_info += f"    **● Message** : `{status.message or None}`\n"
         else:
             user_info += "\n**SpamWatch Banned** : `to get this Info, set var`\n"
 
@@ -68,24 +68,24 @@ async def info(msg: Message):
 
         if iv['success'] and iv['results']['attributes']['is_blacklisted'] is True:
             reason = iv['results']['attributes']['blacklist_reason']
-            user_info += "**Intellivoid SpamProtection** : `False`\n"
-            user_info += f"**\t\t•Reason** : `{reason}`\n"
+            user_info += "**Intellivoid SpamProtection** : `True`\n"
+            user_info += f"    **● Reason** : `{reason}`\n"
         else:
             user_info += "**Intellivoid SpamProtection** : `False`\n"
         if cas_banned['ok']:
             reason = cas_banned['result']['messages'][0] or None
             user_info += "**AntiSpam Banned** : `True`\n"
-            user_info += f"**\t\t•Reason** : `{reason}`\n"
+            user_info += f"    **● Reason** : `{reason}`\n"
         else:
             user_info += "**AntiSpam Banned** : `False`\n"
         if user_gmuted:
             user_info += "**User GMuted** : `True`\n"
-            user_info += f"**\t\t•Reason** : `{user_gmuted['reason'] or None}`\n"
+            user_info += f"    **● Reason** : `{user_gmuted['reason'] or None}`\n"
         else:
             user_info += "**User GMuted** : `False`\n"
         if user_gbanned:
             user_info += "**User GBanned** : `True`\n"
-            user_info += f"**\t\t•Reason** : `{user_gbanned['reason'] or None}`"
+            user_info += f"    **● Reason** : `{user_gbanned['reason'] or None}`"
         else:
             user_info += "**User Gbanned** : `False`"
         await msg.edit_or_send_as_file(text=user_info, disable_web_page_preview=True)
