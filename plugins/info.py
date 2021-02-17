@@ -64,7 +64,7 @@ async def info(msg: Message):
         async with aiohttp.ClientSession() as ses:
             async with ses.get(
                 f"https://api.intellivoid.net/spamprotection/v1/lookup?query={user_id}"
-            ):
+            ) as i_v:
                 iv = json.loads(await i_v.text)
             async with ses.get(f'https://api.cas.chat/check?user_id={user.id}') as c_s:
                 cas_banned = json.loads(await c_s.text)
