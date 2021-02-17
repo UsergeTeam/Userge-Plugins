@@ -84,7 +84,7 @@ async def magisk(message: Message):
 
                 releases += (
                     f"**{name}**:\n"
-                    f"°[ ZIP - v{data['magisk']['version']}]({data['magisk']['link']})\n"
+                    f"°**[ ZIP - v{data['magisk']['version']}]({data['magisk']['link']})**\n"
                     f"° **[APK v{data['app']['version']}]({data['app']['link']})**\n"
                     f"° **[Uninstaller]({data['uninstaller']['link']})**\n\n"
                 )
