@@ -3,7 +3,8 @@
 # By @Krishna_Singhal
 
 import spamwatch
-import requests
+import aiohttp
+import json
 from datetime import datetime
 
 from userge import userge, Config, Message, get_collection
@@ -60,9 +61,13 @@ async def info(msg: Message):
         else:
             user_info += "\n**SpamWatch Banned** : `to get this Info, set var`\n"
 
-        iv = requests.get(
-            "https://api.intellivoid.net/spamprotection/v1/lookup?query=" + str(user_id)).json()
-        cas_banned = requests.get(f'https://api.cas.chat/check?user_id={user.id}').json()
+        async with aiohttp.ClientSession() as ses:
+            async with ses.get(
+                f"https://api.intellivoid.net/spamprotection/v1/lookup?query={user_id}"
+            ):
+                iv = json.loads(await i_v.text)
+            async with ses.get(f'https://api.cas.chat/check?user_id={user.id}') as c_s:
+                cas_banned = json.loads(await c_s.text)
         user_gbanned = await GBAN_USER_BASE.find_one({'user_id': user.id})
         user_gmuted = await GMUTE_USER_BASE.find_one({'user_id': user.id})
 
