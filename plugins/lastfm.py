@@ -77,7 +77,7 @@ async def _lastfm(msg: Message):
         if NOW_PLAYING[1] != track.get_name():
             NOW_PLAYING[1] = track.get_name()
 
-        out = f"{msg.from_user.mention} __is currently Listening to:__\n\n"
+        out = f"{USERNAME} __is currently Listening to:__\n\n"
         k = get_track_info(track)
         if not k:
             return await msg.err("Track Not found...")
@@ -213,7 +213,7 @@ async def lastfm_worker():
         if NOW_PLAYING[1] != song.get_name():
             NOW_PLAYING[1] = song.get_name()
             for chat_id in CHAT_IDS:
-                out = f"{msg.from_user.mention} __is currently Listening to:__\n\n"
+                out = f"{USERNAME} __is currently Listening to:__\n\n"
                 k = get_track_info(song)
                 if not k:
                     NOW_PLAYING[0] = False
