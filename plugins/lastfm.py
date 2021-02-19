@@ -203,11 +203,11 @@ async def lastfm_worker():
     global NOW_PLAYING  # pylint: disable=global-statement
 
     user = pylast.LastFMNetwork(
-               api_key=API_KEY,
-               api_secret=API_SECRET,
-               username=USERNAME,
-               password_hash=PASSWORD
-           ).get_user(USERNAME)
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        username=USERNAME,
+        password_hash=PASSWORD
+    ).get_user(USERNAME)
     while NOW_PLAYING[0] is True and await _get_now_playing(user) is not None:
         song = await _get_now_playing(user)
         if NOW_PLAYING[1] != song.get_name():
@@ -228,7 +228,7 @@ async def lastfm_worker():
                         await userge.send_message(
                             chat_id, out, disable_web_page_preview=True
                         )
-    NOW_PLAYING[0] == False  # Should not update to DB ig ?
+    NOW_PLAYING[0] = False  # Should not update to DB ig ?
 
 
 #########################################################################
@@ -243,9 +243,9 @@ def _check_creds() -> bool:
 
 def get_track_info(track: pylast.Track) -> Optional[str]:
     try:
-        duration = time_formatter(int(track.get_duration())/1000)
+        duration = time_formatter(int(track.get_duration()) / 1000)
         _tags = track.get_tags()
-        tags = " ".join([f'`{i}`' for i in _tags]) if len(_tags) > 0 else f'`None`'
+        tags = " ".join([f'`{i}`' for i in _tags]) if len(_tags) > 0 else '`None`'
         out = f'''__LastFm's__ [{track.get_correction()}]({unquote(track.get_url())})
 
 __Duration:__ `{duration if duration else None}`
@@ -371,7 +371,7 @@ class LastFm:
             out += get_tracks
             await self.msg.edit(out)
         except pylast.WSError as e:
-            await self.msg.edit("**Soemthing went worng**\n\n`{str(e)}`")
+            await self.msg.edit(f"**Soemthing went worng**\n\n`{str(e)}`")
 
 
 ##########################################################################
