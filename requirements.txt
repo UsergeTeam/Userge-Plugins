@@ -13,6 +13,7 @@ justwatch
 lottie
 newspaper3k
 pydub
+pylast
 pyfiglet
 qrcode
 spotdl
