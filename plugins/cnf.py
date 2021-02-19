@@ -57,7 +57,7 @@ async def cnf(message: Message):
         soup = BeautifulSoup(page.content, "lxml", from_encoding="utf-8")
 
         # heading
-        payload = f"[**{cmd}**]({base_url + cmd})\n"
+        payload = f"**[{cmd}]({base_url + cmd})**\n"
         # description
         payload += f"{soup.find('p', attrs = {'class':'my-0'}).text.strip()}\n\n"
 
