@@ -71,7 +71,7 @@ async def _lastfm(msg: Message):
         )
         await msg.edit("`Auto updates Stopped.`")
     else:
-        track = await LastFm(msg)._now_playing()
+        track = await LastFm(msg).now_playing()
         if not track:
             return await msg.edit("`Currently you are not listening to any Song...`")
         if NOW_PLAYING[1] != track.get_name():
@@ -92,9 +92,9 @@ async def get_user(msg: Message):
     """ get last.fm user """
     await msg.edit("`checking user...`")
     if msg.input_str:
-        user = LastFm(msg)._get_user(msg.input_str)
+        user = LastFm(msg).get_user(msg.input_str)
     else:
-        user = LastFm(msg)._get_user()
+        user = LastFm(msg).get_user()
 
     out = f'''
 __Name:__ [{user.get_name()}]({unquote(user.get_url())})
@@ -142,7 +142,7 @@ __Country:__ `{user.get_country()}`
     'usage': "{tr}lovesong (if listening any song)\n{tr}lovesong Artist - Title"})
 async def love_track(msg: Message):
     """ love any last.fm song """
-    await LastFm(msg)._love()
+    await LastFm(msg).love()
 
 
 @check_creds
@@ -154,7 +154,7 @@ async def love_track(msg: Message):
     'usage': "{tr}unlove (if listening any song)\n{tr}unlove Artist - Title"})
 async def unlove_track(msg: Message):
     """ remove loved song from loved list """
-    await LastFm(msg)._rmlove()
+    await LastFm(msg).rmlove()
 
 
 @check_creds
@@ -163,7 +163,7 @@ async def unlove_track(msg: Message):
     'usage': "{tr}getloved\n{tr}getloved 20"})
 async def get_loved(msg: Message):
     """ get list of loved song """
-    await LastFm(msg)._get_loved()
+    await LastFm(msg).get_loved()
 
 
 @check_creds
@@ -173,7 +173,7 @@ async def get_loved(msg: Message):
 async def get_track(msg: Message):
     """ get pylast.Track info """
     await msg.edit('`getting info...`')
-    track = await LastFm(msg)._get_track()
+    track = await LastFm(msg).get_track()
     if not track:
         return await msg.edit("Please see `.help getrack`")
     out = get_track_info(track)
@@ -195,7 +195,7 @@ async def get_track(msg: Message):
 )
 async def get_last_played(msg: Message):
     """ get list of played song of any user """
-    await LastFm(msg)._get_last_played()
+    await LastFm(msg).get_last_played()
 
 
 @userge.add_task
@@ -273,7 +273,7 @@ class LastFm:
     def __init__(self, msg: Message) -> None:
         self.msg = msg
 
-    def _network(self) -> pylast.LastFMNetwork:
+    def _network() -> pylast.LastFMNetwork:
         return pylast.LastFMNetwork(
             api_key=API_KEY,
             api_secret=API_SECRET,
@@ -281,19 +281,19 @@ class LastFm:
             password_hash=PASSWORD
         )
 
-    def _format_track(track: pylast.Track) -> str:
+    def _format_track(self, track: pylast.Track) -> str:
         return f"`{track.track} - {track.playback_date}`"
 
-    def _get_user(self, username: str = USERNAME) -> pylast.User:
+    def get_user(self, username: str = USERNAME) -> pylast.User:
         return (self._network()).get_user(username)
 
-    async def _now_playing(self, username: str = USERNAME) -> Optional[pylast.Track]:
-        user = self._get_user(username)
+    async def now_playing(self, username: str = USERNAME) -> Optional[pylast.Track]:
+        user = self.get_user(username)
         playing = await _get_now_playing(user)
         return playing
 
-    async def _love(self) -> None:
-        track = await self._get_track()
+    async def love(self) -> None:
+        track = await self.get_track()
         if not track:
             return await self.msg.err("Sorry, track not found.")
         await self.msg.edit("`Loving this Track.`")
@@ -305,8 +305,8 @@ class LastFm:
         except Exception as err:
             await self.msg.err(str(err))
 
-    async def _rmlove(self) -> None:
-        track = await self._get_track()
+    async def rmlove(self) -> None:
+        track = await self.get_track()
         if not track:
             return await self.msg.err("Sorry, track not found.")
         await self.msg.edit("`UnLoving this Track.`")
@@ -318,12 +318,12 @@ class LastFm:
         except Exception as err:
             await self.msg.err(str(err))
 
-    async def _get_loved(self) -> None:
+    async def get_loved(self) -> None:
         await self.msg.edit("`Getting your loved tracks...`")
         limit = 20
         if self.msg.input_str and self.msg.input_str.is_numeric():
             limit = int(self.msg.input_str)
-        tracks = (self._get_user()).get_loved_tracks(limit=limit)
+        tracks = (self.get_user()).get_loved_tracks(limit=limit)
         out = ""
         for i, track in enumerate(tracks, start=1):
             out += f"`{i}.` `{str(track[0])}` 💕\n"
@@ -331,14 +331,14 @@ class LastFm:
             return await self.msg.edit(out)
         await self.msg.err("No loved tracks found.")
 
-    async def _get_track(self) -> Optional[pylast.Track]:
+    async def get_track(self) -> Optional[pylast.Track]:
         if self.msg.input_str and '-' in self.msg.input_str:
             artist, title = self.msg.input_str.split('-', maxsplit=1)
             artist = artist.strip()
             title = title.strip()
             track = pylast.Track(artist, title, self._network())
         else:
-            track = await self._now_playing()
+            track = await self.now_playing()
         if not track:
             return None
         return track
@@ -356,13 +356,13 @@ class LastFm:
             return None
         return out
 
-    async def _get_last_played(self) -> None:
+    async def get_last_played(self) -> None:
         await self.msg.edit("`getting tracks...`")
         limit = self.msg.flags.get('-l', 10)
         if self.msg.filtered_input_str:
-            user = self._get_user(self.msg.filtered_input_str)
+            user = self.get_user(self.msg.filtered_input_str)
         else:
-            user = self._get_user()
+            user = self.get_user()
         out = f"Last played tracks of {user.get_name}:\n"
         try:
             get_tracks = self._get_tracks(user, limit)
