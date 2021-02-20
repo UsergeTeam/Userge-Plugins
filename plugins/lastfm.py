@@ -273,6 +273,7 @@ class LastFm:
     def __init__(self, msg: Message) -> None:
         self.msg = msg
 
+    @staticmethod
     def _network() -> pylast.LastFMNetwork:
         return pylast.LastFMNetwork(
             api_key=API_KEY,
@@ -281,7 +282,8 @@ class LastFm:
             password_hash=PASSWORD
         )
 
-    def _format_track(self, track: pylast.Track) -> str:
+    @staticmethod
+    def _format_track(track: pylast.Track) -> str:
         return f"`{track.track} - {track.playback_date}`"
 
     def get_user(self, username: str = USERNAME) -> pylast.User:
