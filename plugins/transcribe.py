@@ -39,6 +39,7 @@ class WitAiAPI:
         823b1423832b7117ad41c83abb3e25d58dd9e789/src/audiotools/
         speech.py#L13
         """
+        text = ""
         error = ""
         headers = {
             'authorization': f'Bearer {self.api_keys[lang]}',
