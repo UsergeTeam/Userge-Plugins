@@ -104,7 +104,7 @@ async def deezload(message: Message):
     try:
         if 'track/' in input_link:
             await proper_trackdl(input_link, quality, message, loader, TEMP_PATH)
-        elif ('album/' or 'playlist/') in input_link:
+        else:
             await batch_dl(input_link, quality, message, loader, TEMP_PATH, to_zip)
     except NoDataApi as nd:
         await message.edit("No Data is available for input link")
