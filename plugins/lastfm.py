@@ -364,12 +364,12 @@ class LastFm:
 
     async def get_last_played(self) -> None:
         await self.msg.edit("`getting tracks...`")
-        limit = self.msg.flags.get('-l', 10)
+        limit = int(self.msg.flags.get('-l', 10))
         if self.msg.filtered_input_str:
             user = self.get_user(self.msg.filtered_input_str)
         else:
             user = self.get_user()
-        out = f"Last played tracks of {user.get_name}:\n"
+        out = f"Last played tracks of {user.get_name()}:\n"
         try:
             get_tracks = self._get_tracks(user, limit)
             if not get_tracks:
