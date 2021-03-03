@@ -81,7 +81,7 @@ async def _lastfm(msg: Message):
         k = get_track_info(track)
         if not k:
             return await msg.err("Track Not found...")
-        await msg.edit(out, disable_web_page_preview=True)
+        await msg.edit(out + k, disable_web_page_preview=True)
 
 
 @check_creds
@@ -228,6 +228,10 @@ async def lastfm_worker():
                         await userge.send_message(
                             chat_id, out, disable_web_page_preview=True
                         )
+                else:
+                    await userge.send_message(
+                        chat_id, out, disable_web_page_preview=True
+                    )
     NOW_PLAYING[0] = False  # Should not update to DB ig ?
 
 
