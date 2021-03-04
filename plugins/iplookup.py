@@ -34,7 +34,7 @@ async def _ip_look_up(message: Message):
     region = values['region']
     city = values['city']
     localisation = f"{values['lat']}, {values['lon']}"
-    gmap_lock = f"https://www.google.fr/maps?q={localisation}"
+    gmap_lock = f"https://www.google.fr/maps?q={localisation}".replace(" ", "")
 
     await message.edit(
         text=(f"Here details of `{message.input_str}`\n\n"
