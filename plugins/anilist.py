@@ -568,7 +568,7 @@ async def trace_bek(message: Message):
         dls_loc = img_loc
     if dls_loc:
         tracemoe = tracemoepy.async_trace.Async_Trace()
-        search = await tracemoe.search(dls_loc, upload_file=True)
+        search = await tracemoe.search(dls_loc, encode=True)
         os.remove(dls_loc)
         result = search['docs'][0]
         caption = (f"**Title**: **{result['title_english']}**\n"
