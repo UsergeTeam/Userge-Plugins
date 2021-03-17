@@ -57,7 +57,7 @@ def _generate_zippylink(url):
         if not match:
             raise ValueError("Invalid Response!")
         val_1 = int(match.group(1))
-        val_2 = math.floor(val_1/3)
+        val_2 = math.floor(val_1 / 3)
         val_3 = int(match.group(2))
         val = val_1 + val_2 % val_3
         name = match.group(3)
