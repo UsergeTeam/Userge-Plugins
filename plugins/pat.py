@@ -22,11 +22,6 @@ async def pat(message: Message):
         await message.edit("**Bruh** ~`Reply to a message or provide username`", del_in=3)
         return
 
-    resp = requests.get("http://headp.at/js/pats.json")
-    pats = resp.json()
-    _pat = BASE_URL.format(parse.quote(choice(pats)))
-    with open(PAT_IMAGE, 'wb') as f:
-        f.write(requests.get(_pat).content)
     if "-g" in message.flags:
         async with aiohttp.ClientSession() as session:
             r = "https://nekos.life/api/pat"
@@ -36,6 +31,11 @@ async def pat(message: Message):
                 await message.client.send_animation(
                     message.chat.id, animation=link, reply_to_message_id=reply_id)
     else:
+        resp = requests.get("http://headp.at/js/pats.json")
+        pats = resp.json()
+        _pat = BASE_URL.format(parse.quote(choice(pats)))
+        with open(PAT_IMAGE, 'wb') as f:
+            f.write(requests.get(_pat).content)
         if username:
             await message.reply_photo(
                 photo=PAT_IMAGE, caption=username, reply_to_message_id=message.message_id)
