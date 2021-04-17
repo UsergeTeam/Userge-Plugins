@@ -24,9 +24,9 @@ async def pat(message: Message):
 
     resp = requests.get("http://headp.at/js/pats.json")
     pats = resp.json()
-    pat = BASE_URL.format(parse.quote(choice(pats)))
+    _pat = BASE_URL.format(parse.quote(choice(pats)))
     with open(PAT_IMAGE, 'wb') as f:
-        f.write(requests.get(pat).content)
+        f.write(requests.get(_pat).content)
     if "-g" in message.flags:
         async with aiohttp.ClientSession() as session:
             r = "https://nekos.life/api/pat"
