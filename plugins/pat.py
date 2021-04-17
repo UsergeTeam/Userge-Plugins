@@ -19,13 +19,14 @@ async def pat(message: Message):
     kwargs = {"reply_to_message_id": reply_id, "caption": username}
 
     if "-g" in message.flags:
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://nekos.life/api/pat") as request:
-                result = await request.json()
-                link = result.get("url")
-                await message.client.send_animation(
-                    message.chat.id, animation=link, **kwargs
-                )
+        async with aiohttp.ClientSession() as session, session.get(
+            "https://nekos.life/api/pat"
+        ) as request:
+            result = await request.json()
+            link = result.get("url")
+            await message.client.send_animation(
+                message.chat.id, animation=link, **kwargs
+            )
     else:
         async with aiohttp.ClientSession() as session:
             chi_c = await session.get("https://headp.at/js/pats.json")
