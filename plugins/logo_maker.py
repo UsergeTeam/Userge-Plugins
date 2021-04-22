@@ -6,9 +6,7 @@ import os
 import random
 import requests
 from bs4 import BeautifulSoup
-from pyrogram import filters
 from userge import userge, Message, Config
-
 
 def download_images(images):
     count = 0
@@ -27,7 +25,6 @@ def download_images(images):
                         try:
                             image_link = image["src"]
                         except:
-
                             pass
             try:
                 r = requests.get(image_link).content
@@ -53,21 +50,21 @@ def main_logo(type_text, type_keyword):
   'header': "Get a logo from brandcrowd",
   'usage': "{tr}logo text:keyword"})
 async def jv_logo_maker(message: Message):
-  jv_text = message.input_str
-  await message.edit("Please wait...")
-  if ':' not in jv_text:
-    type_keyword = "name"
-    type_text = jv_text
-  else:
-    jv = jv_text.split(":", 1)
-    type_keyword = jv[1]
-    type_text = jv[0]
-  main_logo(type_text, type_keyword)
-  logo_path = f"{Config.DOWN_PATH}/logo.jpg"
-  await message.client.send_photo(message.chat.id, logo_path)
-  await message.delete()
-  try:
-    os.remove(logo_path)
-  except:
-    pass
+    jv_text = message.input_str
+    await message.edit("Please wait...")
+    if ':' not in jv_text:
+        type_keyword = "name"
+        type_text = jv_text
+    else:
+        jv = jv_text.split(":", 1)
+        type_keyword = jv[1]
+        type_text = jv[0]
+    main_logo(type_text, type_keyword)
+    logo_path = f"{Config.DOWN_PATH}/logo.jpg"
+    await message.client.send_photo(message.chat.id, logo_path)
+    await message.delete()
+    try:
+        os.remove(logo_path)
+    except:
+        pass
     
