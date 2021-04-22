@@ -1,7 +1,6 @@
 # © JigarVarma2005
 # Logo maker using brandcrowd.com
 # Moded from @JVToolsBot by @UniversalBotsUpdate
-
 import os
 import random
 import requests
@@ -37,7 +36,6 @@ def download_images(images):
             except:
                 pass
 
-
 def main_logo(type_text, type_keyword):
     url = f"https://www.brandcrowd.com/maker/logos?text={type_text}&searchtext={type_keyword}&searchService="
     r = requests.get(url)
@@ -67,4 +65,3 @@ async def jv_logo_maker(message: Message):
         os.remove(logo_path)
     except:
         pass
-    
