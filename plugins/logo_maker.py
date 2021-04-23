@@ -42,7 +42,8 @@ async def jv_logo_maker(message: Message):
 
 def main_logo(type_text, type_keyword):
 
-    url = f"https://www.brandcrowd.com/maker/logos?text={type_text}&searchtext={type_keyword}&searchService="
+    url = "https://www.brandcrowd.com/maker/logos?" \
+          f"text={type_text}&searchtext={type_keyword}&searchService="
     r = requests.get(url)
     soup = BeautifulSoup(r.text, "html.parser")
     images = soup.findAll("img")
