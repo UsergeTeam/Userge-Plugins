@@ -32,7 +32,8 @@ async def logo_maker(text: str, keyword: str = "name"):
     img_tags = [(i.find("img"), i.find("a")) for i in embed]
     logos = []
     for img in img_tags:
-        if src := img[0].get("src"):
+        src = img[0].get("src")
+        if src:
             logos.append(
                 (src, getattr(img[1], 'get', {}.get)("href", ""))
             )
@@ -50,7 +51,7 @@ async def download(uri: str, file_name: str):
             if not chunk:
                 return file_name
             await file.write(chunk)
-        
+
 
 async def dispatch(message: Message, logos: List[Tuple[str]]):
     """ dispatch logos to chat """
