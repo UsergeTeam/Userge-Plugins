@@ -3,90 +3,120 @@
 # Moded from @JVToolsBot by @UniversalBotsUpdate
 
 import os
-import requests
+from typing import List, Tuple
+
+import aiohttp
+import aiofiles
 from bs4 import BeautifulSoup
-from userge import userge, Message, Config
+
+from pyrogram.types import InputMediaPhoto
+
+from userge import userge, Message
+
+LOG = userge.getLogger(__name__)
+STATUS = {}
+URI = "https://www.brandcrowd.com/maker/logos"
+HEADERS = {"User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) '
+                         'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37'
+                         '.0.2062.124 Safari/537.36'}
+
+
+async def logo_maker(text: str, keyword: str = "name"):
+    """ fetch logos from website """
+    async with aiohttp.ClientSession(headers=HEADERS) as session:
+        resp = await session.get(
+            URI, params={'text': text, 'SearchText': keyword}
+        )
+        soup = BeautifulSoup(await resp.text(), "lxml")
+    embed = soup.findAll("div", {'class': "responsive-embed"})
+    img_tags = [(i.find("img"), i.find("a")) for i in embed]
+    logos = []
+    for img in img_tags:
+        if src := img[0].get("src"):
+            logos.append(
+                (src, getattr(img[1], 'get', {}.get)("href", ""))
+            )
+    return logos
+
+
+async def download(uri: str, file_name: str):
+    """ download a uri """
+    async with \
+            aiofiles.open(file_name, "wb+") as file, \
+            aiohttp.ClientSession(headers=HEADERS) as session, \
+            session.get(uri) as response:
+        while 1:
+            chunk = await response.content.read(512)
+            if not chunk:
+                return file_name
+            await file.write(chunk)
+        
+
+async def dispatch(message: Message, logos: List[Tuple[str]]):
+    """ dispatch logos to chat """
+    group: List[InputMediaPhoto] = []
+    paths: List[str] = []
+    src: str = "Source: <a href='https://www.brandcrowd.com{}'>Here</a>"
+    count: int = 1
+    file_name: str = "logo_{}.jpg"
+    status = await message.edit("`Beginning To Dispatch Content...`")
+    batch = 1
+    for logo in logos:
+        direct, source = logo
+        try:
+            loc = await download(direct, file_name.format(count))
+            paths.append(loc)
+            group.append(InputMediaPhoto(loc, caption=src.format(source)))
+            if len(group) == 10:
+                try:
+                    await status.edit(f"`Uploading Batch {batch}...`")
+                    await message.reply_media_group(group)
+                except Exception as pyro:
+                    LOG.exception(pyro)
+                batch += 1
+                group.clear()
+            count += 1
+        except Exception as e:
+            LOG.exception(e)
+
+    if len(group) >= 2:
+        await status.edit(f"`Uploading Batch {batch}`")
+        await message.reply_media_group(group)
+    elif len(group) == 1:
+        await message.reply_photo(group[0].media, caption=group[0].caption)
+    STATUS[""] = False
+    for path in paths:
+        if os.path.lexists(path):
+            os.remove(path)
+    await status.delete()
 
 
 @userge.on_cmd("logo", about={
     'header': "Get a logo from brandcrowd",
-    'usage': "{tr}logo text:keyword"})
+    'usage': "{tr}logo text:keyword",
+    'examples': [
+        "{tr}logo Userge", "{tr}logo Userge:bot"
+    ]
+})
 async def jv_logo_maker(message: Message):
-
+    """ make logos """
+    if STATUS.get("", False):
+        return await message.err("Let the current process be completed!!")
+    STATUS[""] = True
     jv_text = message.input_str
+    if not jv_text:
+        return await message.err("Input Required!!")
     await message.edit("Please wait...")
 
-    if ':' not in jv_text:
+    type_keyword = "name"
+    type_text = jv_text
+    if ':' in jv_text:
+        type_text, type_keyword = jv_text.split(":", 1)
 
-        type_keyword = "name"
-        type_text = jv_text
-
-    else:
-
-        jv = jv_text.split(":", 1)
-        type_keyword = jv[1]
-        type_text = jv[0]
-
-    images = main_logo(type_text, type_keyword)
-    image_list = download_images(images)
-
-    if not image_list:
-        return await message.err("Images not Found!")
-
-    for i in image_list:
-        if os.path.exists(i):
-            await message.client.send_photo(message.chat.id, i)
-            os.remove(i)
-    await message.delete()
-
-
-def main_logo(type_text, type_keyword):
-
-    url = f"https://www.brandcrowd.com/maker/logos?text={type_text}&searchtext={type_keyword}"
-    r = requests.get(url)
-    soup = BeautifulSoup(r.text, "html.parser")
-    images = soup.findAll("img")
-    return images
-
-
-def download_images(images):
-
-    image_link = None
-    return_list = []
-
-    if len(images) > 0:
-
-        for i, image in enumerate(images):
-
-            if image.get("data-srcset"):
-                image_link = image.get("data-srcset")
-
-            elif image.get("data-src"):
-                image_link = image["data-src"]
-
-            elif image.get("data-fallback-src"):
-                image_link = image.get("data-fallback-src")
-
-            elif image.get("src"):
-                image_link = image.get("src")
-
-            if not image_link:
-                return None
-
-            try:
-                r = requests.get(image_link).content
-
-                try:
-                    r = str(r, "utf-8")
-                except UnicodeDecodeError:
-                    with open(f"{Config.DOWN_PATH}/logo_{i}.jpg", "wb+") as f:
-                        f.write(r)
-
-                return_list.append(f"{Config.DOWN_PATH}/logo_{i}.jpg")
-
-            except Exception:
-                pass
-
-        return return_list
-
-    return None
+    try:
+        logos = await logo_maker(type_text, type_keyword)
+    except Exception as e:
+        LOG.exception(e)
+        await message.err("No Logos for Ya 😒😒😏")
+        return
+    await dispatch(message, logos)
