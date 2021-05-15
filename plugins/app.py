@@ -47,8 +47,6 @@ async def app(message: Message):
         await message.err(err)
 
 
-# Android user may need this
-# Credits : Telegram-Paperplane & UserindoBot Team
 @userge.on_cmd(
     'magisk',
     about={
@@ -62,11 +60,11 @@ async def magisk(message: Message):
     magisk_raw_uri = "https://raw.githubusercontent.com/topjohnwu/magisk-files/master/"
     releases = "**Latest Magisk Releases:**\n"
     async with aiohttp.ClientSession() as session:
-        for type, branch in magisk_branch.items():
+        for _type, branch in magisk_branch.items():
             async with session.get(magisk_raw_uri + branch + ".json") as res:
                 data = await res.json(content_type="text/plain")
                 releases += (
-                    f'**× {type}:** `{data["magisk"]["version"]}-{data["magisk"]["versionCode"]}`|'
+                    f'**× {_type}:** `{data["magisk"]["version"]}-{data["magisk"]["versionCode"]}`|'
                     f'[Notes]({data["magisk"]["note"]})|'
                     f'[Magisk]({data["magisk"]["link"]})|\n'
                 )
