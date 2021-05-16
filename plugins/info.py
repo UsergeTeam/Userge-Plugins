@@ -66,7 +66,10 @@ async def info(msg: Message):
             async with ses.get(
                 f"https://api.intellivoid.net/spamprotection/v1/lookup?query={user_id}"
             ) as i_v:
-                iv = json.loads(await i_v.text())
+                try:
+                    iv = json.loads(await i_v.text())
+                except json.decoder.JSONDecodeError:
+                    iv = {'success': False, 'api_500': "API Dead"}
             async with ses.get(f'https://api.cas.chat/check?user_id={user.id}') as c_s:
                 cas_banned = json.loads(await c_s.text())
         user_gbanned = await GBAN_USER_BASE.find_one({'user_id': user.id})
@@ -77,7 +80,7 @@ async def info(msg: Message):
             user_info += "**Intellivoid SpamProtection** : `True`\n"
             user_info += f"    **● Reason** : `{reason}`\n"
         else:
-            user_info += "**Intellivoid SpamProtection** : `False`\n"
+            user_info += f"**Intellivoid SpamProtection** : `{iv.get('api_500', 'False')}`\n"
         if cas_banned['ok']:
             reason = cas_banned['result']['messages'][0] or None
             user_info += "**AntiSpam Banned** : `True`\n"
