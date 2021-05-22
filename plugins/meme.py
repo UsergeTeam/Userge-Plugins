@@ -64,15 +64,15 @@ async def meme_(message: Message):
                 "this cmd not for you, If you want to use, Unblock **@MemeAutobot**",
                 del_in=5)
             return
-        await conv.send_message(message.input_str)
-        response = await conv.get_response(mark_read=True)
-        if "Okay..." not in response.text:
-            await message.err("Bot is Down, try to restart Bot !...")
-            return
         if should_forward:
             await conv.forward_message(replied)
         else:
             await userge.send_photo(chat, meme_file)
+        response = await conv.get_response(mark_read=True)
+        if "Okay..." not in response.text:
+            await message.err("Bot is Down, try to restart Bot !...")
+            return
+        await conv.send_message(message.input_str)
         response = await conv.get_response(mark_read=True)
         if response.sticker:
             await response.copy(message.chat.id, reply_to_message_id=replied.message_id)
