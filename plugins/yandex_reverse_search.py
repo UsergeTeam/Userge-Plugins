@@ -50,7 +50,7 @@ async def labstack(message: Message):
                       'AppleWebKit/537.36 (KHTML, like Gecko) '
                       'Chrome/83.0.4103.97 Safari/537.36'
     }
-    r = _post(
+    r = await _post(
         url="https://up.labstack.com/api/v1/links",
         json=data,
         headers=headers
@@ -60,7 +60,7 @@ async def labstack(message: Message):
         'files': (filename, open(dl_loc, 'rb')),
     }
     send_url = "https://up.labstack.com/api/v1/links/{}/send".format(r['code'])
-    response = _post(url=send_url, headers=headers, files=files)
+    response = await _post(url=send_url, headers=headers, files=files)
     if (response.status_code) == 200:
         link = (
             "https://yandex.com/images/search?rpt=imageview&url="
