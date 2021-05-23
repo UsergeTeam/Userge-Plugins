@@ -71,7 +71,7 @@ async def labstack(message: Message):
 
 
 @pool.run_in_thread
-def _post(link: str, headers: dict, json: dict = {}, files: dict = {}):
+def _post(url: str, headers: dict, json: dict = {}, files: dict = {}):
     args = {'url': url, 'headers': headers}
     if files:
         args['files'] = files
