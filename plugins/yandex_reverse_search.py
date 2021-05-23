@@ -8,7 +8,7 @@ import random
 
 import requests
 
-from userge import userge, Config, Message
+from userge import userge, Config, Message, pool
 from userge.utils import progress
 
 
@@ -49,14 +49,17 @@ async def labstack(message: Message):
                       'AppleWebKit/537.36 (KHTML, like Gecko) '
                       'Chrome/83.0.4103.97 Safari/537.36'
     }
-    r = requests.post(
-        "https://up.labstack.com/api/v1/links", json=data, headers=headers).json()
+    r = _post(
+        url="https://up.labstack.com/api/v1/links",
+        json=data,
+        headers=headers
+    ).json()
 
     files = {
         'files': (filename, open(dl_loc, 'rb')),
     }
     send_url = "https://up.labstack.com/api/v1/links/{}/send".format(r['code'])
-    response = requests.post(send_url, headers=headers, files=files)
+    response = _post(url=send_url, headers=headers, files=files)
     if (response.status_code) == 200:
         link = (
             "https://yandex.com/images/search?rpt=imageview&url="
@@ -65,3 +68,14 @@ async def labstack(message: Message):
         await message.edit(f"**Yandex Search Link**: {link}")
     else:
         await message.edit("Request Failed!", del_in=5)
+
+
+@pool.run_in_thread
+def _post(link: str, headers: dict, json: dict = {}, files: dict = {}):
+    args = {'url': url, 'headers': headers}
+    if files:
+        args['files'] = files
+    elif json:
+        args['json'] = json
+
+    return requests.post(**args)
