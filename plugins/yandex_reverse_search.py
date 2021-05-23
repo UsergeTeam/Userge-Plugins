@@ -50,11 +50,11 @@ async def labstack(message: Message):
                       'AppleWebKit/537.36 (KHTML, like Gecko) '
                       'Chrome/83.0.4103.97 Safari/537.36'
     }
-    r = await _post(
+    r = (await _post(
         url="https://up.labstack.com/api/v1/links",
         json=data,
         headers=headers
-    ).json()
+    )).json()
 
     files = {
         'files': (filename, open(dl_loc, 'rb')),
