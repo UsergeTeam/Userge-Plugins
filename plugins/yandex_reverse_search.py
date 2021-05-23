@@ -5,6 +5,7 @@
 import os
 import string
 import random
+from typing import Dict
 
 import requests
 
@@ -71,7 +72,12 @@ async def labstack(message: Message):
 
 
 @pool.run_in_thread
-def _post(url: str, headers: dict, json: dict = {}, files: dict = {}):
+def _post(
+    url: str,
+    headers: dict,
+    json: Dict[str, str] = None,
+    files: Dict[str, str] = None
+):
     args = {'url': url, 'headers': headers}
     if files:
         args['files'] = files
