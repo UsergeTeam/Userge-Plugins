@@ -60,7 +60,7 @@ async def info(msg: Message):
             except InvalidApiToken:
                 LOG.error("Your Userge AntiSpam Api is Invalid!")
                 respnse = {"success": False}
-            if respnse["success"]:
+            if not respnse["success"]:
                 user_info += "\n**Userge Antispam API Banned** : `False`\n"
             else:
                 user_info += "\n**Userge Antispam API Banned** : `True`\n"
