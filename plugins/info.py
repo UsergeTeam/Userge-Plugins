@@ -56,7 +56,7 @@ async def info(msg: Message):
     if user:
         if Config.USERGE_ANTISPAM_API:
             try:
-                respnse = Client(Config.USERGE_ANTISPAM_API).get_ban(user.id)
+                respnse = Client(Config.USERGE_ANTISPAM_API).getban(user.id)
             except InvalidApiToken:
                 LOG.error("Your Userge AntiSpam Api is Invalid!")
                 respnse = {"success": False}
