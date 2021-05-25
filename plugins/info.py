@@ -81,7 +81,7 @@ async def info(msg: Message):
         async with aiohttp.ClientSession() as ses, ses.get(
             f'https://api.cas.chat/check?user_id={user.id}'
         ) as c_s:
-                cas_banned = json.loads(await c_s.text())
+            cas_banned = json.loads(await c_s.text())
         user_gbanned = await GBAN_USER_BASE.find_one({'user_id': user.id})
         user_gmuted = await GMUTE_USER_BASE.find_one({'user_id': user.id})
 
