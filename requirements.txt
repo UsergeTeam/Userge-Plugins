@@ -19,3 +19,4 @@ pyfiglet
 qrcode
 tracemoepy
 validators
+UsergeAntiSpamApi

@@ -7,11 +7,14 @@ from datetime import datetime
 
 import aiohttp
 import spamwatch
+from UsergeAntiSpamApi import Client
+from UsergeAntiSpamApi.errors import InvalidApiToken
 
 from userge import userge, Config, Message, get_collection
 
 GBAN_USER_BASE = get_collection("GBAN_USER")
 GMUTE_USER_BASE = get_collection("GMUTE_USER")
+LOG = userge.getLogger(__name__)
 
 
 @userge.on_cmd("info", about={
@@ -51,6 +54,19 @@ async def info(msg: Message):
   - **Contact**: `{user.is_contact}`
         """
     if user:
+        if Config.USERGE_ANTISPAM_API:
+            try:
+                respnse = Client(Config.USERGE_ANTISPAM_API).get_ban(user.id)
+            except InvalidApiToken:
+                LOG.error("Your Userge AntiSpam Api is Invalid!")
+                respnse = {"success": False}
+            if respnse["success"]:
+                user_info += "\n**Userge Antispam API Banned** : `False`\n"
+            else:
+                user_info += "\n**Userge Antispam API Banned** : `True`\n"
+                user_info += f"    **● Reason** : `{respnse['reason'] or None}`\n"
+        else:
+            user_info += "\n**SpamWatch Banned** : `to get this Info, set var`\n"
         if Config.SPAM_WATCH_API:
             status = spamwatch.Client(Config.SPAM_WATCH_API).get_ban(user.id)
             if status is False:
@@ -62,25 +78,13 @@ async def info(msg: Message):
         else:
             user_info += "\n**SpamWatch Banned** : `to get this Info, set var`\n"
 
-        async with aiohttp.ClientSession() as ses:
-            async with ses.get(
-                f"https://api.intellivoid.net/spamprotection/v1/lookup?query={user_id}"
-            ) as i_v:
-                try:
-                    iv = json.loads(await i_v.text())
-                except json.decoder.JSONDecodeError:
-                    iv = {'success': False, 'api_500': "API Dead"}
-            async with ses.get(f'https://api.cas.chat/check?user_id={user.id}') as c_s:
+        async with aiohttp.ClientSession() as ses, ses.get(
+            f'https://api.cas.chat/check?user_id={user.id}'
+        ) as c_s:
                 cas_banned = json.loads(await c_s.text())
         user_gbanned = await GBAN_USER_BASE.find_one({'user_id': user.id})
         user_gmuted = await GMUTE_USER_BASE.find_one({'user_id': user.id})
 
-        if iv['success'] and iv['results']['attributes']['is_blacklisted'] is True:
-            reason = iv['results']['attributes']['blacklist_reason']
-            user_info += "**Intellivoid SpamProtection** : `True`\n"
-            user_info += f"    **● Reason** : `{reason}`\n"
-        else:
-            user_info += f"**Intellivoid SpamProtection** : `{iv.get('api_500', 'False')}`\n"
         if cas_banned['ok']:
             reason = cas_banned['result']['messages'][0] or None
             user_info += "**AntiSpam Banned** : `True`\n"
