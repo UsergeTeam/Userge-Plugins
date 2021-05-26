@@ -8,7 +8,6 @@ from datetime import datetime
 import aiohttp
 import spamwatch
 from UsergeAntiSpamApi import Client
-from UsergeAntiSpamApi.errors import InvalidApiToken
 
 from userge import userge, Config, Message, get_collection
 
@@ -56,17 +55,14 @@ async def info(msg: Message):
     if user:
         if Config.USERGE_ANTISPAM_API:
             try:
-                respnse = Client(Config.USERGE_ANTISPAM_API).getban(user.id)
-            except InvalidApiToken:
-                LOG.error("Your Userge AntiSpam Api is Invalid!")
-                respnse = {"success": False}
-            if not respnse["success"]:
-                user_info += "\n**Userge Antispam API Banned** : `False`\n"
+                ban = Client(Config.USERGE_ANTISPAM_API).getban(user.id)
+            except Exception as err:
+                return await msg.err(err)
+            if not ban:
+                user_info += "\n**Userge Antispam API Banned** : `False`"
             else:
-                user_info += "\n**Userge Antispam API Banned** : `True`\n"
-                user_info += f"    **● Reason** : `{respnse['reason'] or None}`\n"
-        else:
-            user_info += "\n**SpamWatch Banned** : `to get this Info, set var`\n"
+                user_info += "\n**Userge Antispam API Banned** : `True`"
+                user_info += f"|n    **● Reason** : `{ban.reason or None}`"
         if Config.SPAM_WATCH_API:
             status = spamwatch.Client(Config.SPAM_WATCH_API).get_ban(user.id)
             if status is False:
@@ -75,8 +71,6 @@ async def info(msg: Message):
                 user_info += "\n**SpamWatch Banned** : `True`\n"
                 user_info += f"    **● Reason** : `{status.reason or None}`\n"
                 user_info += f"    **● Message** : `{status.message or None}`\n"
-        else:
-            user_info += "\n**SpamWatch Banned** : `to get this Info, set var`\n"
 
         async with aiohttp.ClientSession() as ses, ses.get(
             f'https://api.cas.chat/check?user_id={user.id}'
