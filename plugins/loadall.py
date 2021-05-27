@@ -11,6 +11,22 @@ _CHANNEL = userge.getCLogger(__name__)
 _LOG = logging.getLogger(__name__)
 
 
+async def _init():
+    if not PLUGINS_CHAT_ID:
+        return
+    message = await userge.send_message(PLUGINS_CHAT_ID, "Loading All Plugin(s)...")
+    success, total, p_error = await load_all_plugins()
+    if success:
+        if success == total:
+            await message.edit('`Loaded all Plugin(s)`')
+        else:
+            await message.edit(p_error)
+            await _CHANNEL.log(f'`{success} Plugin(s) loaded from {total}`')
+    else:
+        await message.edit(p_error)
+        await _CHANNEL.log(f'`0 Plugin(s) loaded from {total}`')
+
+
 @userge.on_cmd(
     'loadall', about={
         'header': "load all plugins from plugins Channel.",
@@ -22,10 +38,24 @@ async def loadall(msg: Message) -> None:
         await msg.edit("Add `PLUGINS_CHAT_ID` var to Load Plugins from Plugins Channel")
         return
     await msg.edit("`Loading All Plugin(s)...`")
+    success, total, p_error = await load_all_plugins()
+    if success:
+        if success == total:
+            await msg.edit('`Loaded all Plugin(s)`')
+        else:
+            await msg.edit(
+                f'`{success} Plugin(s) loaded from {total}`\n__see log channel for more info__')
+            await _CHANNEL.log(p_error)
+    else:
+        await msg.edit(f'`0 Plugin(s) loaded from {total}`\n__see log channel for more info__')
+        await _CHANNEL.log(p_error)
+
+
+async def load_all_plugins():
     success = 0
     total = 0
     p_error = ''
-    async for _file in msg.client.search_messages(
+    async for _file in userge.search_messages(
         PLUGINS_CHAT_ID, filter="document"
     ):
         total += 1
@@ -47,13 +77,4 @@ async def loadall(msg: Message) -> None:
             else:
                 success += 1
                 _LOG.info(f"Loaded {plugin}")
-    if success:
-        if success == total:
-            await msg.edit('`Loaded all Plugin(s)`')
-        else:
-            await msg.edit(
-                f'`{success} Plugin(s) loaded from {total}`\n__see log channel for more info__')
-            await _CHANNEL.log(p_error)
-    else:
-        await msg.edit(f'`0 Plugin(s) loaded from {total}`\n__see log channel for more info__')
-        await _CHANNEL.log(p_error)
+    return (success, total, p_error)
