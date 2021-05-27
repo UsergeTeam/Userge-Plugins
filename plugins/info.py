@@ -51,7 +51,7 @@ async def info(msg: Message):
   - **Last Online**: `{last_online(user)}`
   - **Common Groups**: `{len(common_chats)}`
   - **Contact**: `{user.is_contact}`
-        """
+"""
     if user:
         if Config.USERGE_ANTISPAM_API:
             try:
@@ -62,7 +62,7 @@ async def info(msg: Message):
                 user_info += "\n**Userge Antispam API Banned** : `False`"
             else:
                 user_info += "\n**Userge Antispam API Banned** : `True`"
-                user_info += f"|n    **● Reason** : `{ban.reason or None}`"
+                user_info += f"\n    **● Reason** : `{ban.reason or None}`"
         if Config.SPAM_WATCH_API:
             status = spamwatch.Client(Config.SPAM_WATCH_API).get_ban(user.id)
             if status is False:
