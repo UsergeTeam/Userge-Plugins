@@ -11,22 +11,6 @@ _CHANNEL = userge.getCLogger(__name__)
 _LOG = logging.getLogger(__name__)
 
 
-async def _init():
-    if not PLUGINS_CHAT_ID:
-        return
-    message = await userge.send_message(PLUGINS_CHAT_ID, "Loading All Plugin(s)...")
-    success, total, p_error = await load_all_plugins()
-    if success:
-        if success == total:
-            await message.edit('`Loaded all Plugin(s)`')
-        else:
-            await message.edit(p_error)
-            await _CHANNEL.log(f'`{success} Plugin(s) loaded from {total}`')
-    else:
-        await message.edit(p_error)
-        await _CHANNEL.log(f'`0 Plugin(s) loaded from {total}`')
-
-
 @userge.on_cmd(
     'loadall', about={
         'header': "load all plugins from plugins Channel.",
