@@ -1,7 +1,7 @@
 cairosvg
 coffeehouse
 colour
-deezloader
+git+https://github.com/TomyPrs/deezloader
 emoji-country-flag
 gdshortener
 git+https://github.com/Phyco-Ninja/spotify-downloader
