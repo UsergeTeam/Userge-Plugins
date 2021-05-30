@@ -166,7 +166,6 @@ def get_credits_text(soup):
                     writer.append(name.text.strip())
                 if credit_name == "Stars":
                     actor.append(name.text.strip())
-    director = writers = actors = ""
     if direc:
         if len(direc) > 1:
             director = ', '.join(direc)
@@ -187,7 +186,7 @@ def get_credits_text(soup):
         else:
             actors = actor[0]
     else:
-        director = "No Actor Found!"
+        actors = "No Actor Found!"
     return director, writers, actors
 
 
