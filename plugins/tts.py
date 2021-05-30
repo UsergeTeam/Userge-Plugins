@@ -9,19 +9,29 @@ from userge import userge, Message
 
 @userge.on_cmd("tts", about={
     'header': "Text To Speech",
-    'examples': "{tr}tts en|Userge"})
+    'examples': [
+        "{tr}tts Userge", "{tr}tts en | Userge", "{tr}tts [reply to message]"
+    ]
+})
 async def text_to_speech(message: Message):
     req_file_name = "gtts.mp3"
-    inp_text = message.input_str
-    if ("|" not in inp_text) or not inp_text:
-        await message.edit("Pathetic")
-        return
-    await message.edit("Processing.")
+    replied = message.reply_to_message
     def_lang = "en"
-    def_lang, text = inp_text.split("|")
+    if replied and replied.text:
+        text = replied.text
+        if message.input_str:
+            def_lang = message.input_str
+    elif message.input_str:
+        if '|' in message.input_str:
+            def_lang, text = message.input_str.split("|", maxsplit=1)
+        else:
+            text = message.input_str
+    else:
+        return await message.err("Input not found!")
+    await message.edit("Processing.")
     try:
         await message.edit("Processing..")
-        speeched = gTTS(text, lang=def_lang.strip())
+        speeched = gTTS(text.strip(), lang=def_lang.strip())
         speeched.save(req_file_name)
         await message.edit("Processing...")
         meta = XMan(CPR(req_file_name))
