@@ -76,7 +76,9 @@ async def imdb(message: Message):
         await message.edit("__downloading thumb ...__")
         image = await get_image(image_link)
         if image:
-            img_path = await pool.run_in_thread(wget.download)(image, os.path.join(Config.DOWN_PATH, 'imdb_thumb.jpg'))
+            img_path = await pool.run_in_thread(
+                wget.download
+            )(image, os.path.join(Config.DOWN_PATH, 'imdb_thumb.jpg'))
             if len(des_) > 1024:
                 des_ = des_[:1021] + "..."
             await message.client.send_photo(
@@ -93,7 +95,7 @@ async def imdb(message: Message):
             await message.edit(des_, parse_mode="HTML")
     else:
         if len(des_) > 1024:
-                des_ = des_[:1021] + "..."
+            des_ = des_[:1021] + "..."
         await message.edit(des_, parse_mode="HTML")
 
 
@@ -123,10 +125,14 @@ def get_countries_and_languages(soup):
             detail_header = li.span.text if li.span else None
             print(detail_header)
             if detail_header == "Country of origin":
-                for ct in li.findAll('a', attrs={"class": "ipc-metadata-list-item__list-content-item"}):
+                for ct in li.findAll(
+                    'a', attrs={"class": "ipc-metadata-list-item__list-content-item"}
+                ):
                     countries.append(ct.text.strip())
             elif detail_header == "Languages":
-                for lg in li.findAll('a', attrs={"class": "ipc-metadata-list-item__list-content-item"}):
+                for lg in li.findAll(
+                    'a', attrs={"class": "ipc-metadata-list-item__list-content-item"}
+                ):
                     languages.append(lg.text.strip())
     if languages:
         if len(languages) > 1:
@@ -185,12 +191,14 @@ def get_credits_text(soup):
 
 
 async def get_image(image_link: str):
-    image_content = await _get("https://imdb.com" + image_link.get("href").replace("/?ref_=tt_ov_i", ""))
+    image_content = await _get(
+        "https://imdb.com" + image_link.get("href").replace("/?ref_=tt_ov_i", "")
+    )
     soup = bs4.BeautifulSoup(image_content.content, 'lxml')
 
     for i in soup.findAll("img"):
-      if "portraitimage" in i.attrs['class'][0].lower():
-        return i.get("src")
+        if "portraitimage" in i.attrs['class'][0].lower():
+            return i.get("src")
     return None
 
 
