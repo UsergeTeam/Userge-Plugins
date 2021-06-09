@@ -1,6 +1,7 @@
 """ Mentions alerter Plugin """
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.erros import PeerIdInvalid
 from userge import userge, Message, Config, filters, get_collection
 
 SAVED_SETTINGS = get_collection("CONFIGS")
