@@ -21,7 +21,10 @@ async def _init():
 async def toggle_mentions(msg: Message):
     """ toggle mentions """
     global TOGGLE  # pylint: disable=global-statement
-    TOGGLE = False if TOGGLE else True
+    if TOGGLE:
+        TOGGLE = False
+    else:
+        TOGGLE = True
     await SAVED_SETTINGS.update_one(
         {"_id": "MENTION_TOGGLE"}, {"$set": {"data": TOGGLE}}, upsert=True
     )
@@ -30,7 +33,7 @@ async def toggle_mentions(msg: Message):
 
 @userge.on_filters(
     ~filters.me & ~filters.bot & ~filters.edited & ~filters.service
-    & (filters.mentioned | filters.private), allow_via_bot=False)
+    & (filters.mentioned | filters.private), group=1, allow_via_bot=False)
 async def handle_mentions(msg: Message):
 
     if TOGGLE is False:
@@ -45,8 +48,9 @@ async def handle_mentions(msg: Message):
     else:
         link = msg.link
         text = f"{msg.from_user.mention} 💻 tagged you in **{msg.chat.title}.**"
+    text += f"\n\n[Message]({link}):" if not userge.has_bot else "\n\n**Message:**"
     if msg.text:
-        text += f"\n\n**Message:**\n`{msg.text}`"
+        text += f"\n`{msg.text}`"
 
     button = InlineKeyboardButton(text="📃 Message Link", url=link)
 
