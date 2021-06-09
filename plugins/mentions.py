@@ -65,7 +65,7 @@ async def handle_mentions(msg: Message):
         )
     except PeerIdInvalid:
         if userge.dual_mode:
-            await userge.send_message("/start")
+            await userge.send_message(userge.id, "/start")
             await client.send_message(
                 chat_id=userge.id if userge.has_bot else Config.LOG_CHANNEL_ID,
                 text=text,
