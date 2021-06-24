@@ -1,13 +1,14 @@
-import re
+import json
 import os
-
-import bs4
-import wget
 import requests
 
 from userge import userge, Message, Config, pool
 
 THUMB_PATH = Config.DOWN_PATH + "imdb_thumb.jpg"
+# ask in @UserGeSpam to get API URLs
+# Please don't steal this code.
+API_ONE_URL = os.environ.get("IMDB_API_ONE_URL")
+API_TWO_URL = os.environ.get("IMDB_API_TWO_URL")
 
 
 @userge.on_cmd("imdb", about={
@@ -20,31 +21,21 @@ async def imdb(message: Message):
     try:
         movie_name = message.input_str
         await message.edit(f"__searching IMDB for__ : `{movie_name}`")
-        final_name = movie_name.replace(' ', '+')
-        page = await _get(
-            f"https://www.imdb.com/find?ref_=nv_sr_fn&q={final_name}&s=all")
-        soup = bs4.BeautifulSoup(page.content, 'lxml')
-        odds = soup.findAll("tr", "odd")
-        mov_title = odds[0].findNext('td').findNext('td').text
-        mov_link = "http://www.imdb.com/" + odds[0].findNext('td').findNext('td').a['href']
-        page1 = await _get(mov_link)
-        soup = bs4.BeautifulSoup(page1.content, 'lxml')
-        image_link = soup.find('a', attrs={"class": "ipc-lockup-overlay ipc-focusable"})
-        mov_details = get_movie_details(soup)
-        director, writer, stars = get_credits_text(soup)
-        story = soup.find('div', attrs={"class": "ipc-html-content ipc-html-content--base"})
-        if story:
-            story_line = story.findAll('div')[0].text
-        else:
-            story_line = 'Not available'
-        mov_country, mov_language = get_countries_and_languages(soup)
-        pg = soup.find('div', attrs={"data-testid": "hero-title-block__aggregate-rating__score"})
-        if pg:
-            rating = [i.text for i in pg]
-            voted_users = pg.findNext('div').findNext('div').text
-            mov_rating = f"{rating[0]}{rating[1]} based on {voted_users} users ratings."
-        else:
-            mov_rating = 'Not available'
+        final_name = movie_name.replace(' ', '_')
+        search_results = await _get(API_ONE_URL.format(the=final_name[0], userge=final_name))
+        srch_results = json.loads(search_results)
+        first_movie = srch_results.get("d")[0]
+        mov_title = first_movie.get("l")
+        mov_imdb_id = first_movie.get("id")
+        mov_link = f"https://www.imdb.com/title/{mov_imdb_id}"
+        page2 = await _get(API_TWO_URL.format(userge_imdb_id=mov_imdb_id))
+        second_page_response = json.loads(page2)
+        image_link = first_movie.get("i").get("imageUrl")
+        mov_details = get_movie_details(second_page_response)
+        director, writer, stars = get_credits_text(second_page_response)
+        story_line = second_page_response.get("summary").get("plot", 'Not available')
+        mov_country, mov_language = get_countries_and_languages(second_page_response)
+        mov_rating = second_page_response.get("rating")
         des_ = f"""<b>Title🎬: </b><code>{mov_title}</code>
 
 <b>More Info: </b><code>{mov_details}</code>
@@ -101,105 +92,67 @@ async def imdb(message: Message):
 
 def get_movie_details(soup):
     mov_details = []
-    inline = soup.find('ul', attrs={"class": "ipc-inline-list"})
-    if inline:
-        inline = soup.find('ul', attrs={"class": "ipc-inline-list"})
-        if ["titleblockmetadata" in a.lower() for a in inline.attrs['class']]:
-            for i in inline.findAll('li'):
-                mov_details.append(i.span.text.strip() if i.span else i.text.strip())
-    tags = soup.find('div', attrs={"class": "ipc-chip-list"})
+    
+    inline = soup.get("Genres")
+    if inline and len(inline) > 0:
+        for io in inline:
+            mov_details.append(f"#{io}")
+    tags = soup.get("duration")
     if tags:
-        for i in tags.findAll('a'):
-            mov_details.append(i.text.strip())
+        mov_details.append(tags)
     if mov_details:
         return ' | '.join(mov_details)
     return ''
 
 
 def get_countries_and_languages(soup):
-    languages = []
-    countries = []
-    pg = soup.find('div', attrs={"data-testid": "title-details-section"})
-    if pg:
-        for li in pg.findNext('ul'):
-            detail_header = li.span.text if li.span else None
-            print(detail_header)
-            if detail_header == "Country of origin":
-                for ct in li.findAll(
-                    'a', attrs={"class": "ipc-metadata-list-item__list-content-item"}
-                ):
-                    countries.append(ct.text.strip())
-            elif detail_header == "Languages":
-                for lg in li.findAll(
-                    'a', attrs={"class": "ipc-metadata-list-item__list-content-item"}
-                ):
-                    languages.append(lg.text.strip())
+    languages = soup.get("Language")
+    countries = soup.get("CountryOfOrigin")
+    lg_text = ""
     if languages:
         if len(languages) > 1:
-            lg_text = ', '.join(languages)
+            lg_text = ', '.join([lng["NAME"] for lng in languages])
         else:
-            lg_text = languages[0]
+            lg_text = languages[0]["NAME"]
     else:
         lg_text = "No Languages Found!"
     if countries:
         if len(countries) > 1:
-            ct_text = ', '.join(countries)
+            ct_text = ', '.join([cnt["NAME"] for cnt in countries])
         else:
-            ct_text = countries[0]
+            ct_text = countries[0]["NAME"]
     else:
         ct_text = "No Writer Found!"
     return ct_text, lg_text
 
 
 def get_credits_text(soup):
-    direc = []
-    writer = []
-    actor = []
-    pg = soup.find('ul', attrs={"class": "ipc-metadata-list"})
-    if pg:
-        for data in pg:
-            credit_name = data.span.text if data.span else data.a.text
-            for name in data.findAll('a', {"class": "ipc-metadata-list-item__list-content-item"}):
-                if credit_name == "Director":
-                    direc.append(name.text.strip())
-                if credit_name == "Writers":
-                    writer.append(name.text.strip())
-                if credit_name == "Stars":
-                    actor.append(name.text.strip())
+    pg = soup.get("sum_mary")
+    direc = pg.get("Director")
+    writer = pg.get("Writers")
+    actor = pg.get("Stars")
     if direc:
         if len(direc) > 1:
-            director = ', '.join(direc)
+            director = ', '.join([x["NAME"] for x in direc])
         else:
-            director = direc[0]
+            director = direc[0]["NAME"]
     else:
         director = "No Director Found!"
     if writer:
         if len(writer) > 1:
-            writers = ', '.join(writer)
+            writers = ', '.join([x["NAME"] for x in writer])
         else:
-            writers = writer[0]
+            writers = writer[0]["NAME"]
     else:
         writers = "No Writer Found!"
     if actor:
         if len(actor) > 1:
-            actors = ', '.join(actor)
+            actors = ', '.join([x["NAME"] for x in actor])
         else:
-            actors = actor[0]
+            actors = actor[0]["NAME"]
     else:
         actors = "No Actor Found!"
     return director, writers, actors
-
-
-async def get_image(image_link: str):
-    image_content = await _get(
-        "https://imdb.com" + image_link.get("href").replace("/?ref_=tt_ov_i", "")
-    )
-    soup = bs4.BeautifulSoup(image_content.content, 'lxml')
-
-    for i in soup.findAll("img"):
-        if "portraitimage" in i.attrs['class'][0].lower():
-            return i.get("src")
-    return None
 
 
 @pool.run_in_thread
