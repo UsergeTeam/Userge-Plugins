@@ -1,6 +1,7 @@
 import json
 import os
 import requests
+import wget
 
 from userge import userge, Message, Config, pool
 
@@ -65,7 +66,7 @@ async def imdb(message: Message):
         await message.delete()
     elif image_link is not None:
         await message.edit("__downloading thumb ...__")
-        image = await get_image(image_link)
+        image = image_link
         if image:
             img_path = await pool.run_in_thread(
                 wget.download
@@ -92,7 +93,6 @@ async def imdb(message: Message):
 
 def get_movie_details(soup):
     mov_details = []
-    
     inline = soup.get("Genres")
     if inline and len(inline) > 0:
         for io in inline:
