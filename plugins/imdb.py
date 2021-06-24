@@ -22,7 +22,7 @@ async def imdb(message: Message):
     try:
         movie_name = message.input_str
         await message.edit(f"__searching IMDB for__ : `{movie_name}`")
-        search_results = await _get(API_ONE_URL.format(theuserge=moviename))
+        search_results = await _get(API_ONE_URL.format(theuserge=movie_name))
         srch_results = json.loads(search_results.text)
         first_movie = srch_results.get("d")[0]
         mov_title = first_movie.get("l")
@@ -162,4 +162,3 @@ def _get(url: str, attempts: int = 0) -> requests.Response:
     if abc.status_code != 200:
         return await _get(url, attempts + 1)
     return abc
-
