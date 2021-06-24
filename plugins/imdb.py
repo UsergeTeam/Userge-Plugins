@@ -22,15 +22,14 @@ async def imdb(message: Message):
     try:
         movie_name = message.input_str
         await message.edit(f"__searching IMDB for__ : `{movie_name}`")
-        final_name = movie_name.replace(' ', '_')
-        search_results = await _get(API_ONE_URL.format(the=final_name[0], userge=final_name))
-        srch_results = json.loads(search_results)
+        search_results = await _get(API_ONE_URL.format(theuserge=moviename))
+        srch_results = json.loads(search_results.text)
         first_movie = srch_results.get("d")[0]
         mov_title = first_movie.get("l")
         mov_imdb_id = first_movie.get("id")
         mov_link = f"https://www.imdb.com/title/{mov_imdb_id}"
-        page2 = await _get(API_TWO_URL.format(userge_imdb_id=mov_imdb_id))
-        second_page_response = json.loads(page2)
+        page2 = await _get(API_TWO_URL.format(imdbttid=mov_imdb_id))
+        second_page_response = json.loads(page2.text)
         image_link = first_movie.get("i").get("imageUrl")
         mov_details = get_movie_details(second_page_response)
         director, writer, stars = get_credits_text(second_page_response)
@@ -156,5 +155,11 @@ def get_credits_text(soup):
 
 
 @pool.run_in_thread
-def _get(url: str) -> requests.Response:
-    return requests.get(url)
+def _get(url: str, attempts: int = 0) -> requests.Response:
+    abc = requests.get(url)
+    if attempts > 5:
+        return abc
+    if abc.status_code != 200:
+        return await _get(url, attempts + 1)
+    return abc
+
