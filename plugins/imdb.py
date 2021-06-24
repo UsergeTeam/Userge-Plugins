@@ -95,7 +95,7 @@ def get_movie_details(soup):
     inline = soup.get("Genres")
     if inline and len(inline) > 0:
         for io in inline:
-            mov_details.append(f"#{io}")
+            mov_details.append(io.replace('#', ''))
     tags = soup.get("duration")
     if tags:
         mov_details.append(tags)
@@ -116,18 +116,17 @@ def get_countries_and_languages(soup):
     else:
         lg_text = "No Languages Found!"
     if countries:
-        if len(countries) > 1:
-            ct_text = ', '.join([cnt["NAME"] for cnt in countries])
-        else:
-            ct_text = countries[0]["NAME"]
+        ct_text = countries["NAME"]
     else:
-        ct_text = "No Writer Found!"
+        ct_text = "No Country Found!"
     return ct_text, lg_text
 
 
 def get_credits_text(soup):
     pg = soup.get("sum_mary")
-    direc = pg.get("Director")
+    direc = pg.get("Directors")
+    if not direc:
+        direc = pg.get("Director")
     writer = pg.get("Writers")
     actor = pg.get("Stars")
     if direc:
@@ -158,7 +157,7 @@ def get_credits_text(soup):
 def _get(url: str, attempts: int = 0) -> requests.Response:
     abc = requests.get(url)
     if attempts > 5:
-        return abc
+        raise IndexError
     if abc.status_code != 200:
         return _get(url, attempts + 1)
     return abc
