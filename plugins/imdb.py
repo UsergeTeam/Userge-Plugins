@@ -160,5 +160,5 @@ def _get(url: str, attempts: int = 0) -> requests.Response:
     if attempts > 5:
         return abc
     if abc.status_code != 200:
-        return await _get(url, attempts + 1)
+        return _get(url, attempts + 1)
     return abc
