@@ -35,7 +35,7 @@ async def imdb(message: Message):
         director, writer, stars = get_credits_text(second_page_response)
         story_line = second_page_response.get("summary").get("plot", 'Not available')
         mov_country, mov_language = get_countries_and_languages(second_page_response)
-        mov_rating = second_page_response.get("rating")
+        mov_rating = second_page_response.get("UserRating").get("description")
         des_ = f"""<b>Title🎬: </b><code>{mov_title}</code>
 
 <b>More Info: </b><code>{mov_details}</code>
