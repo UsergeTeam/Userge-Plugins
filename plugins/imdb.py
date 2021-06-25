@@ -157,10 +157,12 @@ def get_credits_text(soup):
 
 
 @pool.run_in_thread
-def _get(url: str, attempts: int = 0) -> requests.Response:
-    abc = requests.get(url)
-    if attempts > 5:
-        raise IndexError
-    if abc.status_code != 200:
-        return _get(url, attempts + 1)
+def _get(url: str, attempts = 0) -> requests.Response:
+    while True:
+        abc = requests.get(url)
+        if attempts > 5:
+            raise IndexError
+        if abc.status_code == 200:
+            break
+        attempts += 1
     return abc
