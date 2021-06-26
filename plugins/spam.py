@@ -35,6 +35,8 @@ async def spam(message: Message):
                 return
             await message.edit(f"Spamming {count} Time")
             for _ in range(count):
+                if message.process_is_canceled:
+                    return await message.edit("`Process Cancelled`")
                 await message.client.send_sticker(sticker=to_spam, chat_id=message.chat.id)
                 await asyncio.sleep(delay)
             await S_LOG.log(f"Spammed Sticker in Chat» {message.chat.title}, {count} times")
@@ -57,6 +59,8 @@ async def spam(message: Message):
                 return
             await message.edit(f"Spamming {count} times")
             for _ in range(count):
+                if message.process_is_canceled:
+                    return await message.edit("`Process Cancelled`")
                 await message.client.send_cached_media(message.chat.id, to_spam)
                 await asyncio.sleep(delay)
             await S_LOG.log(f"Spammed Media in Chat» {message.chat.title}, {count} times")
@@ -74,6 +78,8 @@ async def spam(message: Message):
             return
         await message.edit(f"Spamming {count} times")
         for _ in range(count):
+            if message.process_is_canceled:
+                return await message.edit("`Process Cancelled`")
             await message.client.send_message(text=replied.text, chat_id=message.chat.id)
             await asyncio.sleep(delay)
         await S_LOG.log(f"Spammed Text in Chat» {message.chat.title}, {count} times")
@@ -91,6 +97,8 @@ async def spam(message: Message):
             return
         await message.edit(f"Spamming {sc} times")
         for _ in range(sc):
+            if message.process_is_canceled:
+                return await message.edit("`Process Cancelled`")
             await message.client.send_message(text=spam_text, chat_id=message.chat.id)
             await asyncio.sleep(delay)
         await S_LOG.log(f"Spammed Text in Chat» {message.chat.title}, {sc} times")
