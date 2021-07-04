@@ -16,6 +16,7 @@ newspaper3k
 pydub
 pylast
 pyfiglet
+python-arq
 qrcode
 tracemoepy
 validators
