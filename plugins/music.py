@@ -31,6 +31,12 @@ LOGGER = userge.getLogger(__name__)
     },
 )
 async def music(message: Message):
+    if not ARQ_KEY:
+        return await message.err(
+            "Before using this command, "
+            "you have to set this [Environmental var.](https://t.me/UnofficialPluginsHelp/128)",
+            disable_web_page_preview=True
+        )
     query = message.input_str
     await message.edit(f"Searching for {query} in JioSaavn...")
     try:
