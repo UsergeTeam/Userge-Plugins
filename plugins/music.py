@@ -27,7 +27,7 @@ LOGGER = userge.getLogger(__name__)
     about={
         "header": "Search and Download Music",
         "description": "It Searches and Downloads Music from JioSaavn in HQ",
-        "examples": "{tr}Song name",
+        "examples": "{tr}music name",
     },
 )
 async def music(message: Message):
