@@ -5,7 +5,6 @@
 # Thanks to ARQ API
 
 import os
-from random import randint
 
 from aiohttp import ClientSession
 from Python_ARQ import ARQ
@@ -52,9 +51,9 @@ async def music(message: Message):
     duration = int(song.duration)
     caption_str = f"`{title}` by `{artist}`"
     pathh, _ = await url_download(message, url)
-    temp_name = f"{randint(10, 1000)}.mp3"
-    song_path = os.path.join(Config.DOWN_PATH, temp_name)
-    os.rename(pathh, song_path)
+    temp_name = f"{title}.mp3"
+    song_path = os.path.join(Config.DOWN_PATH, str(message.message_id), temp_name)
+    os.renames(pathh, song_path)
     await message.reply_audio(
         audio=song_path,
         caption=caption_str,
