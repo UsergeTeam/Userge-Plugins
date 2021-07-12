@@ -1,12 +1,11 @@
-""" Music , To Search and Download HQ Music From JioSaavn"""
+""" Music , To Search and Download HQ Music From JioSaavn And Deezer"""
 
 # Made By Devanagaraj
 
-# Refference https://github.com/Devanagaraj/Tg_Meowzik_Bot
+# Reference https://github.com/Devanagaraj/Tg_Meowzik_Bot
 # Thanks to ARQ API
 
 import os
-from random import randint
 
 from aiohttp import ClientSession
 from Python_ARQ import ARQ
@@ -28,7 +27,7 @@ LOGGER = userge.getLogger(__name__)
         "header": "Search and Download Music",
         "description": "It Searches and Downloads Music from JioSaavn in HQ",
         "examples": "{tr}Song name",
-    }
+    },
 )
 async def savn(message: Message):
     query = message.input_str
@@ -59,33 +58,32 @@ async def savn(message: Message):
     )
     await message.delete()
     os.remove(song_path)
-    
+
+
 @userge.on_cmd(
     "deezer",
     about={
-            "header": "Download from Deezer",
-            "options": {"-f": "Sends High Res Flac from Deezer"},
-            "examples": [
-                "{tr}deezer Song name",
-                "{tr}deezer -f Song name"
-                ]
-            }, del_pre=True
+        "header": "Download from Deezer",
+        "options": {"-f": "Sends High Res Flac from Deezer"},
+        "examples": ["{tr}deezer Song name", "{tr}deezer -f Song name"],
+    },
+    del_pre=True,
 )
 async def deeza(message: Message):
     if bool(message.flags):
         query = str(message.filtered_input_str)
         await message.edit(f"Searching for {query} in Deezer...")
         try:
-            res = await arq.deezer(query,1,9)
+            res = await arq.deezer(query, 1, 9)
         except Exception as e:
             return await message.err(str(e))
         if not res.ok:
-            return await message.edit("Found Nothing... Try again...") 
+            return await message.edit("Found Nothing... Try again...")
     else:
         query = message.input_str
         await message.edit(f"Searching for {query} in Deezer...")
         try:
-            res = await arq.deezer(query,1,3)
+            res = await arq.deezer(query, 1, 3)
         except Exception as e:
             return await message.err(str(e))
         if not res.ok:
