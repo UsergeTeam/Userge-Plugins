@@ -16,7 +16,7 @@ ARQ_KEY = os.environ.get("ARQ_KEY", None)
 
 # ARQ API
 session = ClientSession()
-arq = ARQ("https://thearq.tech", ARQ_KEY, session)
+arq = ARQ("https://thearq.tech", ARQ_KEY, session) if ARQ_KEY else None
 
 LOGGER = userge.getLogger(__name__)
 
@@ -26,10 +26,16 @@ LOGGER = userge.getLogger(__name__)
     about={
         "header": "Search and Download Music",
         "description": "It Searches and Downloads Music from JioSaavn in HQ",
-        "examples": "{tr}Song name",
+        "examples": "{tr}saavn name",
     },
 )
 async def savn(message: Message):
+    if not ARQ_KEY:
+        return await message.err(
+            "Before using this command, "
+            "you have to set this [Environmental var.](https://t.me/UnofficialPluginsHelp/128)",
+            disable_web_page_preview=True
+        )
     query = message.input_str
     await message.edit(f"Searching for {query} in JioSaavn...")
     try:
@@ -70,24 +76,20 @@ async def savn(message: Message):
     del_pre=True,
 )
 async def deeza(message: Message):
-    if bool(message.flags):
-        query = str(message.filtered_input_str)
-        await message.edit(f"Searching for {query} in Deezer...")
-        try:
-            res = await arq.deezer(query, 1, 9)
-        except Exception as e:
-            return await message.err(str(e))
-        if not res.ok:
-            return await message.edit("Found Nothing... Try again...")
-    else:
-        query = message.input_str
-        await message.edit(f"Searching for {query} in Deezer...")
-        try:
-            res = await arq.deezer(query, 1, 3)
-        except Exception as e:
-            return await message.err(str(e))
-        if not res.ok:
-            return await message.edit("Found Nothing... Try again...")
+    if not ARQ_KEY:
+        return await message.err(
+            "Before using this command, "
+            "you have to set this [Environmental var.](https://t.me/UnofficialPluginsHelp/128)",
+            disable_web_page_preview=True
+        )
+    query = str(message.filtered_input_str)
+    await message.edit(f"Searching for {query} in Deezer...")
+    try:
+        res = await arq.deezer(query, 1, 9 if message.flags else 3)
+    except Exception as e:
+        return await message.err(str(e))
+    if not res.ok:
+        return await message.edit("Found Nothing... Try again...")
     song = res.result[0]
     title = song.title
     url = song.url
