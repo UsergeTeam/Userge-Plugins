@@ -19,6 +19,11 @@ API_TWO_URL = os.environ.get("IMDB_API_TWO_URL")
                    "the poster with name imdb_thumb.jpg]",
     'usage': "{tr}imdb [Movie Name]"})
 async def imdb(message: Message):
+    if not (API_ONE_URL or API_TWO_URL):
+        return await message.err(
+            "First set [these two vars](https://t.me/UnofficialPluginsHelp/127) before using imdb",
+            disable_web_page_preview=True
+        )
     try:
         movie_name = message.input_str
         await message.edit(f"__searching IMDB for__ : `{movie_name}`")
