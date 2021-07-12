@@ -1,7 +1,8 @@
 """ Music , To Search and Download HQ Music From JioSaavn"""
 
 # Made By Devanagaraj
-# https://github.com/Devanagaraj
+
+# Refference https://github.com/Devanagaraj/Tg_Meowzik_Bot
 # Thanks to ARQ API
 
 import os
@@ -17,20 +18,19 @@ ARQ_KEY = os.environ.get("ARQ_KEY", None)
 # ARQ API
 session = ClientSession()
 arq = ARQ("https://thearq.tech", ARQ_KEY, session)
-saavn = arq.saavn
 
 LOGGER = userge.getLogger(__name__)
 
 
 @userge.on_cmd(
-    "music",
+    "saavn",
     about={
         "header": "Search and Download Music",
         "description": "It Searches and Downloads Music from JioSaavn in HQ",
         "examples": "{tr}Song name",
-    },
+    }
 )
-async def music(message: Message):
+async def savn(message: Message):
     query = message.input_str
     await message.edit(f"Searching for {query} in JioSaavn...")
     try:
@@ -46,11 +46,68 @@ async def music(message: Message):
     duration = int(song.duration)
     caption_str = f"`{title}` by `{artist}`"
     pathh, _ = await url_download(message, url)
-    temp_name = f"{randint(10, 1000)}.mp3"
+    temp_name = f"{title}.mp3"
     song_path = os.path.join(Config.DOWN_PATH, temp_name)
     os.rename(pathh, song_path)
     await message.reply_audio(
         audio=song_path,
+        caption=caption_str,
+        duration=duration,
+        performer=artist,
+        title=title,
+        quote=False,
+    )
+    await message.delete()
+    os.remove(song_path)
+    
+@userge.on_cmd(
+    "deezer",
+    about={
+            "header": "Download from Deezer",
+            "options": {"-f": "Sends High Res Flac from Deezer"},
+            "examples": [
+                "{tr}deezer Song name",
+                "{tr}deezer -f Song name"
+                ]
+            }, del_pre=True
+)
+async def deeza(message: Message):
+    if bool(message.flags):
+        query = str(message.filtered_input_str)
+        await message.edit(f"Searching for {query} in Deezer...")
+        try:
+            res = await arq.deezer(query,1,9)
+        except Exception as e:
+            return await message.err(str(e))
+        if not res.ok:
+            return await message.edit("Found Nothing... Try again...") 
+    else:
+        query = message.input_str
+        await message.edit(f"Searching for {query} in Deezer...")
+        try:
+            res = await arq.deezer(query,1,3)
+        except Exception as e:
+            return await message.err(str(e))
+        if not res.ok:
+            return await message.edit("Found Nothing... Try again...")
+    song = res.result[0]
+    title = song.title
+    url = song.url
+    thumb = song.thumbnail
+    artist = song.artist
+    duration = int(song.duration)
+    caption_str = f"`{title}` by `{artist}`"
+    pathh, _ = await url_download(message, url)
+    thumby, _ = await url_download(message, thumb)
+    if pathh.endswith("m4a"):
+        temp_name = f"{title}.mp3"
+    else:
+        temp_name = f"{title}.flac"
+    song_path = os.path.join(Config.DOWN_PATH, temp_name)
+    os.rename(pathh, song_path)
+    await message.reply_audio(
+        audio=song_path,
+        thumb=thumby,
         caption=caption_str,
         duration=duration,
         performer=artist,
