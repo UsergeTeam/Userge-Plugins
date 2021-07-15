@@ -61,7 +61,7 @@ async def imdb(message: Message):
         await message.edit("Bruh, Plox enter **Valid movie name** kthx")
         return
     if len(des_) > 1024:
-            des_ = des_[:1021] + "..."
+        des_ = des_[:1021] + "..."
     if os.path.exists(THUMB_PATH):
         optimize_image(THUMB_PATH)
         await message.client.send_photo(
