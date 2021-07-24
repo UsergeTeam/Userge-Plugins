@@ -93,7 +93,7 @@ async def imdb(message: Message):
 def optimize_image(path):
     _image = Image.open(path)
     if _image.size[0] > 720:
-        _image.resize((720, round(truediv(_image.size[::-1]) * 720))).save(path, quality=95)
+        _image.resize((720, round(truediv(*_image.size[::-1]) * 720))).save(path, quality=95)
 
 
 def get_movie_details(soup):
