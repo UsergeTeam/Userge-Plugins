@@ -29,7 +29,7 @@ async def create_button(msg: Message):
         if replied:
             try:
                 replied = await client.get_messages(
-                    replied.chat.id, 
+                    replied.chat.id,
                     replied.message_id
                 )
             except ChannelInvalid:
