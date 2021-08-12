@@ -57,4 +57,4 @@ async def generate_sysinfo(workdir):
 async def get_sysinfo(message: Message):
     await message.edit("Getting system information ...")
     response = await generate_sysinfo(userge.workdir)
-    await message.edit("<u>**System Information**</u>:\n"+response)
+    await message.edit("<u>**System Information**</u>:\n" + response)
