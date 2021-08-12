@@ -6,7 +6,7 @@ from userge import userge, Message
 async def generate_sysinfo(workdir):
     # uptime
     info = {
-        'boot': (datetime.fromtimestamp(psutil.boot_time())
+        'BOOT': (datetime.fromtimestamp(psutil.boot_time())
                  .strftime("%Y-%m-%d %H:%M:%S"))
     }
     # CPU
@@ -15,7 +15,7 @@ async def generate_sysinfo(workdir):
         cpu_freq = f"{round(cpu_freq / 1000, 2)}GHz"
     else:
         cpu_freq = f"{round(cpu_freq, 2)}MHz"
-    info['cpu'] = (
+    info['CPU'] = (
         f"{psutil.cpu_percent(interval=1)}% "
         f"({psutil.cpu_count()}) "
         f"{cpu_freq}"
@@ -23,20 +23,20 @@ async def generate_sysinfo(workdir):
     # Memory
     vm = psutil.virtual_memory()
     sm = psutil.swap_memory()
-    info['ram'] = (f"{bytes2human(vm.total)}, "
+    info['RAM'] = (f"{bytes2human(vm.total)}, "
                    f"{bytes2human(vm.available)} available")
-    info['swap'] = f"{bytes2human(sm.total)}, {sm.percent}%"
+    info['SWAP'] = f"{bytes2human(sm.total)}, {sm.percent}%"
     # Disks
     du = psutil.disk_usage(workdir)
     dio = psutil.disk_io_counters()
-    info['disk'] = (f"{bytes2human(du.used)} / {bytes2human(du.total)} "
+    info['DISK'] = (f"{bytes2human(du.used)} / {bytes2human(du.total)} "
                     f"({du.percent}%)")
     if dio:
-        info['disk io'] = (f"R {bytes2human(dio.read_bytes)} | "
+        info['DISK I/O'] = (f"R {bytes2human(dio.read_bytes)} | "
                            f"W {bytes2human(dio.write_bytes)}")
     # Network
     nio = psutil.net_io_counters()
-    info['net io'] = (f"TX {bytes2human(nio.bytes_sent)} | "
+    info['NET I/O'] = (f"TX {bytes2human(nio.bytes_sent)} | "
                       f"RX {bytes2human(nio.bytes_recv)}")
     # Sensors
     sensors_temperatures = psutil.sensors_temperatures()
@@ -46,7 +46,7 @@ async def generate_sysinfo(workdir):
             for x in sensors_temperatures['coretemp']
         ]
         temperatures = sum(temperatures_list) / len(temperatures_list)
-        info['temp'] = f"{temperatures}\u00b0C"
+        info['TEMP'] = f"{temperatures}\u00b0C"
     info = {f"{key}:": value for (key, value) in info.items()}
     max_len = max(len(x) for x in info)
     return ("```"
@@ -56,7 +56,6 @@ async def generate_sysinfo(workdir):
 
 @userge.on_cmd("sysinfo", about="Get system info of your host machine.")
 async def get_sysinfo(message: Message):
-    response = "<u>**System Information**</u>:\n"
-    await message.edit(f"{response}`...`")
-    response += await generate_sysinfo(userge.workdir)
-    await message.edit(response)
+    await message.edit("Getting system information ...")
+    response = await generate_sysinfo(userge.workdir)
+    await message.edit("<u>**System Information**</u>:\n"+response)
