@@ -56,7 +56,7 @@ async def generate_sysinfo(workdir):
 
 @userge.on_cmd("sysinfo", about="Get system info of your host machine.")
 async def get_sysinfo(message: Message):
-    response = "**System Information**:\n"
-    message_reply = await message.reply_text(f"{response}`...`")
+    response = "<u>**System Information**</u>:\n"
+    await message.edit(f"{response}`...`")
     response += await generate_sysinfo(userge.workdir)
-    await message_reply.edit_text(response)
+    await message.edit(response)
