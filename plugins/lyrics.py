@@ -1,11 +1,11 @@
 import os
 import re
 
-import requests
+from aiohttp import ClientSession
 from bs4 import BeautifulSoup
 from googlesearch import search
 
-from userge import userge, Message
+from userge import userge, Message, pool
 
 
 @userge.on_cmd("glyrics", about={
@@ -21,27 +21,19 @@ async def glyrics(message: Message):
     await message.edit(f"__Searching Lyrics For {song}__")
     to_search = song + "genius lyrics"
     gen_surl = list(search(to_search, num=1, stop=1))[0]
-    gen_page = requests.get(gen_surl)
-    scp = BeautifulSoup(gen_page.text, 'html.parser')
-    lyrics = scp.find("div", class_="lyrics")
+    async with ClientSession() as ses, ses.get(gen_surl) as res:
+        gen_page = await res.text()
+    scp = BeautifulSoup(gen_page, 'html.parser')
+    lyrics = await get_lyrics(scp)
     if not lyrics:
         await message.edit(f"No Results Found for: `{song}`")
         return
-    lyrics = lyrics.get_text()
     lyrics = re.sub(r'[\(\[].*?[\)\]]', '', lyrics)
     lyrics = os.linesep.join((s for s in lyrics.splitlines() if s))
     title = scp.find('title').get_text().split("|")
-    writers_box = [
-        writer
-        for writer in scp.find_all("span", {'class': 'metadata_unit-label'})
-        if writer.text == "Written By"]
-    if writers_box:
-        target_node = writers_box[0].find_next_sibling("span", {'class': 'metadata_unit-info'})
-        writers = target_node.text.strip()
-    else:
-        writers = "UNKNOWN"
+    writers = await get_writers(scp) or "UNKNOWN"
     lyr_format = ''
-    lyr_format += '**' + title[0] + '**\n'
+    lyr_format += '**' + title[0] + '**\n\n'
     lyr_format += '__' + lyrics + '__'
     lyr_format += "\n\n**Written By: **" + '__' + writers + '__'
     lyr_format += "\n**Source: **" + '`' + title[1] + '`'
@@ -50,3 +42,23 @@ async def glyrics(message: Message):
         await message.edit(lyr_format)
     else:
         await message.edit(f"No Lyrics Found for **{song}**")
+
+
+# Added seperate scraping functions to change logic easily in future...
+@pool.run_in_thread
+def get_lyrics(bs):
+    lyrics = bs.find_all("div", class_="eOLwDW")
+    if not lyrics:
+        return None
+    for lyric in lyrics:
+        for br in lyric.find_all("br"):
+            br.replace_with("\n")
+    return "\n".join([x.text for x in lyrics])
+
+
+@pool.run_in_thread
+def get_writers(bs):
+    writers = bs.find("div", class_="fognin")
+    if writers.contents[0].extract().text == "Written By":
+        return writers.text
+    return None
