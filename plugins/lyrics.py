@@ -43,6 +43,7 @@ async def glyrics(message: Message):
     else:
         await message.edit(f"No Lyrics Found for **{song}**")
 
+
 # Added seperate scraping functions to change logic easily in future...
 @pool.run_in_thread
 def get_lyrics(bs):
@@ -60,3 +61,4 @@ def get_writers(bs):
     writers = bs.find("div", class_="fognin")
     if writers.contents[0].extract().text == "Written By":
         return writers.text
+    return None
