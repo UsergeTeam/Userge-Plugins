@@ -9,7 +9,7 @@ from userge import userge, Message
 async def attach(update: Message):
     '''Attach links in message''' 
     if update.reply_to_message is None:
-        await update.reply_to_message.reply_text(
+        await update.reply_text(
             text="Reply to a text for attaching"
         )
         return
