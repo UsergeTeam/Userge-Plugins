@@ -15,5 +15,5 @@ async def attach(update: Message):
         return
     message = update.reply_to_message
     link = message.text.split(" ", 1)[1]
-    text = message.reply_to_message.text
+    text = message.text
     await message.reply_text(text=f"[\u2063]({link}){text}")
