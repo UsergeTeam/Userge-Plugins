@@ -9,10 +9,11 @@ from userge import userge, Message
 async def attach(update: Message):
     '''Attach links in message''' 
     if update.reply_to_message is None:
-        message = update
-        link = message.text.split(" ", 1)[1]
-    else:
-        message = update.reply_to_message
-        link = message.text
+        await update.reply_to_message.reply_text(
+            text="Reply to a text for attaching"
+        )
+        return
+    message = update.reply_to_message
+    link = message.text.split(" ", 1)[1]
     text = message.reply_to_message.text
     await message.reply_text(text=f"[\u2063]({link}){text}")
