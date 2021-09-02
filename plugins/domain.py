@@ -16,9 +16,9 @@ async def creator(m: Message):
 
     await m.edit("__This may take a while, please wait ...__")
 
-    if "-c" in m.input_str:
+    if "-c" in m.flags:
         status = "creator"
-    elif "-a" in m.input_str:
+    elif "-a" in m.flags:
         status = "administrator"
     else:
         await m.err("Invalid flag!")
