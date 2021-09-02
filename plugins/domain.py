@@ -29,29 +29,30 @@ async def creator(m: Message):
     c_n = 0
     g_n = 0
 
-    async for dialog in m.client.iter_dialogs():
-        if dialog.chat.type in ["group", "supergroup", "channel"]:
+    async for d in m.client.iter_dialogs():
+        if d.chat.type in ["group", "supergroup", "channel"]:
             try:
                 if (
-                    await m.client.get_chat_member(dialog.chat.id, m.client.id)
+                    await m.client.get_chat_member(d.chat.id, m.client.id)
                 ).status == status:
-                    if dialog.chat.username:
+                    if d.chat.username:
                         c = (
-                            f"[{dialog.chat.title}](https://t.me/{dialog.chat.username})\n"
+                            f"[{d.chat.title}](https://t.me/{d.chat.username})\n"
                             + "  "
                             + "**Privacy**: __public__"
                             + " | "
-                            + f"**Chat ID**: `{dialog.chat.id}`"
+                            + f"**Chat ID**: `{d.chat.id}`"
                         )
                     else:
+                        l = await m.client.get_chat(d.chat.id)).invite_link
                         c = (
-                            f"[{dialog.chat.title}]({(await m.client.get_chat(dialog.chat.id)).invite_link})\n"
+                            f"[{d.chat.title}]({l})\n"
                             + "  "
                             + "**Privacy**: __private__"
                             + " | "
-                            + f"**Chat ID**: `{dialog.chat.id}`"
+                            + f"**Chat ID**: `{d.chat.id}`"
                         )
-                    if dialog.chat.type == "channel":
+                    if d.chat.type == "channel":
                         c_n += 1
                         c_str += f"{c_n}. {c}\n"
                     else:
