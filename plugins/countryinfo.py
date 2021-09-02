@@ -1,3 +1,5 @@
+# Author: Fayas (https://github.com/FayasNoushad) (@FayasNoushad)
+
 from userge import userge, Message
 
 @userge.on_cmd("country", about={
