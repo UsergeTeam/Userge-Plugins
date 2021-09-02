@@ -4,7 +4,7 @@ from countryinfo import CountryInfo
 from userge import userge, Message
 
 
-PREVIEW = False # False for instant view
+PREVIEW = False  # False for instant view
 
 
 @userge.on_cmd("country", about={
