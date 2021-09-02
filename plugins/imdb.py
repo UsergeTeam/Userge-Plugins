@@ -2,6 +2,8 @@ import json
 import os
 import requests
 import wget
+from operator import truediv
+from PIL import Image
 
 from userge import userge, Message, Config, pool
 
@@ -19,6 +21,11 @@ API_TWO_URL = os.environ.get("IMDB_API_TWO_URL")
                    "the poster with name imdb_thumb.jpg]",
     'usage': "{tr}imdb [Movie Name]"})
 async def imdb(message: Message):
+    if not (API_ONE_URL or API_TWO_URL):
+        return await message.err(
+            "First set [these two vars](https://t.me/UnofficialPluginsHelp/127) before using imdb",
+            disable_web_page_preview=True
+        )
     try:
         movie_name = message.input_str
         await message.edit(f"__searching IMDB for__ : `{movie_name}`")
@@ -53,9 +60,10 @@ async def imdb(message: Message):
     except IndexError:
         await message.edit("Bruh, Plox enter **Valid movie name** kthx")
         return
+    if len(des_) > 1024:
+        des_ = des_[:1021] + "..."
     if os.path.exists(THUMB_PATH):
-        if len(des_) > 1024:
-            des_ = des_[:1021] + "..."
+        optimize_image(THUMB_PATH)
         await message.client.send_photo(
             chat_id=message.chat.id,
             photo=THUMB_PATH,
@@ -66,28 +74,26 @@ async def imdb(message: Message):
     elif image_link is not None:
         await message.edit("__downloading thumb ...__")
         image = image_link
-        if image:
-            img_path = await pool.run_in_thread(
-                wget.download
-            )(image, os.path.join(Config.DOWN_PATH, 'imdb_thumb.jpg'))
-            if len(des_) > 1024:
-                des_ = des_[:1021] + "..."
-            await message.client.send_photo(
-                chat_id=message.chat.id,
-                photo=img_path,
-                caption=des_,
-                parse_mode="html"
-            )
-            await message.delete()
-            os.remove(img_path)
-        else:
-            if len(des_) > 1024:
-                des_ = des_[:1021] + "..."
-            await message.edit(des_, parse_mode="HTML")
+        img_path = await pool.run_in_thread(
+            wget.download
+        )(image, os.path.join(Config.DOWN_PATH, 'imdb_thumb.jpg'))
+        optimize_image(img_path)
+        await message.client.send_photo(
+            chat_id=message.chat.id,
+            photo=img_path,
+            caption=des_,
+            parse_mode="html"
+        )
+        await message.delete()
+        os.remove(img_path)
     else:
-        if len(des_) > 1024:
-            des_ = des_[:1021] + "..."
         await message.edit(des_, parse_mode="HTML")
+
+
+def optimize_image(path):
+    _image = Image.open(path)
+    if _image.size[0] > 720:
+        _image.resize((720, round(truediv(*_image.size[::-1]) * 720))).save(path, quality=95)
 
 
 def get_movie_details(soup):
