@@ -16,4 +16,5 @@ async def attach(update: Message):
         )
         return
     text = replied.text
-    await replied.reply_text(text=f"[\u2063]({link}){text}")
+    await replied.edit_text(text=f"[\u2063]({link}){text}")
+    await update.delete()
