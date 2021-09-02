@@ -6,6 +6,7 @@ from userge import userge, Message
 
 PREVIEW = False # False for instant view
 
+
 @userge.on_cmd("country", about={
     'header': "Country Info",
     'usage': "{tr} get information of a country"})
