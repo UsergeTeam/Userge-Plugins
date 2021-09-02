@@ -58,7 +58,7 @@ async def creator(m: Message):
                     else:
                         g_n += 1
                         g_str += f"{g_n}. {c}\n"
-            except UserNotParticipant or ChannelPrivate:
+            except (UserNotParticipant, ChannelPrivate):
                 continue
 
     await m.edit(
