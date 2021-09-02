@@ -44,7 +44,7 @@ async def creator(m: Message):
                             + f"**Chat ID**: `{d.chat.id}`"
                         )
                     else:
-                        l = await m.client.get_chat(d.chat.id)).invite_link
+                        l = (await m.client.get_chat(d.chat.id)).invite_link
                         c = (
                             f"[{d.chat.title}]({l})\n"
                             + "  "
