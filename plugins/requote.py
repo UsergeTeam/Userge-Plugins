@@ -9,8 +9,11 @@ from userge import userge, Message
     'description': "get requoted text from a normal text",.
     'usage': "{tr}requote [text]"})
 async def requote(update: Message):
-    text = requote_uri(update.message.text)
+    if len(update.message.text.split()) <= 1:
+        text = "Add requote text too."
+    else:
+        text = requote_uri(update.message.text.split(" ", 1)[1]
     await update.message.edit_text(
         text=text,
-        disable_web_page_preview=True,
+        disable_web_page_preview=True
     )
