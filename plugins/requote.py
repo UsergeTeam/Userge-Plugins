@@ -6,13 +6,13 @@ from userge import userge, Message
 
 @userge.on_cmd("requote", about={
     'header': "Requote Text",
-    'description': "get requoted text from a normal text",.
+    'description': "get requoted text from a normal text",
     'usage': "{tr}requote [text]"})
 async def requote(update: Message):
     if len(update.message.text.split()) <= 1:
         text = "Add requote text too."
     else:
-        text = requote_uri(update.message.text.split(" ", 1)[1]
+        text = requote_uri(update.message.text.split(" ", 1)[1])
     await update.message.edit_text(
         text=text,
         disable_web_page_preview=True
