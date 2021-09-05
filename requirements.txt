@@ -21,3 +21,4 @@ qrcode
 tracemoepy
 validators
 psutil
+countryinfo
