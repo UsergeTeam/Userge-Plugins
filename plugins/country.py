@@ -9,7 +9,8 @@ PREVIEW = False  # False for instant view
 
 @userge.on_cmd("country", about={
     'header': "Country Info",
-    'usage': "{tr} get information of a country"})
+    'description': "get information of a country",
+    'usage': "{tr}country [name]"})
 async def countryinfo(update: Message):
     if " " not in update.text:
         await update.edit_text("Send with country name")
