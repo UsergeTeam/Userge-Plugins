@@ -13,7 +13,7 @@ async def requote(update: Message):
         text = "Add requote text too."
     else:
         text = requote_uri(update.text.split(" ", 1)[1])
-    await update.message.edit_text(
+    await update.edit_text(
         text=text,
         disable_web_page_preview=True
     )
