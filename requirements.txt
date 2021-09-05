@@ -20,6 +20,5 @@ pylast
 pyfiglet
 python-arq
 qrcode
-requests
 tracemoepy
 validators
