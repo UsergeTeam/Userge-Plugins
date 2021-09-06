@@ -117,14 +117,14 @@ async def labstack(message: Message):
         'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'
     }
     r = requests.post(
-        "https://up.labstack.com/api/v1/links", json=data, headers=headers).json()
+        "https://up.labstack.com/api/v1/links", json=data, headers=headers, verify=False).json()
 
     files = {
         'files': (filename, open(dl_loc, 'rb')),
     }
     send_url = "https://up.labstack.com/api/v1/links/{}/send".format(
         r['code'])
-    response = requests.post(send_url, headers=headers, files=files)
+    response = requests.post(send_url, headers=headers, files=files, verify=False)
     if (response.status_code) == 200:
         link = (
             "https://up.labstack.com/api/v1/links/{}/receive".format(r['code']))
