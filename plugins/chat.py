@@ -67,18 +67,16 @@ async def leave_chat(message: Message):
         text = input_str
     else:
         text = message.chat.id
+    await message.delete()
     try:
         await userge.send_message(text, "```Good bye, Cruel World... :-) ```")
         await userge.leave_chat(text)
     except UsernameNotOccupied:
-        await message.edit("```Username that you entered, doesn't exist... ```", del_in=3)
+        await message.reply("```Username that you entered, doesn't exist... ```", del_in=3)
         return
     except PeerIdInvalid:
-        await message.edit("```Chat id which you entered seems not to be exist...```", del_in=3)
+        await message.reply("```Chat id which you entered seems not to be exist...```", del_in=3)
         return
-    else:
-        await message.delete()
-        await asyncio.sleep(2)
 
 
 @userge.on_cmd("invite", about={
