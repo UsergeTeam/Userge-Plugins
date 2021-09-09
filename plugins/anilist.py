@@ -15,7 +15,7 @@ import humanize
 import tracemoepy
 from aiohttp import ClientSession
 from html_telegraph_poster import TelegraphPoster
-
+from tracemoepy.errors import ServerError
 from userge import userge, Message, get_collection, Config
 from userge.utils import progress, take_screen_shot
 
@@ -567,20 +567,25 @@ async def trace_bek(message: Message):
         os.remove(dls_loc)
         dls_loc = img_loc
     if dls_loc:
-        tracemoe = tracemoepy.async_trace.Async_Trace()
-        search = await tracemoe.search(dls_loc, encode=True)
-        os.remove(dls_loc)
-        result = search['docs'][0]
-        caption = (f"**Title**: **{result['title_english']}**\n"
-                   f"   🇯🇵 (`{result['title_romaji']} - {result['title_native']}`)\n"
-                   f"\n**Anilist ID:** `{result['anilist_id']}`"
-                   f"\n**Similarity**: `{result['similarity']*100}`"
-                   f"\n**Episode**: `{result['episode']}`")
-        preview = await tracemoe.natural_preview(search)
-        with open('preview.mp4', 'wb') as f:
-            f.write(preview)
-        await message.reply_video('preview.mp4', caption=caption)
-        os.remove('preview.mp4')
+        async with ClientSession() as session:
+            tracemoe = tracemoepy.AsyncTrace(session=session)
+            try:
+                search = await tracemoe.search(dls_loc, upload_file=True)
+            except ServerError:
+                try:
+                    search = await tracemoe.search(dls_loc, upload_file=True)
+                except ServerError:
+                    await message.reply('Couldnt parse results!!!')
+                    return
+            result = search["result"][0]
+            caption_ = (
+                f"**Title**: {result['anilist']['title']['english']} (`{result['anilist']['title']['native']}`)\n"
+                f"\n**Anilist ID:** `{result['anilist']['id']}`"
+                f"\n**Similarity**: `{(str(result['similarity']*100))[:5]}`"
+                f"\n**Episode**: `{result['episode']}`"
+            )
+            preview = result['video']
+        await message.reply_video(preview, caption=caption_)
         await message.delete()
 
 
