@@ -579,7 +579,8 @@ async def trace_bek(message: Message):
                     return
             result = search["result"][0]
             caption_ = (
-                f"**Title**: {result['anilist']['title']['english']} (`{result['anilist']['title']['native']}`)\n"
+                f"**Title**: {result['anilist']['title']['english']}"
+                f" (`{result['anilist']['title']['native']}`)\n"
                 f"\n**Anilist ID:** `{result['anilist']['id']}`"
                 f"\n**Similarity**: `{(str(result['similarity']*100))[:5]}`"
                 f"\n**Episode**: `{result['episode']}`"
