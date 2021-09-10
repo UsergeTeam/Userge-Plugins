@@ -384,6 +384,8 @@ class LastFm:
 
 ## The code i am using at the moment, this might work as it is, feel free to edit as per bot's use
 
+du = "https://last.fm/user/"
+
 async def resp(params: dict):
     async with aiohttp.ClientSession() as session:
         async with session.get("http://ws.audioscrobbler.com/2.0", params=params) as resp:
@@ -417,7 +419,7 @@ async def lastfm_compat_(message: Message):
     ta = "topartists"
     ta1, ta2 = (await recs(us1, ta, 500))[1][ta]["artist"], (await recs(us2, ta, 500))[1][ta]["artist"]
     ad1, ad2 = [n["name"] for n in ta1], [n["name"] for n in ta2]
-    display = f"**{us1 if diff else await user()}** and **[{us2}]({du}{us2})**"
+    display = f"****[{us1}]({du}{us1})**** and **[{us2}]({du}{us2})**"
     comart = [value for value in ad2 if value in ad1]
     disart = ", ".join({comart[r] for r in range(min(len(comart), 5))})
     compat = min((len(comart) * 100 / 40), 100)
