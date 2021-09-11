@@ -382,21 +382,23 @@ class LastFm:
 
 ##########################################################################
 
-## The code i am using at the moment, this might work as it is, feel free to edit as per bot's use
+# The code i am using at the moment, this might work as it is, feel free to edit as per bot's use
 
 du = "https://last.fm/user/"
 
+
 async def resp(params: dict):
     async with aiohttp.ClientSession() as session:
-        async with session.get("http://ws.audioscrobbler.com/2.0", params=params) as resp:
-            status_code = resp.status
-            json_ = await resp.json()
+        async with session.get("http://ws.audioscrobbler.com/2.0", params=params) as res:
+            status_code = res.status
+            json_ = await res.json()
         await session.close()
     return status_code, json_
 
 
 async def recs(query, typ, lim):
-    params = {"method": f"user.get{typ}", "user": query, "limit": lim, "api_key": API_KEY, "format": "json"}
+    params = {"method": f"user.get{typ}", "user": query, "limit": lim,
+              "api_key": API_KEY, "format": "json"}
     res = await resp(params)
     return res
 
@@ -417,7 +419,8 @@ async def lastfm_compat_(message: Message):
     diff = "|" in msg
     us1, us2 = msg.split("|") if diff else USERNAME, msg
     ta = "topartists"
-    ta1, ta2 = (await recs(us1, ta, 500))[1][ta]["artist"], (await recs(us2, ta, 500))[1][ta]["artist"]
+    ta1 = (await recs(us1, ta, 500))[1][ta]["artist"]
+    ta2 = (await recs(us2, ta, 500))[1][ta]["artist"]
     ad1, ad2 = [n["name"] for n in ta1], [n["name"] for n in ta2]
     display = f"****[{us1}]({du}{us1})**** and **[{us2}]({du}{us2})**"
     comart = [value for value in ad2 if value in ad1]
