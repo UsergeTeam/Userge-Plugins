@@ -11,11 +11,11 @@ from userge import userge, Message
 async def youtube_thumbnail(update: Message):
     if " " not in update.text:
         await update.edit_text("Send with youtube video link or id")
-        return 
+        return
     await update.edit_text("`Processing`")
     thumbnail = ytthumb.thumbnail(update.text.split(" ", 1)[1])
     message = update.reply_to_message if update.reply_to_message else update
-    await update.reply_photo(
+    await message.reply_photo(
         photo=thumbnail,
         quote=True
     )
