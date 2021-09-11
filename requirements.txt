@@ -22,3 +22,4 @@ python-arq
 qrcode
 tracemoepy
 validators
+ytthumb
