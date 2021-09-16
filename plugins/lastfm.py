@@ -388,9 +388,9 @@ du = "https://last.fm/user/"
 
 
 async def resp(params: dict):
-    async with aiohttp.ClientSession() as session:
-        async with session.get("http://ws.audioscrobbler.com/2.0", params=params) as res:
-            return res.status, await res.json()
+    async with aiohttp.ClientSession() as session, \
+            session.get("http://ws.audioscrobbler.com/2.0", params=params) as res:
+        return res.status, await res.json()
 
 
 async def recs(query, typ, lim):
