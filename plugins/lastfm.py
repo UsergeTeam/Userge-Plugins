@@ -390,17 +390,13 @@ du = "https://last.fm/user/"
 async def resp(params: dict):
     async with aiohttp.ClientSession() as session:
         async with session.get("http://ws.audioscrobbler.com/2.0", params=params) as res:
-            status_code = res.status
-            json_ = await res.json()
-        await session.close()
-    return status_code, json_
+            return res.status, await res.json()
 
 
 async def recs(query, typ, lim):
     params = {"method": f"user.get{typ}", "user": query, "limit": lim,
               "api_key": API_KEY, "format": "json"}
-    res = await resp(params)
-    return res
+    return await resp(params)
 
 
 @userge.on_cmd(
