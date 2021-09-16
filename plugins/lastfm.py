@@ -6,7 +6,7 @@ import os
 import wget
 import pylast
 import asyncio
-
+import aiohttp
 from typing import Optional
 from urllib.parse import unquote
 
@@ -381,3 +381,46 @@ class LastFm:
 
 
 ##########################################################################
+
+# The code i am using at the moment, this might work as it is, feel free to edit as per bot's use
+
+du = "https://last.fm/user/"
+
+
+async def resp(params: dict):
+    async with aiohttp.ClientSession() as session, \
+            session.get("http://ws.audioscrobbler.com/2.0", params=params) as res:
+        return res.status, await res.json()
+
+
+async def recs(query, typ, lim):
+    params = {"method": f"user.get{typ}", "user": query, "limit": lim,
+              "api_key": API_KEY, "format": "json"}
+    return await resp(params)
+
+
+@userge.on_cmd(
+    "compat",
+    about={
+        "header": "Compat",
+        "description": "check music compat level with other lastfm users",
+        "usage": "{tr}compat lastfmuser or {tr}compat lastfmuser1|lastfmuser2",
+    },
+)
+async def lastfm_compat_(message: Message):
+    """Shows Music Compatibility"""
+    msg = message.input_str
+    if not msg:
+        return await message.edit("Please check `{tr}help Compat`")
+    diff = "|" in msg
+    us1, us2 = msg.split("|") if diff else USERNAME, msg
+    ta = "topartists"
+    ta1 = (await recs(us1, ta, 500))[1][ta]["artist"]
+    ta2 = (await recs(us2, ta, 500))[1][ta]["artist"]
+    ad1, ad2 = [n["name"] for n in ta1], [n["name"] for n in ta2]
+    display = f"****[{us1}]({du}{us1})**** and **[{us2}]({du}{us2})**"
+    comart = [value for value in ad2 if value in ad1]
+    disart = ", ".join({comart[r] for r in range(min(len(comart), 5))})
+    compat = min((len(comart) * 100 / 40), 100)
+    rep = f"{display} both listen to __{disart}__...\nMusic Compatibility is **{compat}%**"
+    await message.edit(rep, disable_web_page_preview=True)
