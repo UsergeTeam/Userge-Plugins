@@ -2,7 +2,6 @@
 # https://github.com/Sorrow446/ZS-DL
 # plugin by @aryanvikash
 
-import math
 import re
 
 import requests
@@ -30,12 +29,8 @@ async def zippyshare(message: Message):
 
 _REGEX_LINK = r'https://www(\d{1,3}).zippyshare.com/v/(\w{8})/file.html'
 _REGEX_RESULT = (
-    r'var a = (\d{6});\s+var b = (\d{6});\s+document\.getElementById'
-    r'\(\'dlbutton\'\).omg = "f";\s+if \(document.getElementById\(\''
-    r'dlbutton\'\).omg != \'f\'\) {\s+a = Math.ceil\(a/3\);\s+} else'
-    r' {\s+a = Math.floor\(a/3\);\s+}\s+document.getElementById\(\'d'
-    r'lbutton\'\).href = "/d/[a-zA-Z\d]{8}/\"\+\(a \+ \d{6}%b\)\+"/('
-    r'[\w%-.]+)";'
+    r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" \+ '
+    r'\((\d{6}) % 51245 \+ (\d{6}) % 913\) \+ "/([\w%-.]+)";'
 )
 _HEADERS = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                           "AppleWebKit/537.36 (KHTML, like Gecko) Chrome"
@@ -57,9 +52,8 @@ def _generate_zippylink(url):
         if not match:
             raise ValueError("Invalid Response!")
         val_1 = int(match.group(1))
-        val_2 = math.floor(val_1 / 3)
-        val_3 = int(match.group(2))
-        val = val_1 + val_2 % val_3
+        val_2 = int(match.group(2))
+        val = val_1 % 51245 + val_2 % 913
         name = match.group(3)
         d_l = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server, id_, val, name)
     return d_l, name
