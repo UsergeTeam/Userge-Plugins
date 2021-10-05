@@ -28,8 +28,7 @@ async def glyrics(message: Message):
     if not lyrics:
         await message.edit(f"No Results Found for: `{song}`")
         return
-    lyrics = re.sub(r'[\(\[].*?[\)\]]', '', lyrics)
-    lyrics = os.linesep.join((s for s in lyrics.splitlines() if s))
+    lyrics = os.linesep.join(lyrics.splitlines())
     title = scp.find('title').get_text().split("|")
     writers = await get_writers(scp) or "UNKNOWN"
     lyr_format = ''
@@ -47,7 +46,7 @@ async def glyrics(message: Message):
 # Added seperate scraping functions to change logic easily in future...
 @pool.run_in_thread
 def get_lyrics(bs):
-    lyrics = bs.find_all("div", class_="eOLwDW")
+    lyrics = bs.find_all("div", class_="beMmeb")
     if not lyrics:
         return None
     for lyric in lyrics:
