@@ -1,5 +1,4 @@
 cairosvg
-coffeehouse
 colour
 countryinfo
 git+https://github.com/TomyPrs/deezloader
