@@ -21,3 +21,4 @@ python-arq
 qrcode
 tracemoepy
 validators
+
