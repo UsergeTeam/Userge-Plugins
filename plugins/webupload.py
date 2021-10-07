@@ -44,7 +44,7 @@ async def web(message: Message):
         "0x0": "curl -F \"file=@{}\" https://0x0.st",
         "fileio": "curl -F \"file =@{}\" https://file.io",
         "ninja": "curl -i -F file=@{} https://tmp.ninja/api.php?d=upload-tool",
-        "infura": "curl -X POST -F file=@'{}' "https://ipfs.infura.io:5001/api/v0/add?pin=true""
+        "infura": "curl -X POST -F file=@'{}' \"https://ipfs.infura.io:5001/api/v0/add?pin=true\""
     }
     cmd = hosts[selected_transfer].format(file_name)
     await message.edit(f"`now uploading to {selected_transfer} ...`")
