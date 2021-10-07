@@ -55,9 +55,7 @@ async def web(message: Message):
     )
     response, err = await process.communicate()
     links = '\n'.join(re.findall(r'https?://[^\"\']+', response.decode()))
-    if links and selected_transfer != "infura":
+    if links:
         await message.edit(f"**I found these links** :\n{links}")
-    elif selected_transfer == "infura":
-        await message.edit(str(response))
     else:
         await message.edit('`' + response.decode() + err.decode() + '`')
