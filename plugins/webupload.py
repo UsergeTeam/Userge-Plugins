@@ -43,7 +43,8 @@ async def web(message: Message):
         "vshare": "curl -F \"file=@{}\" https://api.vshare.is/upload",
         "0x0": "curl -F \"file=@{}\" https://0x0.st",
         "fileio": "curl -F \"file =@{}\" https://file.io",
-        "ninja": "curl -i -F file=@{} https://tmp.ninja/api.php?d=upload-tool"
+        "ninja": "curl -i -F file=@{} https://tmp.ninja/api.php?d=upload-tool",
+        "infura": "curl -X POST -F file=@'{}' "https://ipfs.infura.io:5001/api/v0/add?pin=true""
     }
     cmd = hosts[selected_transfer].format(file_name)
     await message.edit(f"`now uploading to {selected_transfer} ...`")
@@ -54,7 +55,9 @@ async def web(message: Message):
     )
     response, err = await process.communicate()
     links = '\n'.join(re.findall(r'https?://[^\"\']+', response.decode()))
-    if links:
+    if links and selected_transfer != "infura":
         await message.edit(f"**I found these links** :\n{links}")
+    elif selected_transfer == "infura":
+        await message.edit(str(response))
     else:
         await message.edit('`' + response.decode() + err.decode() + '`')
