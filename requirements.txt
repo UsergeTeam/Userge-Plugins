@@ -1,5 +1,4 @@
 cairosvg
-coffeehouse
 colour
 countryinfo
 git+https://github.com/TomyPrs/deezloader
@@ -22,3 +21,4 @@ python-arq
 qrcode
 tracemoepy
 validators
+
