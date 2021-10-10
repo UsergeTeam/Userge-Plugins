@@ -8,14 +8,15 @@ from userge.utils import progress
 
 
 @userge.on_cmd("web ?(.+?|) (anonfiles|transfer|filebin|anonymousfiles"
-               "|megaupload|bayfiles|vshare|0x0|fileio|ninja)",
+               "|megaupload|bayfiles|vshare|0x0|fileio|ninja|infura)",
                about={
                    'header': "upload files to web",
                    'usage': "{tr}web [file path | reply to media] [site name]",
                    'examples': "{tr}web downloads/test.mp3 anonymousfiles",
                    'types': [
                        'anonfiles', 'transfer', 'filebin', 'anonymousfiles',
-                       'megaupload', 'bayfiles', 'vshare', '0x0', 'fileio', 'ninja']})
+                       'megaupload', 'bayfiles', 'vshare', '0x0', 'fileio',
+                       'ninja', 'infura']})
 async def web(message: Message):
     await message.edit("`Processing ...`")
     input_str = message.matches[0].group(1)
@@ -32,6 +33,7 @@ async def web(message: Message):
         if message.process_is_canceled:
             await message.err("Process Canceled!")
             return
+
     hosts = {
         "anonfiles": "curl -F \"file=@{}\" https://anonfiles.com/api/upload",
         "transfer": "curl --upload-file \"{}\" https://transfer.sh/" + os.path.basename(file_name),
@@ -43,8 +45,10 @@ async def web(message: Message):
         "vshare": "curl -F \"file=@{}\" https://api.vshare.is/upload",
         "0x0": "curl -F \"file=@{}\" https://0x0.st",
         "fileio": "curl -F \"file =@{}\" https://file.io",
-        "ninja": "curl -i -F file=@{} https://tmp.ninja/api.php?d=upload-tool"
+        "ninja": "curl -i -F file=@{} https://tmp.ninja/api.php?d=upload-tool",
+        "infura": "curl -X POST -F file=@'{}' \"https://ipfs.infura.io:5001/api/v0/add?pin=true\""
     }
+
     cmd = hosts[selected_transfer].format(file_name)
     await message.edit(f"`now uploading to {selected_transfer} ...`")
     process = await asyncio.create_subprocess_exec(
@@ -55,6 +59,6 @@ async def web(message: Message):
     response, err = await process.communicate()
     links = '\n'.join(re.findall(r'https?://[^\"\']+', response.decode()))
     if links:
-        await message.edit(f"**I found these links** :\n{links}")
+        await message.edit(f"**Found these links** :\n{links}")
     else:
         await message.edit('`' + response.decode() + err.decode() + '`')
