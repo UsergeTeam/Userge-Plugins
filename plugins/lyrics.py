@@ -46,7 +46,10 @@ async def glyrics(message: Message):
 # Added seperate scraping functions to change logic easily in future...
 @pool.run_in_thread
 def get_lyrics(bs):
-    lyrics = bs.find_all("div", class_=lambda __class:__class and __class.startswith("Lyrics__Container"))
+    lyrics = bs.find_all(
+        "div",
+        class_=lambda __class: __class and __class.startswith("Lyrics__Container"),
+    )
     if not lyrics:
         return None
     for lyric in lyrics:
