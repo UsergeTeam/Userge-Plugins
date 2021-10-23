@@ -4,8 +4,7 @@
 
 import json
 import requests
-from userge import userge, Message
-
+from userge import userge, Message, pool
 
 
 @userge.on_cmd("azan", about={
@@ -13,13 +12,12 @@ from userge import userge, Message
     'description': "Shows the Islamic prayer times of the given city.",
     'usage': "{tr}azan [city_name]"})
 async def _azan(message: Message):
-    try:
-        city = message.text.split(" ", 1)[1]
-    except:
+    if " " not in message.text:
         await message.edit("`Send a city name with command`", del_in=5)
         return
+    city = message.text.split(" ", 1)[1]
     url = f"http://muslimsalat.com/{city}.json?key=bd099c5825cbedb9aa934e255a81a5fc"
-    request = requests.get(url)
+    request = await pool.run_in_thread(requests.get)(url)
     if request.status_code != 200:
         await message.edit(f"`Couldn't fetch any data about the city {city}`", del_in=5)
         return
