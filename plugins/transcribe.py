@@ -109,7 +109,7 @@ class WitAiAPI:
     'examples': ['{tr}stt en link', '{tr}stt ar -t link']}, check_downpath=True)
 async def stt_(message: Message):
     """ Speech to text using Wit.ai """
-    send_text = bool('v' in message.flags)
+    send_text = bool('t' in message.flags)
     replied = message.reply_to_message
     message_id = replied.message_id if replied else message.message_id
     regex = re.compile(r'([\S]*)(?: |)([\s\S]*)')
