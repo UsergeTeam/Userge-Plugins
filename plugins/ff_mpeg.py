@@ -1,156 +1,350 @@
+import json
 import os
+import re
 import time
-import asyncio
 from datetime import datetime
+from math import floor
+from pathlib import Path
 
+import ffmpeg
 from userge import userge, Message, Config
-from userge.utils import progress
+from userge.plugins.misc.download import tg_download, url_download
+from userge.utils import humanbytes
 
-FF_MPEG_DOWN_LOAD_MEDIA_PATH = "/app/downloads/userge.media.ffmpeg"
+FF_MPEG_DOWN_LOAD_MEDIA_PATH = Path("/app/downloads/userge.media.ffmpeg")
+
+logger = userge.getLogger(__name__)
 
 
-@userge.on_cmd("ffmpegsave", about={'header': "Save a media that is to be used in ffmpeg"})
-async def ffmpegsave(message: Message):
-    if not os.path.exists(FF_MPEG_DOWN_LOAD_MEDIA_PATH):
-        if not os.path.isdir(Config.DOWN_PATH):
-            os.makedirs(Config.DOWN_PATH)
-        if message.reply_to_message.media:
-            start = datetime.now()
-            reply_message = message.reply_to_message
-            try:
-                downloaded_file_name = await message.client.download_media(
-                    message=reply_message,
-                    file_name=FF_MPEG_DOWN_LOAD_MEDIA_PATH,
-                    progress=progress,
-                    progress_args=(message, "trying to download")
-                )
-            except Exception as e:  # pylint:disable=C0103,W0703
-                await message.edit(str(e))
-            else:
-                end = datetime.now()
-                ms = (end - start).seconds
-                await message.edit(
-                    "Downloaded to `{}` in {} seconds.".format(downloaded_file_name, ms))
+async def get_media_path_and_name(message: Message, input_str="") -> (str, str):
+    if not input_str:
+        input_str = message.filtered_input_str
+    dl_loc = ""
+    file_name = ""
+    replied = message.reply_to_message
+    if hasattr(replied, 'media'):
+        dl_loc, _ = await tg_download(message, replied)
+        if hasattr(replied.audio, 'file_name'):
+            file_name = replied.audio.file_name
+        elif hasattr(replied.video, 'file_name'):
+            file_name = replied.video.file_name
+        elif hasattr(replied.document, 'file_name'):
+            file_name = replied.document.file_name
         else:
-            await message.edit("Reply to a Telegram media file")
+            file_name = Path(dl_loc).name
     else:
-        await message.edit(
-            "a media file already exists in path. "
-            f"Please remove the media and try again!\n`.term rm {FF_MPEG_DOWN_LOAD_MEDIA_PATH}`")
-
-
-@userge.on_cmd("ffmpegtrim", about={
-    'header': "Trim a given media",
-    'usage': "{tr}ffmpegtrim [start time] [end time]"})
-async def ffmpegtrim(message: Message):
-    if not os.path.exists(FF_MPEG_DOWN_LOAD_MEDIA_PATH):
-        await message.edit(
-            "a media file needs to be downloaded, and saved to the "
-            f"following path: `{FF_MPEG_DOWN_LOAD_MEDIA_PATH}`")
+        is_url = re.search(r"(?:https?|ftp)://[^|\s]+\.[^|\s]+", input_str)
+        if is_url:
+            try:
+                dl_loc, _ = await url_download(message, input_str)
+                file_name = Path(dl_loc).name
+            except Exception as e_e:
+                await message.err(e_e)
+                return
+    if dl_loc:
+        file_path = dl_loc
+    else:
+        file_path = input_str.strip()
+        file_name = Path(file_path).name
+    if not Path(file_path).exists():
+        await message.err("`Seems that an invalid file path provided?`")
         return
-    current_message_text = message.text
-    cmt = current_message_text.split(" ")
+    return file_path, file_name
+
+
+@userge.on_cmd("x256", about={
+    'header': "Encode a file using x256",
+    'options': {'-b': 'Custom bitrate'},
+    'usage': "{tr}x256 [file / folder path | direct link | reply to telegram file]",
+    'examples': ['{tr}x256 link', '{tr}x256 path']}, check_downpath=True)
+async def encode_x256(message: Message):
+    replied = message.reply_to_message
+    if not message.filtered_input_str and not hasattr(replied, 'media'):
+        await message.edit("`Please read .help x256`")
+        return
+    custom_bitrate = 28
+    match = re.search(r'(\d+)? ?([\s\S]*)?', message.filtered_input_str)
+    if 'b' in message.flags and match:
+        custom_bitrate = match.group(1) if match else "28"
+    dl_loc, file_name = await get_media_path_and_name(message, input_str=match.group(2))
+    if not dl_loc or not file_name:
+        return
+    FF_MPEG_DOWN_LOAD_MEDIA_PATH.mkdir(parents=True, exist_ok=True)
+    video_file = f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/x256_{file_name}"
+    await message.edit("`Encoding to x256...`")
     start = datetime.now()
-    if len(cmt) == 3:
-        # output should be video
-        _, start_time, end_time = cmt
-        o = await cult_small_video(
-            FF_MPEG_DOWN_LOAD_MEDIA_PATH,
-            Config.DOWN_PATH,
-            start_time,
-            end_time
-        )
-        try:
-            await message.client.send_video(
-                chat_id=message.chat.id,
-                video=o,
-                caption=" ".join(cmt[1:])
-            )
-            os.remove(o)
-        except Exception as e:
-            await message.edit(str(e))
-    elif len(cmt) == 2:
-        # output should be image
-        _, start_time = cmt
-        o = await take_screen_shot(
-            FF_MPEG_DOWN_LOAD_MEDIA_PATH,
-            Config.DOWN_PATH,
-            start_time
-        )
-
-        try:
-            await message.client.send_photo(
-                chat_id=message.chat.id,
-                photo=o,
-                caption=" ".join(cmt[1:])
-            )
-            os.remove(o)
-        except Exception as e:
-            await message.edit(str(e))
-    else:
-        await message.edit("RTFM")
+    try:
+        ffmpeg.input(dl_loc).output(
+            video_file, vcodec="libx265", crf=custom_bitrate, preset="ultrafast"
+        ).overwrite_output().run(capture_stdout=True, capture_stderr=True)
+    except ffmpeg.Error as e:
+        await message.edit(f"```{e.stderr.decode()}```")
         return
-    end = datetime.now()
-    ms = (end - start).seconds
-    await message.edit(f"Completed Process in {ms} seconds")
+    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
+    message_id = replied.message_id if replied else message.message_id
+    caption = f"[{humanbytes(Path(video_file).stat().st_size)}]\n" \
+              f"{replied.caption if hasattr(replied, 'media') else file_name}"
+    await message.client.send_video(
+        chat_id=message.chat.id, reply_to_message_id=message_id,
+        video=video_file, caption=caption)
+
+    Path(video_file).unlink(missing_ok=True)
+    Path(f"downloads/{file_name}").unlink(missing_ok=True)
 
 
-async def take_screen_shot(video_file, output_directory, ttl):
-    # https://stackoverflow.com/a/13891070/4723940
-    out_put_file_name = output_directory + \
-        "/" + str(time.time()) + ".jpg"
-    file_genertor_command = [
-        "ffmpeg",
-        "-ss",
-        str(ttl),
-        "-i",
-        video_file,
-        "-vframes",
-        "1",
-        out_put_file_name
-    ]
-    # width = "90"
-    process = await asyncio.create_subprocess_exec(
-        *file_genertor_command,
-        # stdout must a pipe to be accessible as process.stdout
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    # Wait for the subprocess to finish
-    await process.communicate()
-    if os.path.lexists(out_put_file_name):
-        return out_put_file_name
-    return None
+@userge.on_cmd("v2a", about={
+    'header': "Convert a video to audio",
+    'options': {'-b': 'Custom bitrate'},
+    'usage': "{tr}v2a [file / folder path | direct link | reply to telegram file]",
+    'examples': ['{tr}v2a link', '{tr}v2a path']}, check_downpath=True)
+async def video_to_audio(message: Message):
+    replied = message.reply_to_message
+    if not message.filtered_input_str and not hasattr(replied, 'media'):
+        await message.edit("`Please read .help v2a`")
+        return
+    match = re.search(r'(\d+)? ?([\s\S]*)?', message.filtered_input_str)
+    custom_bitrate = "48000"
+    if 'b' in message.flags and match:
+        custom_bitrate = f"{match.group(1)}000" if len(match.group(1)) > 5 else custom_bitrate
+    dl_loc, file_name = await get_media_path_and_name(message, input_str=custom_bitrate.group(2))
+    if not dl_loc or not file_name:
+        return
+    FF_MPEG_DOWN_LOAD_MEDIA_PATH.mkdir(parents=True, exist_ok=True)
+    await message.edit("`Extracting audio...`")
+    audio_file = f"{file_name.split('.')[0]}.mp3"
+    start = datetime.now()
+    stream = ffmpeg.input(dl_loc)
+    output = ffmpeg.output(stream.audio, f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/{audio_file}",
+                           format="mp3", audio_bitrate=custom_bitrate).overwrite_output()
+    try:
+        ffmpeg.run(output, capture_stdout=True, capture_stderr=True)
+    except ffmpeg.Error as e:
+        await message.edit(f"```{e.stderr.decode()}```")
+        return
+    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
 
-# https://github.com/Nekmo/telegram-upload/blob/master/telegram_upload/video.py#L26
+    message_id = replied.message_id if replied else message.message_id
+    caption = f"[{humanbytes(Path(FF_MPEG_DOWN_LOAD_MEDIA_PATH / audio_file).stat().st_size)}]\n" \
+              f"{replied.caption if hasattr(replied, 'media') else file_name}"
+    await message.client.send_audio(
+        chat_id=message.chat.id, reply_to_message_id=message_id,
+        audio=f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/{audio_file}",
+        caption=caption)
+
+    Path(f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/{audio_file}").unlink(missing_ok=True)
+    Path(f"downloads/{file_name}").unlink(missing_ok=True)
 
 
-async def cult_small_video(video_file, output_directory, start_time, end_time):
-    # https://stackoverflow.com/a/13891070/4723940
-    out_put_file_name = output_directory + \
-        "/" + str(round(time.time())) + ".mp4"
-    file_genertor_command = [
-        "ffmpeg",
-        "-i",
-        video_file,
-        "-ss",
-        start_time,
-        "-to",
-        end_time,
-        "-async",
-        "1",
-        "-strict",
-        "-2",
-        out_put_file_name
-    ]
-    process = await asyncio.create_subprocess_exec(
-        *file_genertor_command,
-        # stdout must a pipe to be accessible as process.stdout
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    # Wait for the subprocess to finish
-    await process.communicate()
-    if os.path.lexists(out_put_file_name):
-        return out_put_file_name
-    return None
+@userge.on_cmd("vscale", about={
+    'header': "Scale a video to a given quality",
+    'options': {'-q': 'Video Quality 144/240/360/480/720/etc',
+                '-b': 'Custom bitrate',
+                '-c': 'Compress using x256'},
+    'usage': "{tr}vscale -q quality [file / folder path | direct link | reply to telegram file]",
+    'examples': ['{tr}vscale -q 360 link', '{tr}vscale 360 path']}, check_downpath=True)
+async def scale_video(message: Message):
+    replied = message.reply_to_message
+    if not message.filtered_input_str and not hasattr(replied, 'media'):
+        await message.edit("`Please read .help vscale`")
+        return
+    match = re.search(r'(\d{3})? ?(\d{2})? ?([\s\S]*)?', message.filtered_input_str)
+    try:
+        quality = match.group(1)
+        custom_bitrate = match.group(2)
+        local_file = match.group(3)
+        encoder = "libx265" if "c" in message.flags else "h264"
+    except (IndexError, AttributeError):
+        await message.edit("`You muse specify a quality!`")
+        return
+    dl_loc, file_name = await get_media_path_and_name(message, input_str=local_file)
+    if not dl_loc or not file_name:
+        return
+    FF_MPEG_DOWN_LOAD_MEDIA_PATH.mkdir(parents=True, exist_ok=True)
+    await message.edit("`Scaling the video...`")
+    video_file = f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/{quality}_{file_name}"
+    custom_bitrate = custom_bitrate if custom_bitrate else "28"
+    start = datetime.now()
+    try:
+        ffmpeg.input(dl_loc).filter(
+            "scale", -1, quality).output(
+            video_file, vcodec=encoder, crf=custom_bitrate, preset="ultrafast"
+        ).overwrite_output().run(capture_stdout=True, capture_stderr=True)
+    except ffmpeg.Error as e:
+        await message.edit(f"```{e.stderr.decode()}```")
+        return
+    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
+    message_id = replied.message_id if replied else message.message_id
+    caption = f"[{humanbytes(Path(video_file).stat().st_size)}]\n" \
+              f"{replied.caption if hasattr(replied, 'media') else file_name}"
+    await message.client.send_video(
+        chat_id=message.chat.id, reply_to_message_id=message_id,
+        video=video_file, caption=caption)
+
+    Path(video_file).unlink(missing_ok=True)
+    Path(f"downloads/{file_name}").unlink(missing_ok=True)
+
+
+@userge.on_cmd("vth", about={
+    'header': "Get video thumbnail",
+    'usage': "{tr}vth [file / folder path | direct link | reply to telegram file]",
+    'examples': ['{tr}vth link', '{tr}vth path']}, check_downpath=True)
+async def video_thumbnail(message: Message):
+    replied = message.reply_to_message
+    if not message.filtered_input_str and not hasattr(replied, 'media'):
+        await message.edit("`Please read .help vth`")
+        return
+    dl_loc, file_name = await get_media_path_and_name(message)
+    if not dl_loc or not file_name:
+        return
+    FF_MPEG_DOWN_LOAD_MEDIA_PATH.mkdir(parents=True, exist_ok=True)
+    await message.edit("`Extracting video thumbnail...`")
+    thumbnail_file = f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/{file_name.split('.')[0]}.png"
+    start = datetime.now()
+    try:
+        ffmpeg.input(dl_loc, ss="00:01:00").filter('scale', 720, -1).output(
+            thumbnail_file, vframes=1).overwrite_output().run(
+            capture_stdout=True, capture_stderr=True)
+    except ffmpeg.Error as e:
+        await message.edit(f"```{e.stderr.decode()}```")
+        return
+    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
+
+    message_id = replied.message_id if replied else message.message_id
+    await message.client.send_photo(
+        chat_id=message.chat.id, reply_to_message_id=message_id,
+        photo=thumbnail_file,
+        caption=replied.caption if hasattr(replied, 'media') else file_name)
+
+    Path(thumbnail_file).unlink(missing_ok=True)
+    Path(f"downloads/{file_name}").unlink(missing_ok=True)
+
+
+@userge.on_cmd("vtrim", about={
+    'header': "Trim a video",
+    'usage': "{tr}vtrim [file / folder path | direct link | reply to telegram file]",
+    'examples': ['{tr}vtrim link', '{tr}vtrim path']}, check_downpath=True)
+@userge.on_cmd("atrim", about={
+    'header': "Trim an audio track",
+    'usage': "{tr}atrim [file / folder path | direct link | reply to telegram file]",
+    'examples': ['{tr}atrim link', '{tr}atrim path']}, check_downpath=True)
+async def video_trim(message: Message):
+    replied = message.reply_to_message
+    if not message.filtered_input_str and not hasattr(replied, 'media'):
+        await message.edit("`Please read .help vtrim/atrim`")
+        return
+
+    match = re.search(r'(\d{2}:\d{2}:\d{2})? ?(\d{2}:\d{2}:\d{2})? ?([\s\S]*)?',
+                      message.filtered_input_str)
+    if not match.group(1) and not match.group(2):
+        await message.edit("`You muse specify end time at least!`")
+        return
+
+    dl_loc, file_name = await get_media_path_and_name(message, input_str=match.group(3))
+    if not dl_loc or not file_name:
+        return
+    FF_MPEG_DOWN_LOAD_MEDIA_PATH.mkdir(parents=True, exist_ok=True)
+    await message.edit("`Trimming media...`")
+    end_time = match.group(1) if not match.group(2) else match.group(2)
+    start_time = match.group(1) if match.group(1) and match.group(1) != end_time else "00:00:00"
+    video_file = f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/trimmed_{file_name}"
+    start = datetime.now()
+    try:
+        ffmpeg.input(dl_loc, ss=start_time, to=end_time).output(video_file).overwrite_output().run(
+            capture_stdout=True, capture_stderr=True)
+    except ffmpeg.Error as e:
+        await message.edit(f"```{e.stderr.decode()}```")
+        return
+    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
+
+    message_id = replied.message_id if replied else message.message_id
+    caption = f"[{humanbytes(Path(video_file).stat().st_size)}]\n" \
+              f"{replied.caption if hasattr(replied, 'media') else file_name}"
+    await message.client.send_video(
+        chat_id=message.chat.id, reply_to_message_id=message_id,
+        video=video_file, caption=caption)
+
+    Path(video_file).unlink(missing_ok=True)
+    Path(f"downloads/{file_name}").unlink(missing_ok=True)
+
+
+@userge.on_cmd("vcompress", about={
+    'header': "Compress a video file",
+    'usage': "{tr}vcompress percentage [file / folder path | direct link | reply to telegram file]",
+    'examples': ['{tr}vcompress 70 link', '{tr}vcompress 50 path']}, check_downpath=True)
+async def video_compress(message: Message):
+    replied = message.reply_to_message
+    if not message.filtered_input_str and not hasattr(replied, 'media'):
+        await message.edit("`Please read .help vcompress`")
+        return
+
+    match = re.search(r'(\d{2}) ?([\s\S]*)?', message.filtered_input_str)
+    if not match.group(1):
+        await message.edit("`You must specify a video percentage.`")
+        return
+    dl_loc, file_name = await get_media_path_and_name(message, input_str=match.group(2))
+    if not dl_loc or not file_name:
+        return
+    FF_MPEG_DOWN_LOAD_MEDIA_PATH.mkdir(parents=True, exist_ok=True)
+    await message.edit("`Compressing media...`")
+    # https://github.com/kkroening/ffmpeg-python/issues/545
+    total_time = floor(float(ffmpeg.probe(dl_loc)['streams'][0]['duration']))
+    target_percentage = int(match.group(1))
+    filesize = Path(dl_loc).stat().st_size
+    # https://github.com/AbirHasan2005/VideoCompress/blob/main/bot/helper_funcs/ffmpeg.py#L60
+    calculated_percentage = 100 - target_percentage
+    target_size = (calculated_percentage / 100) * filesize
+    target_bitrate = int(floor(target_size * 8 / total_time))
+    if target_bitrate // 1000000 >= 1:
+        bitrate = str(target_bitrate // 1000000) + "M"
+    # elif target_bitrate // 1000 > 1:
+    else:
+        bitrate = str(target_bitrate // 1000) + "k"
+    video_file = f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/compressed_{file_name}"
+    start = datetime.now()
+    try:
+        ffmpeg.input(dl_loc).output(
+            video_file, video_bitrate=bitrate, bufsize=bitrate, vcodec="h264",
+            preset="ultrafast").overwrite_output().run(capture_stdout=True, capture_stderr=True)
+    except ffmpeg.Error as e:
+        await message.edit(f"```{e.stderr.decode()}```")
+        return
+    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
+
+    message_id = replied.message_id if replied else message.message_id
+    caption = f"[{humanbytes(Path(video_file).stat().st_size)}]\n" \
+              f"{replied.caption if hasattr(replied, 'media') else file_name}"
+    await message.client.send_video(
+        chat_id=message.chat.id, reply_to_message_id=message_id,
+        video=video_file, caption=caption)
+
+    Path(video_file).unlink(missing_ok=True)
+    Path(f"downloads/{file_name}").unlink(missing_ok=True)
+
+
+@userge.on_cmd("minfo", about={
+    'header': "Get media info",
+    'options': {'-d': 'Delete media after getting info'},
+    'usage': "{tr}minfo [file / folder path | direct link | reply to telegram file]",
+    'examples': ['{tr}minfo link', '{tr}minfo path']}, check_downpath=True)
+async def media_info(message: Message):
+    replied = message.reply_to_message
+    if not message.filtered_input_str and not hasattr(replied, 'media'):
+        await message.edit("`Please read .help minfo`")
+        return
+    dl_loc, file_name = await get_media_path_and_name(message)
+    if not dl_loc or not file_name:
+        return
+    FF_MPEG_DOWN_LOAD_MEDIA_PATH.mkdir(parents=True, exist_ok=True)
+    await message.edit("`Extracting media info...`")
+    start = datetime.now()
+    try:
+        info = json.dumps(ffmpeg.probe(dl_loc), indent=1, ensure_ascii=False)
+        await message.reply(f"```{info}```")
+    except ffmpeg.Error as e:
+        await message.edit(f"```{e.stderr.decode()}```")
+        return
+    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
+    if 'd' in message.flags:
+        Path(f"downloads/{file_name}").unlink(missing_ok=True)
+
+# TODO: remove silence
