@@ -1,19 +1,51 @@
 import json
-import os
 import re
-import time
+from asyncio import create_subprocess_exec, subprocess
 from datetime import datetime
 from math import floor
 from pathlib import Path
 
 import ffmpeg
-from userge import userge, Message, Config
+from ffmpeg._run import Error, compile
+from ffmpeg._utils import convert_kwargs_to_cmd_line_args
+
+from userge import userge, Message
 from userge.plugins.misc.download import tg_download, url_download
 from userge.utils import humanbytes
 
 FF_MPEG_DOWN_LOAD_MEDIA_PATH = Path("/app/downloads/userge.media.ffmpeg")
 
 logger = userge.getLogger(__name__)
+
+
+async def probe(filename, cmd='ffprobe', **kwargs):
+    # https://gist.github.com/fedej/7f848d20205efbff4db4a0fc78eae7ba
+    args = [cmd, '-show_format', '-show_streams', '-of', 'json']
+    args += convert_kwargs_to_cmd_line_args(kwargs)
+    args += [filename]
+
+    p = await create_subprocess_exec(*args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    coroutine = p.communicate()
+    out, err = await coroutine
+    if p.returncode != 0:
+        raise Error('ffprobe', out, err)
+    return json.loads(out.decode('utf-8'))
+
+
+async def run(stream_spec, cmd='ffmpeg', pipe_stdin=False, pipe_stdout=False, pipe_stderr=False,
+              input_file=None, quiet=True, overwrite_output=True):
+    # https://gist.github.com/fedej/7f848d20205efbff4db4a0fc78eae7ba
+    args = compile(stream_spec, cmd, overwrite_output=overwrite_output)
+    stdin_stream = subprocess.PIPE if pipe_stdin else None
+    stdout_stream = subprocess.PIPE if pipe_stdout or quiet else None
+    stderr_stream = subprocess.PIPE if pipe_stderr or quiet else None
+    p = await create_subprocess_exec(
+        *args, stdin=stdin_stream, stdout=stdout_stream, stderr=stderr_stream
+    )
+    out, err = await p.communicate(input_file)
+    if p.returncode != 0:
+        raise Error('ffmpeg', out, err)
+    return out, err
 
 
 async def get_media_path_and_name(message: Message, input_str="") -> (str, str):
@@ -38,8 +70,8 @@ async def get_media_path_and_name(message: Message, input_str="") -> (str, str):
             try:
                 dl_loc, _ = await url_download(message, input_str)
                 file_name = Path(dl_loc).name
-            except Exception as e_e:
-                await message.err(e_e)
+            except Exception as err:
+                await message.err(str(err))
                 return
     if dl_loc:
         file_path = dl_loc
@@ -74,16 +106,15 @@ async def encode_x256(message: Message):
     await message.edit("`Encoding to x256...`")
     start = datetime.now()
     try:
-        ffmpeg.input(dl_loc).output(
-            video_file, vcodec="libx265", crf=custom_bitrate, preset="ultrafast"
-        ).overwrite_output().run(capture_stdout=True, capture_stderr=True)
+        await run(ffmpeg.input(dl_loc).output(
+            video_file, vcodec="libx265", crf=custom_bitrate, preset="ultrafast"))
     except ffmpeg.Error as e:
-        await message.edit(f"```{e.stderr.decode()}```")
+        await message.edit(f"```{e.stderr}```")
         return
     await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
-    message_id = replied.message_id if replied else message.message_id
     caption = f"[{humanbytes(Path(video_file).stat().st_size)}]\n" \
               f"{replied.caption if hasattr(replied, 'media') else file_name}"
+    message_id = replied.message_id if replied else message.message_id
     await message.client.send_video(
         chat_id=message.chat.id, reply_to_message_id=message_id,
         video=video_file, caption=caption)
@@ -106,7 +137,7 @@ async def video_to_audio(message: Message):
     custom_bitrate = "48000"
     if 'b' in message.flags and match:
         custom_bitrate = f"{match.group(1)}000" if len(match.group(1)) > 5 else custom_bitrate
-    dl_loc, file_name = await get_media_path_and_name(message, input_str=custom_bitrate.group(2))
+    dl_loc, file_name = await get_media_path_and_name(message, input_str=match.group(2))
     if not dl_loc or not file_name:
         return
     FF_MPEG_DOWN_LOAD_MEDIA_PATH.mkdir(parents=True, exist_ok=True)
@@ -117,9 +148,9 @@ async def video_to_audio(message: Message):
     output = ffmpeg.output(stream.audio, f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/{audio_file}",
                            format="mp3", audio_bitrate=custom_bitrate).overwrite_output()
     try:
-        ffmpeg.run(output, capture_stdout=True, capture_stderr=True)
+        await run(output)
     except ffmpeg.Error as e:
-        await message.edit(f"```{e.stderr.decode()}```")
+        await message.edit(f"```{e.stderr}```")
         return
     await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
 
@@ -165,15 +196,14 @@ async def scale_video(message: Message):
     custom_bitrate = custom_bitrate if custom_bitrate else "28"
     start = datetime.now()
     try:
-        ffmpeg.input(dl_loc).filter(
+        await run(ffmpeg.input(dl_loc).filter(
             "scale", -1, quality).output(
-            video_file, vcodec=encoder, crf=custom_bitrate, preset="ultrafast"
-        ).overwrite_output().run(capture_stdout=True, capture_stderr=True)
+            video_file, vcodec=encoder, crf=custom_bitrate, preset="ultrafast"))
     except ffmpeg.Error as e:
-        await message.edit(f"```{e.stderr.decode()}```")
+        await message.edit(f"```{e.stderr}```")
         return
-    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
     message_id = replied.message_id if replied else message.message_id
+    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
     caption = f"[{humanbytes(Path(video_file).stat().st_size)}]\n" \
               f"{replied.caption if hasattr(replied, 'media') else file_name}"
     await message.client.send_video(
@@ -201,11 +231,10 @@ async def video_thumbnail(message: Message):
     thumbnail_file = f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/{file_name.split('.')[0]}.png"
     start = datetime.now()
     try:
-        ffmpeg.input(dl_loc, ss="00:01:00").filter('scale', 720, -1).output(
-            thumbnail_file, vframes=1).overwrite_output().run(
-            capture_stdout=True, capture_stderr=True)
+        await run(ffmpeg.input(dl_loc, ss="00:01:00").filter('scale', 720, -1).output(
+            thumbnail_file, vframes=1))
     except ffmpeg.Error as e:
-        await message.edit(f"```{e.stderr.decode()}```")
+        await message.edit(f"```{e.stderr}```")
         return
     await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
 
@@ -249,13 +278,12 @@ async def video_trim(message: Message):
     video_file = f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/trimmed_{file_name}"
     start = datetime.now()
     try:
-        ffmpeg.input(dl_loc, ss=start_time, to=end_time).output(video_file).overwrite_output().run(
-            capture_stdout=True, capture_stderr=True)
+        await run(ffmpeg.input(dl_loc, ss=start_time, to=end_time).output(video_file))
     except ffmpeg.Error as e:
-        await message.edit(f"```{e.stderr.decode()}```")
+        await message.edit(f"```{e.stderr}```")
         return
-    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
 
+    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
     message_id = replied.message_id if replied else message.message_id
     caption = f"[{humanbytes(Path(video_file).stat().st_size)}]\n" \
               f"{replied.caption if hasattr(replied, 'media') else file_name}"
@@ -263,8 +291,8 @@ async def video_trim(message: Message):
         chat_id=message.chat.id, reply_to_message_id=message_id,
         video=video_file, caption=caption)
 
-    Path(video_file).unlink(missing_ok=True)
     Path(f"downloads/{file_name}").unlink(missing_ok=True)
+    Path(video_file).unlink(missing_ok=True)
 
 
 @userge.on_cmd("vcompress", about={
@@ -287,7 +315,8 @@ async def video_compress(message: Message):
     FF_MPEG_DOWN_LOAD_MEDIA_PATH.mkdir(parents=True, exist_ok=True)
     await message.edit("`Compressing media...`")
     # https://github.com/kkroening/ffmpeg-python/issues/545
-    total_time = floor(float(ffmpeg.probe(dl_loc)['streams'][0]['duration']))
+    info = await probe(dl_loc)
+    total_time = floor(float(info['streams'][0]['duration']))
     target_percentage = int(match.group(1))
     filesize = Path(dl_loc).stat().st_size
     # https://github.com/AbirHasan2005/VideoCompress/blob/main/bot/helper_funcs/ffmpeg.py#L60
@@ -302,17 +331,16 @@ async def video_compress(message: Message):
     video_file = f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/compressed_{file_name}"
     start = datetime.now()
     try:
-        ffmpeg.input(dl_loc).output(
-            video_file, video_bitrate=bitrate, bufsize=bitrate, vcodec="h264",
-            preset="ultrafast").overwrite_output().run(capture_stdout=True, capture_stderr=True)
+        await run(ffmpeg.input(dl_loc).output(
+            video_file, video_bitrate=bitrate, bufsize=bitrate, vcodec="h264", preset="ultrafast"))
     except ffmpeg.Error as e:
-        await message.edit(f"```{e.stderr.decode()}```")
+        await message.edit(f"```{e.stderr}```")
         return
-    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
 
     message_id = replied.message_id if replied else message.message_id
     caption = f"[{humanbytes(Path(video_file).stat().st_size)}]\n" \
               f"{replied.caption if hasattr(replied, 'media') else file_name}"
+    await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
     await message.client.send_video(
         chat_id=message.chat.id, reply_to_message_id=message_id,
         video=video_file, caption=caption)
@@ -338,10 +366,10 @@ async def media_info(message: Message):
     await message.edit("`Extracting media info...`")
     start = datetime.now()
     try:
-        info = json.dumps(ffmpeg.probe(dl_loc), indent=1, ensure_ascii=False)
-        await message.reply(f"```{info}```")
+        info = await probe(dl_loc)
+        await message.reply(f"```{json.dumps(info, indent=1, ensure_ascii=False)}```")
     except ffmpeg.Error as e:
-        await message.edit(f"```{e.stderr.decode()}```")
+        await message.edit(f"```{e.stderr}```")
         return
     await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
     if 'd' in message.flags:
