@@ -2,6 +2,7 @@ import os
 import asyncio
 
 from userge import userge, Message, Config
+from userge.utils import get_file_id_of_media
 
 S_LOG = userge.getCLogger(__name__)
 
@@ -42,14 +43,7 @@ async def spam(message: Message):
             await S_LOG.log(f"Spammed Sticker in Chat» {message.chat.title}, {count} times")
             await message.delete()
         elif (replied.animation or replied.video or replied.photo or replied.document):
-            if replied.animation:
-                to_spam = replied.animation.file_id
-            elif replied.video:
-                to_spam = replied.video.file_id
-            elif replied.photo:
-                to_spam = replied.photo.file_id
-            elif replied.document:
-                to_spam = replied.document.file_id
+            to_spam = get_file_id_of_media(replied)
             count = message.input_str
             if " " in count:
                 count, delay = count.split(" ", maxsplit=1)
