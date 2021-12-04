@@ -43,13 +43,13 @@ async def spam(message: Message):
             await message.delete()
         elif (replied.animation or replied.video or replied.photo or replied.document):
             if replied.animation:
-              to_spam = replied.animation.file_id
+                to_spam = replied.animation.file_id
             elif replied.video:
-              to_spam = replied.video.file_id
+                to_spam = replied.video.file_id
             elif replied.photo:
-              to_spam = replied.photo.file_id
+                to_spam = replied.photo.file_id
             elif replied.document:
-              to_spam = replied.document.file_id
+                to_spam = replied.document.file_id
             count = message.input_str
             if " " in count:
                 count, delay = count.split(" ", maxsplit=1)
