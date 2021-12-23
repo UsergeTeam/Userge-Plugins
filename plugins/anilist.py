@@ -178,7 +178,7 @@ query ($search: String, $asHtml: Boolean) {
 
 async def _init():
     global ANIME_TEMPLATE  # pylint: disable=global-statement
-    template = await SAVED.find_one({'_id': "ANIME_TEPLATE"})
+    template = await SAVED.find_one({'_id': "ANIME_TEMPLATE"})
     if template:
         ANIME_TEMPLATE = template['anime_data']
 
