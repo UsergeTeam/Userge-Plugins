@@ -22,7 +22,9 @@ async def mark_read(msg: Message):
     for i in chats.chats:
         total += 1
         try:
-            await userge.read_history(chat_id=i.id)
+            await userge.read_history(
+                chat_id=i.username if i.username else i.id
+            )
         except PeerIdInvalid:
             failed += 1
     await msg.edit(f"Marked {total - failed} chats as read from {total}")
