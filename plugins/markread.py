@@ -19,7 +19,7 @@ async def mark_read(msg: Message):
     chats = await userge.send(
         functions.messages.GetAllChats(except_ids=[])
     )
-    for i in chats:
+    for i in chats.chats:
         total += 1
         try:
             await userge.read_history(chat_id=i.id)
