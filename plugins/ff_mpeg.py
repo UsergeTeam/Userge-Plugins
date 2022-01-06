@@ -6,7 +6,7 @@ from math import floor
 from pathlib import Path
 
 import ffmpeg
-from ffmpeg._run import Error, compile
+from ffmpeg._run import Error, compile as ffmpg_compile
 from ffmpeg._utils import convert_kwargs_to_cmd_line_args
 
 from userge import userge, Message
@@ -35,7 +35,7 @@ async def probe(filename, cmd='ffprobe', **kwargs):
 async def run(stream_spec, cmd='ffmpeg', pipe_stdin=False, pipe_stdout=False, pipe_stderr=False,
               input_file=None, quiet=True, overwrite_output=True):
     # https://gist.github.com/fedej/7f848d20205efbff4db4a0fc78eae7ba
-    args = compile(stream_spec, cmd, overwrite_output=overwrite_output)
+    args = ffmpg_compile(stream_spec, cmd, overwrite_output=overwrite_output)
     stdin_stream = subprocess.PIPE if pipe_stdin else None
     stdout_stream = subprocess.PIPE if pipe_stdout or quiet else None
     stderr_stream = subprocess.PIPE if pipe_stderr or quiet else None
@@ -65,8 +65,8 @@ async def get_media_path_and_name(message: Message, input_str="") -> (str, str):
         else:
             file_name = Path(dl_loc).name
     else:
-        is_url = re.search(r"(?:https?|ftp)://[^|\s]+\.[^|\s]+", input_str)
-        if is_url:
+        is_input_url = is_url(input_str)
+        if is_input_url:
             try:
                 dl_loc, _ = await url_download(message, input_str)
                 file_name = Path(dl_loc).name
