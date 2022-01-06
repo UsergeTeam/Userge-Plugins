@@ -11,7 +11,7 @@ from ffmpeg._utils import convert_kwargs_to_cmd_line_args
 
 from userge import userge, Message
 from userge.plugins.misc.download import tg_download, url_download
-from userge.utils import humanbytes
+from userge.utils import humanbytes, is_url
 
 FF_MPEG_DOWN_LOAD_MEDIA_PATH = Path("/app/downloads/userge.media.ffmpeg")
 
