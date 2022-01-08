@@ -1,6 +1,5 @@
 # © JigarVarma2005
 # Logo maker using brandcrowd.com
-# Moded from @JVToolsBot by @UniversalBotsUpdate
 
 import os
 from typing import List, Tuple
