@@ -513,13 +513,13 @@ async def lfy_(message: Message):
         'typing (default)', 'playing', 'upload_photo', 'upload_video',
         'upload_audio', 'upload_document', 'upload_video_note',
         'record_video', 'record_audio', 'record_video_note',
-        'find_location', 'choose_contact'],
+        'find_location', 'choose_contact', 'choose_sticker', 'import_history'],
     'usage': "{tr}scam\n{tr}scam [action]\n{tr}scam [time]\n{tr}scam [action] [time]"})
 async def scam_(message: Message):
     """scam"""
     options = ('typing', 'upload_photo', 'record_video', 'upload_video', 'record_audio',
                'upload_audio', 'upload_document', 'find_location', 'record_video_note',
-               'upload_video_note', 'choose_contact', 'playing')
+               'upload_video_note', 'choose_contact', 'playing', 'choose_sticker', 'import_history')
     input_str = message.input_str
     args = input_str.split()
     if len(args) == 0:  # Let bot decide action and time
