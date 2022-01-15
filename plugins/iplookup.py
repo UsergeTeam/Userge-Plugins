@@ -52,7 +52,7 @@ async def _ip_look_up(message: Message):
               f"**Region:** `{region}`\n"
               f"**Country:** `{country}`\n"
               f"**Postal Code:** `{postal}`\n"
-              f"**population:** `{population}`\n"
+              f"**Population:** `{population}`\n"
               f"**Continent:** `{continent}`\n"
               f"**Time Zone:** `{timezone}`\n"
               f"**Currency:** `{currency}`\n"
