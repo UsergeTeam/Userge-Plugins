@@ -57,26 +57,12 @@ async def join_chat(message: Message):
 @userge.on_cmd("leave", about={
     'header': "Leave Chat",
     'usage': "{tr}leave\n{tr}leave [chat username | reply to Chat username text]",
-    'examples': [
-        "{tr}leave", "{tr}leave UserGeOt"]},
+    'examples': "{tr}leave"},
     allow_private=False)
 async def leave_chat(message: Message):
     """ Leave chat """
-    input_str = message.input_str
-    if input_str:
-        text = input_str
-    else:
-        text = message.chat.id
-    await message.delete()
-    try:
-        await userge.send_message(text, "```Good bye, Cruel World... :-) ```")
-        await userge.leave_chat(text)
-    except UsernameNotOccupied:
-        await message.reply("```Username that you entered, doesn't exist... ```", del_in=3)
-        return
-    except PeerIdInvalid:
-        await message.reply("```Entered chat id seems not to exist...```", del_in=3)
-        return
+    await message.edit("`Good bye, Cruel World... :-) `")
+    await userge.leave_chat(message.chat.id)
 
 
 @userge.on_cmd("invite", about={
