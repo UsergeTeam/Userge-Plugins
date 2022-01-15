@@ -40,7 +40,7 @@ async def _ip_look_up(message: Message):
     if timezone:
         try:
             continent = timezone.split("/", 1)[0]
-        except Exception as err:
+        except Exception:
             continent = values["continent_code"]
 
     await message.edit(
