@@ -18,8 +18,7 @@ async def _ip_look_up(message: Message):
         await message.edit("`No IP Address Found!`")
         return
     url = (
-        f"https://extreme-ip-lookup.com/json/{message.input_str}?"
-        "callback=showIP&key=Qn97RtiI2gwjStzJJjuG"
+        f"https://extreme-ip-lookup.com/json/{message.input_str}?key=Qn97RtiI2gwjStzJJjuG"
     )
     async with aiohttp.ClientSession() as requests:
         data = await requests.get(url)
