@@ -36,7 +36,7 @@ async def _ip_look_up(message: Message):
     timezone = values["timezone"]
     currency = values["currency_name"]
     asn = values["asn"]
-    population = values["population"]
+    population = values["country_population"]
     if timezone:
         try:
             continent = timezone.split("/", 1)[0]
