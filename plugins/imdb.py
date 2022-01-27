@@ -110,14 +110,14 @@ def get_countries_and_languages(soup):
     lg_text = ""
     if languages:
         if len(languages) > 1:
-            lg_text = ', '.join([languages])
+            lg_text = ', '.join(languages)
         else:
             lg_text = languages[0]
     else:
         lg_text = "No Languages Found!"
     if countries:
         if len(countries) > 1:
-            ct_text = ', '.join([countries])
+            ct_text = ', '.join(countries)
         else:
             ct_text = countries[0]
     else:
