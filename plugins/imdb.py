@@ -1,7 +1,16 @@
 import json
 import os
 import requests
-
+import wget
+from operator import truediv
+from PIL import Image
+from pyrogram.types import (
+    InlineQuery,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup
+)
 from userge import userge, Message, Config, pool
 
 THUMB_PATH = Config.DOWN_PATH + "imdb_thumb.jpg"
@@ -70,26 +79,32 @@ async def imdb(message: Message):
         await message.delete()
     elif image_link is not None:
         await message.edit("__downloading thumb ...__")
-        op_img_link = optimize_image(image_link)
+        image = image_link
+        img_path = await pool.run_in_thread(
+            wget.download
+        )(image, os.path.join(Config.DOWN_PATH, 'imdb_thumb.jpg'))
+        optimize_image(img_path)
         await message.client.send_photo(
             chat_id=message.chat.id,
-            photo=op_img_link,
+            photo=img_path,
             caption=des_,
             parse_mode="html"
         )
         await message.delete()
-        os.remove(op_img_link)
+        os.remove(img_path)
     else:
         await message.edit(des_, parse_mode="HTML")
 
 
-def optimize_image(image_url):
-    return image_url.replace("_V1_", "_V1_UX360")
+def optimize_image(path):
+    _image = Image.open(path)
+    if _image.size[0] > 720:
+        _image.resize((720, round(truediv(*_image.size[::-1]) * 720))).save(path, quality=95)
 
 
 def get_movie_details(soup):
     mov_details = []
-    inline = soup.get("genres")
+    inline = soup.get("Genres")
     if inline and len(inline) > 0:
         for io in inline:
             mov_details.append(io)
@@ -109,16 +124,16 @@ def get_countries_and_languages(soup):
     lg_text = ""
     if languages:
         if len(languages) > 1:
-            lg_text = ', '.join(languages)
+            lg_text = ', '.join([lng["NAME"] for lng in languages])
         else:
-            lg_text = languages[0]
+            lg_text = languages[0]["NAME"]
     else:
         lg_text = "No Languages Found!"
     if countries:
         if len(countries) > 1:
-            ct_text = ', '.join(countries)
+            ct_text = ', '.join([ctn["NAME"] for ctn in countries])
         else:
-            ct_text = countries[0]
+            ct_text = countries[0]["NAME"]
     else:
         ct_text = "No Country Found!"
     return ct_text, lg_text
@@ -163,3 +178,67 @@ def _get(url: str, attempts: int = 0) -> requests.Response:
             break
         attempts += 1
     return abc
+
+
+@userge.bot.on_inline_query(
+    filters.create(
+        lambda _, __, inline_query: (
+            inline_query.query and
+            # https://t.me/UserGeSpam/359404
+            inline_query.query.startswith("imdb ")
+        ),
+        name="ImdbInlineFilter"
+    ),
+    group=-1
+)
+async def inline_fn(_, inline_query: InlineQuery):
+    search_word = inline_query.query.split("imdb ")[1].strip()
+    search_results = await _get(API_ONE_URL.format(theuserge=movie_name))
+    srch_results = json.loads(search_results.text)
+    asroe = srch_results.get("d")
+    oorse = []
+    for sraeo in asroe:
+        title = sraeo.get("l", "")
+        description = sraeo.get("q", "")
+        stars = sraeo.get("s", "")
+        imdb_url = f"https://imdb.com/title/{sraeo.get('id')}"
+        year = sraeo.get("yr", "")
+        image_url = sraeo.get("i").get("imageUrl")
+        message_text = ""
+        message_text += f"<a href='{image_url}'>🎬</a>"
+        message_text += f"<a href='{imdb_url}'>{title} {year}</a>"
+        oorse.append(
+            InlineQueryResultArticle(
+                title=f" {title} {year}",
+                input_message_content=InputTextMessageContent(
+                    message_text="",
+                    parse_mode="html",
+                    disable_web_page_preview=False
+                ),
+                url=imdb_url,
+                description=f" {description} | {stars}",
+                thumb_url=image_url,
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton(
+                                text="Open IMDb URL",
+                                url=imdb_url
+                            )
+                        ]
+                    ]
+                )
+            )
+        )
+    resfo = srch_results.get("q")
+    await inline_query.answer(
+        results=oorse,
+        cache_time=300,
+        is_gallery=False,
+        is_personal=False,
+        next_offset="",
+        switch_pm_text=f"Found {len(oorse)} results for {resfo}",
+        switch_pm_parameter="imdbinline"
+    )
+    inline_query.stop_propagation()
+
