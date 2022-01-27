@@ -75,7 +75,7 @@ async def get_movie_description(imdb_id):
     genres = soup.get("genres")
     duration = soup.get("duration")
     mov_rating = soup.get("UserRating").get("rating")
-    if mov_rating == '/':
+    if mov_rating.strip() == '/':
         mov_rating = "`Ratings not found!`"
     else:
         users = soup.get("UserRating").get("numeric_description_only")
