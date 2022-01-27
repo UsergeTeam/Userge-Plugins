@@ -24,7 +24,8 @@ API_TWO_URL = os.environ.get("IMDB_API_TWO_URL")
     'description': "Get info about a Movie on IMDB.\n"
                    "[NOTE: To use a custom poster, download "
                    "the poster with name imdb_thumb.jpg]",
-    'usage': "{tr}imdb [Movie Name]"})
+    'usage': "{tr}imdb [Movie Name]",
+    'use inline': "@botusername imdb [Movie Name]"})
 async def imdb(message: Message):
     if not (API_ONE_URL or API_TWO_URL):
         return await message.err(
