@@ -73,14 +73,10 @@ async def imdb(message: Message):
         await message.delete()
     elif image_link is not None:
         await message.edit("__downloading thumb ...__")
-        image = image_link
-        img_path = await pool.run_in_thread(
-            wget.download
-        )(image, os.path.join(Config.DOWN_PATH, 'imdb_thumb.jpg'))
-        optimize_image(img_path)
+        op_img_link = optimize_image(image_link)
         await message.client.send_photo(
             chat_id=message.chat.id,
-            photo=img_path,
+            photo=op_img_link,
             caption=des_,
             parse_mode="html"
         )
@@ -90,15 +86,13 @@ async def imdb(message: Message):
         await message.edit(des_, parse_mode="HTML")
 
 
-def optimize_image(path):
-    _image = Image.open(path)
-    if _image.size[0] > 720:
-        _image.resize((720, round(truediv(*_image.size[::-1]) * 720))).save(path, quality=95)
+def optimize_image(image_url):
+    return image_url.replace("_V1_", "_V1_UX360")
 
 
 def get_movie_details(soup):
     mov_details = []
-    inline = soup.get("Genres")
+    inline = soup.get("genres")
     if inline and len(inline) > 0:
         for io in inline:
             mov_details.append(io)
@@ -118,16 +112,16 @@ def get_countries_and_languages(soup):
     lg_text = ""
     if languages:
         if len(languages) > 1:
-            lg_text = ', '.join([lng["NAME"] for lng in languages])
+            lg_text = ', '.join([lng for lng in languages])
         else:
-            lg_text = languages[0]["NAME"]
+            lg_text = languages[0]
     else:
         lg_text = "No Languages Found!"
     if countries:
         if len(countries) > 1:
-            ct_text = ', '.join([ctn["NAME"] for ctn in countries])
+            ct_text = ', '.join([ctn for ctn in countries])
         else:
-            ct_text = countries[0]["NAME"]
+            ct_text = countries[0]
     else:
         ct_text = "No Country Found!"
     return ct_text, lg_text
