@@ -1,9 +1,6 @@
 import json
 import os
 import requests
-import wget
-from operator import truediv
-from PIL import Image
 
 from userge import userge, Message, Config, pool
 
@@ -81,7 +78,7 @@ async def imdb(message: Message):
             parse_mode="html"
         )
         await message.delete()
-        os.remove(img_path)
+        os.remove(op_img_link)
     else:
         await message.edit(des_, parse_mode="HTML")
 
@@ -112,14 +109,14 @@ def get_countries_and_languages(soup):
     lg_text = ""
     if languages:
         if len(languages) > 1:
-            lg_text = ', '.join([lng for lng in languages])
+            lg_text = ', '.join(languages)
         else:
             lg_text = languages[0]
     else:
         lg_text = "No Languages Found!"
     if countries:
         if len(countries) > 1:
-            ct_text = ', '.join([ctn for ctn in countries])
+            ct_text = ', '.join(countries)
         else:
             ct_text = countries[0]
     else:
