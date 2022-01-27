@@ -175,9 +175,9 @@ def _get(url: str, attempts: int = 0) -> requests.Response:
     filters.create(
         lambda _, __, inline_query: (
             inline_query.query and
-            # https://t.me/UserGeSpam/359404
             inline_query.query.startswith("imdb ")
         ),
+        # https://t.me/UserGeSpam/359404
         name="ImdbInlineFilter"
     ),
     group=-1
@@ -232,4 +232,3 @@ async def inline_fn(_, inline_query: InlineQuery):
         switch_pm_parameter="imdbinline"
     )
     inline_query.stop_propagation()
-
