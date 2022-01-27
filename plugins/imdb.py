@@ -41,7 +41,7 @@ async def imdb(message: Message):
     except (IndexError, json.JSONDecodeError, AttributeError):
         await message.edit("Bruh, Plox enter **Valid movie name** kthx")
         return
-    
+
     if os.path.exists(THUMB_PATH):
         await message.client.send_photo(
             chat_id=message.chat.id,
@@ -75,11 +75,12 @@ async def get_movie_description(imdb_id):
     genres = soup.get("genres")
     duration = soup.get("duration")
     mov_rating = soup.get("UserRating").get("rating")
-    if users:= soup.get("UserRating").get("numeric_description_only"):
-        mov_rating += f" based on {users} users"
+    users = soup.get("UserRating").get("numeric_description_only")
+    if users:
+        mov_rating += f" (based on {users} users)"
     if duration:
         genres.append(duration)
-    
+
     mov_country, mov_language = get_countries_and_languages(soup)
     director, writer, stars = get_credits_text(soup)
     story_line = soup.get("summary").get("plot", 'Not available')
@@ -169,7 +170,7 @@ def _get(url: str, attempts: int = 0) -> requests.Response:
 if userge.has_bot:
 
     @userge.bot.on_callback_query(filters=filters.regex(pattern=r"imdb\((.+)\)"))
-    async def prvt_msg(_, c_q: CallbackQuery):
+    async def imdb_callback(_, c_q: CallbackQuery):
         if c_q.from_user.id == Config.OWNER_ID[0]:
             imdb_id = str(c_q.matches[0].group(1))
             _, description = await get_movie_description(imdb_id)
@@ -190,12 +191,11 @@ if userge.has_bot:
         else:
             await c_q.answer("This is not for you", show_alert=True)
 
-
     @userge.bot.on_inline_query(
         filters.create(
             lambda _, __, inline_query: (
-                inline_query.query and
-                inline_query.query.startswith("imdb ")
+                inline_query.query
+                and inline_query.query.startswith("imdb ")
             ),
             # https://t.me/UserGeSpam/359404
             name="ImdbInlineFilter"
