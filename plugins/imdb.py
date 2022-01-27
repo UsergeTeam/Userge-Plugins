@@ -75,9 +75,12 @@ async def get_movie_description(imdb_id):
     genres = soup.get("genres")
     duration = soup.get("duration")
     mov_rating = soup.get("UserRating").get("rating")
-    users = soup.get("UserRating").get("numeric_description_only")
-    if users:
-        mov_rating += f" (based on {users} users)"
+    if mov_rating == '/':
+        mov_rating = "`Ratings not found!`"
+    else:
+        users = soup.get("UserRating").get("numeric_description_only")
+        if users:
+            mov_rating += f" (based on {users} users)"
     if duration:
         genres.append(duration)
 
@@ -213,7 +216,7 @@ if userge.has_bot:
             description = sraeo.get("q", "")
             stars = sraeo.get("s", "")
             imdb_url = f"https://imdb.com/title/{sraeo.get('id')}"
-            year = sraeo.get("yr", "")
+            year = sraeo.get("yr", "").rstrip('-')
             image_url = sraeo.get("i").get("imageUrl")
             message_text = f"<a href='{image_url}'>🎬</a>"
             message_text += f"<a href='{imdb_url}'>{title} {year}</a>"
@@ -221,7 +224,7 @@ if userge.has_bot:
                 InlineQueryResultArticle(
                     title=f" {title} {year}",
                     input_message_content=InputTextMessageContent(
-                        message_text="",
+                        message_text=message_text,
                         parse_mode="html",
                         disable_web_page_preview=False
                     ),
@@ -232,7 +235,7 @@ if userge.has_bot:
                         [
                             [
                                 InlineKeyboardButton(
-                                    text="Get IMDB detals",
+                                    text="Get IMDB details",
                                     callback_data=f"imdb({sraeo.get('id')})"
                                 )
                             ]
@@ -248,6 +251,6 @@ if userge.has_bot:
             is_personal=False,
             next_offset="",
             switch_pm_text=f"Found {len(oorse)} results for {resfo}",
-            switch_pm_parameter="imdbinline"
+            switch_pm_parameter="imdb"
         )
         inline_query.stop_propagation()
