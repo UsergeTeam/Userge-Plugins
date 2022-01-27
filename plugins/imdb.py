@@ -1,9 +1,7 @@
 import json
 import os
 import requests
-import wget
-from operator import truediv
-from PIL import Image
+from pyrogram import filters
 from pyrogram.types import (
     InlineQuery,
     InlineQueryResultArticle,
@@ -79,27 +77,20 @@ async def imdb(message: Message):
         await message.delete()
     elif image_link is not None:
         await message.edit("__downloading thumb ...__")
-        image = image_link
-        img_path = await pool.run_in_thread(
-            wget.download
-        )(image, os.path.join(Config.DOWN_PATH, 'imdb_thumb.jpg'))
-        optimize_image(img_path)
+        op_img_link = optimize_image(image_link)
         await message.client.send_photo(
             chat_id=message.chat.id,
-            photo=img_path,
+            photo=op_img_link,
             caption=des_,
             parse_mode="html"
         )
         await message.delete()
-        os.remove(img_path)
     else:
         await message.edit(des_, parse_mode="HTML")
 
 
-def optimize_image(path):
-    _image = Image.open(path)
-    if _image.size[0] > 720:
-        _image.resize((720, round(truediv(*_image.size[::-1]) * 720))).save(path, quality=95)
+def optimize_image(image_url):
+    return image_url.replace("_V1_", "_V1_UX720")
 
 
 def get_movie_details(soup):
@@ -192,7 +183,7 @@ def _get(url: str, attempts: int = 0) -> requests.Response:
     group=-1
 )
 async def inline_fn(_, inline_query: InlineQuery):
-    search_word = inline_query.query.split("imdb ")[1].strip()
+    movie_name = inline_query.query.split("imdb ")[1].strip()
     search_results = await _get(API_ONE_URL.format(theuserge=movie_name))
     srch_results = json.loads(search_results.text)
     asroe = srch_results.get("d")
