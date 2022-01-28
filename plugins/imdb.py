@@ -200,6 +200,8 @@ if userge.has_bot:
             lambda _, __, inline_query: (
                 inline_query.query
                 and inline_query.query.startswith("imdb ")
+                and inline_query.from_user
+                and inline_query.from_user in Config.OWNER_ID
             ),
             # https://t.me/UserGeSpam/359404
             name="ImdbInlineFilter"
