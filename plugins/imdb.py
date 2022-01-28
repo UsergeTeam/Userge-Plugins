@@ -3,6 +3,7 @@ import os
 import requests
 from pyrogram import filters
 from pyrogram.types import (
+    CallbackQuery,
     InlineQuery,
     InlineQueryResultArticle,
     InputTextMessageContent,
@@ -172,6 +173,28 @@ def _get(url: str, attempts: int = 0) -> requests.Response:
 
 if userge.has_bot:
 
+    @userge.bot.on_callback_query(filters=filters.regex(pattern=r"imdb\((.+)\)"))
+    async def imdb_callback(_, c_q: CallbackQuery):
+        if c_q.from_user and c_q.from_user.id in Config.OWNER_ID[:
+            imdb_id = str(c_q.matches[0].group(1))
+            _, description = await get_movie_description(imdb_id)
+            await c_q.edit_message_text(
+                text=description,
+                disable_web_page_preview=False,
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton(
+                                text="Open IMDB!",
+                                url=f"https://imdb.com/title/{imdb_id}"
+                            )
+                        ]
+                    ]
+                )
+            )
+        else:
+            await c_q.answer("This is not for you", show_alert=True)
+
     @userge.bot.on_inline_query(
         filters.create(
             lambda _, __, inline_query: (
@@ -197,12 +220,14 @@ if userge.has_bot:
             stars = sraeo.get("s", "")
             imdb_url = f"https://imdb.com/title/{sraeo.get('id')}"
             year = sraeo.get("yr", "").rstrip('-')
-            image_url, msg_text = await get_movie_description(sraeo.get('id'))
+            image_url = sraeo.get("i").get("imageUrl")
+            message_text = f"<a href='{image_url}'>🎬</a>"
+            message_text += f"<a href='{imdb_url}'>{title} {year}</a>"
             oorse.append(
                 InlineQueryResultArticle(
                     title=f" {title} {year}",
                     input_message_content=InputTextMessageContent(
-                        message_text=msg_text,
+                        message_text=message_text,
                         parse_mode="html",
                         disable_web_page_preview=False
                     ),
@@ -213,8 +238,8 @@ if userge.has_bot:
                         [
                             [
                                 InlineKeyboardButton(
-                                    text="Open IMDB!",
-                                    url=imdb_url
+                                    text="Get IMDB details",
+                                    callback_data=f"imdb({sraeo.get('id')})"
                                 )
                             ]
                         ]
