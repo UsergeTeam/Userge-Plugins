@@ -175,7 +175,7 @@ if userge.has_bot:
 
     @userge.bot.on_callback_query(filters=filters.regex(pattern=r"imdb\((.+)\)"))
     async def imdb_callback(_, c_q: CallbackQuery):
-        if c_q.from_user and c_q.from_user.id in Config.OWNER_ID[:
+        if c_q.from_user and c_q.from_user.id in Config.OWNER_ID:
             imdb_id = str(c_q.matches[0].group(1))
             _, description = await get_movie_description(imdb_id)
             await c_q.edit_message_text(
