@@ -1,5 +1,5 @@
-#don't use this code in your repo without permission
-#https://github.com/UsergeTeam/Userge
+# don't use this code in your repo without permission
+# https://github.com/UsergeTeam/Userge
 
 from pyrogram import filters
 from userge import userge, Message
@@ -15,5 +15,5 @@ async def create_ch(message:Message):
       await userge.create_channel(title, 'nice')
       await message.edit(f"`successfully made a new channel {title}`")
     except Exception as e:
-       message.edit("something went wrong")
+       await message.edit("something went wrong")
        print(e)
