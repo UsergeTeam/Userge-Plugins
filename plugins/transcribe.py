@@ -107,7 +107,8 @@ class WitAiAPI:
     'header': "transcribe a file (speech to text)",
     'options': {'-t': 'send text to telegram as well as the transcription file'},
     'usage': "{tr}stt lang [file / folder path | direct link | reply to telegram file]",
-    'examples': ['{tr}stt en link', '{tr}stt ar -t link']}, check_downpath=True)
+    'examples': ['{tr}stt en link', '{tr}stt ar -t link']
+}, check_downpath=True, del_pre=True)
 async def stt_(message: Message):
     """ Speech to text using Wit.ai """
     send_text = bool('t' in message.flags)
