@@ -2,11 +2,11 @@ import re
 import json
 import ffmpeg
 import asyncio
-from typing import Tuple, Optional
 
 from math import floor
 from pathlib import Path
 from datetime import datetime
+from typing import Tuple, Optional
 from asyncio import create_subprocess_exec, subprocess
 
 from ffmpeg._run import Error, compile as ffmpg_compile
@@ -52,7 +52,7 @@ async def run(stream_spec, cmd='ffmpeg', pipe_stdin=False, pipe_stdout=False, pi
 
 
 async def get_media_path_and_name(
-    message: Message, input_str = ""
+    message: Message, input_str=""
 ) -> Tuple[Optional[str], Optional[str]]:
     if not input_str:
         input_str = message.filtered_input_str
@@ -92,7 +92,8 @@ async def get_media_path_and_name(
 
 @userge.on_cmd("x256", about={
     'header': "Encode a file using x256",
-    'flags': {'-b': 'Custom bitrate'},
+    'flags': {'-b': 'Custom bitrate',
+              '-d': 'Delete media after process done'},
     'usage': "{tr}x256 [file / folder path | direct link | reply to telegram file]",
     'examples': ['{tr}x256 link', '{tr}x256 path']}, check_downpath=True)
 async def encode_x256(message: Message):
@@ -134,13 +135,15 @@ async def encode_x256(message: Message):
             )
         )
     finally:
-        Path(video_file).unlink(missing_ok=True)
-        Path(f"downloads/{file_name}").unlink(missing_ok=True)
+        if '-d' in message.flags:
+            Path(video_file).unlink(missing_ok=True)
+            Path(f"downloads/{file_name}").unlink(missing_ok=True)
 
 
 @userge.on_cmd("v2a", about={
     'header': "Convert a video to audio",
-    'flags': {'-b': 'Custom bitrate'},
+    'flags': {'-b': 'Custom bitrate',
+              '-d': 'Delete media after process done'},
     'usage': "{tr}v2a [file / folder path | direct link | reply to telegram file]",
     'examples': ['{tr}v2a link', '{tr}v2a path']}, check_downpath=True)
 async def video_to_audio(message: Message):
@@ -169,7 +172,7 @@ async def video_to_audio(message: Message):
         )
     except ffmpeg.Error as e:
         await message.err(f"{e.stderr}")
-    else:   
+    else:
         await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
 
         message_id = replied.message_id if replied else None
@@ -186,24 +189,26 @@ async def video_to_audio(message: Message):
             )
         )
     finally:
-        Path(f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/{audio_file}").unlink(missing_ok=True)
-        Path(f"downloads/{file_name}").unlink(missing_ok=True)
+        if '-d' in message.flags:
+            Path(f"{FF_MPEG_DOWN_LOAD_MEDIA_PATH}/{audio_file}").unlink(missing_ok=True)
+            Path(f"downloads/{file_name}").unlink(missing_ok=True)
 
 
 @userge.on_cmd("vscale", about={
     'header': "Scale a video to a given quality using h264",
     'flags': {'-q': 'Video Quality 144/240/360/480/720/etc',
               '-b': 'Custom bitrate',
-              '-c': 'Compress using x256'},
+              '-c': 'Compress using x256',
+              '-d': 'Delete media after process done'},
     'usage': "{tr}vscale -q quality [file / folder path | direct link | reply to telegram file]",
-    'examples': ['{tr}vscale -q 360 link', '{tr}vscale 360 path']}, check_downpath=True)
+    'examples': ['{tr}vscale -q 360 link', '{tr}vscale -d 360 path']}, check_downpath=True)
 async def scale_video(message: Message):
     replied = message.reply_to_message
     if not (message.filtered_input_str and hasattr(replied, 'media')):
         return await message.err("please read .help vscale")
     flags = message.flags
-    if not '-q' in flags:
-        return await message.err("You muse specify a quality!")
+    if '-q' not in flags:
+        return await message.err("You must specify a quality!")
 
     quality = int(flags.get('-q').rstrip('p'))
     custom_bitrate = flags.get('-b', "28")
@@ -236,25 +241,27 @@ async def scale_video(message: Message):
         )
         await asyncio.gather(
             message.delete(),
-                message.client.send_video(
+            message.client.send_video(
                 chat_id=message.chat.id, reply_to_message_id=message_id,
                 video=video_file, caption=caption
             )
         )
     finally:
-        Path(video_file).unlink(missing_ok=True)
-        Path(f"downloads/{file_name}").unlink(missing_ok=True)
+        if '-d' in message.flags:
+            Path(video_file).unlink(missing_ok=True)
+            Path(f"downloads/{file_name}").unlink(missing_ok=True)
 
 
 @userge.on_cmd("vth", about={
     'header': "Get video thumbnail",
+    'flags': {'-d': 'Delete media after process done'},
     'usage': "{tr}vth [file / folder path | direct link | reply to telegram file]",
     'examples': ['{tr}vth link', '{tr}vth path']}, check_downpath=True)
 async def video_thumbnail(message: Message):
     replied = message.reply_to_message
     if not (message.filtered_input_str and hasattr(replied, 'media')):
         return await message.err("please read .help vth")
-    dl_loc, file_name = await get_media_path_and_name(message, message.input_str)
+    dl_loc, file_name = await get_media_path_and_name(message)
 
     if not (dl_loc or file_name):
         return
@@ -284,8 +291,9 @@ async def video_thumbnail(message: Message):
             )
         )
     finally:
-        Path(thumbnail_file).unlink(missing_ok=True)
-        Path(f"downloads/{file_name}").unlink(missing_ok=True)
+        if '-d' in message.flags:
+            Path(thumbnail_file).unlink(missing_ok=True)
+            Path(f"downloads/{file_name}").unlink(missing_ok=True)
 
 
 @userge.on_cmd("vtrim", about={
@@ -297,24 +305,28 @@ async def video_thumbnail(message: Message):
     ]}, check_downpath=True)
 @userge.on_cmd("atrim", about={
     'header': "Trim an audio track",
-    'usage': "{tr}atrim [file / folder path | direct link | reply to telegram file]",
-    'examples': ['{tr}atrim link', '{tr}atrim path']}, check_downpath=True)
+    'flags': {'-d': 'Delete media after process done'},
+    'usage': "{tr}atrim [duration] | [file / folder path | direct link | reply to telegram file]",
+    'examples': [
+        '{tr}atrim 00:00:00 00:01:00 | link',
+        '{tr}atrim 00:10:00 00:20:00 | path'
+    ]}, check_downpath=True)
 async def video_trim(message: Message):
     replied = message.reply_to_message
-    if not (message.input_str and hasattr(replied, 'media')):
+    if not (message.filtered_input_str and hasattr(replied, 'media')):
         return await message.err("please read .help vtrim/atrim")
-    if '|' not in message.input_str:
+    if '|' not in message.filtered_input_str:
         return await message.err("path not specified!")
     match = re.search(
         r'(\d{2}:\d{2}:\d{2})? ?(\d{2}:\d{2}:\d{2})?',
-        message.input_str.split('|', 1)[0]
+        message.filtered_input_str.split('|', 1)[0]
     )
     if not (match and match.group(1) and match.group(2)):
         return await message.err("You muse specify end time at least!")
 
     dl_loc, file_name = await get_media_path_and_name(
         message,
-        input_str=message.input_str.split('|', 1)[1]
+        input_str=message.filtered_input_str.split('|', 1)[1]
     )
 
     if not (dl_loc or file_name):
@@ -345,23 +357,25 @@ async def video_trim(message: Message):
             )
         )
     finally:
-        Path(f"downloads/{file_name}").unlink(missing_ok=True)
-        Path(video_file).unlink(missing_ok=True)
+        if '-d' in message.flags:
+            Path(f"downloads/{file_name}").unlink(missing_ok=True)
+            Path(video_file).unlink(missing_ok=True)
 
 
 @userge.on_cmd("vcompress", about={
     'header': "Compress a video file",
+    'flags': {'-d': 'Delete media after process done'},
     'usage': "{tr}vcompress percentage [file / folder | direct link | reply to telegram file]",
     'examples': ['{tr}vcompress 70 link', '{tr}vcompress 50 path']}, check_downpath=True)
 async def video_compress(message: Message):
     replied = message.reply_to_message
-    if not (message.input_str and hasattr(replied, 'media')):
+    if not (message.filtered_input_str and hasattr(replied, 'media')):
         return await message.edit("`Please read .help vcompress`")
 
-    if ' ' not in message.input_str:
+    if ' ' not in message.filtered_input_str:
         return await message.err("path not specified!")
 
-    percentage, input_str = message.input_str.split(' ', 1)
+    percentage, input_str = message.filtered_input_str.split(' ', 1)
     dl_loc, file_name = await get_media_path_and_name(message, input_str=input_str)
 
     if not (dl_loc or file_name):
@@ -405,20 +419,21 @@ async def video_compress(message: Message):
             )
         )
     finally:
-        Path(video_file).unlink(missing_ok=True)
-        Path(f"downloads/{file_name}").unlink(missing_ok=True)
+        if '-d' in message.flags:
+            Path(video_file).unlink(missing_ok=True)
+            Path(f"downloads/{file_name}").unlink(missing_ok=True)
 
 
 @userge.on_cmd("minfo", about={
     'header': "Get media info",
-    'flags': {'-d': 'Delete media after getting info'},
+    'flags': {'-d': 'Delete media after process done'},
     'usage': "{tr}minfo [file / folder path | direct link | reply to telegram file]",
     'examples': ['{tr}minfo link', '{tr}minfo path']}, check_downpath=True)
 async def media_info(message: Message):
     replied = message.reply_to_message
     if not (message.filtered_input_str and hasattr(replied, 'media')):
         return await message.err("`please read .help minfo`")
-        
+
     dl_loc, file_name = await get_media_path_and_name(message)
     if not (dl_loc or file_name):
         return
