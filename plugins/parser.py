@@ -107,8 +107,8 @@ async def gdtot(message: Message):
             await message.edit("Parsing")
             res = await pool.run_in_thread(client.get)(args)
             soup = BeautifulSoup(res.text, 'html.parser')
-            title = soup.find('h5', {'class': lambda x: x and x =! "modal-title"}).text
-            info = soup.find_all('td', {'align': 'right')
+            title = soup.find('h5', {'class': lambda x: x and "modal-title" not in x}).text
+            info = soup.find_all('td', {'align': 'right'})
             res = await pool.run_in_thread(client.get)(
                 f"https://new.gdtot.top/dld?id={args.split('/')[-1]}")
             matches = re.findall(r'gd=(.*?)&', res.text)
