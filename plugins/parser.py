@@ -42,7 +42,7 @@ async def appdrive_dl(url):
     res = await pool.run_in_thread(client.get)(url)
     key = re.findall(r'"key",\s+"(.*?)"', res.text)[0]
     soup = BeautifulSoup(res.content, 'html.parser')
-    ddl_btn = soup.find('buttonn', {'id': 'drc'})
+    ddl_btn = soup.find('button', {'id': 'drc'})
     info_parsed = parse_info(res.text)
     info_parsed['error'] = False
     info_parsed['link_type'] = 'login'  # direct/login
@@ -107,7 +107,7 @@ async def gdtot(message: Message):
             await message.edit("Parsing")
             res = await pool.run_in_thread(client.get)(args)
             soup = BeautifulSoup(res.text, 'html.parser')
-            title,  = soup.find('h5', {'class': lambda x: x and x =! "modal-title"}).text
+            title = soup.find('h5', {'class': lambda x: x and x =! "modal-title"}).text
             info = soup.find_all('td', {'align': 'right')
             res = await pool.run_in_thread(client.get)(
                 f"https://new.gdtot.top/dld?id={args.split('/')[-1]}")
@@ -146,7 +146,7 @@ async def appdrive(message: Message):
                 raise Exception(res.get('error_message'))
             output = (
                 f'Title: {res.get("name")}\n'
-                f'Format: {res.get("format")}\n',
+                f'Format: {res.get("format")}\n'
                 f'Size: {res.get("size")}\n'
                 f'Drive_Link: {res.get("gdrive_link")}'
             )
