@@ -13,7 +13,9 @@ from userge import userge, Message
 async def create_channel(message: Message):
     try:
         args = message.input_str
-        await userge.create_channel(title, 'nice')
-        await message.edit(f"Successfully made a new channel **{title}**")
+        if not args:
+            return await message.err("title not found!")
+        await userge.create_channel(args, 'nice')
+        await message.edit(f"Successfully made a new channel **{args}**")
     except Exception as e:
         await message.err(str(e))
