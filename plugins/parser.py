@@ -1,12 +1,12 @@
 # Plugin By @ZekXtreme
 # Base Script by <https://github.com/xcscxr>
 
-import base64
 import os
 import re
+import base64
 import requests
+from bs4 import BeautifulSoup
 
-from lxml import etree
 from userge import Message, userge, pool
 
 crypt = os.environ.get("CRYPT")
@@ -24,10 +24,11 @@ def gen_data_string(data, boundary=f'{"-"*6}_'):
 
 
 def parse_info(data):
-    info = re.findall(r'>(.*?)<\/li>', data)
+    soup = BeautifulSoup(data, 'html.parser')
+    info = soup.find_all('li', {'class': 'list-group-item'})
     info_parsed = {}
     for item in info:
-        kv = [s.strip() for s in item.split(':', maxsplit=1)]
+        kv = [s.strip() for s in item.text.split(':', maxsplit=1)]
         info_parsed[kv[0].lower()] = kv[1]
     return info_parsed
 
@@ -38,9 +39,10 @@ async def appdrive_dl(url):
         'MD': MD,
         'PHPSESSID': PHPSESSID
     })
-    res = client.get(url)
+    res = await pool.run_in_thread(client.get)(url)
     key = re.findall(r'"key",\s+"(.*?)"', res.text)[0]
-    ddl_btn = etree.HTML(res.content).xpath("//button[@id='drc']")
+    soup = BeautifulSoup(res.content, 'html.parser')
+    ddl_btn = soup.find('buttonn', {'id': 'drc'})
     info_parsed = parse_info(res.text)
     info_parsed['error'] = False
     info_parsed['link_type'] = 'login'  # direct/login
@@ -51,12 +53,11 @@ async def appdrive_dl(url):
 
     data = {
         'type': 1,
-        'key': key
+        'key': key,
+        'action': 'original'
     }
 
-    data['action'] = 'original'
-
-    if len(ddl_btn):
+    if ddl_btn:
         info_parsed['link_type'] = 'direct'
         data['action'] = 'direct'
 
@@ -79,7 +80,7 @@ async def appdrive_dl(url):
 
     elif 'error' in response and response['error']:
         info_parsed['error'] = True
-        info_parsed['error_message'] = response['message']
+        info_parsed['error_message'] = response['error_message']
 
     info_parsed['src_url'] = url
 
@@ -105,17 +106,18 @@ async def gdtot(message: Message):
         try:
             await message.edit("Parsing")
             res = await pool.run_in_thread(client.get)(args)
-            title = re.findall(r">(.*?)<\/h5>", res.text)[0]
-            info = re.findall(r'<td\salign="right">(.*?)<\/td>', res.text)
+            soup = BeautifulSoup(res.text, 'html.parser')
+            title,  = soup.find('h5', {'class': lambda x: x and x =! "modal-title"}).text
+            info = soup.find_all('td', {'align': 'right')
             res = await pool.run_in_thread(client.get)(
                 f"https://new.gdtot.top/dld?id={args.split('/')[-1]}")
             matches = re.findall(r'gd=(.*?)&', res.text)
             decoded_id = base64.b64decode(str(matches[0])).decode('utf-8')
             gdrive_url = f'https://drive.google.com/open?id={decoded_id}'
             out = (
-                f'Title: {title}\n'
-                f'Size: {info[0]}\n'
-                f'Date: {info[1]}\n'
+                f'Title: {title.strip()}\n'
+                f'Size: {info[0].text.strip()}\n'
+                f'Date: {info[1].text.strip()}\n'
                 f'\nGDrive-URL:\n{gdrive_url}'
             )
             await message.edit(out, disable_web_page_preview=True)
@@ -123,9 +125,9 @@ async def gdtot(message: Message):
             await message.err("Unable To parse Link")
 
 
-@userge.on_cmd("ad", about={
+@userge.on_cmd("appdrive", about={
     'header': "parse appdrive links",
-    'usage': "{tr}ad appdrive_link"})
+    'usage': "{tr}appdrive appdrive_link"})
 async def appdrive(message: Message):
     if not (MD or PHPSESSID):
         return await message.err(
@@ -144,6 +146,8 @@ async def appdrive(message: Message):
                 raise Exception(res.get('error_message'))
             output = (
                 f'Title: {res.get("name")}\n'
+                f'Format: {res.get("format")}\n',
+                f'Size: {res.get("size")}\n'
                 f'Drive_Link: {res.get("gdrive_link")}'
             )
             await message.edit(output, disable_web_page_preview=True)
