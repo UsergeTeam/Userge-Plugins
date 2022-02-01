@@ -12,7 +12,6 @@ gtts
 humanize
 justwatch
 lottie
-lxml
 newspaper3k
 psutil
 pydub
