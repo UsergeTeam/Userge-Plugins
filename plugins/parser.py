@@ -43,7 +43,7 @@ async def appdrive_dl(url):
     ddl_btn = etree.HTML(res.content).xpath("//button[@id='drc']")
     info_parsed = parse_info(res.text)
     info_parsed['error'] = False
-    info_parsed['link_type'] = 'login' # direct/login
+    info_parsed['link_type'] = 'login'  # direct/login
 
     headers = {
         "Content-Type": f"multipart/form-data; boundary={'-'*4}_",
