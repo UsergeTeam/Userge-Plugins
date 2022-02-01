@@ -1,14 +1,13 @@
 # Plugin By @ZekXtreme
 # Base Script by <https://github.com/xcscxr>
 
-
 import base64
 import os
 import re
-
 import requests
+
 from lxml import etree
-from userge import Message, userge
+from userge import Message, userge, pool
 
 crypt = os.environ.get("CRYPT")
 MD = os.environ.get("APPDRIVE_MD")
@@ -25,7 +24,7 @@ def gen_data_string(data, boundary=f'{"-"*6}_'):
 
 
 def parse_info(data):
-    info = re.findall('>(.*?)<\/li>', data)
+    info = re.findall(r'>(.*?)<\/li>', data)
     info_parsed = {}
     for item in info:
         kv = [s.strip() for s in item.split(':', maxsplit=1)]
@@ -33,18 +32,18 @@ def parse_info(data):
     return info_parsed
 
 
-def appdrive_dl(url):
+async def appdrive_dl(url):
     client = requests.Session()
     client.cookies.update({
         'MD': MD,
         'PHPSESSID': PHPSESSID
     })
     res = client.get(url)
-    key = re.findall('"key",\s+"(.*?)"', res.text)[0]
+    key = re.findall(r'"key",\s+"(.*?)"', res.text)[0]
     ddl_btn = etree.HTML(res.content).xpath("//button[@id='drc']")
     info_parsed = parse_info(res.text)
     info_parsed['error'] = False
-    info_parsed['link_type'] = 'login'    # direct/login
+    info_parsed['link_type'] = 'login' # direct/login
 
     headers = {
         "Content-Type": f"multipart/form-data; boundary={'-'*4}_",
@@ -61,14 +60,19 @@ def appdrive_dl(url):
         info_parsed['link_type'] = 'direct'
         data['action'] = 'direct'
 
-    while data['type'] <= 3:
+    if data.get('type') <= 3:
         try:
-            response = client.post(url, data=gen_data_string(
-                data), headers=headers).json()
-            break
-        except Exception:
-            data['type'] += 1
-            print(data['type'])
+            response = await pool.run_in_thread(client.post)(
+                url,
+                data=gen_data_string(data),
+                headers=headers
+            )
+            response = response.json()
+        except Exception as e:
+            response = {
+                'error': True,
+                'error_message': str(e)
+            }
 
     if 'url' in response:
         info_parsed['gdrive_link'] = response['url']
@@ -100,12 +104,12 @@ async def gdtot(message: Message):
     else:
         try:
             await message.edit("Parsing")
-            res = client.get(args)
-            title = re.findall(">(.*?)<\/h5>", res.text)[0]
-            info = re.findall('<td\salign="right">(.*?)<\/td>', res.text)
-            res = client.get(
+            res = await pool.run_in_thread(client.get)(args)
+            title = re.findall(r">(.*?)<\/h5>", res.text)[0]
+            info = re.findall(r'<td\salign="right">(.*?)<\/td>', res.text)
+            res = await pool.run_in_thread(client.get)(
                 f"https://new.gdtot.top/dld?id={args.split('/')[-1]}")
-            matches = re.findall('gd=(.*?)&', res.text)
+            matches = re.findall(r'gd=(.*?)&', res.text)
             decoded_id = base64.b64decode(str(matches[0])).decode('utf-8')
             gdrive_url = f'https://drive.google.com/open?id={decoded_id}'
             out = (
@@ -125,7 +129,7 @@ async def gdtot(message: Message):
 async def appdrive(message: Message):
     if not (MD or PHPSESSID):
         return await message.err(
-            "First set APPDRIVE_MD & PHPSESSID from appdrive.in\n "
+            "First set APPDRIVE_MD & PHPSESSID from appdrive.in "
             "before using this plugin",
             disable_web_page_preview=True
         )
@@ -135,9 +139,13 @@ async def appdrive(message: Message):
     else:
         try:
             await message.edit("Parsing.....")
-            res = appdrive_dl(url)
-            output = f'''Title: {res['name']}\n
-            Drive_Link: {res['gdrive_link']}'''
+            res = await appdrive_dl(url)
+            if res.get('error') and res.get('error_message'):
+                raise Exception(res.get('error_message'))
+            output = (
+                f'Title: {res.get("name")}\n'
+                f'Drive_Link: {res.get("gdrive_link")}'
+            )
             await message.edit(output, disable_web_page_preview=True)
-        except Exception:
-            message.err("Unable to get Drive Link")
+        except Exception as e:
+            await message.err(str(e))
