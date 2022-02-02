@@ -94,11 +94,10 @@ async def appdrive_dl(url):
                 'error': True,
                 'message': str(e)
             }
-    else:
-        if 'url' in response:
-            info_parsed['gdrive_link'] = response['url']
+    if 'url' in response:
+        info_parsed['gdrive_link'] = response['url']
 
-    if response.get('error'):
+    elif response.get('error'):
         info_parsed['error'] = True
         info_parsed['error_message'] = response['message']
 
