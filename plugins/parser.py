@@ -11,7 +11,6 @@ from userge import Message, userge, pool
 
 crypt = os.environ.get("CRYPT")
 MD = os.environ.get("APPDRIVE_MD")
-PHPSESSID = os.environ.get("PHPSESSID")
 
 
 def gen_data_string(data, boundary=f'{"-"*6}_'):
@@ -35,10 +34,7 @@ def parse_info(data):
 
 async def appdrive_dl(url):
     client = requests.Session()
-    client.cookies.update({
-        'MD': MD,
-        'PHPSESSID': PHPSESSID
-    })
+    client.cookies.update({'MD': MD})
     res = await pool.run_in_thread(client.get)(url)
     key = re.findall(r'"key",\s+"(.*?)"', res.text)[0]
     soup = BeautifulSoup(res.content, 'html.parser')
@@ -104,10 +100,11 @@ async def gdtot(message: Message):
         await message.err("Send a link along with command")
     else:
         try:
-            await message.edit("Parsing")
+            await message.edit("Parsing...")
             res = await pool.run_in_thread(client.get)(args)
             soup = BeautifulSoup(res.text, 'html.parser')
-            title = soup.find('h5', {'class': lambda x: x and "modal-title" not in x}).text
+            title = soup.find(
+                'h5', {'class': lambda x: x and "modal-title" not in x}).text
             info = soup.find_all('td', {'align': 'right'})
             res = await pool.run_in_thread(client.get)(
                 f"https://new.gdtot.top/dld?id={args.split('/')[-1]}")
@@ -129,9 +126,9 @@ async def gdtot(message: Message):
     'header': "parse appdrive links",
     'usage': "{tr}appdrive appdrive_link"})
 async def appdrive(message: Message):
-    if not (MD or PHPSESSID):
+    if not MD:
         return await message.err(
-            "First set APPDRIVE_MD & PHPSESSID from appdrive.in "
+            "First set APPDRIVE_MD from appdrive.in "
             "before using this plugin",
             disable_web_page_preview=True
         )
