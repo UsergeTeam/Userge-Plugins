@@ -72,7 +72,6 @@ async def appdrive_dl(url):
     }
 
     data = {
-        'type': 1,
         'key': key,
         'action': 'original'
     }
@@ -81,28 +80,27 @@ async def appdrive_dl(url):
         info_parsed['link_type'] = 'direct'
         data['action'] = 'direct'
 
-    if data.get('type') <= 3:
+    for i in range(1, 4):
+        data['type'] = i
         try:
             response = await pool.run_in_thread(client.post)(
                 url,
                 data=gen_data_string(data),
                 headers=headers
-            )
-            response = response.json()
+            ).json()
+            break
         except Exception as e:
             response = {
                 'error': True,
-                'error_message': e
+                'message': str(e)
             }
+    else:
+        if 'url' in response:
+            info_parsed['gdrive_link'] = response['url']
 
-    if 'url' in response:
-        info_parsed['gdrive_link'] = response['url']
-
-    elif 'error' in response and response['error']:
+    if response.get('error'):
         info_parsed['error'] = True
-        info_parsed['error_message'] = response['error_message']
-
-    info_parsed['src_url'] = url
+        info_parsed['error_message'] = response['message']
 
     return info_parsed
 
