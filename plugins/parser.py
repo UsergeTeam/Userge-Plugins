@@ -83,11 +83,11 @@ async def appdrive_dl(url):
     for i in range(1, 4):
         data['type'] = i
         try:
-            response = await pool.run_in_thread(client.post)(
+            response = (await pool.run_in_thread(client.post)(
                 url,
                 data=gen_data_string(data),
                 headers=headers
-            ).json()
+            )).json()
             break
         except Exception as e:
             response = {
