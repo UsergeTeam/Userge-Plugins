@@ -7,7 +7,7 @@ import base64
 import requests
 from bs4 import BeautifulSoup
 
-from userge import Message, userge
+from userge import Message, userge, pool
 
 crypt = os.environ.get("CRYPT")
 
