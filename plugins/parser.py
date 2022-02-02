@@ -80,26 +80,27 @@ async def appdrive_dl(url):
         info_parsed['link_type'] = 'direct'
         data['action'] = 'direct'
 
-    for i in range(1, 4):
-        data['type'] = i
-        try:
-            response = (await pool.run_in_thread(client.post)(
-                url,
-                data=gen_data_string(data),
-                headers=headers
-            )).json()
-            break
-        except Exception as e:
-            response = {
-                'error': True,
-                'message': str(e)
-            }
-    if 'url' in response:
-        info_parsed['gdrive_link'] = response['url']
+        for i in range(1, 4):
+            data['type'] = i
+            try:
+                response = (await pool.run_in_thread(client.post)(
+                    url,
+                    data=gen_data_string(data),
+                    headers=headers
+                )).json()
+                break
+            except Exception as e:
+                if i == 3:
+                    response = {
+                        'error': True,
+                        'message': str(e)
+                    }
+        if 'url' in response:
+            info_parsed['gdrive_link'] = response['url']
 
-    elif response.get('error'):
-        info_parsed['error'] = True
-        info_parsed['error_message'] = response['message']
+        elif response.get('error'):
+            info_parsed['error'] = True
+            info_parsed['error_message'] = response['message']
 
     return info_parsed
 
@@ -163,7 +164,8 @@ async def appdrive(message: Message):
                 f'Title: {res.get("name")}\n'
                 f'Format: {res.get("format")}\n'
                 f'Size: {res.get("size")}\n'
-                f'Drive_Link: {res.get("gdrive_link")}'
+                'Drive_Link: '
+                f'{res.get("gdrive_link", "this link requires login to get drive_link")}'
             )
             await message.edit(output, disable_web_page_preview=True)
         except Exception as e:
