@@ -3,14 +3,33 @@
 
 import os
 import re
+import json
 import base64
 import requests
 from bs4 import BeautifulSoup
 
 from userge import Message, userge, pool
 
-crypt = os.environ.get("CRYPT")
+CRYPT = os.environ.get("CRYPT")
 MD = os.environ.get("APPDRIVE_MD")
+
+
+async def _init():
+    global CRYPT, MD  # pylint: disable=global-statement
+    if CRYPT:
+        try:
+            crypt = json.loads(CRYPT)
+        except Exception:
+            pass  # user entered only crypt value from dict
+        else:
+            CRYPT = crypt.get("cookie").split('=')[-1]
+    if MD:
+        try:
+            md = json.loads(MD)
+        except Exception:
+            pass  # user entered only crypt value from dict
+        else:
+            MD = md.get("cookie").split(';')[0].split('=')[-1]
 
 
 def gen_data_string(data, boundary=f'{"-"*6}_'):
@@ -33,8 +52,10 @@ def parse_info(data):
 
 
 async def appdrive_dl(url):
+
     client = requests.Session()
     client.cookies.update({'MD': MD})
+
     res = await pool.run_in_thread(client.get)(url)
     key = re.findall(r'"key",\s+"(.*?)"', res.text)[0]
     soup = BeautifulSoup(res.content, 'html.parser')
@@ -45,7 +66,9 @@ async def appdrive_dl(url):
 
     headers = {
         "Content-Type": f"multipart/form-data; boundary={'-'*4}_",
-        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
+        "user-agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                       "AppleWebKit/537.36 (KHTML, like Gecko) "
+                       "Chrome/97.0.4692.99 Safari/537.36")
     }
 
     data = {
@@ -69,7 +92,7 @@ async def appdrive_dl(url):
         except Exception as e:
             response = {
                 'error': True,
-                'error_message': str(e)
+                'error_message': e
             }
 
     if 'url' in response:
@@ -86,16 +109,15 @@ async def appdrive_dl(url):
 
 @userge.on_cmd("gdtot", about={
     'header': "parse gdtot links",
+    'description': "you have to set <code>CRYPT</code>.\nget it by reading "
+                   "<a href='https://t.me/UnofficialPluginsHelp/129'>help</a>.",
     'usage': "{tr}gdtot gdtot_link"})
 async def gdtot(message: Message):
     """ Gets gdrive link """
-    if not crypt:
-        return await message.edit(
-            "**Oops, You forgot to Set GDTOT Cookies**\n"
-            "see [Help](https://telegra.ph/GDTOT-HELP-01-24) ",
-            disable_web_page_preview=True)
+    if not CRYPT:
+        return await message.err("read .help gdtot")
     client = requests.Session()
-    client.cookies.update({'crypt': crypt})
+    client.cookies.update({'crypt': CRYPT})
     args = message.input_str
     if not args:
         await message.err("Send a link along with command")
@@ -125,14 +147,12 @@ async def gdtot(message: Message):
 
 @userge.on_cmd("appdrive", about={
     'header': "parse appdrive links",
+    'description': "you have to set <code>APPDRIVE_MD</code>.\nget it by reading "
+                   "<a href='https://t.me/UnofficialPluginsHelp/129'>help</a>.",
     'usage': "{tr}appdrive appdrive_link"})
 async def appdrive(message: Message):
     if not MD:
-        return await message.err(
-            "First set APPDRIVE_MD from appdrive.in "
-            "before using this plugin",
-            disable_web_page_preview=True
-        )
+        return await message.err("read .help appdrive")
     url = message.input_or_reply_str
     if not url:
         await message.err("Send a link along with command")
@@ -150,4 +170,4 @@ async def appdrive(message: Message):
             )
             await message.edit(output, disable_web_page_preview=True)
         except Exception as e:
-            await message.err(str(e))
+            await message.err(e)
