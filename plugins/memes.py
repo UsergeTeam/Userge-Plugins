@@ -332,9 +332,9 @@ async def slap_(message: Message):
     if message.from_user.is_self:
         await message.edit(caption)
     elif message.reply_to_message:
-		await message.reply_to_message.reply(caption)
-	else:
-		await message.reply(caption)
+        await message.reply_to_message.reply(caption)
+    else:
+        await message.reply(caption)
 
 
 @userge.on_cmd("(yes|no|maybe|decide)$", about={
