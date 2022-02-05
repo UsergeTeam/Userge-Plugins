@@ -329,11 +329,12 @@ async def slap_(message: Message):
     caption = "..." + temp.format(victim=info_dict['mention'],
                                   item=item, hits=hit,
                                   throws=throw, where=where)
-    try:
+    if message.from_user.is_self:
         await message.edit(caption)
-    except Exception:  # pylint: disable=broad-except
-        await message.edit(
-            "`Can't slap this person, need to fetch some sticks and stones !!`")
+    elif message.reply_to_message:
+		await message.reply_to_message.reply(caption)
+	else:
+		await message.reply(caption)
 
 
 @userge.on_cmd("(yes|no|maybe|decide)$", about={
