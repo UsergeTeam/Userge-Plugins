@@ -5,17 +5,20 @@ import os
 import re
 import json
 import base64
+from urllib.parse import urlparse
+
 import requests
 from bs4 import BeautifulSoup
-
 from userge import Message, userge, pool
 
 CRYPT = os.environ.get("CRYPT")
-MD = os.environ.get("APPDRIVE_MD")
+# Website User Account (NOT GOOGLE ACCOUNT)
+APPDRIVE_EMAIL = os.environ.get("APPDRIVE_EMAIL")
+APPDRIVE_PASS = os.environ.get("APPDRIVE_PASS")
 
 
 async def _init():
-    global CRYPT, MD  # pylint: disable=global-statement
+    global CRYPT  # pylint: disable=global-statement
     if CRYPT:
         try:
             crypt = json.loads(CRYPT)
@@ -23,16 +26,18 @@ async def _init():
             pass  # user entered only crypt value from dict
         else:
             CRYPT = crypt.get("cookie").split('=')[-1]
-    if MD:
-        try:
-            md = json.loads(MD)
-        except Exception:
-            pass  # user entered only crypt value from dict
-        else:
-            MD = md.get("cookie").split(';')[0].split('=')[-1]
 
 
-def gen_data_string(data, boundary=f'{"-"*6}_'):
+async def account_login(client, url):
+    data = {
+        'email': APPDRIVE_EMAIL,
+        'password': APPDRIVE_PASS
+    }
+    await pool.run_in_thread(client.post)(
+        f'https://{urlparse(url).netloc}/login', data=data)
+
+
+def gen_payload(data, boundary=f'{"-"*6}_'):
     data_string = ''
     for item in data:
         data_string += f'{boundary}\r\n'
@@ -52,10 +57,13 @@ def parse_info(data):
 
 
 async def appdrive_dl(url):
-
     client = requests.Session()
-    client.cookies.update({'MD': MD})
-
+    client.headers.update({
+        "user-agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                       "AppleWebKit/537.36 (KHTML, like Gecko) "
+                       "Chrome/97.0.4692.99 Safari/537.36")
+    })
+    await account_login(client, url)
     res = await pool.run_in_thread(client.get)(url)
     key = re.findall(r'"key",\s+"(.*?)"', res.text)[0]
     soup = BeautifulSoup(res.content, 'html.parser')
@@ -63,52 +71,48 @@ async def appdrive_dl(url):
     info_parsed = parse_info(res.text)
     info_parsed['error'] = False
     info_parsed['link_type'] = 'login'  # direct/login
-
     headers = {
         "Content-Type": f"multipart/form-data; boundary={'-'*4}_",
-        "user-agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                       "AppleWebKit/537.36 (KHTML, like Gecko) "
-                       "Chrome/97.0.4692.99 Safari/537.36")
     }
 
     data = {
         'key': key,
-        'action': 'original'
+        'action': 'original',
+        'type': 1
     }
 
     if ddl_btn:
-        info_parsed['link_type'] = 'direct'
         data['action'] = 'direct'
+        info_parsed['link_type'] = 'direct'
 
-        for i in range(1, 4):
-            data['type'] = i
-            try:
-                response = (await pool.run_in_thread(client.post)(
-                    url,
-                    data=gen_data_string(data),
-                    headers=headers
-                )).json()
-                break
-            except Exception as e:
-                if i == 3:
-                    response = {
-                        'error': True,
-                        'message': str(e)
-                    }
-        if 'url' in response:
-            info_parsed['gdrive_link'] = response['url']
+    while data['type'] <= 3:
+        try:
+            response = (await pool.run_in_thread(client.post)(
+                url,
+                data=gen_payload(data),
+                headers=headers
+            )).json()
+            break
+        except Exception as e:
+            if data['type'] == 3:
+                response = {
+                    'error': True,
+                    'message': str(e)
+                }
+            data['type'] += 1
 
-        elif response.get('error'):
-            info_parsed['error'] = True
-            info_parsed['error_message'] = response['message']
-
+    if 'url' in response:
+        info_parsed['gdrive_link'] = response['url']
+    else:
+        info_parsed['error'] = True
+        info_parsed['error_message'] = response.get('message', 'Something went wrong :(')
     return info_parsed
 
 
 @userge.on_cmd("gdtot", about={
     'header': "parse gdtot links",
     'description': "you have to set <code>CRYPT</code>.\nget it by reading "
-                   "<a href='https://t.me/UnofficialPluginsHelp/129'>help</a>.",
+                   "<a href='https://t.me/UnofficialPluginsHelp/129'>Help</a>",
     'usage': "{tr}gdtot gdtot_link"})
 async def gdtot(message: Message):
     """ Gets gdrive link """
@@ -145,28 +149,26 @@ async def gdtot(message: Message):
 
 @userge.on_cmd("appdrive", about={
     'header': "parse appdrive links",
-    'description': "you have to set <code>APPDRIVE_MD</code>.\nget it by reading "
-                   "<a href='https://t.me/UnofficialPluginsHelp/129'>help</a>.",
+    'description': "you have to set <code>Required Vars</code>.\nget it by reading"
+                   "<a href='https://t.me/UnofficialPluginsHelp/129'>Help</a>",
     'usage': "{tr}appdrive appdrive_link"})
 async def appdrive(message: Message):
-    if not MD:
+    if not (APPDRIVE_EMAIL or APPDRIVE_PASS):
         return await message.err("read .help appdrive")
-    url = message.input_or_reply_str
+    url = message.input_str
     if not url:
         await message.err("Send a link along with command")
     else:
-        try:
-            await message.edit("Parsing.....")
-            res = await appdrive_dl(url)
-            if res.get('error') and res.get('error_message'):
-                raise Exception(res.get('error_message'))
+        await message.edit("Parsing.....")
+        res = await appdrive_dl(url)
+        if res.get('error') and res.get('error_message'):
+            await message.err(res.get('error_message'))
+        else:
             output = (
                 f'Title: {res.get("name")}\n'
                 f'Format: {res.get("format")}\n'
                 f'Size: {res.get("size")}\n'
                 'Drive_Link: '
-                f'{res.get("gdrive_link", "this link requires login to get drive_link")}'
+                f'{res.get("gdrive_link", "Something Went Wrong")}'
             )
             await message.edit(output, disable_web_page_preview=True)
-        except Exception as e:
-            await message.err(e)
