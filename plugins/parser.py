@@ -84,7 +84,7 @@ async def appdrive_dl(url):
     if ddl_btn:
         data['action'] = 'direct'
         info_parsed['link_type'] = 'direct'
- 
+
     while data['type'] <= 3:
         try:
             response = (await pool.run_in_thread(client.post)(
