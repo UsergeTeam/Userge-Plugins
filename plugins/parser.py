@@ -1,27 +1,20 @@
 # Plugin By @ZekXtreme
 # Base Script by <https://github.com/xcscxr>
 
-
-import base64
-import json
 import os
 import re
+import json
+import base64
 from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
-from userge import Message, pool, userge
+from userge import Message, userge, pool
 
 CRYPT = os.environ.get("CRYPT")
 # Website User Account (NOT GOOGLE ACCOUNT)
 APPDRIVE_EMAIL = os.environ.get("APPDRIVE_EMAIL")
 APPDRIVE_PASS = os.environ.get("APPDRIVE_PASS")
-
-
-account = {
-    'email': APPDRIVE_EMAIL,
-    'passwd': APPDRIVE_PASS
-}
 
 
 async def _init():
@@ -35,13 +28,13 @@ async def _init():
             CRYPT = crypt.get("cookie").split('=')[-1]
 
 
-def account_login(client, url, email, password):
+async def account_login(client, url):
     data = {
-        'email': email,
-        'password': password
+        'email': APPDRIVE_EMAIL,
+        'password': APPDRIVE_PASS
     }
-    (pool.run_in_thread(client.post(
-        f'https://{urlparse(url).netloc}/login', data=data)))
+    await pool.run_in_thread(client.post)(
+        f'https://{urlparse(url).netloc}/login', data=data)
 
 
 def gen_payload(data, boundary=f'{"-"*6}_'):
@@ -63,15 +56,15 @@ def parse_info(data):
     return info_parsed
 
 
-def appdrive_dl(url):
+async def appdrive_dl(url):
     client = requests.Session()
     client.headers.update({
         "user-agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                        "AppleWebKit/537.36 (KHTML, like Gecko) "
                        "Chrome/97.0.4692.99 Safari/537.36")
     })
-    account_login(client, url, account['email'], account['passwd'])
-    res = client.get(url)
+    await account_login(client, url)
+    res = await pool.run_in_thread(client.get)(url)
     key = re.findall(r'"key",\s+"(.*?)"', res.text)[0]
     soup = BeautifulSoup(res.content, 'html.parser')
     ddl_btn = soup.find('button', {'id': 'drc'})
@@ -83,37 +76,36 @@ def appdrive_dl(url):
     }
 
     data = {
-        'type': 1,
         'key': key,
-        'action': 'original'
+        'action': 'original',
+        'type': 1
     }
 
     if ddl_btn:
-        info_parsed['link_type'] = 'direct'
         data['action'] = 'direct'
-
+        info_parsed['link_type'] = 'direct'
+ 
     while data['type'] <= 3:
         try:
-            response = client.post(
+            response = (await pool.run_in_thread(client.post)(
                 url,
                 data=gen_payload(data),
                 headers=headers
-            ).json()
+            )).json()
             break
-        except Exception:
+        except Exception as e:
+            if data['type'] == 3:
+                response = {
+                    'error': True,
+                    'message': str(e)
+                }
             data['type'] += 1
 
     if 'url' in response:
         info_parsed['gdrive_link'] = response['url']
-    elif 'error' in response and response['error']:
-        info_parsed['error'] = True
-        info_parsed['error_message'] = response['message']
     else:
         info_parsed['error'] = True
-        info_parsed['error_message'] = 'Something went wrong :('
-    if info_parsed['error']:
-        return info_parsed
-
+        info_parsed['error_message'] = response.get('message', 'Something went wrong :(')
     return info_parsed
 
 
@@ -167,9 +159,10 @@ async def appdrive(message: Message):
     if not url:
         await message.err("Send a link along with command")
     else:
+        await message.edit("Parsing.....")
         res = await appdrive_dl(url)
         if res.get('error') and res.get('error_message'):
-            await message.edit(res.get('error_message'))
+            await message.err(res.get('error_message'))
         else:
             output = (
                 f'Title: {res.get("name")}\n'
