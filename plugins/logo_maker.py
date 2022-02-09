@@ -54,7 +54,7 @@ async def download(uri: str, file_name: str):
 
 async def dispatch(message: Message, logos: List[Tuple[str]]):
     """ dispatch logos to chat """
-    global STATUS  pylint: disable=global-statement
+    global STATUS  # pylint: disable=global-statement
     group: List[InputMediaPhoto] = []
     paths: List[str] = []
     src: str = "Source: <a href='https://www.brandcrowd.com{}'>Here</a>"
@@ -70,7 +70,8 @@ async def dispatch(message: Message, logos: List[Tuple[str]]):
             group.append(InputMediaPhoto(loc, caption=src.format(source)))
             if len(group) == 10:
                 try:
-                    await status.edit(f"`Uploading Batch {batch}...`")
+                    await status.edit(
+                        f"`Uploading Batch {batch}/{round(len(logos) / 10)}...`")
                     await message.reply_media_group(group)
                 except Exception as pyro:
                     LOG.exception(pyro)
@@ -101,7 +102,7 @@ async def dispatch(message: Message, logos: List[Tuple[str]]):
 })
 async def jv_logo_maker(message: Message):
     """ make logos """
-    global STATUS  pylint: disable=global-statement
+    global STATUS  # pylint: disable=global-statement
     if STATUS:
         return await message.err("Let the current process be completed!!")
     STATUS = True
