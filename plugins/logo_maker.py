@@ -2,10 +2,10 @@
 # Logo maker using brandcrowd.com
 
 import os
-from typing import List, Tuple
-
+import shutil
 import aiohttp
 import aiofiles
+from typing import List, Tuple
 from bs4 import BeautifulSoup
 
 from pyrogram.types import InputMediaPhoto
@@ -13,7 +13,7 @@ from pyrogram.types import InputMediaPhoto
 from userge import userge, Message
 
 LOG = userge.getLogger(__name__)
-STATUS = {}
+STATUS = False
 URI = "https://www.brandcrowd.com/maker/logos"
 HEADERS = {"User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) '
                          'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37'
@@ -54,11 +54,12 @@ async def download(uri: str, file_name: str):
 
 async def dispatch(message: Message, logos: List[Tuple[str]]):
     """ dispatch logos to chat """
+    global STATUS  pylint: disable=global-statement
     group: List[InputMediaPhoto] = []
     paths: List[str] = []
     src: str = "Source: <a href='https://www.brandcrowd.com{}'>Here</a>"
     count: int = 1
-    file_name: str = "logo_{}.jpg"
+    file_name: str = "temp_logos/logo_{}.jpg"
     status = await message.edit("`Beginning To Dispatch Content...`")
     batch = 1
     for logo in logos:
@@ -80,15 +81,15 @@ async def dispatch(message: Message, logos: List[Tuple[str]]):
             LOG.exception(e)
 
     if len(group) >= 2:
-        await status.edit(f"`Uploading Batch {batch}`")
+        await status.edit(
+            f"`Uploading Batch {batch}/{round(len(logos)/10)}`")
         await message.reply_media_group(group)
     elif len(group) == 1:
         await message.reply_photo(group[0].media, caption=group[0].caption)
-    STATUS[""] = False
-    for path in paths:
-        if os.path.lexists(path):
-            os.remove(path)
     await status.delete()
+    STATUS = False
+    if os.path.exists("temp_logos/"):
+        shutil.rmtree("temp_logos/", ignore_errors=True)
 
 
 @userge.on_cmd("logo", about={
@@ -100,9 +101,10 @@ async def dispatch(message: Message, logos: List[Tuple[str]]):
 })
 async def jv_logo_maker(message: Message):
     """ make logos """
-    if STATUS.get("", False):
+    global STATUS  pylint: disable=global-statement
+    if STATUS:
         return await message.err("Let the current process be completed!!")
-    STATUS[""] = True
+    STATUS = True
     jv_text = message.input_str
     if not jv_text:
         return await message.err("Input Required!!")
@@ -116,7 +118,6 @@ async def jv_logo_maker(message: Message):
         logos = await logo_maker(type_text, type_keyword)
     except Exception as e:
         LOG.exception(e)
-        STATUS[""] = False
+        STATUS = False
         return await message.err("No Logos for Ya 😒😒😏")
-
     await dispatch(message, logos)
