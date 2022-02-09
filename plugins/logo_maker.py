@@ -112,11 +112,11 @@ async def jv_logo_maker(message: Message):
     type_text = jv_text
     if ':' in jv_text:
         type_text, type_keyword = jv_text.split(":", 1)
-
     try:
         logos = await logo_maker(type_text, type_keyword)
     except Exception as e:
         LOG.exception(e)
-        await message.err("No Logos for Ya 😒😒😏")
-        return
+        STATUS[""] = False
+        return await message.err("No Logos for Ya 😒😒😏")
+
     await dispatch(message, logos)
