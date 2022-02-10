@@ -41,6 +41,8 @@ async def logo_maker(text: str, keyword: str = "name"):
 
 async def download(uri: str, file_name: str):
     """ download a uri """
+    if not os.path.exists("temp_logos/"):
+        os.mkdir("temp_logos/")
     async with \
             aiofiles.open(file_name, "wb+") as file, \
             aiohttp.ClientSession(headers=HEADERS) as session, \
