@@ -10,6 +10,7 @@ from pydub.exceptions import CouldntDecodeError
 
 from userge import userge, Message, Config
 from userge.plugins.misc.download import tg_download, url_download
+from userge.utils import is_url
 from userge.utils.exceptions import ProcessCanceled
 
 logger = userge.getLogger(__name__)
@@ -47,13 +48,13 @@ class WitAiAPI:
             'content-type': 'audio/raw;encoding=signed-integer;bits=16;rate=8000;endian=little',
         }
         try:
-            async with ClientSession() as session:
-                async with session.post(
-                        f"{self.api_url}/speech", headers=headers,
-                        data=io.BufferedReader(io.BytesIO(chunk.raw_data))) as resp:
-                    if resp.status == 200:
-                        response = await resp.json()
-                        text = response['_text'] if '_text' in response else response['text']
+            async with ClientSession() as session, session.post(
+                f"{self.api_url}/speech", headers=headers,
+                data=io.BufferedReader(io.BytesIO(chunk.raw_data))
+            ) as resp:
+                if resp.status == 200:
+                    response = await resp.json()
+                    text = response['_text'] if '_text' in response else response['text']
         except Exception as e:
             error = f"Could not transcribe chunk: {e}\n{traceback.format_exc()}"
 
@@ -106,10 +107,11 @@ class WitAiAPI:
     'header': "transcribe a file (speech to text)",
     'options': {'-t': 'send text to telegram as well as the transcription file'},
     'usage': "{tr}stt lang [file / folder path | direct link | reply to telegram file]",
-    'examples': ['{tr}stt en link', '{tr}stt ar -t link']}, check_downpath=True)
+    'examples': ['{tr}stt en link', '{tr}stt ar -t link']
+}, check_downpath=True, del_pre=True)
 async def stt_(message: Message):
     """ Speech to text using Wit.ai """
-    send_text = bool('v' in message.flags)
+    send_text = bool('t' in message.flags)
     replied = message.reply_to_message
     message_id = replied.message_id if replied else message.message_id
     regex = re.compile(r'([\S]*)(?: |)([\s\S]*)')
@@ -147,9 +149,8 @@ async def stt_(message: Message):
             return
     else:
         input_str = match.group(2) if match.group(2) else ""
-        is_url = re.search(
-            r"(?:https?|ftp)://[^|\s]+\.[^|\s]+", input_str)
-        if is_url:
+        is_input_url = is_url(input_str)
+        if is_input_url:
             try:
                 dl_loc, _ = await url_download(message, message.filtered_input_str)
                 file_name = os.path.basename(dl_loc)
