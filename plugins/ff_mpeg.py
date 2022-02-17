@@ -439,7 +439,9 @@ async def media_info(message: Message):
 
     try:
         info = await probe(dl_loc)
-        await message.reply(f"`{json.dumps(info, indent=1, ensure_ascii=False)}`")
+        await message.reply_or_send_as_file(
+            f"`{json.dumps(info, indent=1, ensure_ascii=False)}`"
+        )
     except ffmpeg.Error as e:
         await message.err(f"`{e.stderr}`")
     else:
