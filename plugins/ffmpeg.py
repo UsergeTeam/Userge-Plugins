@@ -428,7 +428,6 @@ async def video_compress(message: Message):
     'examples': ['{tr}minfo link', '{tr}minfo path']}, check_downpath=True)
 async def media_info(message: Message):
     """ get media info """
-    replied = message.reply_to_message
     data = await get_media_path_and_name(message)
     if not data:
         return
