@@ -22,7 +22,9 @@ from pyrogram.types import (
     Message as PyroMessage, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 )
 
-from userge import userge, Message, Config, filters, get_collection, pool
+from userge import userge, Message, config, filters, get_collection, pool
+from .. import botpm
+from ...tools import alive
 from userge.utils import SafeDict, time_formatter
 from userge.utils.exceptions import StopConversation
 
@@ -44,12 +46,12 @@ _U_ID_F_M_ID: Dict[int, int] = {}
 _STATS: Dict[str, int] = {"incoming": 0, "outgoing": 0}
 
 START_TEXT = " Hello {mention}, you can contact me using this Bot."
-START_MEDIA = os.environ.get("START_MEDIA")
 
 botPmFilter = filters.create(lambda _, __, ___: BOT_PM)
 bannedFilter = filters.create(lambda _, __, ___: ___.chat.id in _BANNED_USERS)
 
 
+@userge.on_start
 async def _init():
     global START_TEXT, BOT_PM  # pylint: disable=global-statement
     async for a in HAVE_BLOCKED.find():
@@ -96,7 +98,7 @@ async def bot_pm(msg: Message):
 
 
 if userge.has_bot:
-    userge_id = userge.id if userge.dual_mode else Config.OWNER_ID[0]
+    userge_id = userge.id if userge.dual_mode else config.OWNER_ID[0]
     bot = userge.bot
 
     @bot.on_message(~bannedFilter & ~filters.edited
@@ -106,14 +108,15 @@ if userge.has_bot:
         user_dict = await bot.get_user_dict(user_id)
         text = START_TEXT.format_map(SafeDict(**user_dict))
         path = None
-        if START_MEDIA:
+        if botpm.Config.START_MEDIA:
             pattern = r"^https://telegra\.ph/file/\w+\.\w+$"
-            if not re.match(pattern, START_MEDIA):
+            if not re.match(pattern, botpm.Config.START_MEDIA):
                 await CHANNEL.log("Your `START_MEDIA` var is Invalid.")
             else:
-                path = os.path.join(Config.DOWN_PATH, os.path.split(START_MEDIA)[1])
+                path = os.path.join(config.Dynamic.DOWN_PATH,
+                                    os.path.split(botpm.Config.START_MEDIA)[1])
                 if not os.path.exists(path):
-                    await pool.run_in_thread(wget.download)(START_MEDIA, path)
+                    await pool.run_in_thread(wget.download)(botpm.Config.START_MEDIA, path)
         if user_id != userge_id:
             if user_id in _HAVE_BLOCKED:
                 _HAVE_BLOCKED.remove(user_id)
@@ -129,7 +132,7 @@ if userge.has_bot:
             markup = InlineKeyboardMarkup([
                 [
                     InlineKeyboardButton(text="👥 UsergeTeam", url="https://github.com/UsergeTeam"),
-                    InlineKeyboardButton(text="🧪 Repo", url=Config.UPSTREAM_REPO)
+                    InlineKeyboardButton(text="🧪 Repo", url=alive.Config.UPSTREAM_REPO)
                 ],
                 [InlineKeyboardButton(text="🎖 GNU GPL v3.0", url=copy_)]
             ])

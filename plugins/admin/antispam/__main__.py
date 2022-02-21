@@ -20,8 +20,9 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     ChatAdminRequired, UserAdminInvalid, PeerIdInvalid)
 from pyrogram.types import User, Chat
 
-from userge import userge, Message, Config, get_collection, filters, pool
-from .gban import is_whitelist
+from userge import userge, Message, config, get_collection, filters, pool
+from .. import antispam
+from ..gban import is_whitelist
 
 SAVED_SETTINGS = get_collection("CONFIGS")
 GBAN_USER_BASE = get_collection("GBAN_USER")
@@ -33,10 +34,11 @@ HANDLER = None
 _ID = {'_id': 'ANTISPAM_ENABLED'}
 
 
+@userge.on_start
 async def _init() -> None:
     s_o = await SAVED_SETTINGS.find_one(_ID)
     if s_o:
-        Config.ANTISPAM_SENTRY = s_o['data']
+        antispam.Dynamic.ANTISPAM_SENTRY = s_o['data']
     await _re_init_handler()
 
 
@@ -44,11 +46,11 @@ async def _init() -> None:
 def _re_init_handler():
     global HANDLER  # pylint: disable=global-statement
     handler = GBanHandler()
-    if Config.ANTISPAM_SENTRY:
+    if antispam.Dynamic.ANTISPAM_SENTRY:
         tmp = handler.set_next(CASHandler())
-        if Config.USERGE_ANTISPAM_API:
+        if antispam.Config.USERGE_ANTISPAM_API:
             tmp = tmp.set_next(UsergeAntiSpamHandler())
-        if Config.SPAM_WATCH_API:
+        if antispam.Config.SPAM_WATCH_API:
             tmp.set_next(SpamWatchHandler())
     HANDLER = handler
 
@@ -58,11 +60,13 @@ def _re_init_handler():
     'description': "Toggle API Auto Bans"}, allow_channels=False)
 async def antispam_(message: Message):
     """ enable / disable antispam """
-    Config.ANTISPAM_SENTRY = not Config.ANTISPAM_SENTRY
-    text = f"`antispam {'enabled' if Config.ANTISPAM_SENTRY else 'disabled'} !`"
+    antispam.Dynamic.ANTISPAM_SENTRY = antispam.Dynamic.ANTISPAM_SENTRY
+    text = f"`antispam {'enabled' if antispam.Dynamic.ANTISPAM_SENTRY else 'disabled'} !`"
     await message.edit(text, del_in=3)
     await _re_init_handler()
-    await SAVED_SETTINGS.update_one(_ID, {"$set": {'data': Config.ANTISPAM_SENTRY}}, upsert=True)
+    await SAVED_SETTINGS.update_one(
+        _ID, {"$set": {'data': antispam.Dynamic.ANTISPAM_SENTRY}}, upsert=True
+    )
 
 
 @userge.on_filters(filters.group & filters.new_chat_members, group=1,
@@ -200,7 +204,7 @@ class CASHandler(AbstractHandler):
 
 class UsergeAntiSpamHandler(AbstractHandler):
     def __init__(self) -> None:
-        self._client = Client(Config.USERGE_ANTISPAM_API)
+        self._client = Client(antispam.Config.USERGE_ANTISPAM_API)
         super().__init__("UsergeAntiSpamAPI")
 
     async def get_data(self, user_id: int):
@@ -215,7 +219,7 @@ class UsergeAntiSpamHandler(AbstractHandler):
 
 class SpamWatchHandler(AbstractHandler):
     def __init__(self) -> None:
-        self._client = spamwatch.Client(Config.SPAM_WATCH_API)
+        self._client = spamwatch.Client(antispam.Config.SPAM_WATCH_API)
         super().__init__("SpamWatch")
 
     async def get_data(self, user_id: int):

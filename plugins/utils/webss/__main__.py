@@ -15,12 +15,13 @@ from re import match
 import aiofiles
 from selenium import webdriver
 from fake_headers import Headers
-from userge import userge, Message, Config
+from userge import userge, Message, config
+from ...fun import carbon
 
 
 @userge.on_cmd("webss", about={'header': "Get snapshot of a website"})
 async def webss(message: Message):
-    if Config.GOOGLE_CHROME_BIN is None:
+    if carbon.Config.GOOGLE_CHROME_BIN is None:
         await message.edit("`need to install Google Chrome. Module Stopping`", del_in=5)
         return
     link_match = match(r'\bhttps?://.*\.\S+', message.input_str)
@@ -31,7 +32,7 @@ async def webss(message: Message):
     await message.edit("`Processing ...`")
     chrome_options = webdriver.ChromeOptions()
     header = Headers(headers=False).generate()
-    chrome_options.binary_location = Config.GOOGLE_CHROME_BIN
+    chrome_options.binary_location = carbon.Config.GOOGLE_CHROME_BIN
     chrome_options.add_argument('--ignore-certificate-errors')
     chrome_options.add_argument("--test-type")
     chrome_options.add_argument("--headless")
@@ -62,7 +63,7 @@ async def webss(message: Message):
     message_id = message.message_id
     if message.reply_to_message:
         message_id = message.reply_to_message.message_id
-    file_path = os.path.join(Config.DOWN_PATH, "webss.png")
+    file_path = os.path.join(config.Dynamic.DOWN_PATH, "webss.png")
     async with aiofiles.open(file_path, 'wb') as out_file:
         await out_file.write(im_png)
     await asyncio.gather(

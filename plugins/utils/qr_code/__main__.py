@@ -16,7 +16,7 @@ import qrcode
 
 from bs4 import BeautifulSoup
 
-from userge import userge, Config, Message
+from userge import userge, config, Message
 
 
 @userge.on_cmd("mkqr", about={
@@ -62,12 +62,12 @@ async def get_qr(message: Message):
     if not (replied and replied.media and (replied.photo or replied.sticker)):
         await message.err("```reply to qr code to get data...```", del_in=5)
         return
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.makedirs(Config.DOWN_PATH)
+    if not os.path.isdir(config.Dynamic.DOWN_PATH):
+        os.makedirs(config.Dynamic.DOWN_PATH)
     await message.edit("```Downloading media to my local...```")
     down_load = await message.client.download_media(
         message=replied,
-        file_name=Config.DOWN_PATH
+        file_name=config.Dynamic.DOWN_PATH
     )
     await message.edit("```Processing your QR Code...```")
     cmd = [

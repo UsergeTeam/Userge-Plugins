@@ -8,4 +8,9 @@
 #
 # All rights reserved.
 
+from os import environ
 from .__main__ import is_whitelist  # noqa
+
+
+class Config:
+    FBAN_CHAT_ID = int(environ.get("FBAN_CHAT_ID") or 0)

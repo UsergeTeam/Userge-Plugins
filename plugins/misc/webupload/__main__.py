@@ -13,7 +13,7 @@ import re
 import shlex
 import asyncio
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
 from userge.utils import progress
 
 
@@ -36,7 +36,7 @@ async def web(message: Message):
     else:
         file_name = await message.client.download_media(
             message=message.reply_to_message,
-            file_name=Config.DOWN_PATH,
+            file_name=config.Dynamic.DOWN_PATH,
             progress=progress,
             progress_args=(message, "trying to download")
         )

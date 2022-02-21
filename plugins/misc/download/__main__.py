@@ -20,7 +20,7 @@ from urllib.parse import unquote_plus
 from pySmartDL import SmartDL
 from pyrogram.types import Message as PyroMessage
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
 from userge.utils import progress, humanbytes, extract_entities
 from userge.utils.exceptions import ProcessCanceled
 
@@ -105,7 +105,7 @@ async def url_download(message: Message, url: str) -> Tuple[str, int]:
         url = url.strip()
         if c_file_name:
             custom_file_name = c_file_name.strip()
-    dl_loc = os.path.join(Config.DOWN_PATH, custom_file_name)
+    dl_loc = os.path.join(config.Dynamic.DOWN_PATH, custom_file_name)
     downloader = SmartDL(url, dl_loc, progress_bar=False)
     downloader.start(blocking=False)
     with message.cancel_callback(downloader.stop):
@@ -127,9 +127,9 @@ async def url_download(message: Message, url: str) -> Tuple[str, int]:
                 "**ETA** : `{}`"
             progress_str = progress_str.format(
                 "trying to download",
-                ''.join((Config.FINISHED_PROGRESS_STR
+                ''.join((config.FINISHED_PROGRESS_STR
                          for _ in range(math.floor(percentage / 5)))),
-                ''.join((Config.UNFINISHED_PROGRESS_STR
+                ''.join((config.UNFINISHED_PROGRESS_STR
                          for _ in range(20 - math.floor(percentage / 5)))),
                 round(percentage, 2),
                 url,
@@ -139,7 +139,7 @@ async def url_download(message: Message, url: str) -> Tuple[str, int]:
                 speed,
                 estimated_total_time)
             await message.edit(progress_str, disable_web_page_preview=True)
-            await asyncio.sleep(Config.EDIT_SLEEP_TIMEOUT)
+            await asyncio.sleep(config.Dynamic.EDIT_SLEEP_TIMEOUT)
     if message.process_is_canceled:
         raise ProcessCanceled
     return dl_loc, (datetime.now() - start_t).seconds
@@ -161,13 +161,13 @@ async def tg_download(
         return dumps(dl_loc), mite
     await message.edit("`Downloading From TG...`")
     start_t = datetime.now()
-    custom_file_name = Config.DOWN_PATH
+    custom_file_name = config.Dynamic.DOWN_PATH
     if message.filtered_input_str and not from_url:
-        custom_file_name = os.path.join(Config.DOWN_PATH, message.filtered_input_str.strip())
+        custom_file_name = os.path.join(config.Dynamic.DOWN_PATH, message.filtered_input_str.strip())
     elif "|" in message.filtered_input_str:
         _, c_file_name = message.filtered_input_str.split("|", maxsplit=1)
         if c_file_name:
-            custom_file_name = os.path.join(Config.DOWN_PATH, c_file_name.strip())
+            custom_file_name = os.path.join(config.Dynamic.DOWN_PATH, c_file_name.strip())
     with message.cancel_callback():
         dl_loc = await message.client.download_media(
             message=to_download,

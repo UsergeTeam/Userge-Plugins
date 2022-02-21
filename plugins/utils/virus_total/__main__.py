@@ -16,10 +16,9 @@ import json
 import asyncio
 import requests
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
+from .. import virus_total
 from userge.utils import progress, humanbytes
-
-API_KEY = os.environ.get("VT_API_KEY", None)
 
 
 @userge.on_cmd("scan", about={
@@ -28,7 +27,7 @@ API_KEY = os.environ.get("VT_API_KEY", None)
     'usage': "{tr}scan [reply to document file]"})
 async def _scan_file(msg: Message):
     """ scan files and get scan id """
-    if API_KEY is None:
+    if virus_total.Config.API_KEY is None:
         await msg.edit(
             "You have to sign up on `virustotal.com` and get `API_KEY` "
             "and paste in `VT_API_KEY` var.\nFor more info "
@@ -46,11 +45,11 @@ async def _scan_file(msg: Message):
     await msg.edit("`Downloading file to local...`")
     dls_loc = await msg.client.download_media(
         message=replied,
-        file_name=Config.DOWN_PATH,
+        file_name=config.Dynamic.DOWN_PATH,
         progress=progress,
         progress_args=(msg, "Downloading file to local...")
     )
-    dls = os.path.join(Config.DOWN_PATH, os.path.basename(dls_loc))
+    dls = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(dls_loc))
     await msg.edit(
         f"`Processing your file`, **File_size:** `{humanbytes(size_of_file)}`")
     response = scan_file(dls)
@@ -105,7 +104,7 @@ def scan_file(path: str) -> str:
     url = 'https://www.virustotal.com/vtapi/v2/file/scan'
     path_name = path.split('/')[-1]
 
-    params = {'apikey': API_KEY}
+    params = {'apikey': virus_total.Config.API_KEY}
     files = {
         'file': (path_name, open(path, 'rb'))
     }
@@ -117,7 +116,7 @@ def get_report(sha1: str) -> str:
     """ get report of files """
     url = 'https://www.virustotal.com/vtapi/v2/file/report'
     params = {
-        'apikey': API_KEY, 'resource': sha1, 'allinfo': 'False'
+        'apikey': virus_total.Config.API_KEY, 'resource': sha1, 'allinfo': 'False'
     }
     response = requests.get(url, params=params)
     return response

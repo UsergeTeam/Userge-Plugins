@@ -7,3 +7,10 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    GOOGLE_CHROME_DRIVER = os.environ.get("GOOGLE_CHROME_DRIVER")
+    GOOGLE_CHROME_BIN = os.environ.get("GOOGLE_CHROME_BIN")

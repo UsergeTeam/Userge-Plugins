@@ -7,3 +7,11 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+from userge import config
+
+
+class Dynamic:
+    THUMB_PATH = config.Dynamic.DOWN_PATH + "thumb_image.jpg"

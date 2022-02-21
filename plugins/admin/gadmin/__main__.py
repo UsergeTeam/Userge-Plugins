@@ -19,23 +19,21 @@ from pyrogram.errors import (
     FloodWait, UserAdminInvalid, UsernameInvalid, PeerIdInvalid, UserIdInvalid)
 
 from userge import userge, Message, get_collection, filters
+from .. import gadmin
 
 CHANNEL = userge.getCLogger(__name__)
 DB = get_collection("BAN_CHANNELS")
 
-ENABLED_CHATS: List[int] = []
-BAN_CHANNELS: List[int] = []  # list of chats which enabled ban_mode
-ALLOWED: Dict[int, List[int]] = {}  # dict to store chat ids which are allowed to chat as channels
 
-
+@userge.on_start
 async def _init() -> None:
     async for chat in DB.find():
         chat_id = chat['chat_id']
         if chat['enabled']:
-            ENABLED_CHATS.append(chat_id)
+            gadmin.ENABLED_CHATS.append(chat_id)
             if chat['ban']:
-                BAN_CHANNELS.append(chat_id)
-        ALLOWED[chat_id] = chat['allowed']
+                gadmin.BAN_CHANNELS.append(chat_id)
+        gadmin.ALLOWED[chat_id] = chat['allowed']
 
 channel_delete = filters.create(
     lambda _, __, query: query.chat and query.sender_chat and query.chat.id in ENABLED_CHATS)
@@ -602,34 +600,34 @@ async def enable_ban(message: Message):
 
     await message.edit("Setting up..")
     if is_disable:
-        if chat_id not in ENABLED_CHATS:
+        if chat_id not in gadmin.ENABLED_CHATS:
             return await message.edit("Not enabled for this chat.", del_in=5)
-        ENABLED_CHATS.remove(chat_id)
+        gadmin.ENABLED_CHATS.remove(chat_id)
         await DB.update_one({'chat_id': chat_id}, {'$set': {'enabled': False}})
         await message.edit("Disabled deletion / banning send_as channels.\n"
                            "Members are allowed to chat as channel.")
-    elif chat_id in ENABLED_CHATS:
-        if is_ban and chat_id in BAN_CHANNELS:
+    elif chat_id in gadmin.ENABLED_CHATS:
+        if is_ban and chat_id in gadmin.BAN_CHANNELS:
             await message.edit("Already enabled in this chat, No changes applied.", del_in=5)
-        elif chat_id in BAN_CHANNELS:
+        elif chat_id in gadmin.BAN_CHANNELS:
             await DB.update_one({'chat_id': chat_id}, {'$set': {'ban': False}})
-            BAN_CHANNELS.remove(chat_id)
+            gadmin.BAN_CHANNELS.remove(chat_id)
             await message.edit("Changed to delete only mode.\n"
                                "Messages send on behalf of channels will be deleted.")
         elif is_ban:
             await DB.update_one({'chat_id': chat_id}, {'$set': {'ban': True}})
-            BAN_CHANNELS.append(chat_id)
+            gadmin.BAN_CHANNELS.append(chat_id)
             await message.edit("Ban mode enabled.\nUsers sending as channel will be banned.")
         else:
             await message.edit("Already Delete only Mode", del_in=5)
     else:
-        allowed = ALLOWED.get(chat_id)
+        allowed = gadmin.ALLOWED.get(chat_id)
         if not allowed:
             allowed = [chat_id]
             linked_chat = (await message.client.get_chat(chat_id)).linked_chat
             if linked_chat:
                 allowed.append(linked_chat.id)
-            ALLOWED[chat_id] = allowed
+            gadmin.ALLOWED[chat_id] = allowed
 
         await DB.update_one({
             'chat_id': chat_id},
@@ -639,9 +637,9 @@ async def enable_ban(message: Message):
                 'enabled': True,
                 'allowed': allowed}}, upsert=True)
 
-        ENABLED_CHATS.append(chat_id)
+        gadmin.ENABLED_CHATS.append(chat_id)
         if is_ban:
-            BAN_CHANNELS.append(chat_id)
+            gadmin.BAN_CHANNELS.append(chat_id)
             await message.edit("Enabled with ban mode")
         else:
             await message.edit('Enabled with delete mode')
@@ -659,12 +657,12 @@ async def allow_a_channel(message: Message):
         return
 
     chat_id = message.chat.id
-    allowed = ALLOWED.get(chat_id, [])
+    allowed = gadmin.ALLOWED.get(chat_id, [])
     channel_id = channel.id
     if channel_id in allowed:
         return await message.edit("This channel is already whitelisted", del_in=5)
     allowed.append(channel_id)
-    ALLOWED[chat_id] = allowed
+    gadmin.ALLOWED[chat_id] = allowed
 
     await _update_chat_data(chat_id, allowed)
     await message.edit(f'Successfully Whitelisted {channel.title} (`{channel_id}`)')
@@ -682,7 +680,7 @@ async def disallow_a_channel(message: Message):
         return
 
     chat_id = message.chat.id
-    allowed = ALLOWED.get(chat_id, [])
+    allowed = gadmin.ALLOWED.get(chat_id, [])
     channel_id = channel.id
     if channel_id not in allowed:
         return await message.edit("This channel is not yet whitelisted", del_in=5)
@@ -714,8 +712,8 @@ async def _get_channel(message: Message) -> Optional[Chat]:
 
 
 async def _update_chat_data(chat_id: int, allowed: List[int]) -> None:
-    ban = chat_id in BAN_CHANNELS
-    enabled = chat_id in ENABLED_CHATS
+    ban = chat_id in gadmin.BAN_CHANNELS
+    enabled = chat_id in gadmin.ENABLED_CHATS
     await DB.update_one({
         'chat_id': chat_id},
         {'$set': {
@@ -731,9 +729,9 @@ async def _update_chat_data(chat_id: int, allowed: List[int]) -> None:
 async def ban_spammers(message: Message):
     chat_id = message.chat.id
     sender_chat_id = message.sender_chat.id
-    if sender_chat_id not in ALLOWED.get(chat_id, [chat_id]):
+    if sender_chat_id not in gadmin.ALLOWED.get(chat_id, [chat_id]):
         await message.delete()
-        if chat_id in BAN_CHANNELS:
+        if chat_id in gadmin.BAN_CHANNELS:
             await message.chat.ban_member(sender_chat_id)
             await message.reply(
                 "#BAN_CHANNEL\n\n"

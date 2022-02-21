@@ -28,6 +28,7 @@ CHANNEL = userge.getCLogger(__name__)
 LOG = userge.getLogger(__name__)
 
 
+@userge.on_start
 async def _init() -> None:
     global BIO_UPDATION, AUTOBIO_TIMEOUT  # pylint: disable=global-statement
     data = await USER_DATA.find_one({'_id': 'BIO_UPDATION'})

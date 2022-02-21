@@ -7,3 +7,10 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    GCS_API_KEY = os.environ.get("GCS_API_KEY")
+    GCS_IMAGE_E_ID = os.environ.get("GCS_IMAGE_E_ID")

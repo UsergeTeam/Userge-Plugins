@@ -14,7 +14,7 @@
 from aiofiles import os
 from telegraph import upload_file
 
-from userge import userge, Config, Message, pool
+from userge import userge, config, Message, pool
 
 
 @userge.on_cmd("yrs", about={
@@ -28,7 +28,7 @@ async def labstack(message: Message):
         await message.edit("`processing ...`")
         dl_loc = await message.client.download_media(
             message=message.reply_to_message,
-            file_name=Config.DOWN_PATH,
+            file_name=config.Dynamic.DOWN_PATH,
         )
     else:
         return await message.err("Media not found!")

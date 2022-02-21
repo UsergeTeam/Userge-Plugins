@@ -17,9 +17,9 @@ from PIL import Image
 from validators.url import url
 
 from userge.utils import demojify
-from userge import userge, Config, Message
+from userge import userge, config, Message
 
-CONVERTED_IMG = Config.DOWN_PATH + "img.png"
+CONVERTED_IMG = config.Dynamic.DOWN_PATH + "img.png"
 
 
 @userge.on_cmd("trump", about={
@@ -126,7 +126,7 @@ async def _tweets(msg: Message, text: str, username: str = '', type_: str = "twe
     if not url(tweets_):
         await msg.err("Invalid Syntax, Exiting...")
         return
-    tmp_file = Config.DOWN_PATH + "temp.png"
+    tmp_file = config.Dynamic.DOWN_PATH + "temp.png"
     with open(tmp_file, "wb") as t_f:
         t_f.write(requests.get(tweets_).content)
     img = Image.open(tmp_file)

@@ -21,20 +21,14 @@ from urllib.parse import unquote
 
 from pyrogram.errors import ChatWriteForbidden, ChannelPrivate, ChatIdInvalid
 from userge import userge, Message, Config, pool, get_collection
+from .. import lastfm
 from userge.utils import time_formatter
-
-API_KEY = os.environ.get("FM_API")
-API_SECRET = os.environ.get("FM_SECRET")
-USERNAME = os.environ.get("FM_USERNAME")
-PASSWORD = pylast.md5(os.environ.get("FM_PASSWORD"))
-CHAT_IDS = [
-    int(x) for x in os.environ.get("LASTFM_CHAT_ID", str(Config.LOG_CHANNEL_ID)).split()
-]
 
 LASTFM_DB = get_collection("LASTFM")
 NOW_PLAYING = [False, None]
 
 
+@userge.on_start
 async def _init():
     global NOW_PLAYING  # pylint: disable=global-statement
     k = await LASTFM_DB.find_one({'_id': "LASTFM"})
@@ -86,7 +80,7 @@ async def _lastfm(msg: Message):
         if NOW_PLAYING[1] != track.get_name():
             NOW_PLAYING[1] = track.get_name()
 
-        out = f"{USERNAME} __is currently Listening to:__\n\n"
+        out = f"{lastfm.Config.USERNAME} __is currently Listening to:__\n\n"
         k = get_track_info(track)
         if not k:
             return await msg.err("Track Not found...")
@@ -212,17 +206,17 @@ async def lastfm_worker():
     global NOW_PLAYING  # pylint: disable=global-statement
 
     user = pylast.LastFMNetwork(
-        api_key=API_KEY,
-        api_secret=API_SECRET,
-        username=USERNAME,
-        password_hash=PASSWORD
-    ).get_user(USERNAME)
+        api_key=lastfm.Config.API_KEY,
+        api_secret=lastfm.Config.API_SECRET,
+        username=lastfm.Config.USERNAME,
+        password_hash=lastfm.Config.PASSWORD
+    ).get_user(lastfm.Config.USERNAME)
     while NOW_PLAYING[0] is True and await _get_now_playing(user) is not None:
         song = await _get_now_playing(user)
         if NOW_PLAYING[1] != song.get_name():
             NOW_PLAYING[1] = song.get_name()
-            for chat_id in CHAT_IDS:
-                out = f"{USERNAME} __is currently Listening to:__\n\n"
+            for chat_id in lastfm.Config.CHAT_IDS:
+                out = f"{lastfm.Config.USERNAME} __is currently Listening to:__\n\n"
                 k = get_track_info(song)
                 if not k:
                     NOW_PLAYING[0] = False
@@ -249,7 +243,12 @@ async def lastfm_worker():
 
 def _check_creds() -> bool:
     """ check creds """
-    if API_KEY and API_SECRET and USERNAME and PASSWORD:
+    if (
+        lastfm.Config.API_KEY
+        and lastfm.Config.API_SECRET
+        and lastfm.Config.USERNAME
+        and lastfm.Config.PASSWORD
+    ):
         return True
     return False
 
@@ -289,20 +288,20 @@ class LastFm:
     @staticmethod
     def _network() -> pylast.LastFMNetwork:
         return pylast.LastFMNetwork(
-            api_key=API_KEY,
-            api_secret=API_SECRET,
-            username=USERNAME,
-            password_hash=PASSWORD
+            api_key=lastfm.Config.API_KEY,
+            api_secret=lastfm.Config.API_SECRET,
+            username=lastfm.Config.USERNAME,
+            password_hash=lastfm.Config.PASSWORD
         )
 
     @staticmethod
     def _format_track(track: pylast.Track) -> str:
         return f"`{track.track} - {track.playback_date}`"
 
-    def get_user(self, username: str = USERNAME) -> pylast.User:
+    def get_user(self, username: str = lastfm.Config.USERNAME) -> pylast.User:
         return (self._network()).get_user(username)
 
-    async def now_playing(self, username: str = USERNAME) -> Optional[pylast.Track]:
+    async def now_playing(self, username: str = lastfm.Config.USERNAME) -> Optional[pylast.Track]:
         user = self.get_user(username)
         playing = await _get_now_playing(user)
         return playing
@@ -404,7 +403,7 @@ async def resp(params: dict):
 
 async def recs(query, typ, lim):
     params = {"method": f"user.get{typ}", "user": query, "limit": lim,
-              "api_key": API_KEY, "format": "json"}
+              "api_key": lastfm.Config.API_KEY, "format": "json"}
     return await resp(params)
 
 
@@ -422,7 +421,7 @@ async def lastfm_compat_(message: Message):
     if not msg:
         return await message.edit("Please check `{tr}help Compat`")
     diff = "|" in msg
-    us1, us2 = msg.split("|") if diff else USERNAME, msg
+    us1, us2 = msg.split("|") if diff else lastfm.Config.USERNAME, msg
     ta = "topartists"
     ta1 = (await recs(us1, ta, 500))[1][ta]["artist"]
     ta2 = (await recs(us2, ta, 500))[1][ta]["artist"]

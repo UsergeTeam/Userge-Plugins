@@ -13,7 +13,7 @@
 import os
 import lottie
 
-from userge import userge, Message, Config, pool
+from userge import userge, Message, config, pool
 
 
 @userge.on_cmd("gif", about={
@@ -40,11 +40,11 @@ async def gifify(msg: Message):
         quality = input_
     else:
         quality = 512
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.makedirs(Config.DOWN_PATH)
+    if not os.path.isdir(config.Dynamic.DOWN_PATH):
+        os.makedirs(config.Dynamic.DOWN_PATH)
     await msg.try_to_edit("```Converting this Sticker to GiF...\n"
                           "This may takes upto few mins...```")
-    dls = await msg.client.download_media(replied, file_name=Config.DOWN_PATH)
+    dls = await msg.client.download_media(replied, file_name=config.Dynamic.DOWN_PATH)
     converted_gif = await _tgs_to_gif(dls, quality)
     await msg.client.send_animation(
         msg.chat.id,
@@ -57,7 +57,7 @@ async def gifify(msg: Message):
 
 @pool.run_in_thread
 def _tgs_to_gif(sticker_path: str, quality: int = 256) -> str:
-    dest = os.path.join(Config.DOWN_PATH, "animation.gif")
+    dest = os.path.join(config.Dynamic.DOWN_PATH, "animation.gif")
     with open(dest, 'wb') as t_g:
         lottie.exporters.gif.export_gif(lottie.parsers.tgs.parse_tgs(sticker_path), t_g, quality, 1)
     os.remove(sticker_path)

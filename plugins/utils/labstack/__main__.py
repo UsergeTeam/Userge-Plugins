@@ -22,7 +22,7 @@ from urllib.parse import unquote_plus
 import requests
 from pySmartDL import SmartDL
 
-from userge import userge, Config, Message
+from userge import userge, config, Message
 from userge.utils import progress, humanbytes
 
 
@@ -33,8 +33,8 @@ from userge.utils import progress, humanbytes
     'examples': "{tr}labstack https://mirror.nforce.com/pub/speedtests/10mb.bin"})
 async def labstack(message: Message):
     await message.edit("Initiating...")
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.mkdir(Config.DOWN_PATH)
+    if not os.path.isdir(config.Dynamic.DOWN_PATH):
+        os.mkdir(config.Dynamic.DOWN_PATH)
 
     path_ = message.filtered_input_str
     dl_loc = ""
@@ -42,13 +42,13 @@ async def labstack(message: Message):
         is_url = re.search(r"(?:https?|ftp)://[^|\s]+\.[^|\s]+", path_)
         if is_url:
             await message.edit("`Downloading From URL...`")
-            if not os.path.isdir(Config.DOWN_PATH):
-                os.mkdir(Config.DOWN_PATH)
+            if not os.path.isdir(config.Dynamic.DOWN_PATH):
+                os.mkdir(config.Dynamic.DOWN_PATH)
             url = is_url[0]
             file_name = unquote_plus(os.path.basename(url))
             if "|" in path_:
                 file_name = path_.split("|")[1].strip()
-            path_ = os.path.join(Config.DOWN_PATH, file_name)
+            path_ = os.path.join(config.Dynamic.DOWN_PATH, file_name)
             dl_loc = path_
             try:
                 downloader = SmartDL(url, path_, progress_bar=False)
@@ -75,9 +75,9 @@ async def labstack(message: Message):
                         "**ETA** : `{}`"
                     progress_str = progress_str.format(
                         "Downloading",
-                        ''.join((Config.FINISHED_PROGRESS_STR
+                        ''.join((config.FINISHED_PROGRESS_STR
                                  for i in range(math.floor(percentage / 5)))),
-                        ''.join((Config.UNFINISHED_PROGRESS_STR
+                        ''.join((config.UNFINISHED_PROGRESS_STR
                                  for i in range(20 - math.floor(percentage / 5)))),
                         round(percentage, 2),
                         url,
@@ -98,14 +98,14 @@ async def labstack(message: Message):
             path_, file_name = path_.split("|")
             path_ = path_.strip()
             if os.path.isfile(path_):
-                new_path = os.path.join(Config.DOWN_PATH, file_name.strip())
+                new_path = os.path.join(config.Dynamic.DOWN_PATH, file_name.strip())
                 os.rename(path_, new_path)
                 dl_loc = new_path
 
     if message.reply_to_message and message.reply_to_message.media:
         dl_loc = await message.client.download_media(
             message=message.reply_to_message,
-            file_name=Config.DOWN_PATH,
+            file_name=config.Dynamic.DOWN_PATH,
             progress=progress,
             progress_args=(message, "Downloading")
         )

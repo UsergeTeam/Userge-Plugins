@@ -16,7 +16,7 @@ import aiofiles
 import aiohttp
 from aiohttp import client_exceptions
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
 
 
 class PasteService:
@@ -192,7 +192,7 @@ _SERVICES: Dict[str, PasteService] = {
     '-n': NekoBin(), '-h': HasteBin(), '-r': Rentry(), '-p': Pasting(),
     '-pl': PastyLus(), '-k': KatBin(), '-s': SpaceBin()}
 
-_DEFAULT_SERVICE = '-k' if Config.HEROKU_ENV else '-n'
+_DEFAULT_SERVICE = '-k' if config.HEROKU_APP else '-n'
 _HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 ('
                           'KHTML, like Gecko) Cafari/537.36'}
 
@@ -235,7 +235,7 @@ async def paste_(message: Message) -> None:
     if not text and replied:
         if replied.document and replied.document.file_size < 2 ** 20 * 10:
             file_type = os.path.splitext(replied.document.file_name)[1].lstrip('.')
-            path = await replied.download(Config.DOWN_PATH)
+            path = await replied.download(config.Dynamic.DOWN_PATH)
             async with aiofiles.open(path, 'r') as d_f:
                 text = await d_f.read()
             os.remove(path)

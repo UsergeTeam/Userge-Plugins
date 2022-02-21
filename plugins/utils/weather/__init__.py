@@ -7,3 +7,10 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    OPEN_WEATHER_MAP = os.environ.get("OPEN_WEATHER_MAP")
+    WEATHER_DEFCITY = os.environ.get("WEATHER_DEFCITY")

@@ -7,3 +7,9 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    MAX_DURATION = int(os.environ.get("MAX_DURATION", 900))

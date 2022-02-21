@@ -24,7 +24,7 @@ from typing import Union, List, Tuple, Sequence
 
 from rarfile import RarFile, is_rarfile
 
-from userge import userge, Message, Config, pool
+from userge import userge, Message, config, pool
 from userge.utils import humanbytes, time_formatter, sort_file_name_key
 from userge.utils.exceptions import ProcessCanceled
 
@@ -62,9 +62,9 @@ class _BaseLib:
         """ Returns progress """
         percentage = self.percentage
         return "[{}{}]".format(
-            ''.join((Config.FINISHED_PROGRESS_STR
+            ''.join((config.FINISHED_PROGRESS_STR
                      for _ in range(floor(percentage / 5)))),
-            ''.join((Config.UNFINISHED_PROGRESS_STR
+            ''.join((config.UNFINISHED_PROGRESS_STR
                      for _ in range(20 - floor(percentage / 5)))))
 
     @property
@@ -173,7 +173,7 @@ class PackLib(_BaseLib):
         else:
             file_name += '.zip'
             p_type = ZipFile
-        self._final_file_path = join(Config.DOWN_PATH, file_name)
+        self._final_file_path = join(config.Dynamic.DOWN_PATH, file_name)
         pool.submit_thread(self._zip, p_type, file_paths, self._final_file_path)
 
     def unpack_path(self) -> None:
@@ -196,7 +196,7 @@ class PackLib(_BaseLib):
             chunked_file_names.append(temp_file_names)
         dir_name = splitext(basename(self._file_path))[0]
         self._final_file_path = join(
-            Config.DOWN_PATH, dir_name.replace('.tar', '').replace('.', '_'))
+            config.Dynamic.DOWN_PATH, dir_name.replace('.tar', '').replace('.', '_'))
         for f_n_s in chunked_file_names:
             pool.submit_thread(self._unpack, f_n_s)
 
@@ -249,9 +249,9 @@ class SCLib(_BaseLib):
         """ Returns progress """
         percentage = self.percentage
         return "[{}{}]".format(
-            ''.join((Config.FINISHED_PROGRESS_STR
+            ''.join((config.FINISHED_PROGRESS_STR
                      for _ in range(floor(percentage / 5)))),
-            ''.join((Config.UNFINISHED_PROGRESS_STR
+            ''.join((config.UNFINISHED_PROGRESS_STR
                      for _ in range(20 - floor(percentage / 5)))))
 
     @property
@@ -344,7 +344,7 @@ class SCLib(_BaseLib):
     'usage': "{tr}ls [path]\n{tr}ls -d : default path"}, allow_channels=False)
 async def ls_dir(message: Message) -> None:
     """ list dir """
-    path = Config.DOWN_PATH if '-d' in message.flags else message.input_str or '.'
+    path = config.Dynamic.DOWN_PATH if '-d' in message.flags else message.input_str or '.'
     if not exists(path):
         await message.err("path not exists!")
         return
@@ -388,7 +388,7 @@ async def dset_(message: Message) -> None:
     try:
         if not isdir(path):
             os.makedirs(path)
-        Config.DOWN_PATH = path.rstrip('/') + '/'
+        config.Dynamic.DOWN_PATH = path.rstrip('/') + '/'
         await message.edit(f"set `{path}` as **working directory** successfully!", del_in=5)
     except Exception as p_e:
         await message.err(str(p_e))
@@ -400,7 +400,7 @@ async def dset_(message: Message) -> None:
 async def dreset_(message: Message) -> None:
     """ reset dir """
     path = os.environ.get("DOWN_PATH", "downloads").rstrip('/') + '/'
-    Config.DOWN_PATH = path
+    config.Dynamic.DOWN_PATH = path
     await message.edit(f"reset **working directory** to `{path}` successfully!", del_in=5)
 
 
@@ -408,14 +408,14 @@ async def dreset_(message: Message) -> None:
     'header': "Clear the current working directory"}, allow_channels=False)
 async def dclear_(message: Message):
     """ clear dir """
-    if not isdir(Config.DOWN_PATH):
+    if not isdir(config.Dynamic.DOWN_PATH):
         await message.edit(
-            f'path : `{Config.DOWN_PATH}` not found and just created!', del_in=5)
+            f'path : `{config.Dynamic.DOWN_PATH}` not found and just created!', del_in=5)
     else:
-        rmtree(Config.DOWN_PATH, True)
+        rmtree(config.Dynamic.DOWN_PATH, True)
         await message.edit(
-            f'path : `{Config.DOWN_PATH}` **cleared** successfully!', del_in=5)
-    os.makedirs(Config.DOWN_PATH, exist_ok=True)
+            f'path : `{config.Dynamic.DOWN_PATH}` **cleared** successfully!', del_in=5)
+    os.makedirs(config.Dynamic.DOWN_PATH, exist_ok=True)
 
 
 @userge.on_cmd('dremove', about={
@@ -493,7 +493,7 @@ async def split_(message: Message) -> None:
                                           s_obj.eta,
                                           s_obj.completed_files,
                                           s_obj.total_files))
-            await sleep(Config.EDIT_SLEEP_TIMEOUT)
+            await sleep(config.Dynamic.EDIT_SLEEP_TIMEOUT)
 
     def _on_cancel():
         s_obj.cancel()
@@ -561,7 +561,7 @@ async def combine_(message: Message) -> None:
                                           c_obj.eta,
                                           c_obj.completed_files,
                                           c_obj.total_files))
-            await sleep(Config.EDIT_SLEEP_TIMEOUT)
+            await sleep(config.Dynamic.EDIT_SLEEP_TIMEOUT)
 
     def _on_cancel():
         c_obj.cancel()
@@ -628,7 +628,7 @@ async def _pack_helper(message: Message, tar: bool = False) -> None:
                                           p_obj.final_file_path,
                                           p_obj.completed_files,
                                           p_obj.total_files))
-            await sleep(Config.EDIT_SLEEP_TIMEOUT)
+            await sleep(config.Dynamic.EDIT_SLEEP_TIMEOUT)
 
     def _on_cancel():
         p_obj.cancel()
@@ -687,7 +687,7 @@ async def unpack_(message: Message) -> None:
                                           p_obj.final_file_path,
                                           p_obj.completed_files,
                                           p_obj.total_files))
-            await sleep(Config.EDIT_SLEEP_TIMEOUT)
+            await sleep(config.Dynamic.EDIT_SLEEP_TIMEOUT)
 
     def _on_cancel():
         p_obj.cancel()

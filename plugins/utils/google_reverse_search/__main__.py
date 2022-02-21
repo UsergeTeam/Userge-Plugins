@@ -16,7 +16,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from userge.utils import take_screen_shot
-from userge import userge, Message, Config
+from userge import userge, Message, config
 
 
 @userge.on_cmd("grs", about={
@@ -37,12 +37,12 @@ async def google_rs(message: Message):
         if message_.photo or message_.animation or message_.sticker:
             dis = await message.client.download_media(
                 message=message_,
-                file_name=Config.DOWN_PATH
+                file_name=config.Dynamic.DOWN_PATH
             )
-            dis_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dis))
+            dis_loc = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(dis))
         if message_.animation:
             await message.edit("Converting this Gif to Image")
-            img_file = os.path.join(Config.DOWN_PATH, "grs.jpg")
+            img_file = os.path.join(config.Dynamic.DOWN_PATH, "grs.jpg")
             await take_screen_shot(dis_loc, 0, img_file)
             if not os.path.lexists(img_file):
                 await message.err("Something went wrong in Conversion")

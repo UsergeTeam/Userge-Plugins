@@ -17,11 +17,10 @@ from PIL import Image
 from google_images_search import GoogleImagesSearch as GIS
 
 from userge import userge, Message
+from .. import google_img as gimg
 
 
 PATH = "temp_img_down/"
-GCS_API_KEY = os.environ.get("GCS_API_KEY", None)
-GCS_IMAGE_E_ID = os.environ.get("GCS_IMAGE_E_ID", None)
 
 REQ_ERR = """**Both or any one of the following requirements
 are missing:**
@@ -47,13 +46,13 @@ option and for "Sites to search" option select "Search the entire
     'usage': "{tr}gimg [Query]",
     'examples': "{tr}gimg Dogs"})
 async def google_img(message: Message):
-    if (GCS_API_KEY and GCS_IMAGE_E_ID) is None:
+    if (gimg.Config.GCS_API_KEY and gimg.Config.GCS_IMAGE_E_ID) is None:
         await message.edit(REQ_ERR, disable_web_page_preview=True)
         return
     if os.path.exists(PATH):
         shutil.rmtree(PATH, ignore_errors=True)
 
-    fetcher = GIS(GCS_API_KEY, GCS_IMAGE_E_ID)
+    fetcher = GIS(gimg.Config.GCS_API_KEY, gimg.Config.GCS_IMAGE_E_ID)
     query = message.input_str
     search = {'q': query,
               'num': 9,

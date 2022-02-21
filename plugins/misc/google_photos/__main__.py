@@ -26,7 +26,8 @@ from apiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file, client
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
+from .. import google_photos
 from userge.utils import progress
 from userge.plugins.misc.download import tg_download, url_download
 
@@ -39,12 +40,7 @@ OAUTH_SCOPE = [
 REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
 PHOTOS_BASE_URI = "https://photoslibrary.googleapis.com"
 
-G_PHOTOS_CLIENT_ID = os.environ.get(
-    "G_PHOTOS_CLIENT_ID", os.environ.get("G_DRIVE_CLIENT_ID", None))
-G_PHOTOS_CLIENT_SECRET = os.environ.get(
-    "G_PHOTOS_CLIENT_SECRET", os.environ.get("G_DRIVE_CLIENT_SECRET", None))
-TOKEN_FILE_NAME = os.path.join(Config.DOWN_PATH, "gPhoto_credentials_UserGe.json")
-G_PHOTOS_AUTH_TOKEN_ID = int(os.environ.get("G_PHOTOS_AUTH_TOKEN_ID", 0))
+TOKEN_FILE_NAME = os.path.join(config.Dynamic.DOWN_PATH, "gPhoto_credentials_UserGe.json")
 
 LOG = userge.getLogger(__name__)
 CHANNEL = userge.getCLogger(__name__)
@@ -52,7 +48,10 @@ CHANNEL = userge.getCLogger(__name__)
 
 @userge.on_cmd("gpsetup", about={'header': "setup gphotos"})
 async def setup_google_photos(message: Message):
-    if G_PHOTOS_CLIENT_ID is None or G_PHOTOS_CLIENT_SECRET is None:
+    if (
+        google_photos.Config.G_PHOTOS_CLIENT_ID is None
+        or google_photos.Config.G_PHOTOS_CLIENT_SECRET is None
+    ):
         await message.err("first fill gphoto id and secret")
         return
     creds = await check_creds(message)
@@ -67,13 +66,13 @@ async def setup_google_photos(message: Message):
 async def create_token_file():
     # Run through the OAuth flow and retrieve credentials
     flow = client.OAuth2WebServerFlow(
-        G_PHOTOS_CLIENT_ID,
-        G_PHOTOS_CLIENT_SECRET,
+        google_photos.Config.G_PHOTOS_CLIENT_ID,
+        google_photos.Config.G_PHOTOS_CLIENT_SECRET,
         OAUTH_SCOPE,
         redirect_uri=REDIRECT_URI
     )
     authorize_url = flow.step1_get_authorize_url()
-    async with userge.conversation(Config.LOG_CHANNEL_ID, timeout=150) as conv:
+    async with userge.conversation(config.LOG_CHANNEL_ID, timeout=150) as conv:
         await conv.send_message(
             "Go to the following link in "
             f"your browser: {authorize_url} and reply the code"
@@ -97,10 +96,10 @@ async def create_token_file():
 
 
 async def check_creds(message):
-    if G_PHOTOS_AUTH_TOKEN_ID:
+    if google_photos.Config.G_PHOTOS_AUTH_TOKEN_ID:
         confidential_message = await message.client.get_messages(
-            chat_id=Config.LOG_CHANNEL_ID,
-            message_ids=G_PHOTOS_AUTH_TOKEN_ID,
+            chat_id=config.LOG_CHANNEL_ID,
+            message_ids=google_photos.Config.G_PHOTOS_AUTH_TOKEN_ID,
             replies=0
         )
         if confidential_message and confidential_message.document:

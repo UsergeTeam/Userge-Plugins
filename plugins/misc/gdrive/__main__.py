@@ -28,7 +28,8 @@ from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from oauth2client.client import (
     OAuth2WebServerFlow, HttpAccessTokenRefreshError, FlowExchangeError)
 
-from userge import userge, Message, Config, get_collection, pool
+from userge import userge, Message, config, get_collection, pool
+from .. import gdrive
 from userge.utils import humanbytes, time_formatter, is_url
 from userge.utils.exceptions import ProcessCanceled
 from userge.plugins.misc.download import url_download, tg_download
@@ -50,6 +51,7 @@ _LOG = userge.getLogger(__name__)
 _SAVED_SETTINGS = get_collection("CONFIGS")
 
 
+@userge.on_start
 async def _init() -> None:
     global _CREDS  # pylint: disable=global-statement
     _LOG.debug("Setting GDrive DBase...")
@@ -102,7 +104,7 @@ def creds_dec(func):
 class _GDrive:
     """ GDrive Class For Search, Upload, Download, Copy, Move, Delete, EmptyTrash, ... """
     def __init__(self) -> None:
-        self._parent_id = _PARENT_ID or Config.G_DRIVE_PARENT_ID
+        self._parent_id = _PARENT_ID or gdrive.Config.G_DRIVE_PARENT_ID
         self._completed = 0
         self._list = 1
         self._progress = None
@@ -201,9 +203,9 @@ class _GDrive:
             out = G_DRIVE_FOLDER_LINK.format(file_id, file_name)
         else:
             out = G_DRIVE_FILE_LINK.format(file_id, file_name, file_size)
-        if Config.G_DRIVE_INDEX_LINK:
+        if gdrive.Config.G_DRIVE_INDEX_LINK:
             link = os.path.join(
-                Config.G_DRIVE_INDEX_LINK.rstrip('/'),
+                gdrive.Config.G_DRIVE_INDEX_LINK.rstrip('/'),
                 quote(self._get_file_path(file_id, file_name)))
             if mime_type == G_DRIVE_DIR_MIME_TYPE:
                 link += '/'
@@ -252,9 +254,9 @@ class _GDrive:
                         "**Speed** : `{}/s`\n" + \
                         "**ETA** : `{}`"
                     self._progress = tmp.format(
-                        "".join((Config.FINISHED_PROGRESS_STR
+                        "".join((config.FINISHED_PROGRESS_STR
                                  for _ in range(math.floor(percentage / 5)))),
-                        "".join((Config.UNFINISHED_PROGRESS_STR
+                        "".join((config.UNFINISHED_PROGRESS_STR
                                  for _ in range(20 - math.floor(percentage / 5)))),
                         round(percentage, 2),
                         file_name,
@@ -265,7 +267,7 @@ class _GDrive:
                         humanbytes(speed),
                         time_formatter(eta))
             file_id = response.get("id")
-        if not Config.G_DRIVE_IS_TD:
+        if not gdrive.Config.G_DRIVE_IS_TD:
             self._set_permission(file_id)
         self._completed += 1
         _LOG.info(
@@ -281,7 +283,7 @@ class _GDrive:
         file_ = self._service.files().create(body=body, supportsTeamDrives=True).execute()
         file_id = file_.get("id")
         file_name = file_.get("name")
-        if not Config.G_DRIVE_IS_TD:
+        if not gdrive.Config.G_DRIVE_IS_TD:
             self._set_permission(file_id)
         self._completed += 1
         _LOG.info("Created Google-Drive Folder => Name: %s ID: %s ", file_name, file_id)
@@ -349,9 +351,9 @@ class _GDrive:
                         "**Speed** : `{}/s`\n" + \
                         "**ETA** : `{}`"
                     self._progress = tmp.format(
-                        "".join((Config.FINISHED_PROGRESS_STR
+                        "".join((config.FINISHED_PROGRESS_STR
                                  for _ in range(math.floor(percentage / 5)))),
-                        "".join((Config.UNFINISHED_PROGRESS_STR
+                        "".join((config.UNFINISHED_PROGRESS_STR
                                  for _ in range(20 - math.floor(percentage / 5)))),
                         round(percentage, 2),
                         name,
@@ -413,11 +415,11 @@ class _GDrive:
             drive_file = self._service.files().get(fileId=file_id, fields="id, name, mimeType",
                                                    supportsTeamDrives=True).execute()
             if drive_file['mimeType'] == G_DRIVE_DIR_MIME_TYPE:
-                path = self._create_server_dir(Config.DOWN_PATH, drive_file['name'])
+                path = self._create_server_dir(config.Dynamic.DOWN_PATH, drive_file['name'])
                 self._download_dir(path, **drive_file)
             else:
-                self._download_file(Config.DOWN_PATH, **drive_file)
-            self._output = os.path.join(Config.DOWN_PATH, drive_file['name'])
+                self._download_file(config.Dynamic.DOWN_PATH, **drive_file)
+            self._output = os.path.join(config.Dynamic.DOWN_PATH, drive_file['name'])
         except HttpError as h_e:
             _LOG.exception(h_e)
             self._output = h_e
@@ -440,9 +442,9 @@ class _GDrive:
             "```[{}{}]({}%)```\n" + \
             "**Completed** : `{}/{}`"
         self._progress = tmp.format(
-            "".join((Config.FINISHED_PROGRESS_STR
+            "".join((config.FINISHED_PROGRESS_STR
                      for _ in range(math.floor(percentage / 5)))),
-            "".join((Config.UNFINISHED_PROGRESS_STR
+            "".join((config.UNFINISHED_PROGRESS_STR
                      for _ in range(20 - math.floor(percentage / 5)))),
             round(percentage, 2),
             self._completed,
@@ -497,7 +499,7 @@ class _GDrive:
         file_ = self._service.files().create(body=body, supportsTeamDrives=True).execute()
         file_id = file_.get("id")
         file_name = file_.get("name")
-        if not Config.G_DRIVE_IS_TD:
+        if not gdrive.Config.G_DRIVE_IS_TD:
             self._set_permission(file_id)
         _LOG.info("Created Google-Drive Folder => Name: %s ID: %s ", file_name, file_id)
         return G_DRIVE_FOLDER_LINK.format(file_id, file_name)
@@ -609,8 +611,8 @@ class Worker(_GDrive):
         if _CREDS:
             await self._message.edit("`Already Setup!`", del_in=5)
         else:
-            _AUTH_FLOW = OAuth2WebServerFlow(Config.G_DRIVE_CLIENT_ID,
-                                             Config.G_DRIVE_CLIENT_SECRET,
+            _AUTH_FLOW = OAuth2WebServerFlow(gdrive.Config.G_DRIVE_CLIENT_ID,
+                                             gdrive.Config.G_DRIVE_CLIENT_SECRET,
                                              OAUTH_SCOPE,
                                              redirect_uri=REDIRECT_URI)
             reply_string = f"please visit {_AUTH_FLOW.step1_get_authorize_url()} and "
@@ -766,7 +768,7 @@ class Worker(_GDrive):
             while not self._is_finished:
                 if self._progress is not None:
                     await self._message.edit(self._progress)
-                await asyncio.sleep(Config.EDIT_SLEEP_TIMEOUT)
+                await asyncio.sleep(config.Dynamic.EDIT_SLEEP_TIMEOUT)
         if dl_loc and os.path.exists(dl_loc):
             os.remove(dl_loc)
         end_t = datetime.now()
@@ -792,7 +794,7 @@ class Worker(_GDrive):
             while not self._is_finished:
                 if self._progress is not None:
                     await self._message.edit(self._progress)
-                await asyncio.sleep(Config.EDIT_SLEEP_TIMEOUT)
+                await asyncio.sleep(config.Dynamic.EDIT_SLEEP_TIMEOUT)
         end_t = datetime.now()
         m_s = (end_t - start_t).seconds
         if isinstance(self._output, HttpError):
@@ -819,7 +821,7 @@ class Worker(_GDrive):
             while not self._is_finished:
                 if self._progress is not None:
                     await self._message.edit(self._progress)
-                await asyncio.sleep(Config.EDIT_SLEEP_TIMEOUT)
+                await asyncio.sleep(config.Dynamic.EDIT_SLEEP_TIMEOUT)
         end_t = datetime.now()
         m_s = (end_t - start_t).seconds
         if isinstance(self._output, HttpError):
@@ -944,8 +946,8 @@ class Worker(_GDrive):
 async def gsetup_(message: Message):
     """ setup creds """
     link = "https://theuserge.github.io/deployment.html#6-g_drive_client_id--g_drive_client_secret"
-    if Config.G_DRIVE_CLIENT_ID and Config.G_DRIVE_CLIENT_SECRET:
-        if message.chat.id in Config.AUTH_CHATS:
+    if gdrive.Config.G_DRIVE_CLIENT_ID and gdrive.Config.G_DRIVE_CLIENT_SECRET:
+        if message.chat.id in config.AUTH_CHATS:
             await Worker(message).setup()
         else:
             await message.edit("`try in log channel`", del_in=5)

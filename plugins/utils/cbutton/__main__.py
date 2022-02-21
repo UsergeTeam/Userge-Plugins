@@ -12,7 +12,7 @@
 
 from pyrogram.errors import BadRequest, ChannelInvalid, UserIsBot
 
-from userge import userge, Config, Message
+from userge import userge, config, Message
 from userge.utils import parse_buttons as pb, get_file_id_of_media
 
 log = userge.getLogger(__name__)
@@ -28,7 +28,7 @@ log = userge.getLogger(__name__)
                "<b>add a url button to same row</b>"})
 async def create_button(msg: Message):
     """ Create Buttons Using Bot """
-    if Config.BOT_TOKEN is None:
+    if config.BOT_TOKEN is None:
         await msg.err("First Create a Bot via @Botfather to Create Buttons...")
         return
     string = msg.input_raw

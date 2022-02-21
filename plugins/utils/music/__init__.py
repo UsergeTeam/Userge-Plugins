@@ -7,3 +7,9 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    ARQ_KEY = os.environ.get("ARQ_KEY")

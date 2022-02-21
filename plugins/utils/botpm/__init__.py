@@ -7,3 +7,9 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    START_MEDIA = os.environ.get("START_MEDIA")

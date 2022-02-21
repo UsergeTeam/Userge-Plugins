@@ -11,7 +11,8 @@
 import asyncio
 from typing import Dict, Tuple
 
-from userge import userge, Message, get_collection, Config
+from userge import userge, Message, get_collection, config
+from ...builtin import sudo
 
 NOTES_COLLECTION = get_collection("notes")
 CHANNEL = userge.getCLogger(__name__)
@@ -43,6 +44,7 @@ def _get_notes_for_chat(chat_id: int) -> str:
     return out
 
 
+@userge.on_start
 async def _init() -> None:
     async for nt in NOTES_COLLECTION.find():
         if 'mid' not in nt:
@@ -169,9 +171,9 @@ async def get_note(message: Message) -> None:
         return
     if message.chat.id not in NOTES_DATA:
         return
-    can_access = message.from_user.is_self or message.from_user.id in Config.SUDO_USERS
-    if Config.OWNER_ID:
-        can_access = can_access or message.from_user.id in Config.OWNER_ID
+    can_access = message.from_user.is_self or message.from_user.id in sudo.USERS
+    if config.OWNER_ID:
+        can_access = can_access or message.from_user.id in config.OWNER_ID
     notename = message.matches[0].group(1).lower()
     mid, is_global = (0, False)
     for note in NOTES_DATA[message.chat.id]:

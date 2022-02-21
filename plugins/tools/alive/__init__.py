@@ -7,3 +7,11 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    ALIVE_MEDIA = os.environ.get("ALIVE_MEDIA")
+    UPSTREAM_REPO = os.environ.get("UPSTREAM_REPO",
+                                   "https://github.com/UsergeTeam/Userge")

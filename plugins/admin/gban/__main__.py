@@ -14,7 +14,9 @@ from typing import AsyncGenerator, Tuple, Dict
 from pyrogram.errors.exceptions.bad_request_400 import (
     ChatAdminRequired, UserAdminInvalid, ChannelInvalid)
 
-from userge import userge, Message, Config, get_collection
+from userge import userge, Message, get_collection
+from .. import gban
+from ...builtin import sudo
 
 GBAN_USER_BASE = get_collection("GBAN_USER")
 WHITELIST = get_collection("WHITELIST_USER")
@@ -28,6 +30,7 @@ async def is_whitelist(user_id: int) -> bool:
     return user_id in _WHITE_CACHE
 
 
+@userge.on_start
 async def _init() -> None:
     async for i in WHITELIST.find():
         _WHITE_CACHE[int(i['user_id'])] = i['firstname']
@@ -73,7 +76,7 @@ async def gban_user(message: Message):
     if user_id == message.client.id:
         await message.edit(r"LoL. Why would I GBan myself ¯\(°_o)/¯")
         return
-    if user_id in Config.SUDO_USERS:
+    if user_id in sudo.USERS:
         await message.edit(
             "That user is in my Sudo List, Hence I can't ban him.\n\n"
             "**Tip:** Remove them from Sudo List and try again. (¬_¬)", del_in=5)
@@ -110,7 +113,7 @@ async def gban_user(message: Message):
                                      'user_id': user_id,
                                      'reason': reason,
                                      'chat_ids': gbanned_chats})
-    if Config.FBAN_CHAT_ID and not message.client.is_bot:
+    if gban.Config.FBAN_CHAT_ID and not message.client.is_bot:
         mention = None  # to avoid peer id invalid
         if message.reply_to_message and message.reply_to_message.from_user:
             mention = message.reply_to_message.from_user.mention
@@ -121,7 +124,7 @@ async def gban_user(message: Message):
                     break
         if mention:
             await message.client.send_message(
-                Config.FBAN_CHAT_ID,
+                gban.Config.FBAN_CHAT_ID,
                 f"/fban {mention} {reason}"
             )
             await CHANNEL.log(f'$FBAN #prid{user_id} ⬆️')
@@ -167,7 +170,7 @@ async def ungban_user(message: Message):
                        f"\n\n**First Name:** [{firstname}](tg://user?id={user_id})\n"
                        f"**User ID:** `{user_id}`")
     await GBAN_USER_BASE.delete_one({'firstname': firstname, 'user_id': user_id})
-    if Config.FBAN_CHAT_ID and not message.client.is_bot:
+    if gban.Config.FBAN_CHAT_ID and not message.client.is_bot:
         mention = None  # to avoid peer id invalid
         if message.reply_to_message and message.reply_to_message.from_user:
             mention = message.reply_to_message.from_user.mention
@@ -178,7 +181,7 @@ async def ungban_user(message: Message):
                     break
         if mention:
             await message.client.send_message(
-                Config.FBAN_CHAT_ID,
+                gban.Config.FBAN_CHAT_ID,
                 f"/unfban {mention}"
             )
             await CHANNEL.log(f'$UNFBAN #prid{user_id} ⬆️')

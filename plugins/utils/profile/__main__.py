@@ -17,10 +17,10 @@ from datetime import datetime
 from pyrogram.errors.exceptions.bad_request_400 import (
     UsernameOccupied, AboutTooLong, UsernameNotOccupied, VideoFileInvalid)
 
-from userge import userge, Config, Message
+from userge import userge, config, Message
 from userge.utils import progress
 
-PHOTO = Config.DOWN_PATH + "profile_pic.jpg"
+PHOTO = config.Dynamic.DOWN_PATH + "profile_pic.jpg"
 USER_DATA = {}
 
 
@@ -138,7 +138,7 @@ async def set_profile_picture(message: Message):
 
     elif (replied and replied.media and (
              replied.video or replied.animation)):
-        VIDEO = Config.DOWN_PATH + "profile_vid.mp4"
+        VIDEO = config.Dynamic.DOWN_PATH + "profile_vid.mp4"
         await userge.download_media(message=replied,
                                     file_name=VIDEO,
                                     progress=progress,

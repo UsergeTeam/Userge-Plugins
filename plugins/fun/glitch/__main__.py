@@ -15,10 +15,10 @@ import os
 from PIL import Image
 from glitch_this import ImageGlitcher
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
 from userge.utils import take_screen_shot, runcmd
 
-Glitched = Config.DOWN_PATH + "glitch.gif"
+Glitched = config.Dynamic.DOWN_PATH + "glitch.gif"
 
 
 @userge.on_cmd("glitch", about={
@@ -46,17 +46,17 @@ async def glitch_(message: Message):
         args = input_
     else:
         args = 2
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.makedirs(Config.DOWN_PATH)
+    if not os.path.isdir(config.Dynamic.DOWN_PATH):
+        os.makedirs(config.Dynamic.DOWN_PATH)
     await message.edit("```Glitching... 😁```")
     dls = await message.client.download_media(
         message=replied,
-        file_name=Config.DOWN_PATH
+        file_name=config.Dynamic.DOWN_PATH
     )
-    dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
+    dls_loc = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(dls))
     glitch_file = None
     if replied.sticker and replied.sticker.file_name.endswith(".tgs"):
-        file_1 = os.path.join(Config.DOWN_PATH, "glitch.png")
+        file_1 = os.path.join(config.Dynamic.DOWN_PATH, "glitch.png")
         cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {file_1}"
         stdout, stderr = (await runcmd(cmd))[:2]
         if not os.path.lexists(file_1):
@@ -64,14 +64,14 @@ async def glitch_(message: Message):
             raise Exception(stdout + stderr)
         glitch_file = file_1
     elif replied.sticker and replied.sticker.file_name.endswith(".webp"):
-        file_2 = os.path.join(Config.DOWN_PATH, "glitch.png")
+        file_2 = os.path.join(config.Dynamic.DOWN_PATH, "glitch.png")
         os.rename(dls_loc, file_2)
         if not os.path.lexists(file_2):
             await message.err("```Sticker not found...```")
             return
         glitch_file = file_2
     elif replied.animation or replied.video:
-        file_3 = os.path.join(Config.DOWN_PATH, "glitch.png")
+        file_3 = os.path.join(config.Dynamic.DOWN_PATH, "glitch.png")
         await take_screen_shot(dls_loc, 0, file_3)
         if not os.path.lexists(file_3):
             await message.err("```Sticker not found...```")
@@ -83,7 +83,7 @@ async def glitch_(message: Message):
     img = Image.open(glitch_file)
     message_id = replied.message_id
     if '-s' in message.flags:
-        glitched = Config.DOWN_PATH + "glitched.webp"
+        glitched = config.Dynamic.DOWN_PATH + "glitched.webp"
         glitch_img = glitcher.glitch_image(img, args, color_offset=True)
         glitch_img.save(glitched)
         await message.client.send_sticker(

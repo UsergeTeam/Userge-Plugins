@@ -16,9 +16,9 @@ from math import floor
 
 import wget
 
-from userge import userge, Message, Config, pool
+from userge import userge, Message, config, pool
 from userge.utils import time_formatter, humanbytes, import_ytdl
-from .upload import upload
+from ..upload import upload
 
 LOGGER = userge.getLogger(__name__)
 ytdl = import_ytdl()
@@ -46,7 +46,7 @@ __{uploader}__
     """.format_map(_exracted)
     if _exracted['thumb']:
         _tmp = await pool.run_in_thread(wget.download)(
-            _exracted['thumb'], os.path.join(Config.DOWN_PATH, f"{time()}.jpg"))
+            _exracted['thumb'], os.path.join(config.Dynamic.DOWN_PATH, f"{time()}.jpg"))
         await message.reply_photo(_tmp, caption=out)
         await message.delete()
         os.remove(_tmp)
@@ -72,7 +72,7 @@ async def ytDown(message: Message):
     def __progress(data: dict):
         nonlocal edited, c_time
         diff = time() - c_time
-        if data['status'] == "downloading" and (not edited or diff >= Config.EDIT_SLEEP_TIMEOUT):
+        if data['status'] == "downloading" and (not edited or diff >= config.Dynamic.EDIT_SLEEP_TIMEOUT):
             c_time = time()
             edited = True
             eta = data.get('eta')
@@ -88,9 +88,9 @@ async def ytDown(message: Message):
                 percentage = int(current) * 100 / int(total)
                 out += f"Progress >> {int(percentage)}%\n"
                 out += "[{}{}]".format(
-                    ''.join((Config.FINISHED_PROGRESS_STR
+                    ''.join((config.FINISHED_PROGRESS_STR
                              for _ in range(floor(percentage / 5)))),
-                    ''.join((Config.UNFINISHED_PROGRESS_STR
+                    ''.join((config.UNFINISHED_PROGRESS_STR
                              for _ in range(20 - floor(percentage / 5)))))
             userge.loop.create_task(message.edit(out))
 
@@ -119,7 +119,7 @@ async def ytDown(message: Message):
         retcode = await _tubeDl([message.filtered_input_str], __progress, startTime)
     if retcode == 0:
         _fpath = ''
-        for _path in glob.glob(os.path.join(Config.DOWN_PATH, str(startTime), '*')):
+        for _path in glob.glob(os.path.join(config.Dynamic.DOWN_PATH, str(startTime), '*')):
             if not _path.lower().endswith((".jpg", ".png", ".webp")):
                 _fpath = _path
         if not _fpath:
@@ -191,7 +191,7 @@ def _supported(url):
 
 @pool.run_in_thread
 def _tubeDl(url: list, prog, starttime, uid=None):
-    _opts = {'outtmpl': os.path.join(Config.DOWN_PATH, str(starttime),
+    _opts = {'outtmpl': os.path.join(config.Dynamic.DOWN_PATH, str(starttime),
                                      '%(title)s-%(format)s.%(ext)s'),
              'logger': LOGGER,
              'writethumbnail': True,
@@ -213,7 +213,7 @@ def _tubeDl(url: list, prog, starttime, uid=None):
 
 @pool.run_in_thread
 def _mp3Dl(url, prog, starttime):
-    _opts = {'outtmpl': os.path.join(Config.DOWN_PATH, str(starttime), '%(title)s.%(ext)s'),
+    _opts = {'outtmpl': os.path.join(config.Dynamic.DOWN_PATH, str(starttime), '%(title)s.%(ext)s'),
              'logger': LOGGER,
              'writethumbnail': True,
              'prefer_ffmpeg': True,

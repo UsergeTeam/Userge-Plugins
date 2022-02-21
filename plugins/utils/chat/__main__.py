@@ -23,11 +23,11 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     UsernameNotOccupied,
     PeerIdInvalid)
 
-from userge import userge, Config, Message
+from userge import userge, config, Message
 
 LOG = userge.getLogger(__name__)
 
-PATH = Config.DOWN_PATH + "chat_pic.jpg"
+PATH = config.Dynamic.DOWN_PATH + "chat_pic.jpg"
 
 
 def mention_html(user_id, name):

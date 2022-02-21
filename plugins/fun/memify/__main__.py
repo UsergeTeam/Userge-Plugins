@@ -13,7 +13,7 @@ import textwrap
 
 from PIL import Image, ImageFont, ImageDraw
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
 from userge.utils import progress, take_screen_shot, runcmd
 
 
@@ -33,19 +33,19 @@ async def memify(message: Message):
     if not (replied.photo or replied.sticker or replied.animation):
         await message.err("Bruh, U Comedy me? Read help or gtfo (¬_¬)")
         return
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.makedirs(Config.DOWN_PATH)
+    if not os.path.isdir(config.Dynamic.DOWN_PATH):
+        os.makedirs(config.Dynamic.DOWN_PATH)
     await message.edit("He he, let me use my skills")
     dls = await message.client.download_media(
         message=message.reply_to_message,
-        file_name=Config.DOWN_PATH,
+        file_name=config.Dynamic.DOWN_PATH,
         progress=progress,
         progress_args=(message, "Trying to Posses given content")
     )
-    dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
+    dls_loc = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(dls))
     if replied.sticker and replied.sticker.file_name.endswith(".tgs"):
         await message.edit("OMG, an Animated sticker ⊙_⊙, lemme do my bleck megik...")
-        png_file = os.path.join(Config.DOWN_PATH, "meme.png")
+        png_file = os.path.join(config.Dynamic.DOWN_PATH, "meme.png")
         cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {png_file}"
         stdout, stderr = (await runcmd(cmd))[:2]
         os.remove(dls_loc)
@@ -55,7 +55,7 @@ async def memify(message: Message):
         dls_loc = png_file
     elif replied.animation:
         await message.edit("Look it's GF. Oh, no it's just a Gif ")
-        jpg_file = os.path.join(Config.DOWN_PATH, "meme.jpg")
+        jpg_file = os.path.join(config.Dynamic.DOWN_PATH, "meme.jpg")
         await take_screen_shot(dls_loc, 0, jpg_file)
         os.remove(dls_loc)
         if not os.path.lexists(jpg_file):
@@ -122,6 +122,6 @@ async def draw_meme_text(image_path, text):
             current_h += u_height + pad
 
     image_name = "memify.webp"
-    webp_file = os.path.join(Config.DOWN_PATH, image_name)
+    webp_file = os.path.join(config.Dynamic.DOWN_PATH, image_name)
     img.save(webp_file, "WebP")
     return webp_file

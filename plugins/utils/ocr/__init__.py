@@ -7,3 +7,9 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    OCR_SPACE_API_KEY = os.environ.get("OCR_SPACE_API_KEY")

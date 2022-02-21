@@ -12,7 +12,8 @@ import time
 import asyncio
 from random import choice, randint
 
-from userge import userge, Message, filters, Config, get_collection
+from userge import userge, Message, filters, config, get_collection
+from .. import pmpermit
 from userge.utils import time_formatter
 
 CHANNEL = userge.getCLogger(__name__)
@@ -26,6 +27,7 @@ TIME = 0.0
 USERS = {}
 
 
+@userge.on_start
 async def _init() -> None:
     global IS_AFK, REASON, TIME  # pylint: disable=global-statement
     data = await SAVED_SETTINGS.find_one({'_id': 'AFK'})
@@ -58,7 +60,8 @@ async def active_afk(message: Message) -> None:
 
 @userge.on_filters(IS_AFK_FILTER & ~filters.me & ~filters.bot & ~filters.edited & (
     filters.mentioned | (filters.private & ~filters.service & (
-        filters.create(lambda _, __, ___: Config.ALLOW_ALL_PMS) | Config.ALLOWED_CHATS))),
+        filters.create(
+            lambda _, __, ___: pmpermit.Dynamic.ALLOW_ALL_PMS) | pmpermit.ALLOWED_CHATS))),
     allow_via_bot=False)
 async def handle_afk_incomming(message: Message) -> None:
     """ handle incomming messages when you afk """

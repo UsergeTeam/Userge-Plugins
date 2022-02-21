@@ -15,7 +15,8 @@ from json import dumps
 from emoji import get_emoji_regexp
 from googletrans import Translator, LANGUAGES
 
-from userge import userge, Message, Config, pool
+from userge import userge, Message, pool
+from .. import translate
 
 
 @userge.on_cmd("tr", about={
@@ -55,7 +56,7 @@ async def translateme(message: Message):
     elif len(flags) == 1:
         src, dest = 'auto', list(flags)[0]
     else:
-        src, dest = 'auto', Config.LANG
+        src, dest = 'auto', translate.Config.LANG
     text = get_emoji_regexp().sub(u'', text)
     await message.edit("`Translating ...`")
     try:

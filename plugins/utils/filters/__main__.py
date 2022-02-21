@@ -52,6 +52,7 @@ def _get_filters_for_chat(chat_id: int) -> str:
     return out
 
 
+@userge.on_start
 async def _init() -> None:
     async for flt in FILTERS_COLLECTION.find():
         if 'mid' not in flt:

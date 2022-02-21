@@ -14,7 +14,8 @@ from datetime import datetime
 import aiohttp
 from pytz import country_timezones as c_tz, timezone as tz, country_names as c_n
 
-from userge import userge, Message, Config
+from userge import userge, Message
+from .. import weather
 
 CHANNEL = userge.getCLogger(__name__)
 
@@ -43,7 +44,7 @@ async def weather_get(message: Message):
     """
     this function can get weather info
     """
-    OWM_API = Config.OPEN_WEATHER_MAP
+    OWM_API = weather.Config.OPEN_WEATHER_MAP
     if not OWM_API:
         await message.edit(
             "<code>Oops!!get the API from</code> "
@@ -56,7 +57,7 @@ async def weather_get(message: Message):
     APPID = OWM_API
 
     if not message.input_str:
-        CITY = Config.WEATHER_DEFCITY
+        CITY = weather.Config.WEATHER_DEFCITY
         if not CITY:
             await message.edit("`Please specify a city or set one as default!`", del_in=0)
             return

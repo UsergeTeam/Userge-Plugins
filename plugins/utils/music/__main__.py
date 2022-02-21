@@ -16,14 +16,15 @@ import os
 
 from aiohttp import ClientSession
 from Python_ARQ import ARQ
-from userge import Config, Message, userge
+from userge import config, Message, userge
+from .. import music
 from userge.plugins.misc.download import url_download
-
-ARQ_KEY = os.environ.get("ARQ_KEY", None)
 
 # ARQ API
 session = ClientSession()
-arq = ARQ("https://thearq.tech", ARQ_KEY, session) if ARQ_KEY else None
+arq = ARQ(
+    "https://thearq.tech", music.Config.ARQ_KEY, session
+) if music.Config.ARQ_KEY else None
 
 LOGGER = userge.getLogger(__name__)
 
@@ -37,7 +38,7 @@ LOGGER = userge.getLogger(__name__)
     },
 )
 async def savn(message: Message):
-    if not ARQ_KEY:
+    if not music.Config.ARQ_KEY:
         return await message.err(
             "Before using this command, "
             "you have to set this [Environmental var.](https://t.me/UnofficialPluginsHelp/128)",
@@ -59,7 +60,7 @@ async def savn(message: Message):
     caption_str = f"`{title}` by `{artist}`"
     pathh, _ = await url_download(message, url)
     temp_name = f"{title}.mp3"
-    song_path = os.path.join(Config.DOWN_PATH, temp_name)
+    song_path = os.path.join(config.Dynamic.DOWN_PATH, temp_name)
     os.rename(pathh, song_path)
     await message.reply_audio(
         audio=song_path,
@@ -83,7 +84,7 @@ async def savn(message: Message):
     del_pre=True,
 )
 async def deeza(message: Message):
-    if not ARQ_KEY:
+    if not music.Config.ARQ_KEY:
         return await message.err(
             "Before using this command, "
             "you have to set this [Environmental var.](https://t.me/UnofficialPluginsHelp/128)",
@@ -110,7 +111,7 @@ async def deeza(message: Message):
         temp_name = f"{title}.mp3"
     else:
         temp_name = f"{title}.flac"
-    song_path = os.path.join(Config.DOWN_PATH, temp_name)
+    song_path = os.path.join(config.Dynamic.DOWN_PATH, temp_name)
     os.rename(pathh, song_path)
     await message.reply_audio(
         audio=song_path,

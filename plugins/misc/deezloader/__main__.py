@@ -16,10 +16,11 @@ import deezloader  # pylint: disable=W0406
 from deezloader.exceptions import NoDataApi
 
 from userge import userge, Message, pool
+from .. import deezloader
 from userge.plugins.misc.upload import doc_upload, audio_upload
 
 Clogger = userge.getCLogger(__name__)
-ARL_TOKEN = os.environ.get("ARL_TOKEN")
+
 TEMP_PATH = 'deezdown_temp/'
 REX = re.compile(r"https?:\/\/(open\.spotify|www\.deezer)\.com\/"
                  r"(track|album|playlist)\/[A-Z0-9a-z]{3,}")
@@ -48,11 +49,11 @@ async def deezload(message: Message):
     if not os.path.exists(TEMP_PATH):
         os.makedirs(TEMP_PATH)
     await message.edit("Checking your Token.")
-    if ARL_TOKEN is None:
+    if deezloader.Config.ARL_TOKEN is None:
         await message.edit(ARL_HELP, disable_web_page_preview=True)
         return
     try:
-        loader = deezloader.Login(ARL_TOKEN)
+        loader = deezloader.Login(deezloader.Config.ARL_TOKEN)
     except Exception as er:
         await message.edit(er)
         await Clogger.log(f"#ERROR\n\n{er}")

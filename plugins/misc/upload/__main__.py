@@ -20,7 +20,8 @@ from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from pyrogram.errors.exceptions import FloodWait
 
-from userge import userge, Config, Message
+from userge import userge, config, Message
+from .. import thumbnail
 from userge.utils import (
     is_url, sort_file_name_key, progress, take_screen_shot, humanbytes)
 from userge.utils.exceptions import ProcessCanceled
@@ -97,7 +98,7 @@ async def upload_to_tg(message: Message):
         path_, file_name = path_.split("|")
         path_ = path_.strip()
         if os.path.isfile(path_):
-            new_path = os.path.join(Config.DOWN_PATH, file_name.strip())
+            new_path = os.path.join(config.Dynamic.DOWN_PATH, file_name.strip())
             os.rename(path_, new_path)
             path_ = new_path
     try:
@@ -257,7 +258,7 @@ async def audio_upload(message: Message, path, del_path: bool = False,
     if with_thumb:
         try:
             album_art = stagger.read_tag(str_path)
-            if album_art.picture and not os.path.lexists(Config.THUMB_PATH):
+            if album_art.picture and not os.path.lexists(thumbnail.Dynamic.THUMB_PATH):
                 bytes_pic_data = album_art[stagger.id3.APIC][0].data
                 bytes_io = io.BytesIO(bytes_pic_data)
                 image_file = Image.open(bytes_io)
@@ -336,8 +337,8 @@ async def photo_upload(message: Message, path, del_path: bool = False, extra: st
 
 
 async def get_thumb(path: str = ''):
-    if os.path.exists(Config.THUMB_PATH):
-        return Config.THUMB_PATH
+    if os.path.exists(thumbnail.Dynamic.THUMB_PATH):
+        return thumbnail.Dynamic.THUMB_PATH
     if path:
         types = (".jpg", ".webp", ".png")
         if path.endswith(types):
@@ -363,7 +364,7 @@ async def get_thumb(path: str = ''):
 
 async def remove_thumb(thumb: str) -> None:
     if (thumb and os.path.exists(thumb)
-            and thumb != LOGO_PATH and thumb != Config.THUMB_PATH):
+            and thumb != LOGO_PATH and thumb != thumbnail.Dynamic.THUMB_PATH):
         os.remove(thumb)
 
 

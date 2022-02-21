@@ -12,10 +12,10 @@
 
 import os
 from PIL import Image, ImageOps
-from userge import userge, Message, Config
+from userge import userge, Message, config
 from userge.utils import take_screen_shot, runcmd
 
-Converted = Config.DOWN_PATH + "sticker.webp"
+Converted = config.Dynamic.DOWN_PATH + "sticker.webp"
 
 
 @userge.on_cmd("(ghost|invert)", about={
@@ -30,18 +30,18 @@ async def ghost_invert(message: Message):
         await message.edit("```Media not found...```")
         await message.reply_sticker('CAADBQADVAUAAjZgsCGE7PH3Wt1wSRYE')
         return
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.makedirs(Config.DOWN_PATH)
+    if not os.path.isdir(config.Dynamic.DOWN_PATH):
+        os.makedirs(config.Dynamic.DOWN_PATH)
     await message.edit("```Wait, Ghost is coming 😈```")
     dls = await message.client.download_media(
         message=replied,
-        file_name=Config.DOWN_PATH
+        file_name=config.Dynamic.DOWN_PATH
     )
-    dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
+    dls_loc = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(dls))
     ghost_file = None
     if replied.sticker and replied.sticker.file_name.endswith(".tgs"):
         await message.edit("```Ghost is coming from Animated Sticker```")
-        file_1 = os.path.join(Config.DOWN_PATH, "ghost.png")
+        file_1 = os.path.join(config.Dynamic.DOWN_PATH, "ghost.png")
         cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {file_1}"
         stdout, stderr = (await runcmd(cmd))[:2]
         if not os.path.lexists(file_1):
@@ -50,7 +50,7 @@ async def ghost_invert(message: Message):
         ghost_file = file_1
     elif replied.sticker and replied.sticker.file_name.endswith(".webp"):
         await message.edit("```Ghost coming from this gay sticker```")
-        file_2 = os.path.join(Config.DOWN_PATH, "ghost.png")
+        file_2 = os.path.join(config.Dynamic.DOWN_PATH, "ghost.png")
         os.rename(dls_loc, file_2)
         if not os.path.lexists(file_2):
             await message.err("```Ghost ran away```")
@@ -61,7 +61,7 @@ async def ghost_invert(message: Message):
             await message.edit("```Ghost coming from this gay GIF```")
         else:
             await message.edit("```Ghost coming from this gay video```")
-        file_3 = os.path.join(Config.DOWN_PATH, "ghost.jpg")
+        file_3 = os.path.join(config.Dynamic.DOWN_PATH, "ghost.jpg")
         await take_screen_shot(dls_loc, 0, file_3)
         if not os.path.lexists(file_3):
             await message.err("```Ghost ran away```")
@@ -94,18 +94,18 @@ async def mirror_flip(message: Message):
         await message.edit("```Media not found...```")
         await message.reply_sticker('CAADBQADVAUAAjZgsCGE7PH3Wt1wSRYE')
         return
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.makedirs(Config.DOWN_PATH)
+    if not os.path.isdir(config.Dynamic.DOWN_PATH):
+        os.makedirs(config.Dynamic.DOWN_PATH)
     Cmd = message.matches[0].group(1).lower()
     await message.edit("```Wait, let me converting your media 😉```")
     dls = await message.client.download_media(
         message=replied,
-        file_name=Config.DOWN_PATH
+        file_name=config.Dynamic.DOWN_PATH
     )
-    dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
+    dls_loc = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(dls))
     mirror_flip_file = None
     if replied.sticker and replied.sticker.file_name.endswith(".tgs"):
-        file_1 = os.path.join(Config.DOWN_PATH, "img.png")
+        file_1 = os.path.join(config.Dynamic.DOWN_PATH, "img.png")
         cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {file_1}"
         stdout, stderr = (await runcmd(cmd))[:2]
         if not os.path.lexists(file_1):
@@ -113,14 +113,14 @@ async def mirror_flip(message: Message):
             raise Exception(stdout + stderr)
         mirror_flip_file = file_1
     elif replied.sticker and replied.sticker.file_name.endswith(".webp"):
-        file_2 = os.path.join(Config.DOWN_PATH, "img.png")
+        file_2 = os.path.join(config.Dynamic.DOWN_PATH, "img.png")
         os.rename(dls_loc, file_2)
         if not os.path.lexists(file_2):
             await message.err("```Sticker not found```")
             return
         mirror_flip_file = file_2
     elif replied.animation or replied.video:
-        file_3 = os.path.join(Config.DOWN_PATH, "img.jpg")
+        file_3 = os.path.join(config.Dynamic.DOWN_PATH, "img.jpg")
         await take_screen_shot(dls_loc, 0, file_3)
         if not os.path.lexists(file_3):
             await message.err("```Sticker not found```")
@@ -167,17 +167,17 @@ async def rotate_(message: Message):
         args = input_
     else:
         args = 90
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.makedirs(Config.DOWN_PATH)
+    if not os.path.isdir(config.Dynamic.DOWN_PATH):
+        os.makedirs(config.Dynamic.DOWN_PATH)
     await message.edit("```Wait, let me Rotating Your media ☺️```")
     dls = await message.client.download_media(
         message=replied,
-        file_name=Config.DOWN_PATH
+        file_name=config.Dynamic.DOWN_PATH
     )
-    dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
+    dls_loc = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(dls))
     rotate_file = None
     if replied.sticker and replied.sticker.file_name.endswith(".tgs"):
-        file_1 = os.path.join(Config.DOWN_PATH, "img.png")
+        file_1 = os.path.join(config.Dynamic.DOWN_PATH, "img.png")
         cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {file_1}"
         stdout, stderr = (await runcmd(cmd))[:2]
         if not os.path.lexists(file_1):
@@ -185,14 +185,14 @@ async def rotate_(message: Message):
             raise Exception(stdout + stderr)
         rotate_file = file_1
     elif replied.sticker and replied.sticker.file_name.endswith(".webp"):
-        file_2 = os.path.join(Config.DOWN_PATH, "img.png")
+        file_2 = os.path.join(config.Dynamic.DOWN_PATH, "img.png")
         os.rename(dls_loc, file_2)
         if not os.path.lexists(file_2):
             await message.err("```Sticker not found```")
             return
         rotate_file = file_2
     elif replied.animation or replied.video:
-        file_3 = os.path.join(Config.DOWN_PATH, "img.jpg")
+        file_3 = os.path.join(config.Dynamic.DOWN_PATH, "img.jpg")
         await take_screen_shot(dls_loc, 0, file_3)
         if not os.path.lexists(file_3):
             await message.err("```Sticker not found```")

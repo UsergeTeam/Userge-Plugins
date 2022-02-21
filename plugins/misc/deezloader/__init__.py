@@ -7,3 +7,9 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    ARL_TOKEN = os.environ.get("ARL_TOKEN")

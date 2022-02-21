@@ -17,7 +17,8 @@ import aiofiles
 from selenium import webdriver
 from pyrogram.errors.exceptions.bad_request_400 import YouBlockedUser
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
+from .. import carbon
 
 CARBON = 'https://carbon.now.sh/?t={theme}&l={lang}&code={code}&bg={bg}'
 
@@ -41,7 +42,7 @@ CARBON = 'https://carbon.now.sh/?t={theme}&l={lang}&code={code}&bg={bg}'
         'solarized light', 'synthwave-84', 'twilight', 'verminal', 'vscode',
         'yeti', 'zenburn']}, del_pre=True)
 async def carbon_(message: Message):
-    if Config.GOOGLE_CHROME_BIN is None:
+    if carbon.Config.GOOGLE_CHROME_BIN is None:
         replied = message.reply_to_message
         if replied:
             text = replied.text
@@ -88,7 +89,7 @@ async def carbon_(message: Message):
             message_id = replied.message_id
             if replied.document:
                 await message.edit("`Downloading File...`")
-                path_ = await message.client.download_media(replied, file_name=Config.DOWN_PATH)
+                path_ = await message.client.download_media(replied, file_name=config.Dynamic.DOWN_PATH)
                 async with aiofiles.open(path_) as file_:
                     code = await file_.read()
                 os.remove(path_)
@@ -121,7 +122,7 @@ async def carbon_(message: Message):
         await message.edit("`Creating a Carbon...`")
         code = quote_plus(code)
         await message.edit("`Processing... 20%`")
-        carbon_path = os.path.join(Config.DOWN_PATH, "carbon.png")
+        carbon_path = os.path.join(config.Dynamic.DOWN_PATH, "carbon.png")
         if os.path.isfile(carbon_path):
             os.remove(carbon_path)
         url = CARBON.format(theme=theme, lang=lang, code=code, bg=bg_)
@@ -129,13 +130,13 @@ async def carbon_(message: Message):
             await message.err("input too large!")
             return
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.binary_location = Config.GOOGLE_CHROME_BIN
+        chrome_options.binary_location = carbon.Config.GOOGLE_CHROME_BIN
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--window-size=1920x1080")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-gpu")
-        prefs = {'download.default_directory': Config.DOWN_PATH}
+        prefs = {'download.default_directory': config.Dynamic.DOWN_PATH}
         chrome_options.add_experimental_option('prefs', prefs)
         driver = webdriver.Chrome(chrome_options=chrome_options)
         driver.get(url)
@@ -146,7 +147,7 @@ async def carbon_(message: Message):
             'cmd': 'Page.setDownloadBehavior',
             'params': {
                 'behavior': 'allow',
-                'downloadPath': Config.DOWN_PATH
+                'downloadPath': config.Dynamic.DOWN_PATH
             }
         }
         driver.execute("send_command", params)

@@ -7,3 +7,14 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+from os import environ
+
+
+class Dynamic:
+    ANTISPAM_SENTRY: bool = True
+
+
+class Config:
+    USERGE_ANTISPAM_API = environ.get("USERGE_ANTISPAM_API")
+    SPAM_WATCH_API = environ.get("SPAM_WATCH_API")

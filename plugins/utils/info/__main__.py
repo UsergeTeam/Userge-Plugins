@@ -18,7 +18,8 @@ import aiohttp
 import spamwatch
 from UsergeAntiSpamApi import Client
 
-from userge import userge, Config, Message, get_collection
+from userge import userge, Message, get_collection
+from ...admin import antispam
 
 GBAN_USER_BASE = get_collection("GBAN_USER")
 GMUTE_USER_BASE = get_collection("GMUTE_USER")
@@ -62,9 +63,9 @@ async def info(msg: Message):
   - **Contact**: `{user.is_contact}`
 """
     if user:
-        if Config.USERGE_ANTISPAM_API:
+        if antispam.Config.USERGE_ANTISPAM_API:
             try:
-                ban = Client(Config.USERGE_ANTISPAM_API).getban(user.id)
+                ban = Client(antispam.Config.USERGE_ANTISPAM_API).getban(user.id)
             except Exception as err:
                 return await msg.err(err)
             if not ban:
@@ -72,8 +73,8 @@ async def info(msg: Message):
             else:
                 user_info += "\n**Userge Antispam API Banned** : `True`"
                 user_info += f"\n    **● Reason** : `{ban.reason or None}`"
-        if Config.SPAM_WATCH_API:
-            status = spamwatch.Client(Config.SPAM_WATCH_API).get_ban(user.id)
+        if antispam.Config.SPAM_WATCH_API:
+            status = spamwatch.Client(antispam.Config.SPAM_WATCH_API).get_ban(user.id)
             if status is False:
                 user_info += "\n**SpamWatch Banned** : `False`\n"
             else:

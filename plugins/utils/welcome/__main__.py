@@ -8,16 +8,22 @@
 #
 # All rights reserved.
 
-from userge import userge, filters, Message, Config, get_collection
+from userge import userge, filters, Message, config, get_collection
 
+SAVED_SETTINGS = get_collection("CONFIGS")
 WELCOME_COLLECTION = get_collection("welcome")
 LEFT_COLLECTION = get_collection("left")
+
+WELCOME_DELETE_TIMEOUT: int = 120
 WELCOME_CHATS = filters.chat([])
 LEFT_CHATS = filters.chat([])
+
 CHANNEL = userge.getCLogger(__name__)
 
 
+@userge.on_start
 async def _init() -> None:
+    global WELCOME_DELETE_TIMEOUT  # pylint: disbale=global-statement
     async for i in WELCOME_COLLECTION.find({'on': True}):
         if 'mid' not in i:
             continue
@@ -26,6 +32,9 @@ async def _init() -> None:
         if 'mid' not in i:
             continue
         LEFT_CHATS.add(i.get('_id'))
+    wel_t = await SAVED_SETTINGS.find_one({'_id': 'WELCOME_DELETE_TIMEOUT'})
+    if wel_t:
+        WELCOME_DELETE_TIMEOUT = wel_t['data']
 
 
 @userge.on_cmd("setwelcome", about={
@@ -150,6 +159,37 @@ async def viewleft(msg: Message):
     await raw_view(msg, 'Left', LEFT_COLLECTION)
 
 
+@userge.on_cmd("swelto (\\d+)", about={
+    'header': "Set auto welcome/left message delete timeout",
+    'usage': "{tr}swelto [timeout in seconds]",
+    'examples': "{tr}swelto 15\n{tr}swelto 0 : for disable deletion"})
+async def set_welcome_timeout(message: Message):
+    """ set welcome/left timeout """
+    global WELCOME_DELETE_TIMEOUT  # pylint: disbale=global-statement
+    await message.edit("`Setting auto welcome/left message delete timeout...`")
+    t_o = int(message.matches[0].group(1))
+    WELCOME_DELETE_TIMEOUT = t_o
+    await SAVED_SETTINGS.update_one(
+        {'_id': 'WELCOME_DELETE_TIMEOUT'}, {"$set": {'data': t_o}}, upsert=True)
+    if t_o:
+        await message.edit(
+            f"`Set auto welcome/left message delete timeout as {t_o} seconds!`", del_in=3)
+    else:
+        await message.edit("`Auto welcome/left message deletion disabled!`", del_in=3)
+
+
+@userge.on_cmd("vwelto", about={'header': "View auto welcome/left message delete timeout"})
+async def view_welcome_timeout(message: Message):
+    """ view welcome/left timeout """
+    if WELCOME_DELETE_TIMEOUT:
+        await message.edit(
+            "`Welcome/Left messages will be deleted after "
+            f"{WELCOME_DELETE_TIMEOUT} seconds!`",
+            del_in=5)
+    else:
+        await message.edit("`Auto welcome/left message deletion disabled!`", del_in=3)
+
+
 @userge.on_new_member(WELCOME_CHATS)
 async def saywel(msg: Message):
     """ welcome message handler """
@@ -257,4 +297,4 @@ async def raw_say(message: Message, name, collection):
                                      chat_id=message.chat.id,
                                      user_id=user.id,
                                      reply_to_message_id=message.message_id,
-                                     del_in=Config.WELCOME_DELETE_TIMEOUT)
+                                     del_in=WELCOME_DELETE_TIMEOUT)

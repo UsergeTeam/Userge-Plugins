@@ -18,23 +18,27 @@ from shutil import copyfile
 import aiofiles
 from PIL import Image, ImageFont, ImageDraw
 
-from userge import userge, Message, Config, get_collection
+from userge import userge, Message, get_collection
 
 SAVED_SETTINGS = get_collection("CONFIGS")
 UPDATE_PIC = False
+AUTOPIC_TIMEOUT = 300
 BASE_PIC = "resources/base_profile_pic.jpg"
 MDFY_PIC = "resources/mdfy_profile_pic.jpg"
 LOG = userge.getLogger(__name__)
 
 
 async def _init() -> None:
-    global UPDATE_PIC  # pylint: disable=global-statement
+    global UPDATE_PIC, AUTOPIC_TIMEOUT  # pylint: disable=global-statement
     data = await SAVED_SETTINGS.find_one({'_id': 'UPDATE_PIC'})
     if data:
         UPDATE_PIC = data['on']
         if not os.path.exists(BASE_PIC):
             with open(BASE_PIC, "wb") as media_file_:
                 media_file_.write(base64.b64decode(data['media']))
+    pic_data = await SAVED_SETTINGS.find_one({'_id': 'AUTOPIC_TIMEOUT'})
+    if pic_data:
+        AUTOPIC_TIMEOUT = bool(pic_data.get("data"))
 
 
 @userge.on_cmd(
@@ -88,13 +92,40 @@ async def autopic(message: Message):
     UPDATE_PIC = asyncio.get_event_loop().create_task(apic_worker())
 
 
+@userge.on_cmd("sapicto (\\d+)", about={
+    'header': "Set auto profile picture timeout",
+    'usage': "{tr}sapicto [timeout in seconds]",
+    'examples': "{tr}sapicto 60"})
+async def set_app_timeout(message: Message):
+    """ set auto profile picture timeout """
+    global AUTOPIC_TIMEOUT  # pylint: disable=global-statement
+    t_o = int(message.matches[0].group(1))
+    if t_o < 15:
+        await message.err("too short! (min = 15sec)")
+        return
+    await message.edit("`Setting auto profile picture timeout...`")
+    AUTOPIC_TIMEOUT = t_o
+    await SAVED_SETTINGS.update_one(
+        {'_id': 'AUTOPIC_TIMEOUT'}, {"$set": {'data': t_o}}, upsert=True)
+    await message.edit(
+        f"`Set auto profile picture timeout as {t_o} seconds!`", del_in=3)
+
+
+@userge.on_cmd("vapicto", about={'header': "View auto profile picture timeout"})
+async def view_app_timeout(message: Message):
+    """ view profile picture timeout """
+    await message.edit(
+        f"`Profile picture will be updated after {AUTOPIC_TIMEOUT} seconds!`",
+        del_in=5)
+
+
 @userge.add_task
 async def apic_worker():
     user_dict = await userge.get_user_dict('me')
     user = '@' + user_dict['uname'] if user_dict['uname'] else user_dict['flname']
     count = 0
     while UPDATE_PIC:
-        if not count % Config.AUTOPIC_TIMEOUT:
+        if not count % AUTOPIC_TIMEOUT:
             img = Image.open(BASE_PIC)
             i_width, i_height = img.size
             s_font = ImageFont.truetype("resources/font.ttf", int((35 / 640)*i_width))

@@ -7,3 +7,14 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+from .. import gdrive
+
+
+class Config:
+    G_PHOTOS_CLIENT_ID = os.environ.get("G_PHOTOS_CLIENT_ID", gdrive.Config.G_DRIVE_CLIENT_ID)
+    G_PHOTOS_CLIENT_SECRET = os.environ.get(
+        "G_PHOTOS_CLIENT_SECRET", gdrive.Config.G_DRIVE_CLIENT_SECRET
+    )
+    G_PHOTOS_AUTH_TOKEN_ID = int(os.environ.get("G_PHOTOS_AUTH_TOKEN_ID") or 0)

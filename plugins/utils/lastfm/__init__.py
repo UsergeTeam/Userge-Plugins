@@ -7,3 +7,18 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+import pylast
+
+from userge import config
+
+
+class Config:
+    API_KEY = os.environ.get("FM_API")
+    API_SECRET = os.environ.get("FM_SECRET")
+    USERNAME = os.environ.get("FM_USERNAME")
+    PASSWORD = pylast.md5(os.environ.get("FM_PASSWORD"))
+    CHAT_IDS = [
+        int(x) for x in os.environ.get("LASTFM_CHAT_ID", str(config.LOG_CHANNEL_ID)).split()
+    ]

@@ -26,6 +26,7 @@ LOG = userge.getLogger(__name__)
 CHANNEL = userge.getCLogger(__name__)
 
 
+@userge.on_start
 async def _init() -> None:
     async for data in ANTI_FLOOD.find():
         ANTIFLOOD_DATA[data["chat_id"]] = {

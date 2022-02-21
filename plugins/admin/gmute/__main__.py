@@ -17,7 +17,8 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     ChannelInvalid,
 )
 
-from userge import userge, Config, Message, get_collection, filters
+from userge import userge, Message, get_collection, filters
+from ...builtin import sudo
 
 GMUTE_USER_BASE = get_collection("GMUTE_USER")
 CHANNEL = userge.getCLogger(__name__)
@@ -47,7 +48,7 @@ async def gmute_user(msg: Message):
     if user_id == msg.from_user.id:
         await msg.edit(r"LoL. Why would I GMuting myself ¯\(°_o)/¯", del_in=5)
         return
-    if user_id in Config.SUDO_USERS:
+    if user_id in sudo.USERS:
         await msg.edit(
             "`That user is in my Sudo List, Hence I can't GMute him.`\n\n"
             "**Tip:** `Remove them from Sudo List and try again. (¬_¬)`", del_in=5)

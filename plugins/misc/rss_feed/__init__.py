@@ -7,3 +7,11 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+from userge import config
+
+
+class Config:
+    RSS_CHAT_ID = [int(x) for x in os.environ.get("RSS_CHAT_ID", str(config.LOG_CHANNEL_ID)).split()]

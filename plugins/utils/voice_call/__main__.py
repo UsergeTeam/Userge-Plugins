@@ -55,7 +55,8 @@ from pytgcalls.types.input_stream import (
     VideoParameters
 )
 
-from userge import userge, Message, pool, filters, get_collection, Config
+from userge import userge, Message, pool, filters, get_collection, config
+from .. import voice_call as vc
 from userge.utils import time_formatter, import_ytdl, progress, runcmd, is_url
 from userge.utils.exceptions import StopConversation
 
@@ -95,6 +96,7 @@ yt_regex = re.compile(
 _SCHEDULED = "[{title}]({link}) Scheduled to QUEUE on #{position} position"
 
 
+@userge.on_start
 async def _init():
     global CMDS_FOR_ALL  # pylint: disable=global-statement
     data = await VC_DB.find_one({'_id': 'VC_CMD_TOGGLE'})
@@ -366,7 +368,7 @@ async def toggle_vc(msg: Message):
     'flags': {
         '-v': "Stream as video.",
         '-q': "Quality of video stream (1-100)"}},
-    trigger=Config.PUBLIC_TRIGGER, check_client=True,
+    trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @check_enable_for_all
 @vc_chat
@@ -504,7 +506,7 @@ async def play_music(msg: Message, forceplay: bool):
 
 @userge.on_cmd("helpvc",
                about={'header': "help for voice_call plugin"},
-               trigger=Config.PUBLIC_TRIGGER,
+               trigger=config.PUBLIC_TRIGGER,
                allow_private=False,
                check_client=True,
                filter_me=False,
@@ -515,12 +517,12 @@ async def _help(msg: Message):
     """ help commands of this plugin for others """
 
     commands = userge.manager.enabled_plugins["voice_call"].enabled_commands
-    key = msg.input_str.lstrip(Config.PUBLIC_TRIGGER)
+    key = msg.input_str.lstrip(config.PUBLIC_TRIGGER)
     cmds = []
     raw_cmds = []
 
     for i in commands:
-        if i.name.startswith(Config.PUBLIC_TRIGGER):
+        if i.name.startswith(config.PUBLIC_TRIGGER):
             cmds.append(i)
             raw_cmds.append(i.name)
 
@@ -535,7 +537,7 @@ async def _help(msg: Message):
                 f"    📚 <b>info:</b>  <i>{cmd.doc}</i>\n\n")
         return await reply_text(msg, out_str, parse_mode="html")
 
-    key = Config.PUBLIC_TRIGGER + key
+    key = config.PUBLIC_TRIGGER + key
     if key in raw_cmds:
         for cmd in cmds:
             if cmd.name == key:
@@ -547,7 +549,7 @@ async def _help(msg: Message):
 @userge.on_cmd("current", about={
     'header': "View Current playing Song.",
     'usage': "{tr}current"},
-    trigger=Config.PUBLIC_TRIGGER, check_client=True,
+    trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
 @check_enable_for_all
@@ -567,7 +569,7 @@ async def current(msg: Message):
 @userge.on_cmd("queue", about={
     'header': "View Queue of Songs",
     'usage': "{tr}queue"},
-    trigger=Config.PUBLIC_TRIGGER, check_client=True,
+    trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
 @check_enable_for_all
@@ -624,7 +626,7 @@ async def set_volume(msg: Message):
 @userge.on_cmd("skip", about={
     'header': "Skip Song",
     'usage': "{tr}skip\n{tr}skip 2"},
-    trigger=Config.PUBLIC_TRIGGER, check_client=True,
+    trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
 async def skip_music(msg: Message):
@@ -655,7 +657,7 @@ async def skip_music(msg: Message):
 @userge.on_cmd("pause", about={
     'header': "Pause Song.",
     'usage': "{tr}pause"},
-    trigger=Config.PUBLIC_TRIGGER, check_client=True,
+    trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
 async def pause_music(msg: Message):
@@ -668,7 +670,7 @@ async def pause_music(msg: Message):
 @userge.on_cmd("resume", about={
     'header': "Resume Song.",
     'usage': "{tr}resume"},
-    trigger=Config.PUBLIC_TRIGGER, check_client=True,
+    trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
 async def resume_music(msg: Message):
@@ -884,7 +886,7 @@ async def tg_down(msg: Message):
     else:
         filename = msg.path_to_media
         duration = await get_duration(shlex.quote(msg.path_to_media))
-    if duration > Config.MAX_DURATION:
+    if duration > vc.Config.MAX_DURATION:
         await reply_text(msg, "**ERROR:** `Max song duration limit reached!`")
         return await _skip()
 
@@ -1061,7 +1063,7 @@ def _get_song_info(url: str):
         info = ydl.extract_info(url, download=False)
         duration = info.get("duration") or 0
 
-        if duration > Config.MAX_DURATION:
+        if duration > vc.Config.MAX_DURATION:
             return False
     return info.get("title"), time_formatter(duration) if duration else "Live"
 

@@ -7,3 +7,9 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+from os import environ
+
+
+class Config:
+    API_KEY = environ.get("VT_API_KEY")

@@ -19,7 +19,7 @@ from aiohttp import ClientSession
 from pydub import AudioSegment
 from pydub.exceptions import CouldntDecodeError
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
 from userge.plugins.misc.download import tg_download, url_download
 from userge.utils import is_url
 from userge.utils.exceptions import ProcessCanceled
@@ -188,8 +188,8 @@ async def stt_(message: Message):
         processed += 1
         await message.edit(f"`Processed chunk {processed} of {api.chunks}`")
     if send_text:
-        text_chunks = [api.text[i:i + Config.MAX_MESSAGE_LENGTH] for i in
-                       range(0, len(api.text), Config.MAX_MESSAGE_LENGTH)]
+        text_chunks = [api.text[i:i + config.MAX_MESSAGE_LENGTH] for i in
+                       range(0, len(api.text), config.MAX_MESSAGE_LENGTH)]
         if len(text_chunks) == 1:
             await message.edit(text_chunks[0])
         else:

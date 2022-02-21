@@ -15,7 +15,7 @@ from pyrogram.errors.exceptions.bad_request_400 import YouBlockedUser
 
 from PIL import Image, ImageEnhance, ImageOps
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
 from userge.utils import progress, take_screen_shot, runcmd
 
 
@@ -38,19 +38,19 @@ async def deepfryer(message: Message):
         fry_c = int(message.input_str)
     except ValueError:
         fry_c = 1
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.makedirs(Config.DOWN_PATH)
+    if not os.path.isdir(config.Dynamic.DOWN_PATH):
+        os.makedirs(config.Dynamic.DOWN_PATH)
     await message.edit("*turns on fryer*")
     dls = await message.client.download_media(
         message=message.reply_to_message,
-        file_name=Config.DOWN_PATH,
+        file_name=config.Dynamic.DOWN_PATH,
         progress=progress,
         progress_args=(message, "Lemme add some seasonings")
     )
-    dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
+    dls_loc = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(dls))
     if replied.sticker and replied.sticker.file_name.endswith(".tgs"):
         await message.edit("wait fryer is cold naw")
-        png_file = os.path.join(Config.DOWN_PATH, "meme.png")
+        png_file = os.path.join(config.Dynamic.DOWN_PATH, "meme.png")
         cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {png_file}"
         stdout, stderr = (await runcmd(cmd))[:2]
         os.remove(dls_loc)
@@ -60,7 +60,7 @@ async def deepfryer(message: Message):
         dls_loc = png_file
     elif replied.animation or replied.video:
         await message.edit("wait putting some more oil in fryer")
-        jpg_file = os.path.join(Config.DOWN_PATH, "meme.jpg")
+        jpg_file = os.path.join(config.Dynamic.DOWN_PATH, "meme.jpg")
         await take_screen_shot(dls_loc, 0, jpg_file)
         os.remove(dls_loc)
         if not os.path.lexists(jpg_file):
@@ -111,7 +111,7 @@ async def deepfry(img):
     img = ImageEnhance.Sharpness(img).enhance(random.randint(5, 300))
 
     image_name = "deepfried.jpeg"
-    fried_file = os.path.join(Config.DOWN_PATH, image_name)
+    fried_file = os.path.join(config.Dynamic.DOWN_PATH, image_name)
     img.save(fried_file, "JPEG")
     return fried_file
 
@@ -141,19 +141,19 @@ async def fry_(message: Message):
     if not 0 < args < 9:
         await message.err("Invalid range !...")
         return
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.makedirs(Config.DOWN_PATH)
+    if not os.path.isdir(config.Dynamic.DOWN_PATH):
+        os.makedirs(config.Dynamic.DOWN_PATH)
     await message.edit("`Frying, Wait plox ...`")
     dls = await message.client.download_media(
         message=replied,
-        file_name=Config.DOWN_PATH,
+        file_name=config.Dynamic.DOWN_PATH,
         progress=progress,
         progress_args=(message, "Downloading to my local")
     )
-    dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
+    dls_loc = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(dls))
     if replied.sticker and replied.sticker.file_name.endswith(".tgs"):
         await message.edit("```Ohh nice sticker, Lemme deepfry this Animated sticker ...```")
-        webp_file = os.path.join(Config.DOWN_PATH, "fry.png")
+        webp_file = os.path.join(config.Dynamic.DOWN_PATH, "fry.png")
         cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {webp_file}"
         stdout, stderr = (await runcmd(cmd))[:2]
         if not os.path.lexists(webp_file):
@@ -165,7 +165,7 @@ async def fry_(message: Message):
             await message.edit("```Wait bruh, lemme deepfry this video ...```")
         else:
             await message.edit("```What a Gif, Lemme deepfry this ...```")
-        jpg_file = os.path.join(Config.DOWN_PATH, "fry.jpg")
+        jpg_file = os.path.join(config.Dynamic.DOWN_PATH, "fry.jpg")
         await take_screen_shot(dls_loc, 0, jpg_file)
         if not os.path.lexists(jpg_file):
             await message.err("```Media not found ...```", del_in=5)
@@ -173,7 +173,7 @@ async def fry_(message: Message):
         frying_file = jpg_file
     elif replied.sticker and replied.sticker.file_name.endswith(".webp"):
         await message.edit("```Lemme deepfry this Sticker, wait plox ...```")
-        png_file = os.path.join(Config.DOWN_PATH, "fry.jpg")
+        png_file = os.path.join(config.Dynamic.DOWN_PATH, "fry.jpg")
         os.rename(dls_loc, png_file)
         if not os.path.lexists(png_file):
             await message.err("```Media not found ...```", del_in=5)
@@ -205,7 +205,7 @@ async def fry_(message: Message):
         message_id = replied.message_id
         deep_fry = None
         if response.photo:
-            directory = Config.DOWN_PATH
+            directory = config.Dynamic.DOWN_PATH
             files_name = "fry.webp"
             deep_fry = os.path.join(directory, files_name)
             await message.client.download_media(

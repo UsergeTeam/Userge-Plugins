@@ -21,10 +21,10 @@ from pyrogram.errors import (
 )
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from userge import userge, Message, Config, logging, get_collection, pool
+from userge import userge, Message, config, logging, get_collection, pool
+from .. import rss_feed
 from userge.utils.exceptions import UsergeBotNotFound
 
-RSS_CHAT_ID = [int(x) for x in os.environ.get("RSS_CHAT_ID", str(Config.LOG_CHANNEL_ID)).split()]
 _LOG = logging.getLogger(__name__)
 
 RSS_DICT: Dict[str, List[datetime]] = {}
@@ -33,6 +33,7 @@ RSS_COLLECTION = get_collection("RSS_FEED")  # Changed Collection Name cuz of Me
 TASK_RUNNING = False
 
 
+@userge.on_start
 async def _init():
     async for i in RSS_COLLECTION.find():
         RSS_DICT[i['url']] = [i['published'], None]
@@ -81,7 +82,7 @@ async def send_new_post(entries):
     thumb_url = entries.get('media_thumbnail')
     if thumb_url:
         thumb_url = thumb_url[0].get('url')
-        thumb = os.path.join(Config.DOWN_PATH, f"{title}.{str(thumb_url).split('.')[-1]}")
+        thumb = os.path.join(config.Dynamic.DOWN_PATH, f"{title}.{str(thumb_url).split('.')[-1]}")
         if not os.path.exists(thumb):
             await pool.run_in_thread(wget.download)(thumb_url, thumb)
     if time:
@@ -110,7 +111,7 @@ async def send_new_post(entries):
             'parse_mode': "md",
             'reply_markup': markup if userge.has_bot else None
         }
-    for chat_id in RSS_CHAT_ID:
+    for chat_id in rss_feed.Config.RSS_CHAT_ID:
         args.update({'chat_id': chat_id})
         try:
             await send_rss_to_telegram(userge.bot, args, thumb)
@@ -190,7 +191,7 @@ async def rss_worker():
     global TASK_RUNNING  # pylint: disable=global-statement
     TASK_RUNNING = True
     chunk = 20
-    if RSS_DICT and RSS_CHAT_ID[0] == Config.LOG_CHANNEL_ID:
+    if RSS_DICT and rss_feed.Config.RSS_CHAT_ID[0] == config.LOG_CHANNEL_ID:
         _LOG.info(
             "You have to add var for `RSS_CHAT_ID`, for Now i will send in LOG_CHANNEL")
     while RSS_DICT:

@@ -21,7 +21,8 @@ from pyrogram.errors import YouBlockedUser, StickersetInvalid
 from pyrogram.raw.functions.messages import GetStickerSet
 from pyrogram.raw.types import InputStickerSetShortName
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
+from .. import kang
 from userge.utils.tools import runcmd
 
 
@@ -72,7 +73,7 @@ async def kang_(message: Message):
         return await message.edit("`Unsupported File!`")
 
     await message.edit(f"`{random.choice(KANGING_STR)}`")
-    media = await userge.download_media(message=replied, file_name=Config.DOWN_PATH)
+    media = await userge.download_media(message=replied, file_name=config.Dynamic.DOWN_PATH)
     if not media:
         return await message.edit("`No Media!`")
 
@@ -108,7 +109,7 @@ async def kang_(message: Message):
         u_name = user.first_name or user.id
 
     packname = f"a{user.id}_by_userge_{pack}"
-    custom_packnick = Config.CUSTOM_PACK_NAME or f"{u_name}'s Kang Pack"
+    custom_packnick = kang.Config.CUSTOM_PACK_NAME or f"{u_name}'s Kang Pack"
     packnick = f"{custom_packnick} Vol.{pack}"
     cmd = '/newpack'
 

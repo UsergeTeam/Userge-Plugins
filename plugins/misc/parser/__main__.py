@@ -27,6 +27,7 @@ APPDRIVE_EMAIL = os.environ.get("APPDRIVE_EMAIL")
 APPDRIVE_PASS = os.environ.get("APPDRIVE_PASS")
 
 
+@userge.on_start
 async def _init():
     global CRYPT  # pylint: disable=global-statement
     if CRYPT:

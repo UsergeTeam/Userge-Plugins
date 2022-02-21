@@ -14,7 +14,7 @@ import os
 
 from pyrogram.errors.exceptions.bad_request_400 import YouBlockedUser
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
 from userge.utils import take_screen_shot, runcmd
 
 
@@ -31,8 +31,8 @@ async def meme_(message: Message):
     if not (replied.photo or replied.sticker or replied.video or replied.animation):
         await message.err("reply to only media...")
         return
-    if not os.path.isdir(Config.DOWN_PATH):
-        os.makedirs(Config.DOWN_PATH)
+    if not os.path.isdir(config.Dynamic.DOWN_PATH):
+        os.makedirs(config.Dynamic.DOWN_PATH)
     await message.edit("`Memifying...`")
 
     meme_file = None
@@ -46,10 +46,10 @@ async def meme_(message: Message):
     else:
         dls = await message.client.download_media(
             message=replied,
-            file_name=Config.DOWN_PATH)
-        dls_loc = os.path.join(Config.DOWN_PATH, os.path.basename(dls))
+            file_name=config.Dynamic.DOWN_PATH)
+        dls_loc = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(dls))
         if replied.sticker and replied.sticker.file_name.endswith(".tgs"):
-            file_1 = os.path.join(Config.DOWN_PATH, "meme.png")
+            file_1 = os.path.join(config.Dynamic.DOWN_PATH, "meme.png")
             cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {file_1}"
             stdout, stderr = (await runcmd(cmd))[:2]
             if not os.path.lexists(file_1):
@@ -57,7 +57,7 @@ async def meme_(message: Message):
                 raise Exception(stdout + stderr)
             meme_file = file_1
         elif replied.animation or replied.video:
-            file_2 = os.path.join(Config.DOWN_PATH, "meme.png")
+            file_2 = os.path.join(config.Dynamic.DOWN_PATH, "meme.png")
             await take_screen_shot(dls_loc, 0, file_2)
             if not os.path.lexists(file_2):
                 await message.err("Media not found...")

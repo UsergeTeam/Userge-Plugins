@@ -11,7 +11,7 @@
 import os
 import asyncio
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
 from userge.utils import get_file_id_of_media
 
 S_LOG = userge.getCLogger(__name__)
@@ -30,8 +30,8 @@ async def spam(message: Message):
     delay = str(0.1)
     is_str = "|" in message.input_str
     if (replied and replied.media and not is_str):
-        if not os.path.isdir(Config.DOWN_PATH):
-            os.makedirs(Config.DOWN_PATH)
+        if not os.path.isdir(config.Dynamic.DOWN_PATH):
+            os.makedirs(config.Dynamic.DOWN_PATH)
         if replied.sticker:
             to_spam = replied.sticker.file_id
             count = message.input_str

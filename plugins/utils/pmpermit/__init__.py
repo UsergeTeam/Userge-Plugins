@@ -7,3 +7,12 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+from pyrogram import filters
+
+ALLOWED_CHATS = filters.chat([])
+
+
+class Dynamic:
+    ALLOW_ALL_PMS: bool = True
+    IS_INLINE = True

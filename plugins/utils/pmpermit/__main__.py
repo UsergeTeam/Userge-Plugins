@@ -14,7 +14,8 @@ from typing import Dict
 from pyrogram.errors import BotInlineDisabled
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
-from userge import userge, filters, Message, Config, get_collection
+from userge import userge, filters, Message, config, get_collection
+from .. import pmpermit
 from userge.utils import SafeDict
 
 CHANNEL = userge.getCLogger(__name__)
@@ -22,24 +23,24 @@ SAVED_SETTINGS = get_collection("CONFIGS")
 ALLOWED_COLLECTION = get_collection("PM_PERMIT")
 
 pmCounter: Dict[int, int] = {}
-_IS_INLINE = True
-allowAllFilter = filters.create(lambda _, __, ___: Config.ALLOW_ALL_PMS)
+allowAllFilter = filters.create(lambda _, __, ___: pmpermit.Dynamic.ALLOW_ALL_PMS)
 noPmMessage = bk_noPmMessage = ("Hello {fname} this is an automated message\n"
                                 "Please wait until you get approved to direct message "
                                 "And please dont spam until then ")
 blocked_message = bk_blocked_message = "**You were automatically blocked**"
 
 
+@userge.on_start
 async def _init() -> None:
-    global noPmMessage, blocked_message, _IS_INLINE  # pylint: disable=global-statement
+    global noPmMessage, blocked_message  # pylint: disable=global-statement
     async for chat in ALLOWED_COLLECTION.find({"status": 'allowed'}):
-        Config.ALLOWED_CHATS.add(chat.get("_id"))
+        pmpermit.ALLOWED_CHATS.add(chat.get("_id"))
     _pm = await SAVED_SETTINGS.find_one({'_id': 'PM GUARD STATUS'})
     if _pm:
-        Config.ALLOW_ALL_PMS = bool(_pm.get('data'))
+        pmpermit.Dynamic.ALLOW_ALL_PMS = bool(_pm.get('data'))
     i_pm = await SAVED_SETTINGS.find_one({'_id': 'INLINE_PM_PERMIT'})
     if i_pm:
-        _IS_INLINE = bool(i_pm.get('data'))
+        pmpermit.Dynamic.IS_INLINE = bool(i_pm.get('data'))
     _pmMsg = await SAVED_SETTINGS.find_one({'_id': 'CUSTOM NOPM MESSAGE'})
     if _pmMsg:
         noPmMessage = _pmMsg.get('data')
@@ -60,7 +61,7 @@ async def allow(message: Message):
     if userid:
         if userid in pmCounter:
             del pmCounter[userid]
-        Config.ALLOWED_CHATS.add(userid)
+        pmpermit.ALLOWED_CHATS.add(userid)
         a = await ALLOWED_COLLECTION.update_one(
             {'_id': userid}, {"$set": {'status': 'allowed'}}, upsert=True)
         if a.matched_count:
@@ -84,14 +85,14 @@ async def allow(message: Message):
 async def denyToPm(message: Message):
     """ disallows to pm """
     if message.flags and '-all' in message.flags:
-        Config.ALLOWED_CHATS.clear()
+        pmpermit.ALLOWED_CHATS.clear()
         await ALLOWED_COLLECTION.drop()
         await message.edit("`Deleted all allowed Pms.`")
         return
     userid = await get_id(message)
     if userid:
-        if userid in Config.ALLOWED_CHATS:
-            Config.ALLOWED_CHATS.remove(userid)
+        if userid in pmpermit.ALLOWED_CHATS:
+            pmpermit.ALLOWED_CHATS.remove(userid)
         a = await ALLOWED_COLLECTION.delete_one({'_id': userid})
         if a.deleted_count:
             await message.edit("`Prohibitted to direct message`", del_in=3)
@@ -108,9 +109,9 @@ async def denyToPm(message: Message):
     'usage': "{tr}listpm"})
 async def list_pm(msg: Message):
     out = "`Allowed list is empty`"
-    if Config.ALLOWED_CHATS:
+    if pmpermit.ALLOWED_CHATS:
         out = "**Allowed Chats are:**\n"
-        for chat in Config.ALLOWED_CHATS:
+        for chat in pmpermit.ALLOWED_CHATS:
             out += f"\n`{chat}`"
     await msg.edit_or_send_as_file(out)
 
@@ -140,15 +141,18 @@ async def get_id(message: Message):
     allow_channels=False)
 async def pmguard(message: Message):
     """ enable or disable auto pm handler """
-    if Config.ALLOW_ALL_PMS:
-        Config.ALLOW_ALL_PMS = False
+    if pmpermit.Dynamic.ALLOW_ALL_PMS:
+        pmpermit.Dynamic.ALLOW_ALL_PMS = False
         await message.edit("`PM_guard activated`", del_in=3, log=__name__)
     else:
-        Config.ALLOW_ALL_PMS = True
+        pmpermit.Dynamic.ALLOW_ALL_PMS = True
         await message.edit("`PM_guard deactivated`", del_in=3, log=__name__)
         pmCounter.clear()
     await SAVED_SETTINGS.update_one(
-        {'_id': 'PM GUARD STATUS'}, {"$set": {'data': Config.ALLOW_ALL_PMS}}, upsert=True)
+        {'_id': 'PM GUARD STATUS'},
+        {"$set": {'data': pmpermit.Dynamic.ALLOW_ALL_PMS}},
+        upsert=True
+    )
 
 
 @userge.on_cmd(
@@ -159,15 +163,17 @@ async def pmguard(message: Message):
     allow_channels=False)
 async def ipmguard(message: Message):
     """ enable or disable inline pmpermit """
-    global _IS_INLINE  # pylint: disable=global-statement
-    if _IS_INLINE:
-        _IS_INLINE = False
+    if pmpermit.Dynamic.IS_INLINE:
+        pmpermit.Dynamic.IS_INLINE = False
         await message.edit("`Inline PM_guard deactivated`", del_in=3, log=__name__)
     else:
-        _IS_INLINE = True
+        pmpermit.Dynamic.IS_INLINE = True
         await message.edit("`Inline PM_guard activated`", del_in=3, log=__name__)
     await SAVED_SETTINGS.update_one(
-        {'_id': 'INLINE_PM_PERMIT'}, {"$set": {'data': _IS_INLINE}}, upsert=True)
+        {'_id': 'INLINE_PM_PERMIT'},
+        {"$set": {'data': pmpermit.Dynamic.IS_INLINE}},
+        upsert=True
+    )
 
 
 @userge.on_cmd("setpmmsg", about={
@@ -261,8 +267,10 @@ async def view_current_blockPM_msg(message: Message):
     await message.edit(f"--current blockPM message--\n\n{blocked_message}")
 
 
-@userge.on_filters(~allowAllFilter & filters.incoming & filters.private & ~filters.bot
-                   & ~filters.me & ~filters.service & ~Config.ALLOWED_CHATS, allow_via_bot=False)
+@userge.on_filters(~allowAllFilter & filters.incoming
+                   & filters.private & ~filters.bot
+                   & ~filters.me & ~filters.service
+                   & ~pmpermit.ALLOWED_CHATS, allow_via_bot=False)
 async def uninvitedPmHandler(message: Message):
     """ pm message handler """
     user_dict = await userge.get_user_dict(message.from_user.id)
@@ -286,7 +294,7 @@ async def uninvitedPmHandler(message: Message):
                 "Please wait until you get approved to pm !", del_in=5)
     else:
         pmCounter.update({message.from_user.id: 1})
-        if userge.has_bot and _IS_INLINE:
+        if userge.has_bot and pmpermit.Dynamic.IS_INLINE:
             try:
                 bot_username = (await userge.bot.get_me()).username
                 k = await userge.get_inline_bot_results(bot_username, "pmpermit")
@@ -305,13 +313,13 @@ async def uninvitedPmHandler(message: Message):
 
 
 @userge.on_filters(~allowAllFilter & filters.outgoing & ~filters.edited
-                   & filters.private & ~Config.ALLOWED_CHATS, allow_via_bot=False)
+                   & filters.private & ~pmpermit.ALLOWED_CHATS, allow_via_bot=False)
 async def outgoing_auto_approve(message: Message):
     """ outgoing handler """
     userID = message.chat.id
     if userID in pmCounter:
         del pmCounter[userID]
-    Config.ALLOWED_CHATS.add(userID)
+    pmpermit.ALLOWED_CHATS.add(userID)
     await ALLOWED_COLLECTION.update_one(
         {'_id': userID}, {"$set": {'status': 'allowed'}}, upsert=True)
     user_dict = await userge.get_user_dict(userID)
@@ -325,7 +333,7 @@ if userge.has_bot:
             userID = int(c_q.matches[0].group(1))
             await userge.unblock_user(userID)
             user = await userge.get_users(userID)
-            if userID in Config.ALLOWED_CHATS:
+            if userID in pmpermit.ALLOWED_CHATS:
                 await c_q.edit_message_text(
                     f"{user.mention} already allowed to Direct Messages.")
             else:
@@ -335,7 +343,7 @@ if userge.has_bot:
                     userID, f"{owner.mention} `approved you to Direct Messages.`")
                 if userID in pmCounter:
                     del pmCounter[userID]
-                Config.ALLOWED_CHATS.add(userID)
+                pmpermit.ALLOWED_CHATS.add(userID)
                 await ALLOWED_COLLECTION.update_one(
                     {'_id': userID}, {"$set": {'status': 'allowed'}}, upsert=True)
         else:
@@ -352,8 +360,8 @@ if userge.has_bot:
             await userge.block_user(userID)
             if userID in pmCounter:
                 del pmCounter[userID]
-            if userID in Config.ALLOWED_CHATS:
-                Config.ALLOWED_CHATS.remove(userID)
+            if userID in pmpermit.ALLOWED_CHATS:
+                pmpermit.ALLOWED_CHATS.remove(userID)
             k = await ALLOWED_COLLECTION.delete_one({'_id': userID})
             user = await userge.get_users(userID)
             if k.deleted_count:

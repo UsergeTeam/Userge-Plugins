@@ -12,7 +12,7 @@ import aiofiles
 from aiofiles import os
 from PIL import Image
 from telegraph import upload_file
-from userge import userge, Message, Config, pool
+from userge import userge, Message, config, pool
 from userge.utils import post_to_telegraph, progress
 
 _T_LIMIT = 5242880
@@ -48,7 +48,7 @@ async def telegraph_(message: Message):
         if replied.document:
             dl_loc = await message.client.download_media(
                 message=message.reply_to_message,
-                file_name=Config.DOWN_PATH,
+                file_name=config.Dynamic.DOWN_PATH,
                 progress=progress,
                 progress_args=(message, "trying to download")
             )
@@ -73,15 +73,15 @@ async def telegraph_(message: Message):
         return
     dl_loc = await message.client.download_media(
         message=message.reply_to_message,
-        file_name=Config.DOWN_PATH,
+        file_name=config.Dynamic.DOWN_PATH,
         progress=progress,
         progress_args=(message, "trying to download")
     )
     if replied.sticker:
         img = Image.open(dl_loc).convert('RGB')
-        img.save(f'{Config.DOWN_PATH}/userge.png', 'png')
+        img.save(f'{config.Dynamic.DOWN_PATH}/userge.png', 'png')
         await os.remove(dl_loc)
-        dl_loc = f'{Config.DOWN_PATH}/userge.png'
+        dl_loc = f'{config.Dynamic.DOWN_PATH}/userge.png'
     await message.edit("`uploading to telegraph...`")
     try:
         response = await pool.run_in_thread(upload_file)(dl_loc)

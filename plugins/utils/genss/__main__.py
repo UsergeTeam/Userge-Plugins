@@ -16,7 +16,7 @@ import asyncio
 from hachoir.metadata import extractMetadata as XMan
 from hachoir.parser import createParser as CPR
 
-from userge import userge, Message, Config
+from userge import userge, Message, config
 from userge.utils import take_screen_shot, progress
 
 
@@ -49,11 +49,11 @@ async def ss_gen(message: Message):
         await message.edit("Downloading Video to my Local")
         vid = await message.client.download_media(
             message=replied,
-            file_name=Config.DOWN_PATH,
+            file_name=config.Dynamic.DOWN_PATH,
             progress=progress,
             progress_args=(message, "Downloading🧐? W8 plox")
         )
-        vid_loc = os.path.join(Config.DOWN_PATH, os.path.basename(vid))
+        vid_loc = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(vid))
         should_clean = True
     await message.edit("Compiling Resources")
     meta = XMan(CPR(vid_loc))

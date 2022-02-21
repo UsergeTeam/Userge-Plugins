@@ -7,3 +7,9 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    CUSTOM_PACK_NAME = os.environ.get("CUSTOM_PACK_NAME")

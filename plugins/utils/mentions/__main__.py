@@ -10,12 +10,13 @@
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import PeerIdInvalid
-from userge import userge, Message, Config, filters, get_collection
+from userge import userge, Message, config, filters, get_collection
 
 SAVED_SETTINGS = get_collection("CONFIGS")
 TOGGLE = False
 
 
+@userge.on_start
 async def _init():
     global TOGGLE  # pylint: disable=global-statement
     if data:= await SAVED_SETTINGS.find_one({"_id": "MENTION_TOGGLE"}):
@@ -66,7 +67,7 @@ async def handle_mentions(msg: Message):
     client = userge.bot if userge.has_bot else userge
     try:
         await client.send_message(
-            chat_id=userge.id if userge.has_bot else Config.LOG_CHANNEL_ID,
+            chat_id=userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
             text=text,
             disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup([[button]])
@@ -75,7 +76,7 @@ async def handle_mentions(msg: Message):
         if userge.dual_mode:
             await userge.send_message(userge.id, "/start")
             await client.send_message(
-                chat_id=userge.id if userge.has_bot else Config.LOG_CHANNEL_ID,
+                chat_id=userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
                 text=text,
                 disable_web_page_preview=True,
                 reply_markup=InlineKeyboardMarkup([[button]])
