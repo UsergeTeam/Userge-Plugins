@@ -11,8 +11,8 @@
 # By @Krishna_Singhal
 
 import random
+from emoji import get_emoji_regexp
 
-from userge.utils import demojify
 from userge import userge, Message
 
 
@@ -43,7 +43,7 @@ async def anime_sticker(message: Message):
         try:
             stickers = await userge.get_inline_bot_results(
                 "stickerizerbot",
-                f"#12{demojify(text)}")
+                f"#12{get_emoji_regexp().sub(u'', text)}")
             await userge.send_inline_bot_result(
                 chat_id=message.chat.id,
                 query_id=stickers.query_id,
@@ -65,7 +65,7 @@ async def anime_sticker(message: Message):
     try:
         stickers = await userge.get_inline_bot_results(
             "stickerizerbot",
-            f"#{animus}{demojify(text)}"
+            f"#{animus}{get_emoji_regexp().sub(u'', text)}"
         )
         saved = await userge.send_inline_bot_result(
             chat_id="me",

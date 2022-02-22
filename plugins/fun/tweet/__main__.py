@@ -12,11 +12,11 @@
 
 import os
 import requests
+from emoji import get_emoji_regexp
 
 from PIL import Image
 from validators.url import url
 
-from userge.utils import demojify
 from userge import userge, config, Message
 
 CONVERTED_IMG = config.Dynamic.DOWN_PATH + "img.png"
@@ -120,7 +120,7 @@ async def tweet(msg: Message):
 async def _tweets(msg: Message, text: str, username: str = '', type_: str = "tweet") -> None:
     api_url = f"https://nekobot.xyz/api/imagegen?type={type_}&text={demojify(text)}"
     if username:
-        api_url += f"&username={demojify(username)}"
+        api_url += f"&username={get_emoji_regexp().sub(b'', username)}"
     res = requests.get(api_url).json()
     tweets_ = res.get("message")
     if not url(tweets_):

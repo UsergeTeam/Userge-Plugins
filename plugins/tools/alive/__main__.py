@@ -21,7 +21,7 @@ from pyrogram.errors import (
     FileIdInvalid, FileReferenceEmpty, BadRequest, ChannelInvalid, MediaEmpty
 )
 
-from userge import userge, Message, pool, config, versions, get_version, logging
+from userge import userge, Message, pool, config, versions, logging
 from .. import alive as aliveConfig
 from ...admin import antispam
 from ...utils import pmpermit
@@ -72,12 +72,13 @@ def _get_alive_text_and_markup(message: Message) -> Tuple[str, Optional[InlineKe
     markup = None
     output = f"""
 **⏱ Uptime** : `{userge.uptime}`
-**💡 Version** : `{get_version()}`
+**💡 Version** : `{versions.get_version()}`
 **⚙️ Mode** : `{_get_mode().upper()}`
 
 • **Sudo**: `{_parse_arg(sudo.Dynamic.ENABLED)}`
 • **Pm-Guard**: `{_parse_arg(not pmpermit.Dynamic.ALLOW_ALL_PMS)}`
-• **Anti-Spam**: `{_parse_arg(antispam.Dynamic.ANTISPAM_SENTRY)}`"""
+• **Anti-Spam**: `{_parse_arg(antispam.Dynamic.ANTISPAM_SENTRY)}`
+• **Plugins**: `{_parse_arg(config.Dynamic.Plugins)}`"""
     if config.HEROKU_APP:
         output += f"\n• **Dyno-saver**: `{_parse_arg(system.Dynamic.RUN_DYNO_SAVER)}`"
     output += f"""

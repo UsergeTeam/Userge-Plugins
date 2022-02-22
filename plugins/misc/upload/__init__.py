@@ -8,7 +8,7 @@
 #
 # All rights reserved.
 
-from .__main__ import (upload, # noqa
+from .uploader import (upload, # noqa
                        doc_upload,
                        audio_upload,
                        vid_upload,

@@ -17,7 +17,7 @@ from deezloader.exceptions import NoDataApi
 
 from userge import userge, Message, pool
 from .. import deezloader
-from userge.plugins.misc.upload import doc_upload, audio_upload
+from ..upload import doc_upload, audio_upload
 
 Clogger = userge.getCLogger(__name__)
 

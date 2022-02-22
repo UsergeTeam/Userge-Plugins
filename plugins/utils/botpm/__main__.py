@@ -24,7 +24,6 @@ from pyrogram.types import (
 
 from userge import userge, Message, config, filters, get_collection, pool
 from .. import botpm
-from ...tools import alive
 from userge.utils import SafeDict, time_formatter
 from userge.utils.exceptions import StopConversation
 
@@ -132,7 +131,7 @@ if userge.has_bot:
             markup = InlineKeyboardMarkup([
                 [
                     InlineKeyboardButton(text="👥 UsergeTeam", url="https://github.com/UsergeTeam"),
-                    InlineKeyboardButton(text="🧪 Repo", url=alive.Config.UPSTREAM_REPO)
+                    InlineKeyboardButton(text="🧪 Repo", url=botpm.Config.UPSTREAM_REPO)
                 ],
                 [InlineKeyboardButton(text="🎖 GNU GPL v3.0", url=copy_)]
             ])

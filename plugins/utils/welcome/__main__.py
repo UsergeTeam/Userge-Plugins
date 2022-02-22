@@ -8,7 +8,7 @@
 #
 # All rights reserved.
 
-from userge import userge, filters, Message, config, get_collection
+from userge import userge, filters, Message, get_collection
 
 SAVED_SETTINGS = get_collection("CONFIGS")
 WELCOME_COLLECTION = get_collection("welcome")

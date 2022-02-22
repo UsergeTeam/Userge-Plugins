@@ -8,8 +8,14 @@
 #
 # All rights reserved.
 
+from typing import Dict
 from os import environ
-from .__main__ import is_whitelist  # noqa
+
+WHITE_CACHE: Dict[int, str] = {}
+
+
+async def is_whitelist(user_id: int) -> bool:
+    return user_id in WHITE_CACHE
 
 
 class Config:

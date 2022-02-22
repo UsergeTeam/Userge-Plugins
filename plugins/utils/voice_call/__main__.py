@@ -1,4 +1,4 @@
-""" Userge Voice-Call Plugin """
+""" Userge Video-Chat Plugin """
 
 # Copyright (C) 2020-2022 by UsergeTeam@Github, < https://github.com/UsergeTeam >.
 #
@@ -17,6 +17,7 @@ import shlex
 import shutil
 import asyncio
 import requests
+import yt_dlp as ytdl
 from pathlib import Path
 from traceback import format_exc
 from typing import List, Tuple, Optional
@@ -56,8 +57,8 @@ from pytgcalls.types.input_stream import (
 )
 
 from userge import userge, Message, pool, filters, get_collection, config
-from .. import voice_call as vc
-from userge.utils import time_formatter, import_ytdl, progress, runcmd, is_url
+from .. import video_chat as vc
+from userge.utils import time_formatter, progress, runcmd, is_url
 from userge.utils.exceptions import StopConversation
 
 # https://github.com/pytgcalls/pytgcalls/blob/master/pytgcalls/mtproto/mtproto_client.py#L18
@@ -85,8 +86,6 @@ CLIENT = userge
 
 BACK_BUTTON_TEXT = ""
 CQ_MSG: List[RawMessage] = []
-
-ytdl = import_ytdl()
 
 yt_regex = re.compile(
     r'(https?://)?(www\.)?'
@@ -133,15 +132,15 @@ def _get_scheduled_text(title: str, link: str = None) -> str:
 
 
 def vc_chat(func):
-    """ decorator for Voice-Call chat """
+    """ decorator for Video-Chat chat """
 
     async def checker(msg: Message):
         if CHAT_ID and msg.chat.id in ([CHAT_ID] + CONTROL_CHAT_IDS):
             await func(msg)
         elif CHAT_ID and msg.outgoing:
-            await msg.edit("You can't access voice_call from this chat.")
+            await msg.edit("You can't access video_chat from this chat.")
         elif msg.outgoing:
-            await msg.edit("`Haven't join any Voice-Call...`")
+            await msg.edit("`Haven't join any Video-Chat...`")
 
     checker.__doc__ = func.__doc__
 
@@ -214,7 +213,7 @@ def volume_button_markup():
 
 
 @userge.on_cmd("joinvc", about={
-    'header': "Join Voice-Call",
+    'header': "Join Video-Chat",
     'flags': {
         '-as': "Join as any of your public channel.",
         '-at': "Joins vc in a remote chat and control it from saved messages/linked chat"},
@@ -223,7 +222,7 @@ def volume_button_markup():
         "{tr}joinvc -at=-100123456789 - Join VC of any private channel / group."]},
     allow_bots=False)
 async def joinvc(msg: Message):
-    """ join voice chat """
+    """ join video chat """
     global CHAT_NAME, CHAT_ID, CONTROL_CHAT_IDS  # pylint: disable=global-statement
 
     await msg.delete()
@@ -246,7 +245,7 @@ async def joinvc(msg: Message):
             return await reply_text(msg, f'Invalid Join In Chat Specified\n{e}')
         CHAT_ID = _chat.id
         CHAT_NAME = _chat.title
-        # Joins Voice_call in a remote chat and control it from Saved Messages
+        # Joins video_chat in a remote chat and control it from Saved Messages
         # / Linked Chat
         CONTROL_CHAT_IDS.append(userge.id)
         if _chat.linked_chat:
@@ -274,7 +273,7 @@ async def joinvc(msg: Message):
             for peers in join_as_peers.peers
         ]:
             CHAT_ID, CHAT_NAME, CONTROL_CHAT_IDS = 0, '', []
-            return await reply_text(msg, "You cant join the voice chat as this channel.")
+            return await reply_text(msg, "You cant join the video chat as this channel.")
 
     if join_as:
         peer = await userge.resolve_peer(join_as)
@@ -320,14 +319,14 @@ async def joinvc(msg: Message):
         return await reply_text(msg, f'Error during Joining the Call\n`{e}`')
 
     await _on_join()
-    await reply_text(msg, "`Joined VoiceChat Succesfully`", del_in=5)
+    await reply_text(msg, "`Joined VideoChat Succesfully`", del_in=5)
 
 
 @userge.on_cmd("leavevc", about={
-    'header': "Leave Voice-Call",
+    'header': "Leave Video-Chat",
     'usage': "{tr}leavevc"})
 async def leavevc(msg: Message):
-    """ leave voice chat """
+    """ leave video chat """
     await msg.delete()
     if CHAT_NAME:
         try:
@@ -335,9 +334,9 @@ async def leavevc(msg: Message):
         except (NotInGroupCallError, NoActiveGroupCall):
             pass
         await _on_left()
-        await reply_text(msg, "`Left Voicechat`", del_in=5)
+        await reply_text(msg, "`Left Videochat`", del_in=5)
     else:
-        await reply_text(msg, "`I didn't find any Voice-Chat to leave")
+        await reply_text(msg, "`I didn't find any Video-Chat to leave")
 
 
 @userge.on_cmd("vcmode", about={
@@ -373,7 +372,7 @@ async def toggle_vc(msg: Message):
 @check_enable_for_all
 @vc_chat
 async def _play(msg: Message):
-    """ play music in voice call """
+    """ play music in video chat """
     return await play_music(msg, False)
 
 
@@ -385,7 +384,7 @@ async def _play(msg: Message):
         '-q': "Quality of video stream (1-100)"}})
 @vc_chat
 async def _forceplay(msg: Message):
-    """ forceplay music in voice call """
+    """ forceplay music in video chat """
     return await play_music(msg, True)
 
 
@@ -505,7 +504,7 @@ async def play_music(msg: Message, forceplay: bool):
 
 
 @userge.on_cmd("helpvc",
-               about={'header': "help for voice_call plugin"},
+               about={'header': "help for video chat plugin"},
                trigger=config.PUBLIC_TRIGGER,
                allow_private=False,
                check_client=True,
@@ -516,7 +515,7 @@ async def play_music(msg: Message, forceplay: bool):
 async def _help(msg: Message):
     """ help commands of this plugin for others """
 
-    commands = userge.manager.enabled_plugins["voice_call"].enabled_commands
+    commands = userge.manager.enabled_plugins["video_chat"].enabled_commands
     key = msg.input_str.lstrip(config.PUBLIC_TRIGGER)
     cmds = []
     raw_cmds = []
@@ -529,8 +528,8 @@ async def _help(msg: Message):
     if not key:
         out_str = f"""⚔ <b><u>(<code>{len(cmds)}</code>) Command(s) Available</u></b>
 
-🔧 <b>Plugin:</b>  <code>voice_call</code>
-📘 <b>Doc:</b>  <code>Userge Voice-Call Plugin</code>\n\n"""
+🔧 <b>Plugin:</b>  <code>video_chat</code>
+📘 <b>Doc:</b>  <code>Userge Video-Chat Plugin</code>\n\n"""
         for i, cmd in enumerate(cmds, start=1):
             out_str += (
                 f"    🤖 <b>cmd(<code>{i}</code>):</b>  <code>{cmd.name}</code>\n"
@@ -1073,7 +1072,7 @@ if userge.has_bot:
     @check_cq_for_all
     async def vc_callback(cq: CallbackQuery):
         if not CHAT_NAME:
-            await cq.edit_message_text("`Already Left Voice-Call`")
+            await cq.edit_message_text("`Already Left Video-Chat`")
             return
 
         if "skip" in cq.data:

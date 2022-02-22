@@ -20,19 +20,15 @@ from urllib.parse import urlparse
 import requests
 from bs4 import BeautifulSoup
 from userge import Message, userge, pool
-
-CRYPT = os.environ.get("CRYPT")
-# Website User Account (NOT GOOGLE ACCOUNT)
-APPDRIVE_EMAIL = os.environ.get("APPDRIVE_EMAIL")
-APPDRIVE_PASS = os.environ.get("APPDRIVE_PASS")
+from ..parser import Config
 
 
 @userge.on_start
 async def _init():
     global CRYPT  # pylint: disable=global-statement
-    if CRYPT:
+    if Config.CRYPT:
         try:
-            crypt = json.loads(CRYPT)
+            crypt = json.loads(Config.CRYPT)
         except Exception:
             pass  # user entered only crypt value from dict
         else:
@@ -41,8 +37,8 @@ async def _init():
 
 async def account_login(client, url):
     data = {
-        'email': APPDRIVE_EMAIL,
-        'password': APPDRIVE_PASS
+        'email': Config.APPDRIVE_EMAIL,
+        'password': Config.APPDRIVE_PASS
     }
     await pool.run_in_thread(client.post)(
         f'https://{urlparse(url).netloc}/login', data=data)
@@ -164,7 +160,7 @@ async def gdtot(message: Message):
                    "<a href='https://t.me/UnofficialPluginsHelp/129'>Help</a>",
     'usage': "{tr}appdrive appdrive_link"})
 async def appdrive(message: Message):
-    if not (APPDRIVE_EMAIL or APPDRIVE_PASS):
+    if not (Config.APPDRIVE_EMAIL or Config.APPDRIVE_PASS):
         return await message.err("read .help appdrive")
     url = message.input_str
     if not url:

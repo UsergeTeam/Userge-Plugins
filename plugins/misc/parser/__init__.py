@@ -7,3 +7,12 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    CRYPT = os.environ.get("CRYPT")
+    # Website User Account (NOT GOOGLE ACCOUNT)
+    APPDRIVE_EMAIL = os.environ.get("APPDRIVE_EMAIL")
+    APPDRIVE_PASS = os.environ.get("APPDRIVE_PASS")

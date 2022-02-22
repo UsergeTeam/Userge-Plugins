@@ -20,7 +20,7 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     ChatAdminRequired, UserAdminInvalid, PeerIdInvalid)
 from pyrogram.types import User, Chat
 
-from userge import userge, Message, config, get_collection, filters, pool
+from userge import userge, Message, get_collection, filters, pool
 from .. import antispam
 from ..gban import is_whitelist
 

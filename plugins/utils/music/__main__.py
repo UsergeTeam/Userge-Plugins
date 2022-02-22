@@ -18,7 +18,7 @@ from aiohttp import ClientSession
 from Python_ARQ import ARQ
 from userge import config, Message, userge
 from .. import music
-from userge.plugins.misc.download import url_download
+from ...misc.download import url_download
 
 # ARQ API
 session = ClientSession()

@@ -20,7 +20,7 @@ from pydub import AudioSegment
 from pydub.exceptions import CouldntDecodeError
 
 from userge import userge, Message, config
-from userge.plugins.misc.download import tg_download, url_download
+from ...misc.download import tg_download, url_download
 from userge.utils import is_url
 from userge.utils.exceptions import ProcessCanceled
 

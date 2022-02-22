@@ -8,4 +8,4 @@
 #
 # All rights reserved.
 
-from .__main__ import url_download, tg_download  # noqa
+from .downloader import handle_download, url_download, tg_download  # noqa

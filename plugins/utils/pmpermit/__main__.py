@@ -14,7 +14,7 @@ from typing import Dict
 from pyrogram.errors import BotInlineDisabled
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
-from userge import userge, filters, Message, config, get_collection
+from userge import userge, filters, Message, get_collection
 from .. import pmpermit
 from userge.utils import SafeDict
 

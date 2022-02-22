@@ -23,31 +23,25 @@ WHITELIST = get_collection("WHITELIST_USER")
 CHANNEL = userge.getCLogger(__name__)
 LOG = userge.getLogger(__name__)
 
-_WHITE_CACHE: Dict[int, str] = {}
-
-
-async def is_whitelist(user_id: int) -> bool:
-    return user_id in _WHITE_CACHE
-
 
 @userge.on_start
 async def _init() -> None:
     async for i in WHITELIST.find():
-        _WHITE_CACHE[int(i['user_id'])] = i['firstname']
+        gban.WHITE_CACHE[int(i['user_id'])] = i['firstname']
 
 
 async def _add_whitelist(firstname: str, user_id: int) -> None:
-    _WHITE_CACHE[user_id] = firstname
+    gban.WHITE_CACHE[user_id] = firstname
     await WHITELIST.insert_one({'firstname': firstname, 'user_id': user_id})
 
 
 async def _remove_whitelist(user_id: int) -> None:
-    del _WHITE_CACHE[user_id]
+    del gban.WHITE_CACHE[user_id]
     await WHITELIST.delete_one({'user_id': user_id})
 
 
 async def _iter_whitelist() -> AsyncGenerator[Tuple[int, str], None]:
-    for _ in _WHITE_CACHE.items():
+    for _ in gban.WHITE_CACHE.items():
         yield _
 
 
@@ -218,7 +212,7 @@ async def whitelist(message: Message):
     get_mem = await message.client.get_user_dict(user_id)
     firstname = get_mem['fname']
     user_id = int(get_mem['id'])
-    found = await is_whitelist(user_id)
+    found = await gban.is_whitelist(user_id)
     if found:
         await message.edit("`User Already in My WhiteList`", del_in=5)
         return
@@ -253,7 +247,7 @@ async def rmwhitelist(message: Message):
     get_mem = await message.client.get_user_dict(user_id)
     firstname = get_mem['fname']
     user_id = int(get_mem['id'])
-    found = await is_whitelist(user_id)
+    found = await gban.is_whitelist(user_id)
     if not found:
         await message.edit("`User Not Found in My WhiteList`", del_in=5)
         return
