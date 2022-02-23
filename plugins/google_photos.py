@@ -9,7 +9,6 @@
 """Google Photos
 """
 
-import re
 import os
 import asyncio
 from mimetypes import guess_type
@@ -21,8 +20,7 @@ from httplib2 import Http
 from oauth2client import file, client
 
 from userge import userge, Message, Config
-from userge.utils import progress
-from userge.plugins.misc.download import tg_download, url_download
+from userge.utils import progress, get_media_path_and_name
 
 # setup the gPhotos v1 API
 OAUTH_SCOPE = [
@@ -120,20 +118,13 @@ async def upload_google_photos(message: Message):
     if not creds:
         await message.edit_text("😏 <code>gpsetup</code> first 😡😒😒", parse_mode="html")
         return
-    path_ = ""
-    if message.input_str:
-        if re.search(r"(?:https?|ftp)://[^|\s]+\.[^|\s]+", message.input_str):
-            path_, _ = await url_download(message, message.input_str)
-        elif os.path.exists(message.input_str):
-            path_ = message.input_str
-    elif message.reply_to_message and message.reply_to_message.media:
-        path_, _ = await tg_download(message, message.reply_to_message)
-    if not path_:
-        await message.err("what should i upload ?")
+    data = await get_media_path_and_name(message)
+    if not data:
         return
+    file_path, _ = data
     await message.edit("`proccesing ...`")
     service = build("photoslibrary", "v1", http=creds.authorize(Http()))
-    file_name, mime_type, file_size = file_ops(path_)
+    file_name, mime_type, file_size = file_ops(file_path)
     await message.edit_text("file downloaded, gathering upload informations ")
     async with aiohttp.ClientSession() as session:
         headers = {
@@ -161,7 +152,7 @@ async def upload_google_photos(message: Message):
         number_of_req_s = int(file_size / upload_granularity)
         # LOG.info(number_of_req_s)
         loop = asyncio.get_event_loop()
-        async with aiofiles.open(path_, mode="rb") as f_d:
+        async with aiofiles.open(file_path, mode="rb") as f_d:
             for i in range(number_of_req_s):
                 current_chunk = await f_d.read(upload_granularity)
                 offset = i * upload_granularity

@@ -9,9 +9,7 @@ from pydub import AudioSegment
 from pydub.exceptions import CouldntDecodeError
 
 from userge import userge, Message, Config
-from userge.plugins.misc.download import tg_download, url_download
-from userge.utils import is_url
-from userge.utils.exceptions import ProcessCanceled
+from userge.utils import get_media_path_and_name
 
 logger = userge.getLogger(__name__)
 
@@ -124,50 +122,10 @@ async def stt_(message: Message):
     if not api.has_api_key():
         await message.edit(f'`Please set WIT_AI_API_{lang.upper()} variable first!`')
         return
-    dl_loc = ""
-    file_name = ""
-    if replied and replied.media:
-        try:
-            dl_loc, _ = await tg_download(message, replied)
-            # Try to get file name from the media file.
-            try:
-                if hasattr(replied.audio, 'file_name'):
-                    file_name = replied.audio.file_name
-                elif hasattr(replied.video, 'file_name'):
-                    file_name = replied.video.file_name
-                elif hasattr(replied.document, 'file_name'):
-                    file_name = replied.document.file_name
-                else:
-                    file_name = os.path.basename(dl_loc)
-            except AttributeError:
-                pass
-        except ProcessCanceled:
-            await message.edit("`Process Canceled!`", del_in=5)
-            return
-        except Exception as e_e:
-            await message.err(e_e)
-            return
-    else:
-        input_str = match.group(2) if match.group(2) else ""
-        is_input_url = is_url(input_str)
-        if is_input_url:
-            try:
-                dl_loc, _ = await url_download(message, message.filtered_input_str)
-                file_name = os.path.basename(dl_loc)
-            except ProcessCanceled:
-                await message.edit("`Process Canceled!`", del_in=5)
-                return
-            except Exception as e_e:
-                await message.err(e_e)
-                return
-    if dl_loc:
-        file_path = dl_loc
-    else:
-        file_path = message.filtered_input_str
-        file_name = os.path.basename(dl_loc)
-    if not os.path.exists(file_path):
-        await message.err("`Seems that an invalid file path provided?`")
+    data = await get_media_path_and_name(message)
+    if not data:
         return
+    file_path, file_name = data
     await message.edit("`Starting transcribing...`")
     processed = 0
     async for _, error in api.transcribe(file_path):

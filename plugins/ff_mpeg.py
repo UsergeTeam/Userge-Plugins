@@ -8,15 +8,13 @@ import asyncio
 from math import floor
 from pathlib import Path
 from datetime import datetime
-from typing import Tuple, Union
 from asyncio import create_subprocess_exec, subprocess
 
 from ffmpeg._run import Error, compile as ffmpg_compile
 from ffmpeg._utils import convert_kwargs_to_cmd_line_args
 
 from userge import userge, Message
-from userge.utils import humanbytes, is_url
-from userge.plugins.misc.download import tg_download, url_download
+from userge.utils import humanbytes, get_media_path_and_name
 
 FF_MPEG_DOWN_LOAD_MEDIA_PATH = Path("/app/downloads/userge.media.ffmpeg")
 
@@ -51,45 +49,6 @@ async def run(stream_spec, cmd='ffmpeg', pipe_stdin=False, pipe_stdout=False, pi
     if p.returncode != 0:
         raise Error('ffmpeg', out, err)
     return out, err
-
-
-async def get_media_path_and_name(
-    message: Message, input_str=""
-) -> Union[Tuple[str, str], bool]:
-    if not input_str:
-        input_str = message.filtered_input_str
-    dl_loc, file_name = "", ""
-    replied = message.reply_to_message
-    if hasattr(replied, 'media'):
-        dl_loc, _ = await tg_download(message, replied)
-        if hasattr(replied.audio, 'file_name'):
-            file_name = replied.audio.file_name
-        elif hasattr(replied.video, 'file_name'):
-            file_name = replied.video.file_name
-        elif hasattr(replied.document, 'file_name'):
-            file_name = replied.document.file_name
-        else:
-            file_name = Path(dl_loc).name
-    elif input_str:
-        if is_url(input_str):
-            try:
-                dl_loc, _ = await url_download(message, input_str)
-                file_name = Path(dl_loc).name
-            except Exception as err:
-                await message.err(str(err))
-                return False
-    else:
-        await message.err("nothing provided to process")
-        return False
-    if dl_loc:
-        file_path = dl_loc
-    else:
-        file_path = input_str.strip()
-        file_name = Path(file_path).name
-    if not Path(file_path).exists():
-        await message.err("Seems that an invalid file path provided?")
-        return False
-    return file_path, file_name
 
 
 @userge.on_cmd("x256", about={
