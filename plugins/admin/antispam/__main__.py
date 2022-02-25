@@ -41,48 +41,6 @@ async def _init() -> None:
         antispam.Dynamic.ANTISPAM_SENTRY = s_o['data']
     await _re_init_handler()
 
-
-@pool.run_in_thread
-def _re_init_handler():
-    global HANDLER  # pylint: disable=global-statement
-    handler = GBanHandler()
-    if antispam.Dynamic.ANTISPAM_SENTRY:
-        tmp = handler.set_next(CASHandler())
-        if antispam.Config.USERGE_ANTISPAM_API:
-            tmp = tmp.set_next(UsergeAntiSpamHandler())
-        if antispam.Config.SPAM_WATCH_API:
-            tmp.set_next(SpamWatchHandler())
-    HANDLER = handler
-
-
-@userge.on_cmd("antispam", about={
-    'header': "enable / disable antispam",
-    'description': "Toggle API Auto Bans"}, allow_channels=False)
-async def antispam_(message: Message):
-    """ enable / disable antispam """
-    antispam.Dynamic.ANTISPAM_SENTRY = antispam.Dynamic.ANTISPAM_SENTRY
-    text = f"`antispam {'enabled' if antispam.Dynamic.ANTISPAM_SENTRY else 'disabled'} !`"
-    await message.edit(text, del_in=3)
-    await _re_init_handler()
-    await SAVED_SETTINGS.update_one(
-        _ID, {"$set": {'data': antispam.Dynamic.ANTISPAM_SENTRY}}, upsert=True
-    )
-
-
-@userge.on_filters(filters.group & filters.new_chat_members, group=1,
-                   continue_propagation=True, check_restrict_perm=True)
-async def gban_at_entry(message: Message):
-    """ handle gbans """
-    if isinstance(HANDLER, Handler):
-        try:
-            for user in message.new_chat_members:
-                if await is_whitelist(user.id):
-                    continue
-                await HANDLER.handle(message, user)
-        except (ChatAdminRequired, UserAdminInvalid):
-            pass
-
-
 class Handler(ABC):
     @abstractmethod
     def set_next(self, handler: 'Handler') -> 'Handler':
@@ -230,3 +188,44 @@ class SpamWatchHandler(AbstractHandler):
 
     def get_reason(self, data) -> Optional[str]:
         return data.reason
+
+
+@pool.run_in_thread
+def _re_init_handler():
+    global HANDLER  # pylint: disable=global-statement
+    handler = GBanHandler()
+    if antispam.Dynamic.ANTISPAM_SENTRY:
+        tmp = handler.set_next(CASHandler())
+        if antispam.Config.USERGE_ANTISPAM_API:
+            tmp = tmp.set_next(UsergeAntiSpamHandler())
+        if antispam.Config.SPAM_WATCH_API:
+            tmp.set_next(SpamWatchHandler())
+    HANDLER = handler
+
+
+@userge.on_cmd("antispam", about={
+    'header': "enable / disable antispam",
+    'description': "Toggle API Auto Bans"}, allow_channels=False)
+async def antispam_(message: Message):
+    """ enable / disable antispam """
+    antispam.Dynamic.ANTISPAM_SENTRY = antispam.Dynamic.ANTISPAM_SENTRY
+    text = f"`antispam {'enabled' if antispam.Dynamic.ANTISPAM_SENTRY else 'disabled'} !`"
+    await message.edit(text, del_in=3)
+    await _re_init_handler()
+    await SAVED_SETTINGS.update_one(
+        _ID, {"$set": {'data': antispam.Dynamic.ANTISPAM_SENTRY}}, upsert=True
+    )
+
+
+@userge.on_filters(filters.group & filters.new_chat_members, group=1,
+                   continue_propagation=True, check_restrict_perm=True)
+async def gban_at_entry(message: Message):
+    """ handle gbans """
+    if isinstance(HANDLER, Handler):
+        try:
+            for user in message.new_chat_members:
+                if await is_whitelist(user.id):
+                    continue
+                await HANDLER.handle(message, user)
+        except (ChatAdminRequired, UserAdminInvalid):
+            pass

@@ -142,7 +142,7 @@ async def list_gmuted(msg: Message):
 
 
 @userge.on_filters(filters.group & filters.new_chat_members, group=1,
-                   continue_propagation=True, check_restrict_perm=True)
+                   propogate=True, check_restrict_perm=True)
 async def gmute_at_entry(msg: Message):
     """ handle gmute """
     chat_id = msg.chat.id

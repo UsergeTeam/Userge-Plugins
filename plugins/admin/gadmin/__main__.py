@@ -36,7 +36,9 @@ async def _init() -> None:
         gadmin.ALLOWED[chat_id] = chat['allowed']
 
 channel_delete = filters.create(
-    lambda _, __, query: query.chat and query.sender_chat and query.chat.id in ENABLED_CHATS)
+    lambda _, __, query: (query.chat
+                          and query.sender_chat
+                          and query.chat.id in gadmin.ENABLED_CHATS))
 
 
 @userge.on_cmd("promote", about={
