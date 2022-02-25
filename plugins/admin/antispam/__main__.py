@@ -218,7 +218,7 @@ async def antispam_(message: Message):
 
 
 @userge.on_filters(filters.group & filters.new_chat_members, group=1,
-                   continue_propagation=True, check_restrict_perm=True)
+                   propagate=True, check_restrict_perm=True)
 async def gban_at_entry(message: Message):
     """ handle gbans """
     if isinstance(HANDLER, Handler):
