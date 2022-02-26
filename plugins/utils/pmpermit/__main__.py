@@ -9,12 +9,18 @@
 # All rights reserved.
 
 import asyncio
+from uuid import uuid4
 from typing import Dict
 
 from pyrogram.errors import BotInlineDisabled
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from pyrogram.types import (InlineKeyboardMarkup,
+                            InlineKeyboardButton,
+                            InlineQueryResultArticle,
+                            InputTextMessageContent,
+                            CallbackQuery,
+                            InlineQuery)
 
-from userge import userge, filters, Message, get_collection
+from userge import userge, config, filters, Message, get_collection
 from .. import pmpermit
 from userge.utils import SafeDict
 
@@ -300,7 +306,7 @@ async def uninvitedPmHandler(message: Message):
                 k = await userge.get_inline_bot_results(bot_username, "pmpermit")
                 await userge.send_inline_bot_result(
                     message.chat.id, query_id=k.query_id,
-                    result_id=k.results[2].id, hide_via=True
+                    result_id=k.results[0].id, hide_via=True
                 )
             except (IndexError, BotInlineDisabled):
                 await message.reply(
@@ -412,3 +418,44 @@ if userge.has_bot:
                 f"{c_q.from_user.mention} wanna contact to you.",
                 reply_markup=buttons
             )
+
+    @userge.bot.on_inline_query(
+        filters.create(
+            lambda _, __, query: (
+                query.query
+                and query.query.startswith("pmpermit")
+                and query.from_user
+                and query.from_user.id in config.OWNER_ID
+            ),
+            name="PmPermitInlineFilter"
+        ),
+        group=-2
+    )
+    async def pmpermit_inline_query_handler(_, query: InlineQuery):
+        results = []
+        owner = await userge.get_me()
+        pm_inline_msg = await SAVED_SETTINGS.find_one({'_id': 'CUSTOM_INLINE_PM_MESSAGE'})
+        if pm_inline_msg:
+            text = pm_inline_msg.get('data')
+        else:
+            text = f"Hello, welcome to **{owner.first_name}** Dm.\n\nWhat you want to do ?"
+        buttons = [[
+            InlineKeyboardButton(
+                "Contact Me", callback_data="pm_contact"),
+            InlineKeyboardButton(
+                "Spam here", callback_data="pm_spam")]]
+        results.append(
+            InlineQueryResultArticle(
+                id=uuid4(),
+                title="Pm Permit",
+                input_message_content=InputTextMessageContent(text),
+                description="Inline Pm Permit Handler",
+                thumb_url="https://imgur.com/download/Inyeb1S",
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+        )
+        await query.answer(
+            results=results,
+            cache_time=60
+        )
+        query.stop_propagation()
