@@ -8,20 +8,20 @@
 #
 # All rights reserved.
 
-from pdb import pm
 import re
 import os
+import wget
 import asyncio
+from loader.userge import api
 from typing import Tuple, Optional
 
-import wget
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import (
     ChatSendMediaForbidden, Forbidden, SlowmodeWait, PeerIdInvalid,
     FileIdInvalid, FileReferenceEmpty, BadRequest, ChannelInvalid, MediaEmpty
 )
 
-from userge import userge, Message, pool, config, versions, logging
+from userge import userge, Message, pool, config, versions as ver, logging
 from .. import alive as aliveConfig
 from ...admin import antispam
 from ...utils import pmpermit
@@ -49,7 +49,7 @@ async def alive(message: Message):
                            f"trying again... ERROR:: {set_err} ::")
             _set_data(True)
 
-    alive_text, markup = _get_alive_text_and_markup(message)
+    alive_text, markup = await _get_text_and_markup(message)
     if _MSG_ID == "text_format":
         return await message.edit(alive_text, disable_web_page_preview=True, reply_markup=markup)
     await message.delete()
@@ -68,26 +68,30 @@ def _get_mode() -> str:
     return "User"
 
 
-def _get_alive_text_and_markup(message: Message) -> Tuple[str, Optional[InlineKeyboardMarkup]]:
+async def _get_text_and_markup(message: Message) -> Tuple[str, Optional[InlineKeyboardMarkup]]:
     markup = None
+    plugins = await api.get_repos()
     output = f"""
 **⏱ Uptime** : `{userge.uptime}`
-**💡 Version** : `{versions.get_version()}`
+**💡 Version** : `{await ver.get_version()}`
 **⚙️ Mode** : `{_get_mode().upper()}`
 
 • **Sudo**: `{_parse_arg(sudo.Dynamic.ENABLED)}`
 • **Pm-Guard**: `{_parse_arg(not pmpermit.Dynamic.ALLOW_ALL_PMS)}`
-• **Anti-Spam**: `{_parse_arg(antispam.Dynamic.ANTISPAM_SENTRY)}`
-• **Plugins**: `{_parse_arg(config.Dynamic.Plugins)}`"""
+• **Anti-Spam**: `{_parse_arg(antispam.Dynamic.ANTISPAM_SENTRY)}`"""
+    if len(plugins) > 0:
+        output += "\n• **Plugins**:"
+        for i in plugins:
+            output += f"    **{'.'.join(i.url.split('/')[-2:])}**: `patch-{i.count}@{i.branch}`"
     if config.HEROKU_APP:
         output += f"\n• **Dyno-saver**: `{_parse_arg(system.Dynamic.RUN_DYNO_SAVER)}`"
     output += f"""
 
-    **__Python__**: `{versions.__python_version__}`
-    **__Pyrogram__**: `{versions.__pyro_version__}`"""
+    **__Python__**: `{ver.__python_version__}`
+    **__Pyrogram__**: `{ver.__pyro_version__}`"""
     if not message.client.is_bot:
         output += f"""\n
-🎖 **{versions.__license__}** | 👥 **{versions.__copyright__}** | 🧪 **[Repo]({alive.Config.UPSTREAM_REPO})**
+🎖 **{ver.__license__}** | 👥 **{ver.__copyright__}** | 🧪 **[Repo]({alive.Config.UPSTREAM_REPO})**
 """
     else:
         copy_ = "https://github.com/UsergeTeam/Userge/blob/master/LICENSE"

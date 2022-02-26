@@ -8,7 +8,7 @@
 #
 # All rights reserved.
 
-from userge import userge, Message, versions, get_version
+from userge import userge, Message, versions
 from .. import alive
 
 
@@ -20,7 +20,7 @@ async def see_repo(message: Message):
 
     __Durable as a Serge__
 
-• **userge version** : `{get_version()}`
+• **userge version** : `{await versions.get_version()}`
 • **license** : {versions.__license__}
 • **copyright** : {versions.__copyright__}
 • **repo** : [Userge]({alive.Config.UPSTREAM_REPO})
