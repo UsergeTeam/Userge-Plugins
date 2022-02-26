@@ -10,6 +10,7 @@
 
 import os
 import glob
+import yt_dlp as ytdl
 from pathlib import Path
 from time import time
 from math import floor
@@ -17,11 +18,10 @@ from math import floor
 import wget
 
 from userge import userge, Message, config, pool
-from userge.utils import time_formatter, humanbytes, import_ytdl
+from userge.utils import time_formatter, humanbytes
 from ..upload import upload
 
 LOGGER = userge.getLogger(__name__)
-ytdl = import_ytdl()
 
 
 @userge.on_cmd("ytinfo", about={'header': "Get info from ytdl",
