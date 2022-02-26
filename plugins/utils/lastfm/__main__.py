@@ -124,7 +124,7 @@ __Country:__ `{user.get_country()}`
         if not os.path.exists(path):
             await pool.run_in_thread(wget.download)(user.get_image(), path)
     else:
-        path = "resources/no_image.png"
+        path = "https://telegra.ph/file/6732dd064e5fca5ebb439.png"
 
     await asyncio.gather(
         msg.delete(),

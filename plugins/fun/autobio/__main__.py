@@ -15,7 +15,7 @@ import asyncio
 
 from pyrogram.errors import FloodWait
 
-from resources.quotes import ENGLISH_QUOTES, HINDI_QUOTES
+from .resources.quotes import ENGLISH_QUOTES, HINDI_QUOTES
 from userge import userge, Message, get_collection
 
 BIO_UPDATION = False
