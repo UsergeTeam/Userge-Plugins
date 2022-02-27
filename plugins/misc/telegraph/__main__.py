@@ -12,8 +12,10 @@ import aiofiles
 from aiofiles import os
 from PIL import Image
 from telegraph import upload_file
+from html_telegraph_poster import TelegraphPoster
+
 from userge import userge, Message, config, pool
-from userge.utils import post_to_telegraph, progress
+from userge.utils import progress
 
 _T_LIMIT = 5242880
 
@@ -91,3 +93,17 @@ async def telegraph_(message: Message):
         await message.edit(f"**[Here Your Telegra.ph Link!](https://telegra.ph{response[0]})**")
     finally:
         await os.remove(dl_loc)
+
+
+def post_to_telegraph(a_title: str, content: str) -> str:
+    """ Create a Telegram Post using HTML Content """
+    post_client = TelegraphPoster(use_api=True)
+    auth_name = "@TheUserge"
+    post_client.create_api_token(auth_name)
+    post_page = post_client.post(
+        title=a_title,
+        author=auth_name,
+        author_url="https://telegram.me/theUserge",
+        text=content
+    )
+    return post_page['url']
