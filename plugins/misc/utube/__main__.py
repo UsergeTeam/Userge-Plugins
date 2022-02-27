@@ -10,7 +10,6 @@
 
 import os
 import glob
-import yt_dlp as ytdl
 from pathlib import Path
 from time import time
 from math import floor
@@ -18,8 +17,10 @@ from math import floor
 import wget
 
 from userge import userge, Message, config, pool
-from userge.utils import time_formatter, humanbytes
+from userge.utils import time_formatter, humanbytes, get_custom_import_re
 from ..upload import upload
+
+ytdl = get_custom_import_re("yt-dlp")
 
 LOGGER = userge.getLogger(__name__)
 
