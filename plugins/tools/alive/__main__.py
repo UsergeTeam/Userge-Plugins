@@ -12,7 +12,6 @@ import re
 import os
 import wget
 import asyncio
-from loader.userge import api
 from typing import Tuple, Optional
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -70,20 +69,14 @@ def _get_mode() -> str:
 
 async def _get_text_and_markup(message: Message) -> Tuple[str, Optional[InlineKeyboardMarkup]]:
     markup = None
-    plugins = await api.get_repos()
     output = f"""
 **⏱ Uptime** : `{userge.uptime}`
-**💡 Version** : `{await ver.get_version()}`
+**💡 Version** : `{await ver.get_full_version()}`
 **⚙️ Mode** : `{_get_mode().upper()}`
 
 • **Sudo**: `{_parse_arg(sudo.Dynamic.ENABLED)}`
 • **Pm-Guard**: `{_parse_arg(not pmpermit.Dynamic.ALLOW_ALL_PMS)}`
 • **Anti-Spam**: `{_parse_arg(antispam.Dynamic.ANTISPAM_SENTRY)}`"""
-    if len(plugins) > 0:
-        output += "\n• **Plugins**:"
-        for i in plugins:
-            output += f"\n    **{'.'.join(i.url.split('/')[-2:])}**:"
-            output += f"\n        `patch.{i.count}@{i.branch}`"
     if config.HEROKU_APP:
         output += f"\n• **Dyno-saver**: `{_parse_arg(system.Dynamic.RUN_DYNO_SAVER)}`"
     output += f"""
