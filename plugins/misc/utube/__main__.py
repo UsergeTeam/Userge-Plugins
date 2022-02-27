@@ -20,7 +20,7 @@ from userge import userge, Message, config, pool
 from userge.utils import time_formatter, humanbytes, get_custom_import_re
 from ..upload import upload
 
-ytdl = get_custom_import_re("yt-dlp")
+ytdl = get_custom_import_re("yt_dlp")
 
 LOGGER = userge.getLogger(__name__)
 
