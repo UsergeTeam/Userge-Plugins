@@ -21,6 +21,7 @@ async def see_repo(message: Message):
     __Durable as a Serge__
 
 • **userge version** : `{await versions.get_version()}`
+• **loader version** : `{versions.__loader_version__}`
 • **license** : {versions.__license__}
 • **copyright** : {versions.__copyright__}
 • **repo** : [Userge]({alive.Config.UPSTREAM_REPO})

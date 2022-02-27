@@ -82,13 +82,15 @@ async def _get_text_and_markup(message: Message) -> Tuple[str, Optional[InlineKe
     if len(plugins) > 0:
         output += "\n• **Plugins**:"
         for i in plugins:
-            output += f"\n    **{'.'.join(i.url.split('/')[-2:])}**: `patch.{i.count}@{i.branch}`"
+            output += f"\n    **{'.'.join(i.url.split('/')[-2:])}**:"
+            output += f"\n        `patch.{i.count}@{i.branch}`"
     if config.HEROKU_APP:
         output += f"\n• **Dyno-saver**: `{_parse_arg(system.Dynamic.RUN_DYNO_SAVER)}`"
     output += f"""
 
     **__Python__**: `{ver.__python_version__}`
-    **__Pyrogram__**: `{ver.__pyro_version__}`"""
+    **__Pyrogram__**: `{ver.__pyro_version__}`
+    **__Loader__**: `{ver.__loader_version__}`"""
     if not message.client.is_bot:
         output += f"""\n
 🎖 **{ver.__license__}** | 👥 **{ver.__copyright__}** | 🧪 **[Repo]({alive.Config.UPSTREAM_REPO})**
