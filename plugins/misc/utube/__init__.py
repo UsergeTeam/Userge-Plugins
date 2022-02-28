@@ -7,3 +7,9 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
+import os
+
+
+class Config:
+    YTDL_PATH = os.environ.get("YOUTUBE_DL_PATH", "youtube_dl")
