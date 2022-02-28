@@ -31,7 +31,7 @@ LOG = userge.getLogger(__name__)
     'usage': "{tr}info [for own info]\n"
              "{tr}info [Username | User Id]\n"
              "{tr}info [reply to User]"}, allow_via_bot=False)
-async def info(msg: Message):
+async def _info(msg: Message):
     """ To check User's info """
     await msg.edit("`Checking...`")
     user_id = msg.input_str
