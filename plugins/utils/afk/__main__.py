@@ -12,7 +12,7 @@ import time
 import asyncio
 from random import choice, randint
 
-from userge import userge, Message, filters, config, get_collection
+from userge import userge, Message, filters, get_collection
 from .. import pmpermit
 from userge.utils import time_formatter
 

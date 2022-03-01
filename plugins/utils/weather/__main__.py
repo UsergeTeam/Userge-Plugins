@@ -108,8 +108,6 @@ async def weather_get(message: Message):
     ctimezone = tz(c_tz[country][0])
     time = datetime.now(ctimezone).strftime("%A, %I:%M %p")
     fullc_n = c_n[f"{country}"]
-    # dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
-    #        "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
     dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
 
     div = (360 / len(dirs))

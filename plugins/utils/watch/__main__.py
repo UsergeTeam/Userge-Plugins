@@ -90,7 +90,6 @@ async def fetch_watch_sources(message: Message):
     except KeyError:
         tmdb_score = None
 
-    # type = streams['type']
     stream_providers = streams['providers']
     if release_date is None:
         release_date = release_year

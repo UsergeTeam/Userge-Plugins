@@ -20,7 +20,7 @@ from .. import webss
 
 
 @userge.on_cmd("webss", about={'header': "Get snapshot of a website"})
-async def webss(message: Message):
+async def _webss(message: Message):
     if webss.Config.GOOGLE_CHROME_BIN is None:
         await message.edit("`need to install Google Chrome. Module Stopping`", del_in=5)
         return

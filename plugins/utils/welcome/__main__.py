@@ -23,7 +23,7 @@ CHANNEL = userge.getCLogger(__name__)
 
 @userge.on_start
 async def _init() -> None:
-    global WELCOME_DELETE_TIMEOUT  # pylint: disbale=global-statement
+    global WELCOME_DELETE_TIMEOUT  # pylint: disable=global-statement
     async for i in WELCOME_COLLECTION.find({'on': True}):
         if 'mid' not in i:
             continue
@@ -165,7 +165,7 @@ async def viewleft(msg: Message):
     'examples': "{tr}swelto 15\n{tr}swelto 0 : for disable deletion"})
 async def set_welcome_timeout(message: Message):
     """ set welcome/left timeout """
-    global WELCOME_DELETE_TIMEOUT  # pylint: disbale=global-statement
+    global WELCOME_DELETE_TIMEOUT  # pylint: disable=global-statement
     await message.edit("`Setting auto welcome/left message delete timeout...`")
     t_o = int(message.matches[0].group(1))
     WELCOME_DELETE_TIMEOUT = t_o

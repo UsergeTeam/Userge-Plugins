@@ -8,8 +8,6 @@
 #
 # All rights reserved.
 
-import os
-
 from userge import config
 
 

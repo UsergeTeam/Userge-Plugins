@@ -17,8 +17,8 @@ from pyrogram.errors.exceptions import FloodWait
 from userge import userge, config, Message
 from userge.utils import is_url, sort_file_name_key
 from userge.utils.exceptions import ProcessCanceled
+from . import upload
 from ..download import tg_download, url_download
-from ..upload import upload
 
 LOGGER = userge.getLogger(__name__)
 CHANNEL = userge.getCLogger(__name__)
