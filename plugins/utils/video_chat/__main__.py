@@ -19,7 +19,6 @@ import shlex
 import shutil
 import asyncio
 import requests
-import yt_dlp as ytdl
 from pathlib import Path
 from traceback import format_exc
 from typing import List, Tuple, Optional
@@ -60,9 +59,11 @@ from pytgcalls.types.input_stream import (
 )
 
 from userge import userge, Message, pool, filters, get_collection, config
-from .. import video_chat as vc
-from userge.utils import time_formatter, progress, runcmd, is_url
+from . import Config
+from userge.utils import time_formatter, progress, runcmd, is_url, get_custom_import_re
 from userge.utils.exceptions import StopConversation
+
+ytdl = get_custom_import_re(Config.YTDL_PATH)
 
 # https://github.com/pytgcalls/pytgcalls/blob/master/pytgcalls/mtproto/mtproto_client.py#L18
 userge.__class__.__module__ = 'pyrogram.client'
@@ -449,8 +450,7 @@ async def play_music(msg: Message, forceplay: bool):
                             raise Exception
                     path_to_media = input_str
                     try:
-                        filename = headers["Content-Disposition"].split('=', 1)[
-                            1].strip('"') or ''
+                        filename = headers["Content-Disposition"].split('=', 1)[1].strip('"') or ''
                     except KeyError:
                         filename = None
                     if not filename:
@@ -654,6 +654,7 @@ async def set_volume(msg: Message):
     trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
+@check_enable_for_all
 async def skip_music(msg: Message):
     """ skip music in vc """
     await msg.delete()
@@ -685,6 +686,7 @@ async def skip_music(msg: Message):
     trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
+@check_enable_for_all
 async def pause_music(msg: Message):
     """ pause music in vc """
     await msg.delete()
@@ -704,23 +706,19 @@ async def pause_music(msg: Message):
     trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
+@check_enable_for_all
 async def seek_music_player(msg: Message):
     """ seek music x sec forward or -x sec backward """
-    dur = msg.filtered_input_str
     flags = msg.flags
+    dur = msg.filtered_input_str or flags.get('-to', "0")
     to_reply = ''
     try:
         dur = int(dur)
     except ValueError:
-        if not flags.get('-to', 0):
-            return await reply_text(msg, "Invalid Seek time specified.")
+        return await reply_text(msg, "Invalid Seek time specified.")
     if '-to' in flags:
-        try:
-            seek_point = dur or int(flags.get('-to', 0))
-        except ValueError:
-            return await reply_text(msg, 'Invalid seek point specified.')
-        seek = await seek_music(seek_point, True)
-        to_reply = f"Jumped to {time_formatter(seek_point)}."
+        seek = await seek_music(dur, True)
+        to_reply = f"Jumped to {time_formatter(dur)}."
     else:
         to_reply = f"Seeked {dur} sec {'backward' if dur < 0 else 'forward'}"
         seek = await seek_music(dur)
@@ -740,6 +738,7 @@ async def seek_music_player(msg: Message):
     trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
+@check_enable_for_all
 async def replay_song_(msg: Message):
     """ replay current song from beginning """
     replay = await replay_music()
@@ -755,6 +754,7 @@ async def replay_song_(msg: Message):
     trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
+@check_enable_for_all
 async def resume_music(msg: Message):
     """ resume music in vc """
     await msg.delete()
@@ -1030,7 +1030,7 @@ async def tg_down(msg: Message):
     else:
         filename = msg.path_to_media
         duration = await get_duration(shlex.quote(msg.path_to_media))
-    if duration > vc.Config.MAX_DURATION:
+    if duration > Config.MAX_DURATION:
         await reply_text(msg, "**ERROR:** `Max song duration limit reached!`")
         return await _skip()
     if hasattr(msg, 'file_info'):
@@ -1214,11 +1214,9 @@ def get_quality_ratios(w: int, h: int, q: int) -> Tuple[int, int]:
 
 
 def get_player_string():
-    current = CURRENT_SONG.get('pause') if CURRENT_SONG.get(
-        'pause') else time.time()
+    current = CURRENT_SONG.get('pause', time.time())
     played_duration = round(current - CURRENT_SONG['start'])
-    duration = played_duration if CURRENT_SONG.get(
-        'is_live', False) else CURRENT_SONG['duration']
+    duration = played_duration if CURRENT_SONG.get('is_live', False) else CURRENT_SONG['duration']
     try:
         percentage = played_duration * 100 / duration
     except ZeroDivisionError:
@@ -1246,7 +1244,7 @@ def _get_song_info(url: str):
         info = ydl.extract_info(url, download=False)
         duration = info.get("duration") or 0
 
-        if duration > vc.Config.MAX_DURATION:
+        if duration > Config.MAX_DURATION:
             return False
     return info.get("title"), duration if duration else 0
 
@@ -1305,7 +1303,7 @@ if userge.has_bot:
                 reply_markup=button
             )
 
-        elif "back" in cq.data:
+        elif cq.data == "back":
             if BACK_BUTTON_TEXT:
                 await cq.edit_message_text(
                     BACK_BUTTON_TEXT,
@@ -1359,24 +1357,12 @@ if userge.has_bot:
         if not CHAT_NAME:
             return await cq.edit_message_text("`Already Left Video-Chat`")
 
-        if cq.data == "seek":
-            seek = await seek_music(15)
+        if cq.data in ("seek", "rewind"):
+            dur = 15 if cq.data == "seek" else -15
+            seek = await seek_music(dur)
             try:
                 if seek:
-                    await cq.answer('Seeked 15 sec forward')
-                else:
-                    return await cq.answer(
-                        'This stream is either live stream /'
-                        'seeked duration exceeds duration of file.',
-                        show_alert=True)
-            except QueryIdInvalid:
-                pass
-
-        elif cq.data == "rewind":
-            seek = await seek_music(-15)
-            try:
-                if seek:
-                    await cq.answer('Seeked 15 sec backward')
+                    await cq.answer(f'Seeked 15 sec {"forward" if dur > 0 else "backward"}')
                 else:
                     return await cq.answer(
                         'This stream is either live stream /'
