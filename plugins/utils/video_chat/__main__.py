@@ -319,7 +319,7 @@ async def joinvc(msg: Message):
         return await reply_text(msg, f'Error during Joining the Call\n`{e}`')
 
     await _on_join()
-    await reply_text(msg, "`Joined VideoChat Succesfully`", del_in=5)
+    await reply_text(msg, "`Joined VideoChat Successfully`", del_in=5)
 
 
 @userge.on_cmd("leavevc", about={
@@ -1068,7 +1068,7 @@ def _get_song_info(url: str):
 
 
 if userge.has_bot:
-    @userge.bot.on_callback_query(filters.regex("(skip|queue|back)"))
+    @userge.bot.on_callback_query(filters.regex("(skip|queue|beck)"))
     @check_cq_for_all
     async def vc_callback(cq: CallbackQuery):
         if not CHAT_NAME:
@@ -1112,7 +1112,7 @@ if userge.has_bot:
 
             out += f"\n\n**Clicked by:** {cq.from_user.mention}"
             button = InlineKeyboardMarkup(
-                [[InlineKeyboardButton(text="Back", callback_data="back")]]
+                [[InlineKeyboardButton(text="Back", callback_data="beck")]]
             )
 
             await cq.edit_message_text(
@@ -1121,7 +1121,7 @@ if userge.has_bot:
                 reply_markup=button
             )
 
-        elif "back" in cq.data:
+        elif "beck" in cq.data:
             if BACK_BUTTON_TEXT:
                 await cq.edit_message_text(
                     BACK_BUTTON_TEXT,
