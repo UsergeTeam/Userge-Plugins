@@ -8,4 +8,5 @@
 #
 # All rights reserved.
 
-from .downloader import handle_download, url_download, tg_download  # noqa skipcq
+# skipcq
+from .downloader import handle_download, url_download, tg_download  # noqa
