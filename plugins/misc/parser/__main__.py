@@ -22,6 +22,8 @@ from bs4 import BeautifulSoup
 from userge import Message, userge, pool
 from ..parser import Config
 
+CRYPT = None
+
 
 @userge.on_start
 async def _init():

@@ -19,7 +19,7 @@ TOGGLE = False
 @userge.on_start
 async def _init():
     global TOGGLE  # pylint: disable=global-statement
-    if data:= await SAVED_SETTINGS.find_one({"_id": "MENTION_TOGGLE"}):
+    if data := await SAVED_SETTINGS.find_one({"_id": "MENTION_TOGGLE"}):
         TOGGLE = bool(data["data"])
 
 

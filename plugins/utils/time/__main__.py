@@ -15,7 +15,7 @@ from userge import userge, Message
 
 LOG = userge.getLogger(__name__)  # logger object
 
-COUNTRY_CITY = os.environ.get("COUNTRY_CITY", None)
+COUNTRY_CITY = os.environ.get("COUNTRY_CITY")
 
 
 @userge.on_cmd("dt", about={
@@ -46,6 +46,7 @@ async def grabTime(message: Message):
                            parse_mode="html", del_in=30)
         return
 
+    tz = COUNTRY_CITY
     tzDateTime = dt.now(timezone(COUNTRY_CITY))
     date = tzDateTime.strftime('%d-%m-%Y')
     militaryTime = tzDateTime.strftime('%H:%M')
