@@ -455,7 +455,7 @@ async def play_music(msg: Message, forceplay: bool):
                         filename = None
                     if not filename:
                         if hasattr(msg, 'file_info'):
-                            _, _, _, has_video = getattr(msg, "file_info")
+                            _, _, _, has_video = msg.file_info
                             filename = "Video" if has_video else "Music"
                         else:
                             filename = 'Link'
@@ -1034,7 +1034,7 @@ async def tg_down(msg: Message):
         await reply_text(msg, "**ERROR:** `Max song duration limit reached!`")
         return await _skip()
     if hasattr(msg, 'file_info'):
-        height, width, has_audio, has_video = getattr(msg, 'file_info')
+        height, width, has_audio, has_video = msg.file_info
     else:
         height, width, has_audio, has_video = await get_file_info(shlex.quote(filename))
 
@@ -1139,7 +1139,7 @@ async def play_audio(file: str, seek: int = None):
 
 
 async def get_stream_link(link: str) -> str:
-    yt_dl = (os.environ.get("YOUTUBE_DL_PATH", "youtube_dl")).replace("_", "-")
+    yt_dl = (os.environ.get("YOUTUBE_DL_PATH", "yt_dlp")).replace("_", "-")
     cmd = yt_dl + \
         " --geo-bypass -g -f best[height<=?720][width<=?1280]/best " + link
     out, err, _, _ = await runcmd(cmd)
@@ -1214,8 +1214,8 @@ def get_quality_ratios(w: int, h: int, q: int) -> Tuple[int, int]:
 
 
 def get_player_string():
-    current = CURRENT_SONG.get('pause', time.time())
-    played_duration = round(current - CURRENT_SONG['start'])
+    current_dur = CURRENT_SONG.get('pause', time.time())
+    played_duration = round(current_dur - CURRENT_SONG['start'])
     duration = played_duration if CURRENT_SONG.get('is_live', False) else CURRENT_SONG['duration']
     try:
         percentage = played_duration * 100 / duration
@@ -1253,6 +1253,7 @@ if userge.has_bot:
     @userge.bot.on_callback_query(filters.regex("(skip|queue|back)"))
     @check_cq_for_all
     async def vc_callback(cq: CallbackQuery):
+        await cq.answer()
         if not CHAT_NAME:
             await cq.edit_message_text("`Already Left Video-Chat`")
             return
@@ -1316,7 +1317,7 @@ if userge.has_bot:
     @userge.bot.on_callback_query(filters.regex(r"vol\((.+)\)"))
     @check_cq_for_all
     async def vol_callback(cq: CallbackQuery):
-
+        await cq.answer()
         arg = cq.matches[0].group(1)
         volume = 0
 
@@ -1355,6 +1356,7 @@ if userge.has_bot:
     @check_cq_for_all
     async def vc_control_callback(cq: CallbackQuery):
         if not CHAT_NAME:
+            await cq.answer()
             return await cq.edit_message_text("`Already Left Video-Chat`")
 
         if cq.data in ("seek", "rewind"):
