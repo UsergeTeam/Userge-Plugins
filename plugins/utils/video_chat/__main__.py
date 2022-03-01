@@ -455,7 +455,7 @@ async def play_music(msg: Message, forceplay: bool):
                         filename = None
                     if not filename:
                         if hasattr(msg, 'file_info'):
-                            _, _, _, has_video = getattr(msg, "file_info")
+                            _, _, _, has_video = msg.file_info
                             filename = "Video" if has_video else "Music"
                         else:
                             filename = 'Link'
@@ -1034,7 +1034,7 @@ async def tg_down(msg: Message):
         await reply_text(msg, "**ERROR:** `Max song duration limit reached!`")
         return await _skip()
     if hasattr(msg, 'file_info'):
-        height, width, has_audio, has_video = getattr(msg, 'file_info')
+        height, width, has_audio, has_video = msg.file_info
     else:
         height, width, has_audio, has_video = await get_file_info(shlex.quote(filename))
 
@@ -1214,9 +1214,9 @@ def get_quality_ratios(w: int, h: int, q: int) -> Tuple[int, int]:
 
 
 def get_player_string():
-    current = CURRENT_SONG.get('pause') if CURRENT_SONG.get(
+    current_dur = CURRENT_SONG.get('pause') if CURRENT_SONG.get(
         'pause') else time.time()
-    played_duration = round(current - CURRENT_SONG['start'])
+    played_duration = round(current_dur - CURRENT_SONG['start'])
     duration = played_duration if CURRENT_SONG.get(
         'is_live', False) else CURRENT_SONG['duration']
     try:
