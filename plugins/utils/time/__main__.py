@@ -8,7 +8,6 @@
 #
 # All rights reserved.
 
-import os
 from pytz import timezone
 from datetime import datetime as dt
 

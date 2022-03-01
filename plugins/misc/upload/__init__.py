@@ -8,7 +8,7 @@
 #
 # All rights reserved.
 
-from .uploader import (upload,  # noqa
+from .uploader import (upload,  # skipcq
                        doc_upload,
                        audio_upload,
                        vid_upload,

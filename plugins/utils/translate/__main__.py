@@ -94,3 +94,4 @@ def _translate_this(text: str, dest: str, src: str):
             if i == 9:
                 raise
             time.sleep(0.3)
+    return None
