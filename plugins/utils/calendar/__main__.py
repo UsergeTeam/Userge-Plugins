@@ -18,7 +18,7 @@ from userge import userge, Message
     'header': "Print calendar of any month of any year.",
     'usage': "{tr}calendar\n{tr}calendar [ year | month]",
     'examples': "{tr}calendar 2020 | 6"})
-async def calendar(message: Message):
+async def _calendar(message: Message):
 
     if not message.input_str:
         await message.edit("`Searching...`")

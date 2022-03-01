@@ -30,7 +30,6 @@ NOW_PLAYING = [False, None]
 
 @userge.on_start
 async def _init():
-    global NOW_PLAYING  # pylint: disable=global-statement
     k = await LASTFM_DB.find_one({'_id': "LASTFM"})
     if k:
         NOW_PLAYING[0] = bool(k['data'])
@@ -60,7 +59,6 @@ def check_creds(func):
     'usage': "{tr}lastfm\n{tr}lastfm [flags]"})
 async def _lastfm(msg: Message):
     """ see current playing song """
-    global NOW_PLAYING  # pylint: disable=global-statement
     if msg.flags and '-on' in msg.flags:
         NOW_PLAYING[0] = True
         await LASTFM_DB.update_one(
@@ -203,7 +201,6 @@ async def get_last_played(msg: Message):
 
 @userge.add_task
 async def lastfm_worker():
-    global NOW_PLAYING  # pylint: disable=global-statement
 
     user = pylast.LastFMNetwork(
         api_key=lastfm.Config.API_KEY,

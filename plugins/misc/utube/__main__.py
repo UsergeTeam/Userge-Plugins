@@ -10,7 +10,6 @@
 
 import os
 import glob
-import yt_dlp as ytdl
 from pathlib import Path
 from time import time
 from math import floor
@@ -18,8 +17,11 @@ from math import floor
 import wget
 
 from userge import userge, Message, config, pool
-from userge.utils import time_formatter, humanbytes
+from userge.utils import time_formatter, humanbytes, get_custom_import_re
+from .. import utube
 from ..upload import upload
+
+ytdl = get_custom_import_re(utube.Config.YTDL_PYMOD)
 
 LOGGER = userge.getLogger(__name__)
 
@@ -46,7 +48,9 @@ __{uploader}__
     """.format_map(_exracted)
     if _exracted['thumb']:
         _tmp = await pool.run_in_thread(wget.download)(
-            _exracted['thumb'], os.path.join(config.Dynamic.DOWN_PATH, f"{time()}.jpg"))
+            _exracted['thumb'],
+            os.path.join(config.Dynamic.DOWN_PATH, f"{time()}.jpg")
+        )
         await message.reply_photo(_tmp, caption=out)
         await message.delete()
         os.remove(_tmp)
@@ -72,7 +76,10 @@ async def ytDown(message: Message):
     def __progress(data: dict):
         nonlocal edited, c_time
         diff = time() - c_time
-        if data['status'] == "downloading" and (not edited or diff >= config.Dynamic.EDIT_SLEEP_TIMEOUT):
+        if (
+            data['status'] == "downloading"
+            and (not edited or diff >= config.Dynamic.EDIT_SLEEP_TIMEOUT)
+        ):
             c_time = time()
             edited = True
             eta = data.get('eta')

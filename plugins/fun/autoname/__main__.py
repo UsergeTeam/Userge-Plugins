@@ -135,11 +135,13 @@ async def view_name_timeout(message: Message):
 
 @userge.add_task
 async def _autoname_worker():
-    global UPDATION, NAME, FONTS_  # pylint: disable=global-statement
+    global NAME, FONTS_  # pylint: disable=global-statement
     animation = "|/-\\"
     anicount = 0
     FONTS_ = deque(FONTS_)
     while UPDATION and NAME:
+        if not UPDATION:
+            break
         F = list(FONTS_)
         cur_list = list(F[0])
         to_rep_list = list(F[1])
@@ -161,4 +163,3 @@ async def _autoname_worker():
                 await asyncio.sleep(AUTONAME_TIMEOUT)
                 anicount = (anicount + 1) % 4
         FONTS_.rotate(-1)
-        await CHANNEL.log("`Switched to New font for AutoName`")

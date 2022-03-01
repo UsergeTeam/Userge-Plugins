@@ -86,7 +86,7 @@ async def translateme(message: Message):
 
 
 @pool.run_in_thread
-def _translate_this(text: str, dest: str, src: str) -> str:
+def _translate_this(text: str, dest: str, src: str):
     for i in range(10):
         try:
             return Translator().translate(text, dest=dest, src=src)
@@ -94,3 +94,4 @@ def _translate_this(text: str, dest: str, src: str) -> str:
             if i == 9:
                 raise
             time.sleep(0.3)
+    return None

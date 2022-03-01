@@ -118,7 +118,8 @@ async def tweet(msg: Message):
 
 
 async def _tweets(msg: Message, text: str, username: str = '', type_: str = "tweet") -> None:
-    api_url = f"https://nekobot.xyz/api/imagegen?type={type_}&text={demojify(text)}"
+    api_url = f"https://nekobot.xyz/api/imagegen?type={type_}"
+    api_url += f"&text={get_emoji_regexp().sub(b'', text)}"
     if username:
         api_url += f"&username={get_emoji_regexp().sub(b'', username)}"
     res = requests.get(api_url).json()
