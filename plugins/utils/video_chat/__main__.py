@@ -13,11 +13,12 @@
 import os
 import re
 import json
+import time
+import math
 import shlex
 import shutil
 import asyncio
 import requests
-import yt_dlp as ytdl
 from pathlib import Path
 from traceback import format_exc
 from typing import List, Tuple, Optional
@@ -29,6 +30,7 @@ from pyrogram.raw import functions
 from pyrogram.raw.base import Message as BaseMessage
 from pyrogram.raw.functions.phone import GetGroupCall
 from pyrogram.raw.types import UpdateGroupCallParticipants, InputGroupCall, GroupCall
+from pyrogram.errors import MessageNotModified, QueryIdInvalid
 from pyrogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -57,9 +59,11 @@ from pytgcalls.types.input_stream import (
 )
 
 from userge import userge, Message, pool, filters, get_collection, config
-from .. import video_chat as vc
-from userge.utils import time_formatter, progress, runcmd, is_url
+from . import Config
+from userge.utils import time_formatter, progress, runcmd, is_url, get_custom_import_re
 from userge.utils.exceptions import StopConversation
+
+ytdl = get_custom_import_re(Config.YTDL_PATH)
 
 # https://github.com/pytgcalls/pytgcalls/blob/master/pytgcalls/mtproto/mtproto_client.py#L18
 userge.__class__.__module__ = 'pyrogram.client'
@@ -80,6 +84,7 @@ PLAYING = False
 
 CHAT_NAME = ""
 CHAT_ID = 0
+CURRENT_SONG = {}
 CONTROL_CHAT_IDS: List[int] = []
 QUEUE: List[Message] = []
 CLIENT = userge
@@ -185,11 +190,18 @@ def default_markup():
     """ default markup for playing text """
 
     return InlineKeyboardMarkup(
-        [[
-            InlineKeyboardButton(text="⏩ Skip", callback_data="skip"),
-            InlineKeyboardButton(text="🗒 Queue", callback_data="queue")
-        ]]
-    )
+        [
+            [
+                InlineKeyboardButton(
+                    text=get_player_string(), callback_data='player')
+            ],
+            [
+                InlineKeyboardButton(
+                    text="⏩ Skip", callback_data="skip"),
+                InlineKeyboardButton(
+                    text="🗒 Queue", callback_data="queue")
+            ]
+        ])
 
 
 def volume_button_markup():
@@ -319,7 +331,7 @@ async def joinvc(msg: Message):
         return await reply_text(msg, f'Error during Joining the Call\n`{e}`')
 
     await _on_join()
-    await reply_text(msg, "`Joined VideoChat Succesfully`", del_in=5)
+    await reply_text(msg, "`Joined VideoChat Successfully`", del_in=5)
 
 
 @userge.on_cmd("leavevc", about={
@@ -428,13 +440,27 @@ async def play_music(msg: Message, forceplay: bool):
                     )(input_str, allow_redirects=True, stream=True)
                     headers = dict(res.headers)
                     if (
-                        "video" not in headers["Content-Type"]
-                        and "audio" not in headers["Content-Type"]
+                        "video" not in headers.get("Content-Type", '')
+                        and "audio" not in headers.get("Content-Type", '')
                     ):
-                        raise Exception
+                        height, width, has_audio, has_video = await get_file_info(input_str)
+                        setattr(
+                            msg, 'file_info', (height, width, has_audio, has_video))
+                        if not has_audio and not has_video:
+                            raise Exception
                     path_to_media = input_str
-                    filename = headers["Content-Disposition"].split('=', 1)[1].strip('"')
-                except Exception:
+                    try:
+                        filename = headers["Content-Disposition"].split('=', 1)[1].strip('"') or ''
+                    except KeyError:
+                        filename = None
+                    if not filename:
+                        if hasattr(msg, 'file_info'):
+                            _, _, _, has_video = msg.file_info
+                            filename = "Video" if has_video else "Music"
+                        else:
+                            filename = 'Link'
+                except Exception as e:
+                    LOG.exception(e)
                     return await reply_text(msg, "`invalid direct link provided to stream!`")
             setattr(msg, 'path_to_media', path_to_media)
             setattr(msg, 'file_name', filename.replace('_', ' '))
@@ -628,6 +654,7 @@ async def set_volume(msg: Message):
     trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
+@check_enable_for_all
 async def skip_music(msg: Message):
     """ skip music in vc """
     await msg.delete()
@@ -659,11 +686,66 @@ async def skip_music(msg: Message):
     trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
+@check_enable_for_all
 async def pause_music(msg: Message):
     """ pause music in vc """
     await msg.delete()
     await call.pause_stream(CHAT_ID)
+    CURRENT_SONG['pause'] = time.time()
     await reply_text(msg, "⏸️ **Paused** Music Successfully")
+
+
+@userge.on_cmd("seek", about={
+    'header': "Seek Song x sec forward / backward.",
+    'flags': {
+        '-to': "To jump to a specific timestamp"},
+    'examples': [
+        "{tr}seek 10 - To seek 10 sec forward.",
+        "{tr}seek -10 - To seek 10 sec backward.",
+        "{tr}seek -to 60 - To play from 60th sec onwards."]},
+    trigger=config.PUBLIC_TRIGGER, check_client=True,
+    filter_me=False, allow_bots=False)
+@vc_chat
+@check_enable_for_all
+async def seek_music_player(msg: Message):
+    """ seek music x sec forward or -x sec backward """
+    flags = msg.flags
+    dur = msg.filtered_input_str or flags.get('-to', "0")
+    to_reply = ''
+    try:
+        dur = int(dur)
+    except ValueError:
+        return await reply_text(msg, "Invalid Seek time specified.")
+    if '-to' in flags:
+        seek = await seek_music(dur, True)
+        to_reply = f"Jumped to {time_formatter(dur)}."
+    else:
+        to_reply = f"Seeked {dur} sec {'backward' if dur < 0 else 'forward'}"
+        seek = await seek_music(dur)
+    if seek:
+        await reply_text(msg, to_reply)
+    else:
+        await reply_text(
+            msg,
+            "Sorry i can't do that.\n"
+            "Either this is a live stream / seeked duration exceeds maximum duration of file."
+        )
+
+
+@userge.on_cmd("replay", about={
+    'header': "replay the current song from beginning.",
+    'usage': "{tr}replay"},
+    trigger=config.PUBLIC_TRIGGER, check_client=True,
+    filter_me=False, allow_bots=False)
+@vc_chat
+@check_enable_for_all
+async def replay_song_(msg: Message):
+    """ replay current song from beginning """
+    replay = await replay_music()
+    if replay:
+        await reply_text(msg, 'Replaying current song from beginning.')
+    else:
+        await reply_text(msg, 'No songs found to play.')
 
 
 @userge.on_cmd("resume", about={
@@ -672,10 +754,17 @@ async def pause_music(msg: Message):
     trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
 @vc_chat
+@check_enable_for_all
 async def resume_music(msg: Message):
     """ resume music in vc """
     await msg.delete()
+    if not CURRENT_SONG.get('pause'):
+        return await reply_text(msg, "Nothing paused to resume.")
     await call.resume_stream(CHAT_ID)
+    # adjusting paused duration in start time
+    CURRENT_SONG['start'] = CURRENT_SONG['start'] + \
+        time.time() - CURRENT_SONG['pause']
+    del CURRENT_SONG['pause']
     await reply_text(msg, "◀️ **Resumed** Music Successfully")
 
 
@@ -738,6 +827,7 @@ async def _on_left(group_call: Optional[GroupCall] = None) -> None:
     CHAT_ID = 0
     CONTROL_CHAT_IDS.clear()
     QUEUE.clear()
+    CURRENT_SONG.clear()
     GROUP_CALL_PARTICIPANTS.clear()
     PLAYING = False
     BACK_BUTTON_TEXT = ""
@@ -808,6 +898,52 @@ async def _skip(clear_queue: bool = False):
         await _skip()
 
 
+async def seek_music(dur: int, jump: bool = False) -> bool:
+    if CURRENT_SONG.get('is_live', False):
+        return False
+    if jump:
+        seek_point = max(0, dur)
+        CURRENT_SONG['start'] = time.time() - seek_point
+    else:
+        seek_point = max(0, (time.time() - CURRENT_SONG['start'] + dur))
+        # adjusting seek time in start time
+        CURRENT_SONG['start'] = CURRENT_SONG['start'] - dur
+    if seek_point > CURRENT_SONG['duration']:
+        return False
+    if CURRENT_SONG['is_video']:
+        await play_video(
+            CURRENT_SONG['file'],
+            CURRENT_SONG['height'],
+            CURRENT_SONG['width'],
+            CURRENT_SONG['quality'],
+            int(float(seek_point))
+        )
+    else:
+        await play_audio(
+            CURRENT_SONG['file'],
+            seek_point
+        )
+    return True
+
+
+async def replay_music() -> bool:
+    try:
+        if CURRENT_SONG['is_video']:
+            await play_video(
+                CURRENT_SONG['file'],
+                CURRENT_SONG['height'],
+                CURRENT_SONG['width'],
+                CURRENT_SONG['quality']
+            )
+        else:
+            await play_audio(
+                CURRENT_SONG['file']
+            )
+    except KeyError:
+        return False
+    return True
+
+
 async def yt_down(msg: Message):
     """ youtube downloader """
 
@@ -825,6 +961,16 @@ async def yt_down(msg: Message):
     duration = flags.get("duration")
     quality = max(min(100, int(flags.get('-q', 100))), 1)
     height, width, has_audio, has_video = await get_file_info(stream_link)
+
+    CURRENT_SONG.update({
+        'file': stream_link,
+        "height": height,
+        "width": width,
+        "is_video": is_video and has_video,
+        "duration": duration,
+        "quality": quality,
+        "is_live": duration == 0
+    })
 
     if is_video and has_video:
         await play_video(stream_link, height, width, quality)
@@ -844,9 +990,8 @@ async def yt_down(msg: Message):
 
     BACK_BUTTON_TEXT = (
         f"🎶 **Now playing:** [{title}]({url})\n"
-        f"⏳ **Duration:** `{duration}`\n"
-        f"🎧 **Requested By:** {requester(msg)}"
-    )
+        f"⏳ **Duration:** `{'Live' if not duration else time_formatter(duration)}`\n"
+        f"🎧 **Requested By:** {requester(msg)}")
 
     raw_msg = await reply_text(
         msg,
@@ -885,14 +1030,26 @@ async def tg_down(msg: Message):
     else:
         filename = msg.path_to_media
         duration = await get_duration(shlex.quote(msg.path_to_media))
-    if duration > vc.Config.MAX_DURATION:
+    if duration > Config.MAX_DURATION:
         await reply_text(msg, "**ERROR:** `Max song duration limit reached!`")
         return await _skip()
-
-    height, width, has_audio, has_video = await get_file_info(shlex.quote(filename))
+    if hasattr(msg, 'file_info'):
+        height, width, has_audio, has_video = msg.file_info
+    else:
+        height, width, has_audio, has_video = await get_file_info(shlex.quote(filename))
 
     is_video = file.is_video
     quality = max(min(100, int(getattr(file, 'quality', 100))), 1)
+
+    CURRENT_SONG.update({
+        'file': filename,
+        "height": height,
+        "width": width,
+        "is_video": is_video and has_video,
+        "duration": duration,
+        "quality": quality,
+        "is_live": duration == 0
+    })
 
     if is_video and has_video:
         await play_video(filename, height, width, quality)
@@ -911,10 +1068,9 @@ async def tg_down(msg: Message):
     await message.delete()
 
     BACK_BUTTON_TEXT = (
-        f"🎶 **Now playing:** [{title}]({msg.link if not hasattr(msg, 'file_name') else None})\n"
-        f"⏳ **Duration:** `{time_formatter(duration)}`\n"
-        f"🎧 **Requested By:** {requester(msg)}"
-    )
+        f"🎶 **Now playing:** [{title}]({msg.link})\n"
+        f"⏳ **Duration:** `{'Live' if not duration else time_formatter(duration)}`\n"
+        f"🎧 **Requested By:** {requester(msg)}")
 
     raw_msg = await reply_text(
         msg,
@@ -925,8 +1081,10 @@ async def tg_down(msg: Message):
     CQ_MSG.append(raw_msg)
 
 
-async def play_video(file: str, height: int, width: int, quality: int):
+async def play_video(file: str, height: int, width: int, quality: int, seek: int = None):
     r_width, r_height = get_quality_ratios(width, height, quality)
+    ffmpeg_parm = f'-ss {seek} -atend -to {CURRENT_SONG["duration"]}' if seek else ''
+
     try:
         await call.change_stream(
             CHAT_ID,
@@ -936,7 +1094,8 @@ async def play_video(file: str, height: int, width: int, quality: int):
                     r_width,
                     r_height,
                     25
-                )
+                ),
+                additional_ffmpeg_parameters=ffmpeg_parm
             )
         )
     except NotInGroupCallError:
@@ -948,31 +1107,39 @@ async def play_video(file: str, height: int, width: int, quality: int):
                     r_width,
                     r_height,
                     25
-                )
+                ),
+                additional_ffmpeg_parameters=ffmpeg_parm
             )
         )
+    if not seek:
+        CURRENT_SONG['start'] = time.time()
 
 
-async def play_audio(file: str):
+async def play_audio(file: str, seek: int = None):
+    ffmpeg_parm = f'-ss {seek} -atend -to {CURRENT_SONG["duration"]}' if seek else ''
     try:
         await call.change_stream(
             CHAT_ID,
             AudioPiped(
-                file
+                file,
+                additional_ffmpeg_parameters=ffmpeg_parm
             )
         )
     except NotInGroupCallError:
         await call.join_group_call(
             CHAT_ID,
             AudioPiped(
-                file
+                file,
+                additional_ffmpeg_parameters=ffmpeg_parm
             ),
             stream_type=StreamType().pulse_stream,
         )
+    if not seek:
+        CURRENT_SONG['start'] = time.time()
 
 
 async def get_stream_link(link: str) -> str:
-    yt_dl = (os.environ.get("YOUTUBE_DL_PATH", "youtube_dl")).replace("_", "-")
+    yt_dl = (os.environ.get("YOUTUBE_DL_PATH", "yt_dlp")).replace("_", "-")
     cmd = yt_dl + \
         " --geo-bypass -g -f best[height<=?720][width<=?1280]/best " + link
     out, err, _, _ = await runcmd(cmd)
@@ -1046,6 +1213,21 @@ def get_quality_ratios(w: int, h: int, q: int) -> Tuple[int, int]:
     return w - 1 if w % 2 else w, h - 1 if h % 2 else h
 
 
+def get_player_string():
+    current_dur = CURRENT_SONG.get('pause', time.time())
+    played_duration = round(current_dur - CURRENT_SONG['start'])
+    duration = played_duration if CURRENT_SONG.get('is_live', False) else CURRENT_SONG['duration']
+    try:
+        percentage = played_duration * 100 / duration
+    except ZeroDivisionError:
+        percentage = 100
+    player_string = "▷ {0}◉{1}".format(
+        ''.join(["━" for _ in range(math.floor(percentage / 5))]),
+        ''.join(["─" for _ in range(20 - math.floor(percentage / 5))])
+    )
+    return f"{time_formatter(played_duration)}   {player_string}    {time_formatter(duration)}"
+
+
 @pool.run_in_thread
 def _get_song(name: str) -> Tuple[str, str]:
     results: List[dict] = VideosSearch(name, limit=1).result()['result']
@@ -1062,15 +1244,16 @@ def _get_song_info(url: str):
         info = ydl.extract_info(url, download=False)
         duration = info.get("duration") or 0
 
-        if duration > vc.Config.MAX_DURATION:
+        if duration > Config.MAX_DURATION:
             return False
-    return info.get("title"), time_formatter(duration) if duration else "Live"
+    return info.get("title"), duration if duration else 0
 
 
 if userge.has_bot:
     @userge.bot.on_callback_query(filters.regex("(skip|queue|back)"))
     @check_cq_for_all
     async def vc_callback(cq: CallbackQuery):
+        await cq.answer()
         if not CHAT_NAME:
             await cq.edit_message_text("`Already Left Video-Chat`")
             return
@@ -1121,7 +1304,7 @@ if userge.has_bot:
                 reply_markup=button
             )
 
-        elif "back" in cq.data:
+        elif cq.data == "back":
             if BACK_BUTTON_TEXT:
                 await cq.edit_message_text(
                     BACK_BUTTON_TEXT,
@@ -1134,7 +1317,7 @@ if userge.has_bot:
     @userge.bot.on_callback_query(filters.regex(r"vol\((.+)\)"))
     @check_cq_for_all
     async def vol_callback(cq: CallbackQuery):
-
+        await cq.answer()
         arg = cq.matches[0].group(1)
         volume = 0
 
@@ -1168,3 +1351,48 @@ if userge.has_bot:
             await cq.edit_message_text(f"Successfully set volume to {volume}")
         else:
             await cq.edit_message_text("`Invalid Range!`")
+
+    @userge.bot.on_callback_query(filters.regex("(player|seek|rewind|replay)"))
+    @check_cq_for_all
+    async def vc_control_callback(cq: CallbackQuery):
+        if not CHAT_NAME:
+            await cq.answer()
+            return await cq.edit_message_text("`Already Left Video-Chat`")
+
+        if cq.data in ("seek", "rewind"):
+            dur = 15 if cq.data == "seek" else -15
+            seek = await seek_music(dur)
+            try:
+                if seek:
+                    await cq.answer(f'Seeked 15 sec {"forward" if dur > 0 else "backward"}')
+                else:
+                    return await cq.answer(
+                        'This stream is either live stream /'
+                        'seeked duration exceeds duration of file.',
+                        show_alert=True)
+            except QueryIdInvalid:
+                pass
+
+        elif cq.data == "replay":
+            replay = await replay_music()
+            if replay:
+                await cq.answer("Replaying song from beggining.")
+            else:
+                return await cq.answer('No song found to play!', show_alert=True)
+
+        try:
+            await cq.edit_message_reply_markup(InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(text=get_player_string(), callback_data='back')
+                    ],
+                    [
+                        InlineKeyboardButton(text="⏪ Rewind", callback_data='rewind'),
+                        InlineKeyboardButton(text="🔄 Replay", callback_data='replay'),
+                        InlineKeyboardButton(text="⏩ Seek", callback_data='seek')
+                    ]
+                ]
+            )
+            )
+        except MessageNotModified:
+            pass

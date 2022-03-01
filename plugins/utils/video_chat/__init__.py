@@ -12,4 +12,5 @@ import os
 
 
 class Config:
+    YTDL_PATH = os.environ.get("YOUTUBE_DL_PATH", "yt_dlp")
     MAX_DURATION = int(os.environ.get("MAX_DURATION", 900))
