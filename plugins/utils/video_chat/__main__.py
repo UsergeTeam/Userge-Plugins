@@ -1255,6 +1255,7 @@ if userge.has_bot:
     @userge.bot.on_callback_query(filters.regex("(skip|queue|back)"))
     @check_cq_for_all
     async def vc_callback(cq: CallbackQuery):
+        await cq.answer()
         if not CHAT_NAME:
             await cq.edit_message_text("`Already Left Video-Chat`")
             return
@@ -1318,7 +1319,7 @@ if userge.has_bot:
     @userge.bot.on_callback_query(filters.regex(r"vol\((.+)\)"))
     @check_cq_for_all
     async def vol_callback(cq: CallbackQuery):
-
+        await cq.answer()
         arg = cq.matches[0].group(1)
         volume = 0
 
@@ -1357,6 +1358,7 @@ if userge.has_bot:
     @check_cq_for_all
     async def vc_control_callback(cq: CallbackQuery):
         if not CHAT_NAME:
+            await cq.answer()
             return await cq.edit_message_text("`Already Left Video-Chat`")
 
         if cq.data == "seek":
