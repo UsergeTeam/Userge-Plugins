@@ -46,6 +46,7 @@ async def grabTime(message: Message):
                            parse_mode="html", del_in=30)
         return
 
+    tz = COUNTRY_CITY
     tzDateTime = dt.now(timezone(COUNTRY_CITY))
     date = tzDateTime.strftime('%d-%m-%Y')
     militaryTime = tzDateTime.strftime('%H:%M')
