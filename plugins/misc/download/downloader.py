@@ -137,7 +137,10 @@ async def tg_download(
     start_t = datetime.now()
     custom_file_name = config.Dynamic.DOWN_PATH
     if message.filtered_input_str and not from_url:
-        custom_file_name = os.path.join(config.Dynamic.DOWN_PATH, message.filtered_input_str.strip())
+        custom_file_name = os.path.join(
+            config.Dynamic.DOWN_PATH,
+            message.filtered_input_str.strip()
+        )
     elif "|" in message.filtered_input_str:
         _, c_file_name = message.filtered_input_str.split("|", maxsplit=1)
         if c_file_name:

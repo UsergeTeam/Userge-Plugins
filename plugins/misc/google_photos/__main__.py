@@ -78,7 +78,6 @@ async def create_token_file():
             f"your browser: {authorize_url} and reply the code"
         )
         response = await conv.get_response(mark_read=True)
-        # LOG.info(response.stringify())
         code = response.text.strip()
         credentials = flow.step2_exchange(code)
         storage = file.Storage(TOKEN_FILE_NAME)
@@ -156,15 +155,11 @@ async def upload_google_photos(message: Message):
             await message.edit_text((await step_one_response.text()))
             return
         step_one_resp_headers = step_one_response.headers
-        # LOG.info(step_one_resp_headers)
         # Step 2: Saving the session URL
         real_upload_url = step_one_resp_headers.get("X-Goog-Upload-URL")
-        # LOG.info(real_upload_url)
         upload_granularity = int(step_one_resp_headers.get("X-Goog-Upload-Chunk-Granularity"))
-        # LOG.info(upload_granularity)
         # https://t.me/c/1279877202/74
         number_of_req_s = int(file_size / upload_granularity)
-        # LOG.info(number_of_req_s)
         loop = asyncio.get_event_loop()
         async with aiofiles.open(path_, mode="rb") as f_d:
             for i in range(number_of_req_s):
@@ -177,29 +172,21 @@ async def upload_google_photos(message: Message):
                     "X-Goog-Upload-Offset": str(offset),
                     "Authorization": "Bearer " + creds.access_token,
                 }
-                # LOG.info(i)
-                # LOG.info(headers)
                 response = await session.post(real_upload_url, headers=headers, data=current_chunk)
                 loop.create_task(progress(offset + part_size, file_size,
                                           message, "uploading(gphoto)🧐?"))
                 # LOG.info(response.headers)
                 # https://github.com/SpEcHiDe/UniBorg/commit/8267811b1248c00cd1e34041e2ae8c82b207970f
-                # await f_d.seek(upload_granularity)
-            # await f_d.seek(upload_granularity)
             current_chunk = await f_d.read(upload_granularity)
             # https://t.me/c/1279877202/74
-            # LOG.info(number_of_req_s)
             headers = {
                 "Content-Length": str(len(current_chunk)),
                 "X-Goog-Upload-Command": "upload, finalize",
                 "X-Goog-Upload-Offset": str(number_of_req_s * upload_granularity),
                 "Authorization": "Bearer " + creds.access_token,
             }
-            # LOG.info(headers)
             response = await session.post(real_upload_url, headers=headers, data=current_chunk)
-            # LOG.info(response.headers)
         final_response_text = await response.text()
-        # LOG.info(final_response_text)
     await message.edit_text("uploaded to Google Photos, getting FILE URI 🤔🤔")
     response_create_album = service.mediaItems().batchCreate(
         body={
@@ -212,7 +199,6 @@ async def upload_google_photos(message: Message):
             }]
         }
     ).execute()
-    # LOG.info(response_create_album)
     try:
         photo_url = response_create_album.get(
             "newMediaItemResults")[0].get("mediaItem").get("productUrl")

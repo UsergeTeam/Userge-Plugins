@@ -41,6 +41,7 @@ async def _init() -> None:
         antispam.Dynamic.ANTISPAM_SENTRY = s_o['data']
     await _re_init_handler()
 
+
 class Handler(ABC):
     @abstractmethod
     def set_next(self, handler: 'Handler') -> 'Handler':

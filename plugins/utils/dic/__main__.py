@@ -46,43 +46,33 @@ async def dictionary(message: Message):
             if "noun" in list(meaning):
                 noun = meaning["noun"]
                 out += combine(noun, "noun")
-                # print(noun)
             if "verb" in list(meaning):
                 verb = meaning["verb"]
                 out += combine(verb, "verb")
-                # print(verb)
             if "preposition" in list(meaning):
                 preposition = meaning["preposition"]
                 out += combine(preposition, "preposition")
-                # print(preposition)
             if "adverb" in list(meaning):
                 adverb = meaning["adverb"]
                 out += combine(adverb, "adverb")
-                # print(adverb)
             if "adjective" in list(meaning):
                 adjec = meaning["adjective"]
                 out += combine(adjec, "adjective")
-                # print(adjec)
             if "abbreviation" in list(meaning):
                 abbr = meaning["abbreviation"]
                 out += combine(abbr, "abbreviation")
-                # print(abbr)
             if "exclamation" in list(meaning):
                 exclamation = meaning["exclamation"]
                 out += combine(exclamation, "exclamation")
-                # print(exclamation)
             if "transitive verb" in list(meaning):
                 transitive_verb = meaning["transitive verb"]
                 out += combine(transitive_verb, "transitive verb")
-                # print(tt)
             if "determiner" in list(meaning):
                 determiner = meaning["determiner"]
                 out += combine(determiner, "determiner")
-                # print(determiner)
             if "crossReference" in list(meaning):
                 crosref = meaning["crossReference"]
                 out += combine(crosref, "crossReference")
-                # print(crosref)
         if "title" in list(word1):
             out += ("🔖--**__Error Note__**--\n\n▪️`" + word1["title"] +
                     "🥺\n\n▪️" + word1["message"] + "😬\n\n▪️<i>" + word1["resolution"] +

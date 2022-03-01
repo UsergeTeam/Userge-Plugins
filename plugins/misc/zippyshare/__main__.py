@@ -8,7 +8,7 @@
 #
 # All rights reserved.
 
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 # https://github.com/Sorrow446/ZS-DL
 # plugin by @aryanvikash
 

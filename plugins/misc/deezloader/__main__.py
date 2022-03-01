@@ -16,7 +16,7 @@ import deezloader  # pylint: disable=W0406
 from deezloader.exceptions import NoDataApi
 
 from userge import userge, Message, pool
-from .. import deezloader
+from . import Config
 from ..upload import doc_upload, audio_upload
 
 Clogger = userge.getCLogger(__name__)
@@ -49,11 +49,11 @@ async def deezload(message: Message):
     if not os.path.exists(TEMP_PATH):
         os.makedirs(TEMP_PATH)
     await message.edit("Checking your Token.")
-    if deezloader.Config.ARL_TOKEN is None:
+    if Config.ARL_TOKEN is None:
         await message.edit(ARL_HELP, disable_web_page_preview=True)
         return
     try:
-        loader = deezloader.Login(deezloader.Config.ARL_TOKEN)
+        loader = deezloader.Login(Config.ARL_TOKEN)
     except Exception as er:
         await message.edit(er)
         await Clogger.log(f"#ERROR\n\n{er}")

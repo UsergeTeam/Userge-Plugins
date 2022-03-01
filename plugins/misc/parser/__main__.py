@@ -11,7 +11,6 @@
 # Plugin By @ZekXtreme
 # Base Script by <https://github.com/xcscxr>
 
-import os
 import re
 import json
 import base64
@@ -20,19 +19,18 @@ from urllib.parse import urlparse
 import requests
 from bs4 import BeautifulSoup
 from userge import Message, userge, pool
-from ..parser import Config
+from . import Config
 
 
 @userge.on_start
 async def _init():
-    global CRYPT  # pylint: disable=global-statement
     if Config.CRYPT:
         try:
             crypt = json.loads(Config.CRYPT)
         except Exception:
             pass  # user entered only crypt value from dict
         else:
-            CRYPT = crypt.get("cookie").split('=')[-1]
+            Config.CRYPT = crypt.get("cookie").split('=')[-1]
 
 
 async def account_login(client, url):
@@ -123,10 +121,10 @@ async def appdrive_dl(url):
     'usage': "{tr}gdtot gdtot_link"})
 async def gdtot(message: Message):
     """ Gets gdrive link """
-    if not CRYPT:
+    if not Config.CRYPT:
         return await message.err("read .help gdtot")
     client = requests.Session()
-    client.cookies.update({'crypt': CRYPT})
+    client.cookies.update({'crypt': Config.CRYPT})
     args = message.input_str
     if not args:
         await message.err("Send a link along with command")

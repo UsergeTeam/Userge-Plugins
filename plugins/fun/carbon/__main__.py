@@ -89,7 +89,10 @@ async def carbon_(message: Message):
             message_id = replied.message_id
             if replied.document:
                 await message.edit("`Downloading File...`")
-                path_ = await message.client.download_media(replied, file_name=config.Dynamic.DOWN_PATH)
+                path_ = await message.client.download_media(
+                    replied,
+                    file_name=config.Dynamic.DOWN_PATH
+                )
                 async with aiofiles.open(path_) as file_:
                     code = await file_.read()
                 os.remove(path_)
@@ -151,7 +154,6 @@ async def carbon_(message: Message):
             }
         }
         driver.execute("send_command", params)
-        # driver.find_element_by_xpath("//button[contains(text(),'Export')]").click()
         driver.find_element_by_id("export-menu").click()
         await asyncio.sleep(1)
         await message.edit("`Processing... 60%`")
