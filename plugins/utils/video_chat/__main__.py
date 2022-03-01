@@ -1134,7 +1134,8 @@ async def play_audio(file: str, seek: int = None):
             ),
             stream_type=StreamType().pulse_stream,
         )
-    CURRENT_SONG['start'] = time.time()
+    if not seek:
+        CURRENT_SONG['start'] = time.time()
 
 
 async def get_stream_link(link: str) -> str:
