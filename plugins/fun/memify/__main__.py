@@ -76,7 +76,7 @@ async def draw_meme_text(image_path, text):
     os.remove(image_path)
     i_width, i_height = img.size
     m_font = ImageFont.truetype(
-        "plugins/fun/memify/resources/MutantAcademyStyle.ttf",
+        "userge/plugins/fun/memify/resources/MutantAcademyStyle.ttf",
         int((70 / 640) * i_width)
     )
     if ";" in text:

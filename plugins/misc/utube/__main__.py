@@ -62,12 +62,15 @@ __{uploader}__
                               'options': {'-a': 'select the audio u-id',
                                           '-v': 'select the video u-id',
                                           '-m': 'extract the mp3 in 320kbps',
-                                          '-t': 'upload to telegram'},
+                                          '-t': 'upload to telegram',
+                                          '-output': "one of: mkv, mp4, ogg, webm, flv"},
                               'examples': ['{tr}ytdl link',
                                            '{tr}ytdl -a12 -v120 link',
                                            '{tr}ytdl -m -t link will upload the mp3',
                                            '{tr}ytdl -m -t -d link will upload '
-                                           'the mp3 as a document']}, del_pre=True)
+                                           'the mp3 as a document',
+                                           '{tr}ytdl -output=mp4 -t '
+                                           'merge output in mp4 and upload to telegram']}, del_pre=True)
 async def ytDown(message: Message):
     """ download from a link """
     edited = False
@@ -105,23 +108,31 @@ async def ytDown(message: Message):
     if bool(message.flags):
         desiredFormat1 = str(message.flags.get('a', ''))
         desiredFormat2 = str(message.flags.get('v', ''))
+        m_o_f = message.flags.get('output')
+        if m_o_f and m_o_f not in ('mkv', 'mp4', 'ogg', 'webm', 'flv'):
+            return await message.err(f"Have you checked {config.CMD_TRIGGER}help ytdl ?")
+        
         if 'm' in message.flags:
             retcode = await _mp3Dl([message.filtered_input_str], __progress, startTime)
         elif all(k in message.flags for k in ("a", "v")):
             # 1st format must contain the video
             desiredFormat = '+'.join([desiredFormat2, desiredFormat1])
             retcode = await _tubeDl(
-                [message.filtered_input_str], __progress, startTime, desiredFormat)
+                [message.filtered_input_str],__progress, startTime, desiredFormat, m_o_f)
         elif 'a' in message.flags:
             desiredFormat = desiredFormat1
             retcode = await _tubeDl(
-                [message.filtered_input_str], __progress, startTime, desiredFormat)
+                [message.filtered_input_str], __progress, startTime, desiredFormat, m_o_f)
         elif 'v' in message.flags:
             desiredFormat = desiredFormat2 + '+bestaudio'
             retcode = await _tubeDl(
-                [message.filtered_input_str], __progress, startTime, desiredFormat)
+                [message.filtered_input_str], __progress, startTime, desiredFormat, m_o_f)
         else:
-            retcode = await _tubeDl([message.filtered_input_str], __progress, startTime)
+            retcode = await _tubeDl(
+                [message.filtered_input_str],
+                __progress, startTime,
+                merge_output_format=m_o_f
+            )
     else:
         retcode = await _tubeDl([message.filtered_input_str], __progress, startTime)
     if retcode == 0:
@@ -191,13 +202,7 @@ def _yt_getInfo(link):
 
 
 @pool.run_in_thread
-def _supported(url):
-    ies = ytdl.extractor.gen_extractors()
-    return any(ie.suitable(url) and ie.IE_NAME != 'generic' for ie in ies)
-
-
-@pool.run_in_thread
-def _tubeDl(url: list, prog, starttime, uid=None):
+def _tubeDl(url: list, prog, starttime, uid=None, merge_output_format=None):
     _opts = {'outtmpl': os.path.join(config.Dynamic.DOWN_PATH, str(starttime),
                                      '%(title)s-%(format)s.%(ext)s'),
              'logger': LOGGER,
@@ -205,6 +210,8 @@ def _tubeDl(url: list, prog, starttime, uid=None):
              'prefer_ffmpeg': True,
              'postprocessors': [
                  {'key': 'FFmpegMetadata'}]}
+    if merge_output_format and merge_output_format in ('mkv', 'mp4', 'ogg', 'webm', 'flv'):
+        _opts.update({'merge_output_format': merge_output_format})
     _quality = {'format': 'bestvideo+bestaudio/best' if not uid else str(uid)}
     _opts.update(_quality)
     try:
