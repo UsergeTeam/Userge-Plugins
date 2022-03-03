@@ -734,6 +734,9 @@ async def seek_music_player(msg: Message):
 
 @userge.on_cmd("replay", about={
     'header': "replay the current song from beginning.",
+    'flags': {
+        '-v': "To force play the current song as video",
+        '-a': "To force play the current song as audio."},
     'usage': "{tr}replay"},
     trigger=config.PUBLIC_TRIGGER, check_client=True,
     filter_me=False, allow_bots=False)
@@ -741,7 +744,7 @@ async def seek_music_player(msg: Message):
 @check_enable_for_all
 async def replay_song_(msg: Message):
     """ replay current song from beginning """
-    replay = await replay_music()
+    replay = await replay_music(flags=msg.flags)
     if replay:
         await reply_text(msg, 'Replaying current song from beginning.')
     else:
@@ -926,9 +929,16 @@ async def seek_music(dur: int, jump: bool = False) -> bool:
     return True
 
 
-async def replay_music() -> bool:
+async def replay_music(flags: dict = {}) -> bool:
+    is_video = False
+    if '-v' in flags:
+        is_video = True if CURRENT_SONG['has_video'] else False
+    elif '-a' in flags:
+        is_video = False
+    else:
+        is_video = CURRENT_SONG['is_video']
     try:
-        if CURRENT_SONG['is_video']:
+        if is_video:
             await play_video(
                 CURRENT_SONG['file'],
                 CURRENT_SONG['height'],
@@ -966,6 +976,7 @@ async def yt_down(msg: Message):
         'file': stream_link,
         "height": height,
         "width": width,
+        "has_video": has_video,
         "is_video": is_video and has_video,
         "duration": duration,
         "quality": quality,
@@ -1045,6 +1056,7 @@ async def tg_down(msg: Message):
         'file': filename,
         "height": height,
         "width": width,
+        "has_video": has_video,
         "is_video": is_video and has_video,
         "duration": duration,
         "quality": quality,
@@ -1222,8 +1234,8 @@ def get_player_string():
     except ZeroDivisionError:
         percentage = 100
     player_string = "▷ {0}◉{1}".format(
-        ''.join(["━" for _ in range(math.floor(percentage / 5))]),
-        ''.join(["─" for _ in range(20 - math.floor(percentage / 5))])
+        ''.join(["━" for _ in range(math.floor(percentage / 6.66))]),
+        ''.join(["─" for _ in range(15 - math.floor(percentage / 6.66))])
     )
     return f"{time_formatter(played_duration)}   {player_string}    {time_formatter(duration)}"
 
