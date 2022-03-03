@@ -1,4 +1,4 @@
-""" To check User's Info, Is Banned or Not """
+""" check user's info """
 
 # Copyright (C) 2020-2022 by UsergeTeam@Github, < https://github.com/UsergeTeam >.
 #

@@ -13,6 +13,7 @@
 import gdshortener
 
 from pyrogram.errors import YouBlockedUser
+
 from userge import userge, Message
 from userge.utils.exceptions import StopConversation
 
@@ -27,15 +28,17 @@ async def bitly(msg: Message):
         return
     try:
         async with userge.conversation("Sl_BitlyBot") as conv:
-            await conv.send_message("/start")
+            try:
+                await conv.send_message("/start")
+            except YouBlockedUser:
+                await userge.unblock_user("Sl_BitlyBot")
+                await conv.send_message("/start")
             await conv.get_response(mark_read=True)
             await conv.send_message(url)
             shorten_url = (
                 await conv.get_response(mark_read=True)
             ).text.split('\n', maxsplit=1)[-1]
             await msg.edit(f"`{shorten_url}`", disable_web_page_preview=True)
-    except YouBlockedUser:
-        await msg.edit("unblock **@Sl_BitlyBot** to shorten URLs.")
     except StopConversation:
         await msg.err("bot is down")
 

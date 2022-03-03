@@ -1,4 +1,4 @@
-"""Userge Plugin for getting information about an user on GitHub
+""" Plugin for getting information about an user on GitHub
 
 Syntax: .github USERNAME
 """
