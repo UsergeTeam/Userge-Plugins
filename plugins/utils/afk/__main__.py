@@ -11,7 +11,6 @@
 import time
 import asyncio
 from random import choice, randint
-from plugins.utils import pmpermit
 
 from userge import userge, Message, filters, get_collection
 from userge.utils import time_formatter, get_custom_import_re
