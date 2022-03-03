@@ -541,7 +541,7 @@ async def play_music(msg: Message, forceplay: bool):
 async def _help(msg: Message):
     """ help commands of this plugin for others """
 
-    commands = userge.manager.enabled_plugins["video_chat"].enabled_commands
+    commands = userge.manager.loaded_plugins["video_chat"].loaded_commands
     key = msg.input_str.lstrip(config.PUBLIC_TRIGGER)
     cmds = []
     raw_cmds = []
