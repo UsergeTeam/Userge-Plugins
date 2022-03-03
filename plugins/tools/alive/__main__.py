@@ -26,11 +26,11 @@ from ...builtin import sudo, system
 from userge.utils import get_file_id_of_media, get_custom_import_re
 
 try:
-    antispam = get_custom_import_re("userge.plugins.admin.antispam.__main__")
+    antispam = get_custom_import_re("userge.plugins.admin.antispam")
 except ModuleNotFoundError:
     antispam = None
 try:
-    pmpermit = get_custom_import_re("userge.plugins.utils.pmpermit.__main__")
+    pmpermit = get_custom_import_re("userge.plugins.utils.pmpermit")
 except ModuleNotFoundError:
     pmpermit = None
 
