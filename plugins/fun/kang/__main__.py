@@ -276,7 +276,7 @@ async def resize_media(media: str, video: bool) -> Union[str, io.BytesIO]:
 
         resized_video = f"{media}.webm"
         cmd = f"ffmpeg -i {media} -ss 00:00:00 -to 00:00:03 -map 0:v -bufsize 256k" + \
-            f" -c:v libvpx-vp9 -vf scale={width}:{height},fps=fps=30 {resized_video}"
+            f" -fs 262144 -c:v libvpx-vp9 -vf scale={width}:{height},fps=30 {resized_video}"
         await runcmd(cmd)
         os.remove(media)
         return resized_video

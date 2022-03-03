@@ -8,6 +8,8 @@
 #
 # All rights reserved.
 
+"""kang stickers or creates new ones"""
+
 import os
 
 
