@@ -37,7 +37,7 @@ THUMB_PATH = config.Dynamic.DOWN_PATH + "imdb_thumb.jpg"
 async def _imdb(message: Message):
     if not (imdb.Config.API_ONE_URL or imdb.Config.API_TWO_URL):
         return await message.err(
-            "First set [these two vars](https://t.me/UnofficialPluginsHelp/127) before using imdb",
+            "First set [these two vars](https://t.me/UsergePlugins/127) before using imdb",
             disable_web_page_preview=True
         )
     try:

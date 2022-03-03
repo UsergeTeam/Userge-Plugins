@@ -44,7 +44,7 @@ def check_creds(func):
             await msg.edit(
                 "`This plugins needs environmental variables,"
                 " For more info see` "
-                "[this post](https://t.me/UnofficialPluginsHelp/123).",
+                "[this post](https://t.me/UsergePlugins/123).",
                 disable_web_page_preview=True
             )
     return checker

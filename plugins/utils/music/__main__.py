@@ -41,7 +41,7 @@ async def savn(message: Message):
     if not music.Config.ARQ_KEY:
         return await message.err(
             "Before using this command, "
-            "you have to set this [Environmental var.](https://t.me/UnofficialPluginsHelp/128)",
+            "you have to set this [Environmental var.](https://t.me/UsergePlugins/128)",
             disable_web_page_preview=True
         )
     query = message.input_str
@@ -87,7 +87,7 @@ async def deeza(message: Message):
     if not music.Config.ARQ_KEY:
         return await message.err(
             "Before using this command, "
-            "you have to set this [Environmental var.](https://t.me/UnofficialPluginsHelp/128)",
+            "you have to set this [Environmental var.](https://t.me/UsergePlugins/128)",
             disable_web_page_preview=True
         )
     query = str(message.filtered_input_str)

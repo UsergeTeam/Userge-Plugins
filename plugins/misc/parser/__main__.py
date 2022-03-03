@@ -117,7 +117,7 @@ async def appdrive_dl(url):
 @userge.on_cmd("gdtot", about={
     'header': "parse gdtot links",
     'description': "you have to set <code>CRYPT</code>.\nget it by reading "
-                   "<a href='https://t.me/UnofficialPluginsHelp/129'>Help</a>",
+                   "<a href='https://t.me/UsergePlugins/129'>Help</a>",
     'usage': "{tr}gdtot gdtot_link"})
 async def gdtot(message: Message):
     """ Gets gdrive link """
@@ -155,7 +155,7 @@ async def gdtot(message: Message):
 @userge.on_cmd("appdrive", about={
     'header': "parse appdrive links",
     'description': "you have to set <code>Required Vars</code>.\nget it by reading"
-                   "<a href='https://t.me/UnofficialPluginsHelp/129'>Help</a>",
+                   "<a href='https://t.me/UsergePlugins/129'>Help</a>",
     'usage': "{tr}appdrive appdrive_link"})
 async def appdrive(message: Message):
     if not (Config.APPDRIVE_EMAIL or Config.APPDRIVE_PASS):
