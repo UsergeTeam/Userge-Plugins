@@ -58,19 +58,20 @@ __{uploader}__
         await message.edit(out)
 
 
-@userge.on_cmd("ytdl", about={'header': "Download from youtube",
-                              'options': {'-a': 'select the audio u-id',
-                                          '-v': 'select the video u-id',
-                                          '-m': 'extract the mp3 in 320kbps',
-                                          '-t': 'upload to telegram',
-                                          '-output': "one of: mkv, mp4, ogg, webm, flv"},
-                              'examples': ['{tr}ytdl link',
-                                           '{tr}ytdl -a12 -v120 link',
-                                           '{tr}ytdl -m -t link will upload the mp3',
-                                           '{tr}ytdl -m -t -d link will upload '
-                                           'the mp3 as a document',
-                                           '{tr}ytdl -output=mp4 -t '
-                                           'merge output in mp4 and upload to telegram']}, del_pre=True)
+@userge.on_cmd("ytdl", about={
+    'header': "Download from youtube",
+    'options': {'-a': 'select the audio u-id',
+                '-v': 'select the video u-id',
+                '-m': 'extract the mp3 in 320kbps',
+                '-t': 'upload to telegram',
+                '-output': "one of: mkv, mp4, ogg, webm, flv"},
+    'examples': ['{tr}ytdl link',
+                 '{tr}ytdl -a12 -v120 link',
+                 '{tr}ytdl -m -t link will upload the mp3',
+                 '{tr}ytdl -m -t -d link will upload '
+                 'the mp3 as a document',
+                 '{tr}ytdl -output=mp4 -t '
+                 'merge output in mp4 and upload to telegram']}, del_pre=True)
 async def ytDown(message: Message):
     """ download from a link """
     edited = False
@@ -111,14 +112,14 @@ async def ytDown(message: Message):
         m_o_f = message.flags.get('output')
         if m_o_f and m_o_f not in ('mkv', 'mp4', 'ogg', 'webm', 'flv'):
             return await message.err(f"Have you checked {config.CMD_TRIGGER}help ytdl ?")
-        
+
         if 'm' in message.flags:
             retcode = await _mp3Dl([message.filtered_input_str], __progress, startTime)
         elif all(k in message.flags for k in ("a", "v")):
             # 1st format must contain the video
             desiredFormat = '+'.join([desiredFormat2, desiredFormat1])
             retcode = await _tubeDl(
-                [message.filtered_input_str],__progress, startTime, desiredFormat, m_o_f)
+                [message.filtered_input_str], __progress, startTime, desiredFormat, m_o_f)
         elif 'a' in message.flags:
             desiredFormat = desiredFormat1
             retcode = await _tubeDl(

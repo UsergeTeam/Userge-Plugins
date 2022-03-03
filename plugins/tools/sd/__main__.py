@@ -8,8 +8,6 @@
 #
 # All rights reserved.
 
-""" self destructable message """
-
 from userge import userge, Message
 
 

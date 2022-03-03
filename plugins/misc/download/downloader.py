@@ -46,8 +46,7 @@ async def handle_download(message: Message, resource: Union[Message, str],
 
 async def url_download(message: Message, url: str) -> Tuple[str, int]:
     """ download from link """
-    # pylint: disable=line-too-long
-    pattern = r"^(?:(?:https|tg):\/\/)?(?:www\.)?(?:t\.me\/|openmessage\?)(?:(?:c\/(\d+))|(\w+)|(?:user_id\=(\d+)))(?:\/|&message_id\=)(\d+)(\?single)?$"
+    pattern = r"^(?:(?:https|tg):\/\/)?(?:www\.)?(?:t\.me\/|openmessage\?)(?:(?:c\/(\d+))|(\w+)|(?:user_id\=(\d+)))(?:\/|&message_id\=)(\d+)(\?single)?$"  # noqa
     # group 1: private supergroup id, group 2: chat username,
     # group 3: private group/chat id, group 4: message id
     # group 5: check for download single media from media group

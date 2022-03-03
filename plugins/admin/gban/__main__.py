@@ -9,7 +9,7 @@
 # All rights reserved
 
 import asyncio
-from typing import AsyncGenerator, Tuple, Dict
+from typing import AsyncGenerator, Tuple
 
 from pyrogram.errors.exceptions.bad_request_400 import (
     ChatAdminRequired, UserAdminInvalid, ChannelInvalid)
