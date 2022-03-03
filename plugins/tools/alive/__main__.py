@@ -22,10 +22,17 @@ from pyrogram.errors import (
 
 from userge import userge, Message, pool, config, versions as ver, logging
 from .. import alive
-from ...admin import antispam
-from ...utils import pmpermit
 from ...builtin import sudo, system
-from userge.utils import get_file_id_of_media
+from userge.utils import get_file_id_of_media, get_custom_import_re
+
+try:
+    antispam = get_custom_import_re("userge.plugins.admin.antispam.__main__")
+except ModuleNotFoundError:
+    antispam = None
+try:
+    pmpermit = get_custom_import_re("userge.plugins.utils.pmpermit.__main__")
+except ModuleNotFoundError:
+    pmpermit = None
 
 _LOG = logging.getLogger(__name__)
 
@@ -74,9 +81,11 @@ async def _get_text_and_markup(message: Message) -> Tuple[str, Optional[InlineKe
 **💡 Version** : `{await ver.get_full_version()}`
 **⚙️ Mode** : `{_get_mode().upper()}`
 
-• **Sudo**: `{_parse_arg(sudo.Dynamic.ENABLED)}`
-• **Pm-Guard**: `{_parse_arg(not pmpermit.Dynamic.ALLOW_ALL_PMS)}`
-• **Anti-Spam**: `{_parse_arg(antispam.Dynamic.ANTISPAM_SENTRY)}`"""
+• **Sudo**: `{_parse_arg(sudo.Dynamic.ENABLED)}`"""
+    if pmpermit is not None:
+        output += f"\n• **Pm-Guard**: `{_parse_arg(not pmpermit.Dynamic.ALLOW_ALL_PMS)}`"
+    if antispam is not None:
+        output += f"\n• **Anti-Spam**: `{_parse_arg(antispam.Dynamic.ANTISPAM_SENTRY)}`"
     if config.HEROKU_APP:
         output += f"\n• **Dyno-saver**: `{_parse_arg(system.Dynamic.RUN_DYNO_SAVER)}`"
     output += f"""

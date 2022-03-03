@@ -11,10 +11,15 @@
 import time
 import asyncio
 from random import choice, randint
+from plugins.utils import pmpermit
 
 from userge import userge, Message, filters, get_collection
-from .. import pmpermit
-from userge.utils import time_formatter
+from userge.utils import time_formatter, get_custom_import_re
+
+try:
+    pmpermit = get_custom_import_re("userge.plugins.utils.pmpermit.__main__")
+except ModuleNotFoundError:
+    pmpermit = None
 
 CHANNEL = userge.getCLogger(__name__)
 SAVED_SETTINGS = get_collection("CONFIGS")
@@ -22,6 +27,15 @@ AFK_COLLECTION = get_collection("AFK")
 
 IS_AFK = False
 IS_AFK_FILTER = filters.create(lambda _, __, ___: bool(IS_AFK))
+AFK_INCOMING_FILTER = (
+    IS_AFK_FILTER & ~filters.me & ~filters.bot & ~filters.edited & ~filters.service)
+if pmpermit is not None:
+    AFK_PM_FILTER = (filters.private & (
+        filters.create(
+            lambda _, __, ___: pmpermit.Dynamic.ALLOW_ALL_PMS) | pmpermit.ALLOWED_CHATS))
+    AFK_INCOMING_FILTER &= (filters.mentioned | AFK_PM_FILTER)
+else:
+    AFK_INCOMING_FILTER &= filters.mentioned
 REASON = ''
 TIME = 0.0
 USERS = {}
@@ -58,11 +72,7 @@ async def active_afk(message: Message) -> None:
             {'_id': 'AFK'}, {"$set": {'on': True, 'data': REASON, 'time': TIME}}, upsert=True))
 
 
-@userge.on_filters(IS_AFK_FILTER & ~filters.me & ~filters.bot & ~filters.edited & (
-    filters.mentioned | (filters.private & ~filters.service & (
-        filters.create(
-            lambda _, __, ___: pmpermit.Dynamic.ALLOW_ALL_PMS) | pmpermit.ALLOWED_CHATS))),
-    allow_via_bot=False)
+@userge.on_filters(AFK_INCOMING_FILTER, allow_via_bot=False)
 async def handle_afk_incomming(message: Message) -> None:
     """ handle incomming messages when you afk """
     if not message.from_user:
