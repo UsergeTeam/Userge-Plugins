@@ -8,6 +8,8 @@
 #
 # All rights reserved.
 
+"""manage video chats"""
+
 import os
 
 

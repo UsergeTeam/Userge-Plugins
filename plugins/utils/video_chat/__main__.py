@@ -1250,7 +1250,7 @@ def _get_song_info(url: str):
 
 
 if userge.has_bot:
-    @userge.bot.on_callback_query(filters.regex("(skip|queue|back)"))
+    @userge.bot.on_callback_query(filters.regex("(skip|queue|back$)"))
     @check_cq_for_all
     async def vc_callback(cq: CallbackQuery):
         await cq.answer()
