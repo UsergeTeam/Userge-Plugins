@@ -929,11 +929,11 @@ async def seek_music(dur: int, jump: bool = False) -> bool:
     return True
 
 
-async def replay_music(flags: dict = {}) -> bool:
+async def replay_music(flags: dict = None) -> bool:
     is_video = False
-    if '-v' in flags:
-        is_video = True if CURRENT_SONG['has_video'] else False
-    elif '-a' in flags:
+    if flags and '-v' in flags:
+        is_video = CURRENT_SONG['has_video']
+    elif flags and '-a' in flags:
         is_video = False
     else:
         is_video = CURRENT_SONG['is_video']
