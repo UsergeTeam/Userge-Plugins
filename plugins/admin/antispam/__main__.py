@@ -209,7 +209,7 @@ def _re_init_handler():
     'description': "Toggle API Auto Bans"}, allow_channels=False)
 async def antispam_(message: Message):
     """ enable / disable antispam """
-    antispam.Dynamic.ANTISPAM_SENTRY = antispam.Dynamic.ANTISPAM_SENTRY
+    antispam.Dynamic.ANTISPAM_SENTRY = not antispam.Dynamic.ANTISPAM_SENTRY
     text = f"`antispam {'enabled' if antispam.Dynamic.ANTISPAM_SENTRY else 'disabled'} !`"
     await message.edit(text, del_in=3)
     await _re_init_handler()
