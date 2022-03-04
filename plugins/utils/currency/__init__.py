@@ -10,6 +10,6 @@
 
 import os
 
+from userge.utils import secure_env
 
-class Config:
-    CURRENCY_API = os.environ.get("CURRENCY_API")
+CURRENCY_API = secure_env(os.environ.get("CURRENCY_API"))

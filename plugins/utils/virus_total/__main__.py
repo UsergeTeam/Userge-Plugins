@@ -27,7 +27,7 @@ from userge.utils import progress, humanbytes
     'usage': "{tr}scan [reply to document file]"})
 async def _scan_file(msg: Message):
     """ scan files and get scan id """
-    if virus_total.Config.API_KEY is None:
+    if virus_total.API_KEY is None:
         await msg.edit(
             "You have to sign up on `virustotal.com` and get `API_KEY` "
             "and paste in `VT_API_KEY` var.\nFor more info "
@@ -104,7 +104,7 @@ def scan_file(path: str) -> str:
     url = 'https://www.virustotal.com/vtapi/v2/file/scan'
     path_name = path.split('/')[-1]
 
-    params = {'apikey': virus_total.Config.API_KEY}
+    params = {'apikey': virus_total.API_KEY}
     files = {
         'file': (path_name, open(path, 'rb'))
     }

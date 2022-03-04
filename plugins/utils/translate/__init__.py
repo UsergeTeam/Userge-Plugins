@@ -10,6 +10,4 @@
 
 import os
 
-
-class Config:
-    LANG = os.environ.get("PREFERRED_LANGUAGE")
+LANG = os.environ.get("PREFERRED_LANGUAGE")

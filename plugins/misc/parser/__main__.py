@@ -19,24 +19,24 @@ from urllib.parse import urlparse
 import requests
 from bs4 import BeautifulSoup
 from userge import Message, userge, pool
-from . import Config
+from .. import parser
 
 
 @userge.on_start
 async def _init():
-    if Config.CRYPT:
+    if parser.Dynamic.CRYPT:
         try:
-            crypt = json.loads(Config.CRYPT)
+            crypt = json.loads(parser.Dynamic.CRYPT)
         except Exception:
             pass  # user entered only crypt value from dict
         else:
-            Config.CRYPT = crypt.get("cookie").split('=')[-1]
+            parser.Dynamic.CRYPT = crypt.get("cookie").split('=')[-1]
 
 
 async def account_login(client, url):
     data = {
-        'email': Config.APPDRIVE_EMAIL,
-        'password': Config.APPDRIVE_PASS
+        'email': parser.APPDRIVE_EMAIL,
+        'password': parser.APPDRIVE_PASS
     }
     await pool.run_in_thread(client.post)(
         f'https://{urlparse(url).netloc}/login', data=data)
@@ -121,10 +121,10 @@ async def appdrive_dl(url):
     'usage': "{tr}gdtot gdtot_link"})
 async def gdtot(message: Message):
     """ Gets gdrive link """
-    if not Config.CRYPT:
+    if not parser.Dynamic.CRYPT:
         return await message.err("read .help gdtot")
     client = requests.Session()
-    client.cookies.update({'crypt': Config.CRYPT})
+    client.cookies.update({'crypt': parser.Dynamic.CRYPT})
     args = message.input_str
     if not args:
         await message.err("Send a link along with command")
@@ -158,7 +158,7 @@ async def gdtot(message: Message):
                    "<a href='https://t.me/UsergePlugins/129'>Help</a>",
     'usage': "{tr}appdrive appdrive_link"})
 async def appdrive(message: Message):
-    if not (Config.APPDRIVE_EMAIL or Config.APPDRIVE_PASS):
+    if not (parser.APPDRIVE_EMAIL or parser.APPDRIVE_PASS):
         return await message.err("read .help appdrive")
     url = message.input_str
     if not url:

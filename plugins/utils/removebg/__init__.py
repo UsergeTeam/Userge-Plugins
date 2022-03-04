@@ -10,6 +10,6 @@
 
 import os
 
+from userge.utils import secure_env
 
-class Config:
-    REMOVE_BG_API_KEY = os.environ.get("REMOVE_BG_API_KEY")
+REMOVE_BG_API_KEY = secure_env(os.environ.get("REMOVE_BG_API_KEY"))

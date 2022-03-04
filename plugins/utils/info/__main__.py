@@ -63,9 +63,9 @@ async def _info(msg: Message):
   - **Contact**: `{user.is_contact}`
 """
     if user:
-        if info.Config.USERGE_ANTISPAM_API:
+        if info.USERGE_ANTISPAM_API:
             try:
-                ban = Client(info.Config.USERGE_ANTISPAM_API).getban(user.id)
+                ban = Client(info.USERGE_ANTISPAM_API).getban(user.id)
             except Exception as err:
                 return await msg.err(err)
             if not ban:
@@ -73,8 +73,8 @@ async def _info(msg: Message):
             else:
                 user_info += "\n**Userge Antispam API Banned** : `True`"
                 user_info += f"\n    **● Reason** : `{ban.reason or None}`"
-        if info.Config.SPAM_WATCH_API:
-            status = spamwatch.Client(info.Config.SPAM_WATCH_API).get_ban(user.id)
+        if info.SPAM_WATCH_API:
+            status = spamwatch.Client(info.SPAM_WATCH_API).get_ban(user.id)
             if status is False:
                 user_info += "\n**SpamWatch Banned** : `False`\n"
             else:

@@ -56,7 +56,7 @@ async def translateme(message: Message):
     elif len(flags) == 1:
         src, dest = 'auto', list(flags)[0]
     else:
-        src, dest = 'auto', translate.Config.LANG
+        src, dest = 'auto', translate.LANG
     text = get_emoji_regexp().sub(u'', text)
     await message.edit("`Translating ...`")
     try:

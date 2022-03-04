@@ -27,7 +27,7 @@ IMG_PATH = config.Dynamic.DOWN_PATH + "dl_image.jpg"
     'header': "Removes Background from Image (50 Calls per Month in the free API)",
     'usage': "{tr}removebg [reply to any photo | direct link of photo]"})
 async def remove_background(message: Message):
-    if not removebg.Config.REMOVE_BG_API_KEY:
+    if not removebg.REMOVE_BG_API_KEY:
         await message.edit(
             "Get the API from <a href='https://www.remove.bg/b/background-removal-api'>HERE "
             "</a> & add it to Heroku Config Vars <code>REMOVE_BG_API_KEY</code>",
@@ -50,7 +50,7 @@ async def remove_background(message: Message):
         await message.edit(f"Image saved in {m_s} seconds.\nRemoving Background Now...")
         # Cooking Image
         try:
-            rmbg = RemoveBg(removebg.Config.REMOVE_BG_API_KEY, "removebg_error.log")
+            rmbg = RemoveBg(removebg.REMOVE_BG_API_KEY, "removebg_error.log")
             rmbg.remove_background_from_img_file(IMG_PATH)
             rbg_img_path = IMG_PATH + "_no_bg.png"
             await message.client.send_document(

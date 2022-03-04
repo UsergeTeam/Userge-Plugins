@@ -44,7 +44,7 @@ async def weather_get(message: Message):
     """
     this function can get weather info
     """
-    OWM_API = weather.Config.OPEN_WEATHER_MAP
+    OWM_API = weather.OPEN_WEATHER_MAP
     if not OWM_API:
         await message.edit(
             "<code>Oops!!get the API from</code> "
@@ -57,7 +57,7 @@ async def weather_get(message: Message):
     APPID = OWM_API
 
     if not message.input_str:
-        CITY = weather.Config.WEATHER_DEFCITY
+        CITY = weather.WEATHER_DEFCITY
         if not CITY:
             await message.edit("`Please specify a city or set one as default!`", del_in=0)
             return

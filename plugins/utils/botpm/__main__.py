@@ -23,9 +23,9 @@ from pyrogram.types import (
 )
 
 from userge import userge, Message, config, filters, get_collection, pool
-from .. import botpm
 from userge.utils import SafeDict, time_formatter
 from userge.utils.exceptions import StopConversation
+from .. import botpm
 
 CHANNEL = userge.getCLogger(__name__)
 
@@ -107,15 +107,15 @@ if userge.has_bot:
         user_dict = await bot.get_user_dict(user_id)
         text = START_TEXT.format_map(SafeDict(**user_dict))
         path = None
-        if botpm.Config.START_MEDIA:
+        if botpm.START_MEDIA:
             pattern = r"^https://telegra\.ph/file/\w+\.\w+$"
-            if not re.match(pattern, botpm.Config.START_MEDIA):
+            if not re.match(pattern, botpm.START_MEDIA):
                 await CHANNEL.log("Your `START_MEDIA` var is Invalid.")
             else:
                 path = os.path.join(config.Dynamic.DOWN_PATH,
-                                    os.path.split(botpm.Config.START_MEDIA)[1])
+                                    os.path.split(botpm.START_MEDIA)[1])
                 if not os.path.exists(path):
-                    await pool.run_in_thread(wget.download)(botpm.Config.START_MEDIA, path)
+                    await pool.run_in_thread(wget.download)(botpm.START_MEDIA, path)
         if user_id != userge_id:
             if user_id in _HAVE_BLOCKED:
                 _HAVE_BLOCKED.remove(user_id)
@@ -131,7 +131,7 @@ if userge.has_bot:
             markup = InlineKeyboardMarkup([
                 [
                     InlineKeyboardButton(text="👥 UsergeTeam", url="https://github.com/UsergeTeam"),
-                    InlineKeyboardButton(text="🧪 Repo", url=botpm.Config.UPSTREAM_REPO)
+                    InlineKeyboardButton(text="🧪 Repo", url=botpm.UPSTREAM_REPO)
                 ],
                 [InlineKeyboardButton(text="🎖 GNU GPL v3.0", url=copy_)]
             ])

@@ -23,8 +23,8 @@ from ...misc.download import url_download
 # ARQ API
 session = ClientSession()
 arq = ARQ(
-    "https://thearq.tech", music.Config.ARQ_KEY, session
-) if music.Config.ARQ_KEY else None
+    "https://thearq.tech", music.ARQ_KEY, session
+) if music.ARQ_KEY else None
 
 LOGGER = userge.getLogger(__name__)
 
@@ -38,7 +38,7 @@ LOGGER = userge.getLogger(__name__)
     },
 )
 async def savn(message: Message):
-    if not music.Config.ARQ_KEY:
+    if not music.ARQ_KEY:
         return await message.err(
             "Before using this command, "
             "you have to set this [Environmental var.](https://t.me/UsergePlugins/128)",
@@ -84,7 +84,7 @@ async def savn(message: Message):
     del_pre=True,
 )
 async def deeza(message: Message):
-    if not music.Config.ARQ_KEY:
+    if not music.ARQ_KEY:
         return await message.err(
             "Before using this command, "
             "you have to set this [Environmental var.](https://t.me/UsergePlugins/128)",

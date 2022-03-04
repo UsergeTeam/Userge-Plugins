@@ -25,14 +25,8 @@ from .. import alive
 from ...builtin import sudo, system
 from userge.utils import get_file_id_of_media, get_custom_import_re
 
-try:
-    antispam = get_custom_import_re("userge.plugins.admin.antispam")
-except ModuleNotFoundError:
-    antispam = None
-try:
-    pmpermit = get_custom_import_re("userge.plugins.utils.pmpermit")
-except ModuleNotFoundError:
-    pmpermit = None
+antispam = get_custom_import_re("userge.plugins.admin.antispam", False)
+pmpermit = get_custom_import_re("userge.plugins.utils.pmpermit", False)
 
 _LOG = logging.getLogger(__name__)
 
@@ -95,14 +89,14 @@ async def _get_text_and_markup(message: Message) -> Tuple[str, Optional[InlineKe
     **__Loader__**: `{ver.__loader_version__}`"""
     if not message.client.is_bot:
         output += f"""\n
-🎖 **{ver.__license__}** | 👥 **{ver.__copyright__}** | 🧪 **[Repo]({alive.Config.UPSTREAM_REPO})**
+🎖 **{ver.__license__}** | 👥 **{ver.__copyright__}** | 🧪 **[Repo]({alive.UPSTREAM_REPO})**
 """
     else:
         copy_ = "https://github.com/UsergeTeam/Userge/blob/master/LICENSE"
         markup = InlineKeyboardMarkup([
             [
                 InlineKeyboardButton(text="👥 UsergeTeam", url="https://github.com/UsergeTeam"),
-                InlineKeyboardButton(text="🧪 Repo", url=alive.Config.UPSTREAM_REPO)
+                InlineKeyboardButton(text="🧪 Repo", url=alive.UPSTREAM_REPO)
             ],
             [InlineKeyboardButton(text="🎖 GNU GPL v3.0", url=copy_)]
         ])
@@ -164,12 +158,12 @@ def _set_data(errored: bool = False) -> None:
 
     pattern_1 = r"^(http(?:s?):\/\/)?(www\.)?(t.me)(\/c\/(\d+)|:?\/(\w+))?\/(\d+)$"
     pattern_2 = r"^https://telegra\.ph/file/\w+\.\w+$"
-    if alive.Config.ALIVE_MEDIA and not errored:
-        if alive.Config.ALIVE_MEDIA.lower().strip() == "nothing":
+    if alive.ALIVE_MEDIA and not errored:
+        if alive.ALIVE_MEDIA.lower().strip() == "nothing":
             _CHAT = "text_format"
             _MSG_ID = "text_format"
             return
-        media_link = alive.Config.ALIVE_MEDIA
+        media_link = alive.ALIVE_MEDIA
         match_1 = re.search(pattern_1, media_link)
         match_2 = re.search(pattern_2, media_link)
         if match_1:
@@ -180,8 +174,8 @@ def _set_data(errored: bool = False) -> None:
                 _CHAT = match_1.group(6)
         elif match_2:
             _IS_TELEGRAPH = True
-        elif "|" in alive.Config.ALIVE_MEDIA:
-            _CHAT, _MSG_ID = alive.Config.ALIVE_MEDIA.split("|", maxsplit=1)
+        elif "|" in alive.ALIVE_MEDIA:
+            _CHAT, _MSG_ID = alive.ALIVE_MEDIA.split("|", maxsplit=1)
             _CHAT = _CHAT.strip()
             _MSG_ID = int(_MSG_ID.strip())
     else:
@@ -191,9 +185,9 @@ def _set_data(errored: bool = False) -> None:
 
 
 async def _send_telegraph(msg: Message, text: str, reply_markup: Optional[InlineKeyboardMarkup]):
-    path = os.path.join(config.Dynamic.DOWN_PATH, os.path.split(alive.Config.ALIVE_MEDIA)[1])
+    path = os.path.join(config.Dynamic.DOWN_PATH, os.path.split(alive.ALIVE_MEDIA)[1])
     if not os.path.exists(path):
-        await pool.run_in_thread(wget.download)(alive.Config.ALIVE_MEDIA, path)
+        await pool.run_in_thread(wget.download)(alive.ALIVE_MEDIA, path)
     if path.lower().endswith((".jpg", ".jpeg", ".png", ".bmp")):
         await msg.client.send_photo(
             chat_id=msg.chat.id,

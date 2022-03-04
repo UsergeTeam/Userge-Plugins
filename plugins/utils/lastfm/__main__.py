@@ -11,18 +11,19 @@
 
 # By @Krishna_Singhal
 
-import os
-import wget
-import pylast
 import asyncio
-import aiohttp
+import os
 from typing import Optional
 from urllib.parse import unquote
 
+import aiohttp
+import pylast
+import wget
 from pyrogram.errors import ChatWriteForbidden, ChannelPrivate, ChatIdInvalid
-from userge import userge, Message, Config, pool, get_collection
-from .. import lastfm
+
+from userge import userge, Message, config, pool, get_collection
 from userge.utils import time_formatter
+from .. import lastfm
 
 LASTFM_DB = get_collection("LASTFM")
 NOW_PLAYING = [False, None]
@@ -78,7 +79,7 @@ async def _lastfm(msg: Message):
         if NOW_PLAYING[1] != track.get_name():
             NOW_PLAYING[1] = track.get_name()
 
-        out = f"{lastfm.Config.USERNAME} __is currently Listening to:__\n\n"
+        out = f"{lastfm.USERNAME} __is currently Listening to:__\n\n"
         k = get_track_info(track)
         if not k:
             return await msg.err("Track Not found...")
@@ -118,7 +119,7 @@ __Country:__ `{user.get_country()}`
         out += '__NowPlaying:__ `False`'
 
     if user.get_image():
-        path = os.path.join(Config.DOWN_PATH, f"{user.get_name()}.png")
+        path = os.path.join(config.Dynamic.DOWN_PATH, f"{user.get_name()}.png")
         if not os.path.exists(path):
             await pool.run_in_thread(wget.download)(user.get_image(), path)
     else:
@@ -203,17 +204,17 @@ async def get_last_played(msg: Message):
 async def lastfm_worker():
 
     user = pylast.LastFMNetwork(
-        api_key=lastfm.Config.API_KEY,
-        api_secret=lastfm.Config.API_SECRET,
-        username=lastfm.Config.USERNAME,
-        password_hash=lastfm.Config.PASSWORD
-    ).get_user(lastfm.Config.USERNAME)
+        api_key=lastfm.API_KEY,
+        api_secret=lastfm.API_SECRET,
+        username=lastfm.USERNAME,
+        password_hash=lastfm.PASSWORD
+    ).get_user(lastfm.USERNAME)
     while NOW_PLAYING[0] is True and await _get_now_playing(user) is not None:
         song = await _get_now_playing(user)
         if NOW_PLAYING[1] != song.get_name():
             NOW_PLAYING[1] = song.get_name()
-            for chat_id in lastfm.Config.CHAT_IDS:
-                out = f"{lastfm.Config.USERNAME} __is currently Listening to:__\n\n"
+            for chat_id in lastfm.CHAT_IDS:
+                out = f"{lastfm.USERNAME} __is currently Listening to:__\n\n"
                 k = get_track_info(song)
                 if not k:
                     NOW_PLAYING[0] = False
@@ -241,10 +242,10 @@ async def lastfm_worker():
 def _check_creds() -> bool:
     """ check creds """
     if (
-        lastfm.Config.API_KEY
-        and lastfm.Config.API_SECRET
-        and lastfm.Config.USERNAME
-        and lastfm.Config.PASSWORD
+        lastfm.API_KEY
+        and lastfm.API_SECRET
+        and lastfm.USERNAME
+        and lastfm.PASSWORD
     ):
         return True
     return False
@@ -285,20 +286,20 @@ class LastFm:
     @staticmethod
     def _network() -> pylast.LastFMNetwork:
         return pylast.LastFMNetwork(
-            api_key=lastfm.Config.API_KEY,
-            api_secret=lastfm.Config.API_SECRET,
-            username=lastfm.Config.USERNAME,
-            password_hash=lastfm.Config.PASSWORD
+            api_key=lastfm.API_KEY,
+            api_secret=lastfm.API_SECRET,
+            username=lastfm.USERNAME,
+            password_hash=lastfm.PASSWORD
         )
 
     @staticmethod
     def _format_track(track: pylast.Track) -> str:
         return f"`{track.track} - {track.playback_date}`"
 
-    def get_user(self, username: str = lastfm.Config.USERNAME) -> pylast.User:
+    def get_user(self, username: str = lastfm.USERNAME) -> pylast.User:
         return (self._network()).get_user(username)
 
-    async def now_playing(self, username: str = lastfm.Config.USERNAME) -> Optional[pylast.Track]:
+    async def now_playing(self, username: str = lastfm.USERNAME) -> Optional[pylast.Track]:
         user = self.get_user(username)
         playing = await _get_now_playing(user)
         return playing
@@ -400,7 +401,7 @@ async def resp(params: dict):
 
 async def recs(query, typ, lim):
     params = {"method": f"user.get{typ}", "user": query, "limit": lim,
-              "api_key": lastfm.Config.API_KEY, "format": "json"}
+              "api_key": lastfm.API_KEY, "format": "json"}
     return await resp(params)
 
 
@@ -418,7 +419,7 @@ async def lastfm_compat_(message: Message):
     if not msg:
         return await message.edit("Please check `{tr}help Compat`")
     diff = "|" in msg
-    us1, us2 = msg.split("|") if diff else lastfm.Config.USERNAME, msg
+    us1, us2 = msg.split("|") if diff else lastfm.USERNAME, msg
     ta = "topartists"
     ta1 = (await recs(us1, ta, 500))[1][ta]["artist"]
     ta2 = (await recs(us2, ta, 500))[1][ta]["artist"]

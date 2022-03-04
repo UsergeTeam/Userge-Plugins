@@ -46,13 +46,13 @@ option and for "Sites to search" option select "Search the entire
     'usage': "{tr}gimg [Query]",
     'examples': "{tr}gimg Dogs"})
 async def google_img(message: Message):
-    if (gimg.Config.GCS_API_KEY and gimg.Config.GCS_IMAGE_E_ID) is None:
+    if (gimg.GCS_API_KEY and gimg.GCS_IMAGE_E_ID) is None:
         await message.edit(REQ_ERR, disable_web_page_preview=True)
         return
     if os.path.exists(PATH):
         shutil.rmtree(PATH, ignore_errors=True)
 
-    fetcher = GIS(gimg.Config.GCS_API_KEY, gimg.Config.GCS_IMAGE_E_ID)
+    fetcher = GIS(gimg.GCS_API_KEY, gimg.GCS_IMAGE_E_ID)
     query = message.input_str
     search = {'q': query,
               'num': 9,

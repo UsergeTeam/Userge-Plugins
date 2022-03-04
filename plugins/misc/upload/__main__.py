@@ -9,15 +9,12 @@
 # All rights reserved.
 
 import os
-import time
 from pathlib import Path
 
-from pyrogram.errors.exceptions import FloodWait
-
 from userge import userge, config, Message
-from userge.utils import is_url, sort_file_name_key
+from userge.utils import is_url
 from userge.utils.exceptions import ProcessCanceled
-from . import upload
+from . import upload_path, upload
 from ..download import tg_download, url_download
 
 LOGGER = userge.getLogger(__name__)
@@ -113,29 +110,3 @@ async def _handle_message(message: Message) -> None:
         await message.delete()
         with message.cancel_callback():
             await upload(message, Path(dl_loc), True)
-
-
-async def upload_path(message: Message, path: Path, del_path: bool):
-    file_paths = []
-    if path.exists():
-        def explorer(_path: Path) -> None:
-            if _path.is_file() and _path.stat().st_size:
-                file_paths.append(_path)
-            elif _path.is_dir():
-                for i in sorted(_path.iterdir(), key=lambda a: sort_file_name_key(a.name)):
-                    explorer(i)
-        explorer(path)
-    else:
-        path = path.expanduser()
-        str_path = os.path.join(*(path.parts[1:] if path.is_absolute() else path.parts))
-        for p in Path(path.root).glob(str_path):
-            file_paths.append(p)
-    current = 0
-    for p_t in file_paths:
-        current += 1
-        try:
-            await upload(message, p_t, del_path, f"{current}/{len(file_paths)}")
-        except FloodWait as f_e:
-            time.sleep(f_e.x)  # asyncio sleep ?
-        if message.process_is_canceled:
-            break

@@ -111,7 +111,7 @@ async def send_new_post(entries):
             'parse_mode': "md",
             'reply_markup': markup if userge.has_bot else None
         }
-    for chat_id in rss_feed.Config.RSS_CHAT_ID:
+    for chat_id in rss_feed.RSS_CHAT_ID:
         args.update({'chat_id': chat_id})
         try:
             await send_rss_to_telegram(userge.bot, args, thumb)
@@ -191,7 +191,7 @@ async def rss_worker():
     global TASK_RUNNING  # pylint: disable=global-statement
     TASK_RUNNING = True
     chunk = 20
-    if RSS_DICT and rss_feed.Config.RSS_CHAT_ID[0] == config.LOG_CHANNEL_ID:
+    if RSS_DICT and rss_feed.RSS_CHAT_ID[0] == config.LOG_CHANNEL_ID:
         _LOG.info(
             "You have to add var for `RSS_CHAT_ID`, for Now i will send in LOG_CHANNEL")
     while RSS_DICT:

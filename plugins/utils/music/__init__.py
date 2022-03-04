@@ -10,6 +10,4 @@
 
 import os
 
-
-class Config:
-    ARQ_KEY = os.environ.get("ARQ_KEY")
+ARQ_KEY = os.environ.get("ARQ_KEY")

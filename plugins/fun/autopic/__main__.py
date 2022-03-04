@@ -28,6 +28,7 @@ MDFY_PIC = "resources/mdfy_profile_pic.jpg"
 LOG = userge.getLogger(__name__)
 
 
+@userge.on_start
 async def _init() -> None:
     global UPDATE_PIC, AUTOPIC_TIMEOUT  # pylint: disable=global-statement
     data = await SAVED_SETTINGS.find_one({'_id': 'UPDATE_PIC'})

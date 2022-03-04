@@ -7,3 +7,7 @@
 # All rights reserved.
 
 """ get stream link of movie/series """
+
+import os
+
+WATCH_COUNTRY = os.environ.get("WATCH_COUNTRY", "IN")

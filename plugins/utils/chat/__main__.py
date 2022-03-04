@@ -12,9 +12,9 @@ by @Krishna_Singhal
 #
 # All rights reserved.
 
+import asyncio
 import html
 import os
-import asyncio
 
 from pyrogram.errors.exceptions.bad_request_400 import (
     BadRequest,

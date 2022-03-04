@@ -10,7 +10,5 @@
 
 import os
 
-
-class Config:
-    API_ONE_URL = os.environ.get("IMDB_API_ONE_URL")
-    API_TWO_URL = os.environ.get("IMDB_API_TWO_URL")
+API_ONE_URL = os.environ.get("IMDB_API_ONE_URL")
+API_TWO_URL = os.environ.get("IMDB_API_TWO_URL")

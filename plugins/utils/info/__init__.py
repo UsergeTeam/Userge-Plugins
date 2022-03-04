@@ -10,7 +10,8 @@
 
 from os import environ
 
+from userge.utils import secure_env
 
-class Config:
-    USERGE_ANTISPAM_API = environ.get("USERGE_ANTISPAM_API")
-    SPAM_WATCH_API = environ.get("SPAM_WATCH_API")
+
+USERGE_ANTISPAM_API = secure_env(environ.get("USERGE_ANTISPAM_API"))
+SPAM_WATCH_API = secure_env(environ.get("SPAM_WATCH_API"))

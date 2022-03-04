@@ -21,7 +21,6 @@ _LOG = logging.getLogger(__name__)
 async def banager(
     message: Message, chat_id: int, user_id: int, until_date: int
 ) -> str:
-    log_msg = ''
     try:
         await message.client.ban_chat_member(chat_id=chat_id,
                                              user_id=user_id,
@@ -39,6 +38,7 @@ async def banager(
             )
         else:
             log_msg = f'ERROR:- {type(u_e).__name__} > {str(u_e)}'
+
     return log_msg
 
 

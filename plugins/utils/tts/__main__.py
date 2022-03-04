@@ -10,9 +10,9 @@
 
 import os
 
+from gtts import gTTS
 from hachoir.metadata import extractMetadata as XMan
 from hachoir.parser import createParser as CPR
-from gtts import gTTS
 
 from userge import userge, Message
 

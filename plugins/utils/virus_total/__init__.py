@@ -10,6 +10,6 @@
 
 from os import environ
 
+from userge.utils import secure_env
 
-class Config:
-    API_KEY = environ.get("VT_API_KEY")
+API_KEY = secure_env(environ.get("VT_API_KEY"))

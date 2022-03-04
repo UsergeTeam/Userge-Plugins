@@ -10,8 +10,5 @@
 
 import os
 
-
-class Config:
-    START_MEDIA = os.environ.get("START_MEDIA")
-    UPSTREAM_REPO = os.environ.get("UPSTREAM_REPO",
-                                   "https://github.com/UsergeTeam/Userge")
+START_MEDIA = os.environ.get("START_MEDIA")
+UPSTREAM_REPO = os.environ.get("UPSTREAM_REPO", "https://github.com/UsergeTeam/Userge")

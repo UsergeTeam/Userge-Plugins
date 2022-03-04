@@ -8,20 +8,21 @@
 #
 # All rights reserved.
 
-import os
 import asyncio
+import os
 from re import match
 
 import aiofiles
-from selenium import webdriver
 from fake_headers import Headers
+from selenium import webdriver
+
 from userge import userge, Message, config
 from .. import webss
 
 
 @userge.on_cmd("webss", about={'header': "Get snapshot of a website"})
 async def _webss(message: Message):
-    if webss.Config.GOOGLE_CHROME_BIN is None:
+    if webss.GOOGLE_CHROME_BIN is None:
         await message.edit("`need to install Google Chrome. Module Stopping`", del_in=5)
         return
     link_match = match(r'\bhttps?://.*\.\S+', message.input_str)
@@ -32,7 +33,7 @@ async def _webss(message: Message):
     await message.edit("`Processing ...`")
     chrome_options = webdriver.ChromeOptions()
     header = Headers(headers=False).generate()
-    chrome_options.binary_location = webss.Config.GOOGLE_CHROME_BIN
+    chrome_options.binary_location = webss.GOOGLE_CHROME_BIN
     chrome_options.add_argument('--ignore-certificate-errors')
     chrome_options.add_argument("--test-type")
     chrome_options.add_argument("--headless")

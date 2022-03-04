@@ -10,7 +10,4 @@
 
 import os
 
-
-class Config:
-    UPSTREAM_REPO = os.environ.get("UPSTREAM_REPO",
-                                   "https://github.com/UsergeTeam/Userge")
+UPSTREAM_REPO = os.environ.get("UPSTREAM_REPO", "https://github.com/UsergeTeam/Userge")

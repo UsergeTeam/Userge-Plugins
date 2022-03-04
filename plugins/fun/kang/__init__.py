@@ -10,6 +10,4 @@
 
 import os
 
-
-class Config:
-    CUSTOM_PACK_NAME = os.environ.get("CUSTOM_PACK_NAME")
+CUSTOM_PACK_NAME = os.environ.get("CUSTOM_PACK_NAME")

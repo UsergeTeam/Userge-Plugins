@@ -10,6 +10,4 @@
 
 import os
 
-
-class Config:
-    COUNTRY_CITY = os.environ.get("COUNTRY_CITY")
+COUNTRY_CITY = os.environ.get("COUNTRY_CITY")

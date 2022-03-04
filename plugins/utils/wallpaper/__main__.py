@@ -11,12 +11,12 @@
 # rewrite module by @Krishna_Singhal
 
 import os
-import wget
 import shutil
-import requests
 
-from pyrogram.types import InputMediaPhoto, InputMediaDocument
+import requests
+import wget
 from PIL import Image
+from pyrogram.types import InputMediaPhoto, InputMediaDocument
 
 from userge import userge, Message, pool
 

@@ -12,8 +12,8 @@
 
 import asyncio
 import os
-import qrcode
 
+import qrcode
 from bs4 import BeautifulSoup
 
 from userge import userge, config, Message

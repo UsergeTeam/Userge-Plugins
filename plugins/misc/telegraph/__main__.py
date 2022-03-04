@@ -9,10 +9,10 @@
 # All rights reserved.
 
 import aiofiles
-from aiofiles import os
 from PIL import Image
-from telegraph import upload_file
+from aiofiles import os
 from html_telegraph_poster import TelegraphPoster
+from telegraph import upload_file
 
 from userge import userge, Message, config, pool
 from userge.utils import progress

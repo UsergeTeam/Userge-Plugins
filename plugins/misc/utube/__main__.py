@@ -21,7 +21,7 @@ from userge.utils import time_formatter, humanbytes, get_custom_import_re
 from .. import utube
 from ..upload import upload
 
-ytdl = get_custom_import_re(utube.Config.YTDL_PYMOD)
+ytdl = get_custom_import_re(utube.YTDL_PYMOD)
 
 LOGGER = userge.getLogger(__name__)
 

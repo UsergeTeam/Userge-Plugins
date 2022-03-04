@@ -10,18 +10,18 @@
 
 import asyncio
 import os
-from time import time
-from glob import glob
 from asyncio import sleep
 from datetime import datetime
+from glob import glob
 from math import floor, ceil
-from pathlib import Path
-from shutil import rmtree
 from os.path import (
     join, splitext, basename, dirname, relpath, exists, isdir, isfile)
-from zipfile import ZipFile, is_zipfile
+from pathlib import Path
+from shutil import rmtree
 from tarfile import TarFile, is_tarfile, open as tar_open
+from time import time
 from typing import Union, List, Tuple, Sequence
+from zipfile import ZipFile, is_zipfile
 
 from rarfile import RarFile, is_rarfile
 

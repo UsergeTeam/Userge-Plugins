@@ -8,9 +8,10 @@
 
 """ manage video chats """
 
+import logging
 import os
 
+logging.getLogger("pytgcalls").setLevel(logging.WARNING)
 
-class Config:
-    YTDL_PATH = os.environ.get("YOUTUBE_DL_PATH", "yt_dlp")
-    MAX_DURATION = int(os.environ.get("MAX_DURATION", 900))
+YTDL_PATH = os.environ.get("YOUTUBE_DL_PATH", "yt_dlp")
+MAX_DURATION = int(os.environ.get("MAX_DURATION", 900))

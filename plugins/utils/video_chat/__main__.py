@@ -59,11 +59,11 @@ from pytgcalls.types.input_stream import (
 )
 
 from userge import userge, Message, pool, filters, get_collection, config
-from . import Config
+from .. import video_chat
 from userge.utils import time_formatter, progress, runcmd, is_url, get_custom_import_re
 from userge.utils.exceptions import StopConversation
 
-ytdl = get_custom_import_re(Config.YTDL_PATH)
+ytdl = get_custom_import_re(video_chat.YTDL_PATH)
 
 # https://github.com/pytgcalls/pytgcalls/blob/master/pytgcalls/mtproto/mtproto_client.py#L18
 userge.__class__.__module__ = 'pyrogram.client'
@@ -1041,7 +1041,7 @@ async def tg_down(msg: Message):
     else:
         filename = msg.path_to_media
         duration = await get_duration(shlex.quote(msg.path_to_media))
-    if duration > Config.MAX_DURATION:
+    if duration > video_chat.MAX_DURATION:
         await reply_text(msg, "**ERROR:** `Max song duration limit reached!`")
         return await _skip()
     if hasattr(msg, 'file_info'):
@@ -1256,7 +1256,7 @@ def _get_song_info(url: str):
         info = ydl.extract_info(url, download=False)
         duration = info.get("duration") or 0
 
-        if duration > Config.MAX_DURATION:
+        if duration > video_chat.MAX_DURATION:
             return False
     return info.get("title"), duration if duration else 0
 

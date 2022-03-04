@@ -22,7 +22,7 @@ CHANNEL = userge.getCLogger(__name__)
 def ocr_space_file(filename,
                    language='eng',
                    overlay=False,
-                   api_key=ocr.Config.OCR_SPACE_API_KEY):
+                   api_key=ocr.OCR_SPACE_API_KEY):
     """
     OCR.space API request with local file.
         Python3.5 - not tested on 2.7
@@ -60,7 +60,7 @@ async def ocr_gen(message: Message):
     """
     this function can generate ocr output for a image file
     """
-    if ocr.Config.OCR_SPACE_API_KEY is None:
+    if ocr.OCR_SPACE_API_KEY is None:
         await message.edit(
             "<code>Oops!!get the OCR API from</code> "
             "<a href='http://eepurl.com/bOLOcf'>HERE</a> "

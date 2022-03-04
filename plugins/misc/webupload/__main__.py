@@ -8,10 +8,10 @@
 #
 # All rights reserved.
 
+import asyncio
 import os
 import re
 import shlex
-import asyncio
 
 from userge import userge, Message, config
 from userge.utils import progress

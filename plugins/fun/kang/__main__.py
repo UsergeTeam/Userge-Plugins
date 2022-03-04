@@ -109,7 +109,7 @@ async def kang_(message: Message):
         u_name = user.first_name or user.id
 
     packname = f"a{user.id}_by_userge_{pack}"
-    custom_packnick = kang.Config.CUSTOM_PACK_NAME or f"{u_name}'s Kang Pack"
+    custom_packnick = kang.CUSTOM_PACK_NAME or f"{u_name}'s Kang Pack"
     packnick = f"{custom_packnick} Vol.{pack}"
     cmd = '/newpack'
 

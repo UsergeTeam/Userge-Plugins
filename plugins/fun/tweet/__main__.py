@@ -11,10 +11,10 @@
 # By @Krishna_Singhal
 
 import os
-import requests
-from emoji import get_emoji_regexp
 
+import requests
 from PIL import Image
+from emoji import get_emoji_regexp
 from validators.url import url
 
 from userge import userge, config, Message

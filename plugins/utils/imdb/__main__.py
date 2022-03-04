@@ -11,6 +11,7 @@
 
 import json
 import os
+
 import requests
 from pyrogram import filters
 from pyrogram.types import (
@@ -21,6 +22,7 @@ from pyrogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup
 )
+
 from userge import userge, Message, config, pool
 from .. import imdb
 
@@ -35,7 +37,7 @@ THUMB_PATH = config.Dynamic.DOWN_PATH + "imdb_thumb.jpg"
     'usage': "{tr}imdb [Movie Name]",
     'use inline': "@botusername imdb [Movie Name]"})
 async def _imdb(message: Message):
-    if not (imdb.Config.API_ONE_URL or imdb.Config.API_TWO_URL):
+    if not (imdb.API_ONE_URL or imdb.API_TWO_URL):
         return await message.err(
             "First set [these two vars](https://t.me/UsergePlugins/127) before using imdb",
             disable_web_page_preview=True
@@ -43,7 +45,7 @@ async def _imdb(message: Message):
     try:
         movie_name = message.input_str
         await message.edit(f"__searching IMDB for__ : `{movie_name}`")
-        response = await _get(imdb.Config.API_ONE_URL.format(theuserge=movie_name))
+        response = await _get(imdb.API_ONE_URL.format(theuserge=movie_name))
         srch_results = json.loads(response.text)
         mov_imdb_id = srch_results.get("d")[0].get("id")
         image_link, description = await get_movie_description(mov_imdb_id)
@@ -76,7 +78,7 @@ async def _imdb(message: Message):
 
 
 async def get_movie_description(imdb_id):
-    response = await _get(imdb.Config.API_TWO_URL.format(imdbttid=imdb_id))
+    response = await _get(imdb.API_TWO_URL.format(imdbttid=imdb_id))
     soup = json.loads(response.text)
 
     mov_link = f"https://www.imdb.com/title/{imdb_id}"
@@ -218,7 +220,7 @@ if userge.has_bot:
     )
     async def inline_fn(_, inline_query: InlineQuery):
         movie_name = inline_query.query.split("imdb ")[1].strip()
-        search_results = await _get(imdb.Config.API_ONE_URL.format(theuserge=movie_name))
+        search_results = await _get(imdb.API_ONE_URL.format(theuserge=movie_name))
         srch_results = json.loads(search_results.text)
         asroe = srch_results.get("d")
         oorse = []

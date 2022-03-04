@@ -22,11 +22,11 @@ from asyncio import create_subprocess_exec, subprocess
 from ffmpeg._run import Error, compile as ffmpg_compile
 from ffmpeg._utils import convert_kwargs_to_cmd_line_args
 
-from userge import userge, Message
+from userge import userge, Message, config
 from userge.utils import humanbytes, is_url
 from ..download import tg_download, url_download
 
-FF_MPEG_DOWN_LOAD_MEDIA_PATH = Path("/app/downloads/userge.media.ffmpeg")
+FF_MPEG_DOWN_LOAD_MEDIA_PATH = Path(f"{config.Dynamic.DOWN_PATH.rstrip('/')}/userge.media.ffmpeg")
 
 logger = userge.getLogger(__name__)
 

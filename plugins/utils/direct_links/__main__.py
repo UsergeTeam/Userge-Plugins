@@ -8,8 +8,8 @@
 #
 # All rights reserved.
 
-import re
 import json
+import re
 import urllib.parse
 from base64 import standard_b64encode
 from os import popen

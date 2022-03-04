@@ -10,10 +10,13 @@
 
 import os
 
+from userge.utils import secure_env
 
-class Config:
-    G_PHOTOS_CLIENT_ID = os.environ.get("G_PHOTOS_CLIENT_ID", os.environ.get("G_DRIVE_CLIENT_ID"))
-    G_PHOTOS_CLIENT_SECRET = os.environ.get(
-        "G_PHOTOS_CLIENT_SECRET", os.environ.get("G_DRIVE_CLIENT_SECRET")
-    )
-    G_PHOTOS_AUTH_TOKEN_ID = int(os.environ.get("G_PHOTOS_AUTH_TOKEN_ID") or 0)
+
+G_PHOTOS_CLIENT_ID = secure_env(
+    os.environ.get("G_PHOTOS_CLIENT_ID", os.environ.get("G_DRIVE_CLIENT_ID")))
+
+G_PHOTOS_CLIENT_SECRET = secure_env(os.environ.get(
+    "G_PHOTOS_CLIENT_SECRET", os.environ.get("G_DRIVE_CLIENT_SECRET")))
+
+G_PHOTOS_AUTH_TOKEN_ID = int(os.environ.get("G_PHOTOS_AUTH_TOKEN_ID") or 0)

@@ -11,18 +11,16 @@
 # Userge Plugin for getting list of sites where you can watch a particular Movie or TV-Show
 # Author: Sumanjay (https://github.com/cyberboysumanjay) (@cyberboysumanjay)
 
-import os
-
 from justwatch import JustWatch, justwatchapi
 
 from userge import userge, Message
+from . import WATCH_COUNTRY
 
 # https://github.com/dawoudt/JustWatchAPI/issues/47#issuecomment-691357371
 justwatchapi.__dict__['HEADER'] = {
     'User-Agent': 'JustWatch client (github.com/dawoudt/JustWatchAPI)'}
 
 LOGGER = userge.getLogger(__name__)
-WATCH_COUNTRY = os.environ.get("WATCH_COUNTRY", "IN")
 
 
 def get_stream_data(query):

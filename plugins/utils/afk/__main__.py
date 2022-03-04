@@ -15,10 +15,7 @@ from random import choice, randint
 from userge import userge, Message, filters, get_collection
 from userge.utils import time_formatter, get_custom_import_re
 
-try:
-    pmpermit = get_custom_import_re("userge.plugins.utils.pmpermit")
-except ModuleNotFoundError:
-    pmpermit = None
+pmpermit = get_custom_import_re("userge.plugins.utils.pmpermit", False)
 
 CHANNEL = userge.getCLogger(__name__)
 SAVED_SETTINGS = get_collection("CONFIGS")

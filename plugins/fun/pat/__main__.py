@@ -8,8 +8,9 @@
 #
 # All rights reserved.
 
-from urllib import parse
 from random import choice
+from urllib import parse
+
 import aiohttp
 
 from userge import userge, Message

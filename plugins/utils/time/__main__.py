@@ -12,7 +12,7 @@ from pytz import timezone
 from datetime import datetime as dt
 
 from userge import userge, Message
-from . import Config
+from . import COUNTRY_CITY
 
 LOG = userge.getLogger(__name__)  # logger object
 
@@ -39,16 +39,16 @@ async def grabTime(message: Message):
                            parse_mode="html", del_in=30)
         return
 
-    if not Config.COUNTRY_CITY:
+    if not COUNTRY_CITY:
         LOG.info("Time: No Config Set")
         await message.edit(defaultMessage, disable_web_page_preview=True,
                            parse_mode="html", del_in=30)
         return
 
-    tzDateTime = dt.now(timezone(Config.COUNTRY_CITY))
+    tzDateTime = dt.now(timezone(COUNTRY_CITY))
     date = tzDateTime.strftime('%d-%m-%Y')
     militaryTime = tzDateTime.strftime('%H:%M')
     time = dt.strptime(militaryTime, "%H:%M").strftime("%I:%M %p")
     await message.edit("It is currently " + time + " on " + date + " in " +
-                       Config.COUNTRY_CITY.replace("_", " "))
+                       COUNTRY_CITY.replace("_", " "))
     LOG.info("Time: Command Finished Successfully")

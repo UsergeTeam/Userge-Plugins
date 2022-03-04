@@ -42,7 +42,7 @@ CARBON = 'https://carbon.now.sh/?t={theme}&l={lang}&code={code}&bg={bg}'
         'solarized light', 'synthwave-84', 'twilight', 'verminal', 'vscode',
         'yeti', 'zenburn']}, del_pre=True)
 async def carbon_(message: Message):
-    if carbon.Config.GOOGLE_CHROME_BIN is None:
+    if carbon.GOOGLE_CHROME_BIN is None:
         replied = message.reply_to_message
         if replied:
             text = replied.text
@@ -133,7 +133,7 @@ async def carbon_(message: Message):
             await message.err("input too large!")
             return
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.binary_location = carbon.Config.GOOGLE_CHROME_BIN
+        chrome_options.binary_location = carbon.GOOGLE_CHROME_BIN
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--window-size=1920x1080")
         chrome_options.add_argument("--disable-dev-shm-usage")

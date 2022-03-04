@@ -49,8 +49,8 @@ CHANNEL = userge.getCLogger(__name__)
 @userge.on_cmd("gpsetup", about={'header': "setup gphotos"})
 async def setup_google_photos(message: Message):
     if (
-        google_photos.Config.G_PHOTOS_CLIENT_ID is None
-        or google_photos.Config.G_PHOTOS_CLIENT_SECRET is None
+        google_photos.G_PHOTOS_CLIENT_ID is None
+        or google_photos.G_PHOTOS_CLIENT_SECRET is None
     ):
         await message.err("first fill gphoto id and secret")
         return
@@ -66,8 +66,8 @@ async def setup_google_photos(message: Message):
 async def create_token_file():
     # Run through the OAuth flow and retrieve credentials
     flow = client.OAuth2WebServerFlow(
-        google_photos.Config.G_PHOTOS_CLIENT_ID,
-        google_photos.Config.G_PHOTOS_CLIENT_SECRET,
+        google_photos.G_PHOTOS_CLIENT_ID,
+        google_photos.G_PHOTOS_CLIENT_SECRET,
         OAUTH_SCOPE,
         redirect_uri=REDIRECT_URI
     )
@@ -95,10 +95,10 @@ async def create_token_file():
 
 
 async def check_creds(message):
-    if google_photos.Config.G_PHOTOS_AUTH_TOKEN_ID:
+    if google_photos.G_PHOTOS_AUTH_TOKEN_ID:
         confidential_message = await message.client.get_messages(
             chat_id=config.LOG_CHANNEL_ID,
-            message_ids=google_photos.Config.G_PHOTOS_AUTH_TOKEN_ID,
+            message_ids=google_photos.G_PHOTOS_AUTH_TOKEN_ID,
             replies=0
         )
         if confidential_message and confidential_message.document:

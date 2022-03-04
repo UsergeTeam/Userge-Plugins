@@ -9,7 +9,7 @@
 # All rights reserved.
 
 from userge import userge, Message, versions
-from . import Config
+from . import UPSTREAM_REPO
 
 
 @userge.on_cmd("repo", about={'header': "get repo link and details"})
@@ -24,6 +24,6 @@ async def see_repo(message: Message):
 • **loader version** : `{versions.__loader_version__}`
 • **license** : {versions.__license__}
 • **copyright** : {versions.__copyright__}
-• **repo** : [Userge]({Config.UPSTREAM_REPO})
+• **repo** : [Userge]({UPSTREAM_REPO})
 """
     await message.edit(output)

@@ -104,7 +104,7 @@ def creds_dec(func):
 class _GDrive:
     """ GDrive Class For Search, Upload, Download, Copy, Move, Delete, EmptyTrash, ... """
     def __init__(self) -> None:
-        self._parent_id = _PARENT_ID or gdrive.Config.G_DRIVE_PARENT_ID
+        self._parent_id = _PARENT_ID or gdrive.G_DRIVE_PARENT_ID
         self._completed = 0
         self._list = 1
         self._progress = None
@@ -203,9 +203,9 @@ class _GDrive:
             out = G_DRIVE_FOLDER_LINK.format(file_id, file_name)
         else:
             out = G_DRIVE_FILE_LINK.format(file_id, file_name, file_size)
-        if gdrive.Config.G_DRIVE_INDEX_LINK:
+        if gdrive.G_DRIVE_INDEX_LINK:
             link = os.path.join(
-                gdrive.Config.G_DRIVE_INDEX_LINK.rstrip('/'),
+                gdrive.G_DRIVE_INDEX_LINK.rstrip('/'),
                 quote(self._get_file_path(file_id, file_name)))
             if mime_type == G_DRIVE_DIR_MIME_TYPE:
                 link += '/'
@@ -267,7 +267,7 @@ class _GDrive:
                         humanbytes(speed),
                         time_formatter(eta))
             file_id = response.get("id")
-        if not gdrive.Config.G_DRIVE_IS_TD:
+        if not gdrive.G_DRIVE_IS_TD:
             self._set_permission(file_id)
         self._completed += 1
         _LOG.info(
@@ -283,7 +283,7 @@ class _GDrive:
         file_ = self._service.files().create(body=body, supportsTeamDrives=True).execute()
         file_id = file_.get("id")
         file_name = file_.get("name")
-        if not gdrive.Config.G_DRIVE_IS_TD:
+        if not gdrive.G_DRIVE_IS_TD:
             self._set_permission(file_id)
         self._completed += 1
         _LOG.info("Created Google-Drive Folder => Name: %s ID: %s ", file_name, file_id)
@@ -499,7 +499,7 @@ class _GDrive:
         file_ = self._service.files().create(body=body, supportsTeamDrives=True).execute()
         file_id = file_.get("id")
         file_name = file_.get("name")
-        if not gdrive.Config.G_DRIVE_IS_TD:
+        if not gdrive.G_DRIVE_IS_TD:
             self._set_permission(file_id)
         _LOG.info("Created Google-Drive Folder => Name: %s ID: %s ", file_name, file_id)
         return G_DRIVE_FOLDER_LINK.format(file_id, file_name)
@@ -611,8 +611,8 @@ class Worker(_GDrive):
         if _CREDS:
             await self._message.edit("`Already Setup!`", del_in=5)
         else:
-            _AUTH_FLOW = OAuth2WebServerFlow(gdrive.Config.G_DRIVE_CLIENT_ID,
-                                             gdrive.Config.G_DRIVE_CLIENT_SECRET,
+            _AUTH_FLOW = OAuth2WebServerFlow(gdrive.G_DRIVE_CLIENT_ID,
+                                             gdrive.G_DRIVE_CLIENT_SECRET,
                                              OAUTH_SCOPE,
                                              redirect_uri=REDIRECT_URI)
             reply_string = f"please visit {_AUTH_FLOW.step1_get_authorize_url()} and "
@@ -946,7 +946,7 @@ class Worker(_GDrive):
 async def gsetup_(message: Message):
     """ setup creds """
     link = "https://theuserge.github.io/deployment.html#6-g_drive_client_id--g_drive_client_secret"
-    if gdrive.Config.G_DRIVE_CLIENT_ID and gdrive.Config.G_DRIVE_CLIENT_SECRET:
+    if gdrive.G_DRIVE_CLIENT_ID and gdrive.G_DRIVE_CLIENT_SECRET:
         if message.chat.id in config.AUTH_CHATS:
             await Worker(message).setup()
         else:

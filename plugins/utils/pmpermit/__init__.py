@@ -14,5 +14,5 @@ ALLOWED_CHATS = filters.chat([])
 
 
 class Dynamic:
-    ALLOW_ALL_PMS: bool = True
+    ALLOW_ALL_PMS = True
     IS_INLINE = True

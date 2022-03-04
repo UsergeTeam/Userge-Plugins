@@ -163,7 +163,7 @@ class CASHandler(AbstractHandler):
 
 class UsergeAntiSpamHandler(AbstractHandler):
     def __init__(self) -> None:
-        self._client = Client(antispam.Config.USERGE_ANTISPAM_API)
+        self._client = Client(antispam.USERGE_ANTISPAM_API)
         super().__init__("UsergeAntiSpamAPI")
 
     async def get_data(self, user_id: int):
@@ -178,7 +178,7 @@ class UsergeAntiSpamHandler(AbstractHandler):
 
 class SpamWatchHandler(AbstractHandler):
     def __init__(self) -> None:
-        self._client = spamwatch.Client(antispam.Config.SPAM_WATCH_API)
+        self._client = spamwatch.Client(antispam.SPAM_WATCH_API)
         super().__init__("SpamWatch")
 
     async def get_data(self, user_id: int):
@@ -197,9 +197,9 @@ def _re_init_handler():
     handler = GBanHandler()
     if antispam.Dynamic.ANTISPAM_SENTRY:
         tmp = handler.set_next(CASHandler())
-        if antispam.Config.USERGE_ANTISPAM_API:
+        if antispam.USERGE_ANTISPAM_API:
             tmp = tmp.set_next(UsergeAntiSpamHandler())
-        if antispam.Config.SPAM_WATCH_API:
+        if antispam.SPAM_WATCH_API:
             tmp.set_next(SpamWatchHandler())
     HANDLER = handler
 

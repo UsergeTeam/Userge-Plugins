@@ -28,7 +28,7 @@ async def cur_conv(message: Message):
     """
     this function can get exchange rate results
     """
-    if currency.Config.CURRENCY_API is None:
+    if currency.CURRENCY_API is None:
         await message.edit(
             "<code>Oops!!get the API from</code> "
             "<a href='https://free.currencyconverterapi.com'>HERE</a> "
@@ -48,7 +48,7 @@ async def cur_conv(message: Message):
 
     if amount.isdigit():
         url = ("https://free.currconv.com/api/v7/convert?"
-               f"apiKey={currency.Config.CURRENCY_API}&q="
+               f"apiKey={currency.CURRENCY_API}&q="
                f"{currency_from}_{currency_to}&compact=ultra")
         async with aiohttp.ClientSession() as ses, ses.get(url) as res:
             data = json.loads(await res.text())

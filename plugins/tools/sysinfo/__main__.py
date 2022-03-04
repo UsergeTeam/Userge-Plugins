@@ -8,9 +8,11 @@
 #
 # All rights reserved.
 
-import psutil
 from datetime import datetime
+
+import psutil
 from psutil._common import bytes2human
+
 from userge import userge, Message
 
 

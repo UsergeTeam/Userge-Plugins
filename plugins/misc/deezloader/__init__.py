@@ -10,6 +10,6 @@
 
 import os
 
+from userge.utils import secure_env
 
-class Config:
-    ARL_TOKEN = os.environ.get("ARL_TOKEN")
+ARL_TOKEN = secure_env(os.environ.get("ARL_TOKEN"))

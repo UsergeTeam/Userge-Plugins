@@ -52,6 +52,7 @@ FONTS_ = [
 ]
 
 
+@userge.on_start
 async def _init() -> None:
     global UPDATION, AUTONAME_TIMEOUT, NAME  # pylint: disable=global-statement
     data = await USER_DATA.find_one({'_id': 'UPDATION'})

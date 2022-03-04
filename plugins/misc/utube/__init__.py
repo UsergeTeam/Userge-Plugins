@@ -10,6 +10,4 @@
 
 import os
 
-
-class Config:
-    YTDL_PYMOD = os.environ.get("YOUTUBE_DL_PATH", "yt_dlp")
+YTDL_PYMOD = os.environ.get("YOUTUBE_DL_PATH", "yt_dlp")
