@@ -27,6 +27,10 @@ BASE_PIC = "resources/base_profile_pic.jpg"
 MDFY_PIC = "resources/mdfy_profile_pic.jpg"
 LOG = userge.getLogger(__name__)
 
+# tmp fix
+if not os.path.exists("resources"):
+    os.mkdir("resources")
+
 
 @userge.on_start
 async def _init() -> None:
