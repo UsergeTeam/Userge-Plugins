@@ -82,6 +82,7 @@ async def get_movie_description(imdb_id):
     soup = json.loads(response.text)
 
     mov_link = f"https://www.imdb.com/title/{imdb_id}"
+    mov_name = soup.get('title')
     image_link = soup.get('poster')
     genres = soup.get("genres")
     duration = soup.get("duration")
@@ -99,7 +100,7 @@ async def get_movie_description(imdb_id):
     director, writer, stars = get_credits_text(soup)
     story_line = soup.get("summary").get("plot", 'Not available')
 
-    description = f"<b>Title</b><a href='{image_link}'>🎬</a>: <code>{soup.get('title')}</code>"
+    description = f"<b>Title</b><a href='{image_link}'>🎬</a>: <code>{mov_name}</code>"
     description += f"""
 <b>Genres: </b><code>{' '.join(genres) if len(genres) > 0 else ''}</code>
 <b>Rating⭐: </b><code>{mov_rating}</code>
@@ -113,6 +114,10 @@ async def get_movie_description(imdb_id):
 <b>IMDB URL Link🔗: </b>{mov_link}
 
 <b>Story Line : </b><em>{story_line}</em>"""
+    
+    povas = await search_jw(mov_name, "en_IN")
+    if povas != "":
+        description += f"\n\n{povas}"
 
     if len(description) > 1024:
         description = description[:1021] + "..."
@@ -267,3 +272,38 @@ if userge.has_bot:
             switch_pm_parameter="imdb"
         )
         inline_query.stop_propagation()
+
+ 
+async def search_jw(movie_name: str, locale: str):
+    response = await _get(imdb.API_THREE_URL.format(
+        q=movie_name,
+        L=locale
+    ))
+    soup = json.loads(response.text)
+    items = soup["items"]
+    m_t_ = ""
+    for item in items:
+        if movie_name.lower() == item.get("title", "").lower():
+            offers = item.get("offers", [])
+            t_m_ = []
+            for offer in offers:
+                url = offer.get("urls").get("standard_web")
+                if url not in t_m_:
+                    p_o = get_provider(url)
+                    m_t_ += f"<a href='{url}'>{p_o}</a> | "
+                t_m_.append(url)
+            if m_t_ != "":
+                m_t_ = m_t_[:-2].strip()
+            break
+    return m_t_
+
+
+def get_provider(url):
+    # (c) Sumanjay
+    # [https://github.com/UsergeTeam/Userge-Plugins/blob/8aabd0ac8314a80a89f9764bb868f29849b37c6f/plugins/watch.py#L109]
+    url = url.replace("https://www.", "")
+    url = url.replace("https://", "")
+    url = url.replace("http://www.", "")
+    url = url.replace("http://", "")
+    url = url.split(".")[0]
+    return url
