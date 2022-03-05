@@ -8,9 +8,9 @@
 #
 # All rights reserved.
 
-
-import json
 import os
+import json
+from urllib.parse import urlparse
 
 import requests
 from pyrogram import filters
@@ -48,7 +48,7 @@ async def _imdb(message: Message):
         response = await _get(imdb.API_ONE_URL.format(theuserge=movie_name))
         srch_results = json.loads(response.text)
         mov_imdb_id = srch_results.get("d")[0].get("id")
-        image_link, description = await get_movie_description(mov_imdb_id, 1024)
+        image_link, description = await get_movie_description(mov_imdb_id, 4096)
     except (IndexError, json.JSONDecodeError, AttributeError):
         await message.edit("Bruh, Plox enter **Valid movie name** kthx")
         return
@@ -116,11 +116,11 @@ async def get_movie_description(imdb_id, max_length):
 <b>Story Line : </b><em>{story_line}</em>"""
 
     povas = await search_jw(mov_name, imdb.WATCH_COUNTRY)
+    if len(description + povas) > max_length:
+        inc = max_length - len(description + povas)
+        description = description[:inc - 3].strip() + "..."
     if povas != "":
         description += f"\n\n{povas}"
-
-    if len(description) > max_length:
-        description = description[:max_length - 3] + "..."
     return image_link, description
 
 
@@ -301,11 +301,11 @@ async def search_jw(movie_name: str, locale: str):
 
 
 def get_provider(url):
-    # (c) Sumanjay
-    # [https://github.com/UsergeTeam/Userge-Plugins/blob/8aabd0ac8314a80a89f9764bb868f29849b37c6f/plugins/watch.py#L109]
-    url = url.replace("https://www.", "")
-    url = url.replace("https://", "")
-    url = url.replace("http://www.", "")
-    url = url.replace("http://", "")
-    url = url.split(".")[0]
-    return url
+
+    def pretty(name):
+        if name == "play":
+            name = "Google Play Movies"
+        return name.title()
+
+    netloc = urlparse(url).netloc
+    return pretty(netloc.split('.')[-2].strip())

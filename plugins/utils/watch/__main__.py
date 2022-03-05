@@ -11,6 +11,8 @@
 # Userge Plugin for getting list of sites where you can watch a particular Movie or TV-Show
 # Author: Sumanjay (https://github.com/cyberboysumanjay) (@cyberboysumanjay)
 
+from urllib.parse import urlparse
+
 from justwatch import JustWatch, justwatchapi
 
 from userge import userge, Message
@@ -119,9 +121,5 @@ def pretty(name):
 
 
 def get_provider(url):
-    url = url.replace("https://www.", "")
-    url = url.replace("https://", "")
-    url = url.replace("http://www.", "")
-    url = url.replace("http://", "")
-    url = url.split(".")[0]
-    return url
+    netloc = urlparse(url).netloc
+    return netloc.split('.')[-2].strip()
