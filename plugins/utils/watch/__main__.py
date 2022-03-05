@@ -122,4 +122,4 @@ def pretty(name):
 
 def get_provider(url):
     netloc = urlparse(url).netloc
-    return netloc.split('.')[-2].strip()
+    return netloc.split('.')[0].strip()

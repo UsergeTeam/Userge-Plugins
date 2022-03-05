@@ -308,4 +308,4 @@ def get_provider(url):
         return name.title()
 
     netloc = urlparse(url).netloc
-    return pretty(netloc.split('.')[-2].strip())
+    return pretty(netloc.split('.')[0].strip())
