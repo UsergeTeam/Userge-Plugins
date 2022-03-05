@@ -12,4 +12,4 @@ import os
 
 from userge.utils import secure_env
 
-OCR_SPACE_API_KEY = secure_env(os.environ.get("OCR_SPACE_API_KEY"))
+OCR_SPACE_API_KEY = os.environ.get(secure_env("OCR_SPACE_API_KEY"))

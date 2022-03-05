@@ -12,4 +12,4 @@ from os import environ
 
 from userge.utils import secure_env
 
-API_KEY = secure_env(environ.get("VT_API_KEY"))
+API_KEY = environ.get(secure_env("VT_API_KEY"))
