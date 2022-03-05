@@ -114,7 +114,7 @@ async def get_movie_description(imdb_id, max_length):
 <b>IMDB URL Link🔗: </b>{mov_link}
 
 <b>Story Line : </b><em>{story_line}</em>"""
-    
+
     povas = await search_jw(mov_name, imdb.WATCH_COUNTRY)
     if povas != "":
         description += f"\n\n{povas}"
@@ -273,7 +273,7 @@ if userge.has_bot:
         )
         inline_query.stop_propagation()
 
- 
+
 async def search_jw(movie_name: str, locale: str):
     m_t_ = ""
     if not imdb.API_THREE_URL:
