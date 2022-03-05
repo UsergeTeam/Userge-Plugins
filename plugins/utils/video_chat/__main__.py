@@ -1156,8 +1156,8 @@ async def get_stream_link(link: str) -> str:
         " --geo-bypass -g -f best[height<=?720][width<=?1280]/best " + link
     out, err, _, _ = await runcmd(cmd)
     if err:
-        return False
-    return out
+        LOG.error(err)
+    return out or False
 
 
 async def get_duration(file: str) -> int:
