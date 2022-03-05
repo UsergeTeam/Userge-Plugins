@@ -302,10 +302,11 @@ async def search_jw(movie_name: str, locale: str):
 
 def get_provider(url):
 
-    def pretty(name):
-        if name == "play":
+    def pretty(names):
+        name = names[1]
+        if names[0] == "play":
             name = "Google Play Movies"
         return name.title()
 
     netloc = urlparse(url).netloc
-    return pretty(netloc.split('.')[0].strip())
+    return pretty(netloc.split('.'))

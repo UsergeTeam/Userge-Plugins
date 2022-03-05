@@ -104,7 +104,7 @@ async def fetch_watch_sources(message: Message):
     for provider, link in stream_providers.items():
         if 'sonyliv' in link:
             link = link.replace(" ", "%20")
-        output_ += f"[{pretty(provider)}]({link})\n"
+        output_ += f"[{provider}]({link})\n"
 
     await message.client.send_photo(chat_id=message.chat.id,
                                     photo=thumb_link,
@@ -114,12 +114,13 @@ async def fetch_watch_sources(message: Message):
 
 
 # Helper Functions
-def pretty(name):
-    if name == "play":
-        name = "Google Play Movies"
-    return name[0].upper() + name[1:]
-
-
 def get_provider(url):
+
+    def pretty(names):
+        name = names[1]
+        if names[0] == "play":
+            name = "Google Play Movies"
+        return name.title()
+
     netloc = urlparse(url).netloc
-    return netloc.split('.')[0].strip()
+    return pretty(netloc.split('.'))
