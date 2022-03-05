@@ -115,7 +115,7 @@ async def get_movie_description(imdb_id):
 
 <b>Story Line : </b><em>{story_line}</em>"""
     
-    povas = await search_jw(mov_name, "en_IN")
+    povas = await search_jw(mov_name, imdb.WATCH_COUNTRY)
     if povas != "":
         description += f"\n\n{povas}"
 
@@ -275,13 +275,15 @@ if userge.has_bot:
 
  
 async def search_jw(movie_name: str, locale: str):
+    m_t_ = ""
+    if not imdb.API_THREE_URL:
+        return m_t_
     response = await _get(imdb.API_THREE_URL.format(
         q=movie_name,
         L=locale
     ))
     soup = json.loads(response.text)
     items = soup["items"]
-    m_t_ = ""
     for item in items:
         if movie_name.lower() == item.get("title", "").lower():
             offers = item.get("offers", [])
