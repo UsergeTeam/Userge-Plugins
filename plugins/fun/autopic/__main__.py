@@ -23,13 +23,10 @@ from userge import userge, Message, get_collection
 SAVED_SETTINGS = get_collection("CONFIGS")
 UPDATE_PIC = False
 AUTOPIC_TIMEOUT = 300
-BASE_PIC = "resources/base_profile_pic.jpg"
-MDFY_PIC = "resources/mdfy_profile_pic.jpg"
+AUTOPIC_DIR = "userge/plugins/fun/autopic/resources/"
+BASE_PIC = AUTOPIC_DIR + "base_profile_pic.jpg"
+MDFY_PIC = AUTOPIC_DIR + "mdfy_profile_pic.jpg"
 LOG = userge.getLogger(__name__)
-
-# tmp fix
-if not os.path.exists("resources"):
-    os.mkdir("resources")
 
 
 @userge.on_start
@@ -43,7 +40,7 @@ async def _init() -> None:
                 media_file_.write(base64.b64decode(data['media']))
     pic_data = await SAVED_SETTINGS.find_one({'_id': 'AUTOPIC_TIMEOUT'})
     if pic_data:
-        AUTOPIC_TIMEOUT = bool(pic_data.get("data"))
+        AUTOPIC_TIMEOUT = pic_data.get("data")
 
 
 @userge.on_cmd(
@@ -133,8 +130,8 @@ async def apic_worker():
         if not count % AUTOPIC_TIMEOUT:
             img = Image.open(BASE_PIC)
             i_width, i_height = img.size
-            s_font = ImageFont.truetype("resources/font.ttf", int((35 / 640)*i_width))
-            l_font = ImageFont.truetype("resources/font.ttf", int((50 / 640)*i_width))
+            s_font = ImageFont.truetype(AUTOPIC_DIR + "font.ttf", int((35 / 640)*i_width))
+            l_font = ImageFont.truetype(AUTOPIC_DIR + "font.ttf", int((50 / 640)*i_width))
             draw = ImageDraw.Draw(img)
             current_h, pad = 10, 0
             for user in textwrap.wrap(user, width=20):
