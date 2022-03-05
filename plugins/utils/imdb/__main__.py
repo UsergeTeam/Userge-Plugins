@@ -8,9 +8,9 @@
 #
 # All rights reserved.
 
-
-import json
 import os
+import json
+from urllib.parse import urlparse
 
 import requests
 from pyrogram import filters
@@ -48,7 +48,7 @@ async def _imdb(message: Message):
         response = await _get(imdb.API_ONE_URL.format(theuserge=movie_name))
         srch_results = json.loads(response.text)
         mov_imdb_id = srch_results.get("d")[0].get("id")
-        image_link, description = await get_movie_description(mov_imdb_id)
+        image_link, description = await get_movie_description(mov_imdb_id, 4096)
     except (IndexError, json.JSONDecodeError, AttributeError):
         await message.edit("Bruh, Plox enter **Valid movie name** kthx")
         return
@@ -77,11 +77,12 @@ async def _imdb(message: Message):
         )
 
 
-async def get_movie_description(imdb_id):
+async def get_movie_description(imdb_id, max_length):
     response = await _get(imdb.API_TWO_URL.format(imdbttid=imdb_id))
     soup = json.loads(response.text)
 
     mov_link = f"https://www.imdb.com/title/{imdb_id}"
+    mov_name = soup.get('title')
     image_link = soup.get('poster')
     genres = soup.get("genres")
     duration = soup.get("duration")
@@ -99,7 +100,7 @@ async def get_movie_description(imdb_id):
     director, writer, stars = get_credits_text(soup)
     story_line = soup.get("summary").get("plot", 'Not available')
 
-    description = f"<b>Title</b><a href='{image_link}'>🎬</a>: <code>{soup.get('title')}</code>"
+    description = f"<b>Title</b><a href='{image_link}'>🎬</a>: <code>{mov_name}</code>"
     description += f"""
 <b>Genres: </b><code>{' '.join(genres) if len(genres) > 0 else ''}</code>
 <b>Rating⭐: </b><code>{mov_rating}</code>
@@ -114,8 +115,12 @@ async def get_movie_description(imdb_id):
 
 <b>Story Line : </b><em>{story_line}</em>"""
 
-    if len(description) > 1024:
-        description = description[:1021] + "..."
+    povas = await search_jw(mov_name, imdb.WATCH_COUNTRY)
+    if len(description + povas) > max_length:
+        inc = max_length - len(description + povas)
+        description = description[:inc - 3].strip() + "..."
+    if povas != "":
+        description += f"\n\n{povas}"
     return image_link, description
 
 
@@ -187,7 +192,7 @@ if userge.has_bot:
     async def imdb_callback(_, c_q: CallbackQuery):
         if c_q.from_user and c_q.from_user.id in config.OWNER_ID:
             imdb_id = str(c_q.matches[0].group(1))
-            _, description = await get_movie_description(imdb_id)
+            _, description = await get_movie_description(imdb_id, 4096)
             await c_q.edit_message_text(
                 text=description,
                 disable_web_page_preview=False,
@@ -267,3 +272,41 @@ if userge.has_bot:
             switch_pm_parameter="imdb"
         )
         inline_query.stop_propagation()
+
+
+async def search_jw(movie_name: str, locale: str):
+    m_t_ = ""
+    if not imdb.API_THREE_URL:
+        return m_t_
+    response = await _get(imdb.API_THREE_URL.format(
+        q=movie_name,
+        L=locale
+    ))
+    soup = json.loads(response.text)
+    items = soup["items"]
+    for item in items:
+        if movie_name.lower() == item.get("title", "").lower():
+            offers = item.get("offers", [])
+            t_m_ = []
+            for offer in offers:
+                url = offer.get("urls").get("standard_web")
+                if url not in t_m_:
+                    p_o = get_provider(url)
+                    m_t_ += f"<a href='{url}'>{p_o}</a> | "
+                t_m_.append(url)
+            if m_t_ != "":
+                m_t_ = m_t_[:-2].strip()
+            break
+    return m_t_
+
+
+def get_provider(url):
+
+    def pretty(names):
+        name = names[1]
+        if names[0] == "play":
+            name = "Google Play Movies"
+        return name.title()
+
+    netloc = urlparse(url).netloc
+    return pretty(netloc.split('.'))
