@@ -1,9 +1,13 @@
-import pytz
-from userge import userge, Message
 from ..night_mode import scheduler, TZ
+
+import pytz
 from datetime import datetime, timedelta
-from pyrogram.types import ChatPermissions
+
+from userge import userge, Message
+
 from apscheduler.jobstores.base import ConflictingIdError
+
+from pyrogram.types import ChatPermissions
 from pyrogram.errors import ChatAdminRequired, ChannelInvalid, ChannelPrivate, ChatNotModified
 
 
@@ -40,8 +44,7 @@ async def nightmode_handler(msg: Message):
             scheduler.remove_job(job_id=f"enable_nightmode_{chat_id}")
             scheduler.remove_job(job_id=f"disable_nightmode_{chat_id}")
             return await msg.edit('nightmode disabled.')
-        else:
-            return await msg.err("nightmode isn't enabled in this chat.")
+        return await msg.err("nightmode isn't enabled in this chat.")
 
     start = flags.get('-s', '00:00')
     now = datetime.now(TIME_ZONE)
@@ -56,7 +59,9 @@ async def nightmode_handler(msg: Message):
     lock_dur = extract_time((flags.get('-e', '6h')).lower())
 
     if not lock_dur:
-        return await msg.err('Invalid time duration. Use proper format.\nExample: 6h (for 6 hours), 10m for 10 minutes.')
+        return await msg.err(
+            'Invalid time duration. Use proper format.'
+            '\nExample: 6h (for 6 hours), 10m for 10 minutes.')
 
     if start_timestamp < now:
         start_timestamp = start_timestamp + timedelta(days=1)
@@ -85,10 +90,12 @@ async def nightmode_handler(msg: Message):
             max_instances=50,
             misfire_grace_time=None)
     except ConflictingIdError:
-        return await msg.edit('already a schedule is running in this chat. Disable it using `-d` flag.')
+        return await msg.edit(
+            'already a schedule is running in this chat. Disable it using `-d` flag.')
     await msg.edit(
         'Successfully enabled nightmode in this chat.\n'
-        f'Group will be locked at {start_timestamp.strftime("%H:%M:%S")} and will be opened after {flags.get("-e", "6h")} everyday.')
+        f'Group will be locked at {start_timestamp.strftime("%H:%M:%S")}'
+        ' and will be opened after {flags.get("-e", "6h")} everyday.')
 
 
 async def un_mute_chat(chat_id: int, perm: ChatPermissions):
@@ -115,7 +122,9 @@ async def un_mute_chat(chat_id: int, perm: ChatPermissions):
     else:
         job = scheduler.get_job(f"enable_nightmode_{chat_id}")
         close_at = job.next_run_time
-        await userge.send_message(chat_id, f"#AUTOMATED_HANDLER\nGroup is Opening.\nWill be closed at {close_at}")
+        await userge.send_message(
+            chat_id,
+            f"#AUTOMATED_HANDLER\nGroup is Opening.\nWill be closed at {close_at}")
         await CHANNEL.log(
             f"#NIGHT_MODE_SUCCESS\nSuccessfully turned off nightmode at `{chat_id}`,")
 
@@ -144,7 +153,9 @@ async def mute_chat(chat_id: int):
     else:
         job = scheduler.get_job(f"disable_nightmode_{chat_id}")
         open_at = job.next_run_time
-        await userge.send_message(chat_id, f"#AUTOMATED_HANDLER\nGroup is closing.\nWill be opened at {open_at}")
+        await userge.send_message(
+            chat_id,
+            f"#AUTOMATED_HANDLER\nGroup is closing.\nWill be opened at {open_at}")
         await CHANNEL.log(
             f"#NIGHT_MODE_SUCCESS\nSuccessfully turned on nightmode at `{chat_id}`,")
 
@@ -162,5 +173,4 @@ def extract_time(time_val: str):
         else:
             return ""
         return time
-    else:
-        return ""
+    return ""
