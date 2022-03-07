@@ -95,7 +95,7 @@ async def nightmode_handler(msg: Message):
     await msg.edit(
         'Successfully enabled nightmode in this chat.\n'
         f'Group will be locked at {start_timestamp.strftime("%H:%M:%S")}'
-        ' and will be opened after {flags.get("-e", "6h")} everyday.')
+        f' and will be opened after {flags.get("-e", "6h")} everyday.')
 
 
 async def un_mute_chat(chat_id: int, perm: ChatPermissions):
