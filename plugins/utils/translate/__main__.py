@@ -36,7 +36,7 @@ from .. import translate
              "{tr}tr"}, del_pre=True)
 async def translateme(message: Message):
     text = message.filtered_input_str
-    flags = message.flags if message.flags else []
+    flags = message.flags
     replied = message.reply_to_message
     is_poll = False
 
