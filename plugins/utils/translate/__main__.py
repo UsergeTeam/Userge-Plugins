@@ -36,7 +36,7 @@ from .. import translate
              "{tr}tr"}, del_pre=True)
 async def translateme(message: Message):
     text = message.filtered_input_str
-    flags = message.flags
+    flags = message.flags if message.flags else []
     replied = message.reply_to_message
     is_poll = False
 
@@ -50,7 +50,6 @@ async def translateme(message: Message):
             text = replied.text or replied.caption
     if not text:
         return await message.err("Give a text or reply to a message to translate!")
-
     if len(flags) == 2:
         src, dest = list(flags)
     elif len(flags) == 1:
