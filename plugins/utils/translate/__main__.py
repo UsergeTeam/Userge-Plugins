@@ -50,7 +50,6 @@ async def translateme(message: Message):
             text = replied.text or replied.caption
     if not text:
         return await message.err("Give a text or reply to a message to translate!")
-
     if len(flags) == 2:
         src, dest = list(flags)
     elif len(flags) == 1:

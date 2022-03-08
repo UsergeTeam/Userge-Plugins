@@ -10,4 +10,4 @@
 
 import os
 
-LANG = os.environ.get("PREFERRED_LANGUAGE")
+LANG = os.environ.get("PREFERRED_LANGUAGE", "en")
