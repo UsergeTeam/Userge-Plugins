@@ -13,6 +13,7 @@ from pyrogram.types import (
     # TODO
 )
 from urllib.parse import quote
+from ..ud import URBAN_API_URL
 
 from userge import userge, Message
 
@@ -53,13 +54,29 @@ async def wpraip(query: str) -> List[InlineQueryResultArticle]:
     async with aiohttp.ClientSession() as requests:
         two = await (
             await requests.get(
-                f"{quote(query)}"
+                URBAN_API_URL.format(
+                    Q=quote(query)
+                )
             )
         ).json()
         for term in two.get("list", []):
+            message_text = (
+                "ℹ️ Definition of {term.get('word')}\n"
+                "{term.get('definition')}\n"
+                "\n"
+                "📌 Example\n"
+                "{term.get('example')}"
+            )
             oorse.append(
                 InlineQueryResultArticle(
-
+                    title=term.get("word", " "),
+                    input_message_content=InputTextMessageContent(
+                        message_text=message_text,
+                        parse_mode="html",
+                        disable_web_page_preview=False
+                    ),
+                    url=term.get("permalink"),
+                    description=term.get("definition", " ")
                 )
             )
     return oorse
