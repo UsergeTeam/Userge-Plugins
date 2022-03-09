@@ -103,7 +103,7 @@ if userge.has_bot:
         query = inline_query.query.split("ud ")[1].strip()
         riqa = await wpraip(query)
         await inline_query.answer(
-            results=riqa,
+            results=riqa[:49],
             cache_time=300,
             is_gallery=False,
             is_personal=False,
