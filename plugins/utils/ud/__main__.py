@@ -63,11 +63,11 @@ async def wpraip(query: str) -> List[InlineQueryResultArticle]:
         ).json()
         for term in two.get("list", []):
             message_text = (
-                "ℹ️ Definition of <b>{term.get('word')}</b>\n"
-                "<code>{term.get('definition')}</code>\n"
+                f"ℹ️ Definition of <b>{term.get('word')}</b>\n"
+                f"<code>{term.get('definition')}</code>\n"
                 "\n"
                 "📌 Example\n"
-                "<u>{term.get('example')}</u>"
+                f"<u>{term.get('example')}</u>"
             )
             oorse.append(
                 InlineQueryResultArticle(
