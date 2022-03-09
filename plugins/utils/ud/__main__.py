@@ -10,6 +10,7 @@
 
 import aiohttp
 from json.decoder import JSONDecodeError
+from pyrogram import filters
 from pyrogram.types import (
     InlineQuery,
     InlineQueryResultArticle,
@@ -81,7 +82,7 @@ async def wpraip(query: str) -> List[InlineQueryResultArticle]:
                 )
             )
     return oorse
-            
+
 
 if userge.has_bot:
 
