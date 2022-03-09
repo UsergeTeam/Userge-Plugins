@@ -15,9 +15,9 @@ from pyrogram.types import (
     InlineQueryResultArticle,
     InputTextMessageContent
 )
+from typing import List
 from urllib.parse import quote
 from ..ud import URBAN_API_URL
-
 from userge import userge, Message, config
 
 
@@ -48,7 +48,6 @@ async def urban_dict(message: Message):
         return
     output = f"<b>Query:</b> <code>{query}</code>\n<b>Limit:</b> <code>{limit}</code>\n\n{output}"
     await message.edit_or_send_as_file(text=output, caption=query, parse_mode="html")
-
 
 
 async def wpraip(query: str) -> List[InlineQueryResultArticle]:
@@ -85,7 +84,7 @@ async def wpraip(query: str) -> List[InlineQueryResultArticle]:
             
 
 if userge.has_bot:
-    
+
     @userge.bot.on_inline_query(
         filters.create(
             lambda _, __, inline_query: (
@@ -112,4 +111,3 @@ if userge.has_bot:
             switch_pm_parameter="ud"
         )
         inline_query.stop_propagation()
-
