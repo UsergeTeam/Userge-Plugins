@@ -858,7 +858,7 @@ if VC_CLIENT:
         try:
             await VC_CLIENT.join_chat(invite_link)
         except UserAlreadyParticipant:
-            pass
+            await msg.edit('User already present in this chat')
         except UserBannedInChannel:
             await msg.edit('Unable to join this chat since user is banned here.')
         except Exception as e:
