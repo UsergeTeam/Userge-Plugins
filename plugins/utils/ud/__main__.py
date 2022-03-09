@@ -8,9 +8,11 @@
 #
 # All rights reserved.
 
-from urllib.error import HTTPError
-
-import urbandict
+import aiohttp
+from pyrogram.types import (
+    # TODO
+)
+from urllib.parse import quote
 
 from userge import userge, Message
 
@@ -43,3 +45,23 @@ async def urban_dict(message: Message):
         return
     output = f"**Query:** `{query}`\n**Limit:** `{limit}`\n\n{output}"
     await message.edit_or_send_as_file(text=output, caption=query)
+
+
+
+async def wpraip(query: str) -> List[InlineQueryResultArticle]:
+    oorse = []
+    async with aiohttp.ClientSession() as requests:
+        two = await (
+            await requests.get(
+                f"{quote(query)}"
+            )
+        ).json()
+        for term in two.get("list", []):
+            oorse.append(
+                InlineQueryResultArticle(
+
+                )
+            )
+    return oorse
+            
+        
