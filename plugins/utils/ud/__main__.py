@@ -9,15 +9,18 @@
 # All rights reserved.
 
 import aiohttp
+
+from typing import List
+from urllib.parse import quote
 from json.decoder import JSONDecodeError
+
 from pyrogram import filters
 from pyrogram.types import (
     InlineQuery,
     InlineQueryResultArticle,
     InputTextMessageContent
 )
-from typing import List
-from urllib.parse import quote
+
 from ..ud import URBAN_API_URL
 from userge import userge, Message, config
 
@@ -30,23 +33,28 @@ from userge import userge, Message, config
 async def urban_dict(message: Message):
     await message.edit("Processing...")
     query = message.filtered_input_str
+
     if not query:
         await message.err("Not found any query!")
         return
+
     try:
         mean = await wpraip(query)
     except JSONDecodeError:
         await message.edit(f"Sorry, couldn't find any results for: `{query}`", del_in=5)
         return
+
     output = ''
     limit = int(message.flags.get('-l', 1))
     for i, mean_ in enumerate(mean, start=1):
         output += f"{i}. {mean_.input_message_content.message_text}\n\n"
         if limit <= i:
             break
+
     if not output:
         await message.edit(f"No result found for **{query}**", del_in=5)
         return
+
     output = f"<b>Query:</b> <code>{query}</code>\n<b>Limit:</b> <code>{limit}</code>\n\n{output}"
     await message.edit_or_send_as_file(text=output, caption=query, parse_mode="html")
 
@@ -101,14 +109,20 @@ if userge.has_bot:
     )
     async def inline_fn(_, inline_query: InlineQuery):
         query = inline_query.query.split("ud ")[1].strip()
-        riqa = await wpraip(query)
+        try:
+            riqa = await wpraip(query)
+            switch_pm_text = f"Found {len(riqa)} results for {query}"
+        except JSONDecodeError:
+            pass
+        if not riqa:
+            switch_pm_text = f"Sorry, couldn't find any results for: {query}"
         await inline_query.answer(
             results=riqa[:49],
             cache_time=300,
             is_gallery=False,
             is_personal=False,
             next_offset="",
-            switch_pm_text=f"Found {len(riqa)} results for {query}",
+            switch_pm_text=switch_pm_text,
             switch_pm_parameter="ud"
         )
         inline_query.stop_propagation()
