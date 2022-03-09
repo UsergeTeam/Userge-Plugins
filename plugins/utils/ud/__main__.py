@@ -9,13 +9,16 @@
 # All rights reserved.
 
 import aiohttp
+from json.decoder import JSONDecodeError
 from pyrogram.types import (
-    # TODO
+    InlineQuery,
+    InlineQueryResultArticle,
+    InputTextMessageContent
 )
 from urllib.parse import quote
 from ..ud import URBAN_API_URL
 
-from userge import userge, Message
+from userge import userge, Message, config
 
 
 @userge.on_cmd("ud", about={
@@ -27,25 +30,24 @@ async def urban_dict(message: Message):
     await message.edit("Processing...")
     query = message.filtered_input_str
     if not query:
-        await message.err("No found any query!")
+        await message.err("Not found any query!")
         return
     try:
-        mean = urbandict.define(query)
-    except HTTPError:
+        mean = await wpraip(query)
+    except JSONDecodeError:
         await message.edit(f"Sorry, couldn't find any results for: `{query}`", del_in=5)
         return
     output = ''
     limit = int(message.flags.get('-l', 1))
     for i, mean_ in enumerate(mean, start=1):
-        output += f"{i}. **{mean_['def']}**\n" + \
-            f"  Examples:\n  * `{mean_['example'] or 'not found'}`\n\n"
+        output += f"{i}. {mean_.input_message_content.message_text}\n\n"
         if limit <= i:
             break
     if not output:
         await message.edit(f"No result found for **{query}**", del_in=5)
         return
-    output = f"**Query:** `{query}`\n**Limit:** `{limit}`\n\n{output}"
-    await message.edit_or_send_as_file(text=output, caption=query)
+    output = f"<b>Query:</b> <code>{query}</code>\n<b>Limit:</b> <code>{limit}</code>\n\n{output}"
+    await message.edit_or_send_as_file(text=output, caption=query, parse_mode="html")
 
 
 
@@ -61,11 +63,11 @@ async def wpraip(query: str) -> List[InlineQueryResultArticle]:
         ).json()
         for term in two.get("list", []):
             message_text = (
-                "ℹ️ Definition of {term.get('word')}\n"
-                "{term.get('definition')}\n"
+                "ℹ️ Definition of <b>{term.get('word')}</b>\n"
+                "<code>{term.get('definition')}</code>\n"
                 "\n"
                 "📌 Example\n"
-                "{term.get('example')}"
+                "<u>{term.get('example')}</u>"
             )
             oorse.append(
                 InlineQueryResultArticle(
@@ -81,4 +83,33 @@ async def wpraip(query: str) -> List[InlineQueryResultArticle]:
             )
     return oorse
             
-        
+
+if userge.has_bot:
+    
+    @userge.bot.on_inline_query(
+        filters.create(
+            lambda _, __, inline_query: (
+                inline_query.query
+                and inline_query.query.startswith("ud ")
+                and inline_query.from_user
+                and inline_query.from_user.id in config.OWNER_ID
+            ),
+            # https://t.me/UserGeSpam/359404
+            name="UdInlineFilter"
+        ),
+        group=-2
+    )
+    async def inline_fn(_, inline_query: InlineQuery):
+        query = inline_query.query.split("ud ")[1].strip()
+        riqa = await wpraip(query)
+        await inline_query.answer(
+            results=riqa,
+            cache_time=300,
+            is_gallery=False,
+            is_personal=False,
+            next_offset="",
+            switch_pm_text=f"Found {len(riqa)} results for {query}",
+            switch_pm_parameter="ud"
+        )
+        inline_query.stop_propagation()
+
