@@ -8,11 +8,21 @@
 #
 # All rights reserved.
 
-from urllib.error import HTTPError
+import aiohttp
 
-import urbandict
+from typing import List
+from urllib.parse import quote
+from json.decoder import JSONDecodeError
 
-from userge import userge, Message
+from pyrogram import filters
+from pyrogram.types import (
+    InlineQuery,
+    InlineQueryResultArticle,
+    InputTextMessageContent
+)
+
+from ..ud import URBAN_API_URL
+from userge import userge, Message, config
 
 
 @userge.on_cmd("ud", about={
@@ -23,23 +33,96 @@ from userge import userge, Message
 async def urban_dict(message: Message):
     await message.edit("Processing...")
     query = message.filtered_input_str
+
     if not query:
-        await message.err("No found any query!")
+        await message.err("Not found any query!")
         return
+
     try:
-        mean = urbandict.define(query)
-    except HTTPError:
+        mean = await wpraip(query)
+    except JSONDecodeError:
         await message.edit(f"Sorry, couldn't find any results for: `{query}`", del_in=5)
         return
+
     output = ''
     limit = int(message.flags.get('-l', 1))
     for i, mean_ in enumerate(mean, start=1):
-        output += f"{i}. **{mean_['def']}**\n" + \
-            f"  Examples:\n  * `{mean_['example'] or 'not found'}`\n\n"
+        output += f"{i}. {mean_.input_message_content.message_text}\n\n"
         if limit <= i:
             break
+
     if not output:
         await message.edit(f"No result found for **{query}**", del_in=5)
         return
-    output = f"**Query:** `{query}`\n**Limit:** `{limit}`\n\n{output}"
-    await message.edit_or_send_as_file(text=output, caption=query)
+
+    output = f"<b>Query:</b> <code>{query}</code>\n<b>Limit:</b> <code>{limit}</code>\n\n{output}"
+    await message.edit_or_send_as_file(text=output, caption=query, parse_mode="html")
+
+
+async def wpraip(query: str) -> List[InlineQueryResultArticle]:
+    oorse = []
+    async with aiohttp.ClientSession() as requests:
+        two = await (
+            await requests.get(
+                URBAN_API_URL.format(
+                    Q=quote(query)
+                )
+            )
+        ).json()
+        for term in two.get("list", []):
+            message_text = (
+                f"ℹ️ Definition of <b>{term.get('word')}</b>\n"
+                f"<code>{term.get('definition')}</code>\n"
+                "\n"
+                "📌 Example\n"
+                f"<u>{term.get('example')}</u>"
+            )
+            oorse.append(
+                InlineQueryResultArticle(
+                    title=term.get("word", " "),
+                    input_message_content=InputTextMessageContent(
+                        message_text=message_text,
+                        parse_mode="html",
+                        disable_web_page_preview=False
+                    ),
+                    url=term.get("permalink"),
+                    description=term.get("definition", " ")
+                )
+            )
+    return oorse
+
+
+if userge.has_bot:
+
+    @userge.bot.on_inline_query(
+        filters.create(
+            lambda _, __, inline_query: (
+                inline_query.query
+                and inline_query.query.startswith("ud ")
+                and inline_query.from_user
+                and inline_query.from_user.id in config.OWNER_ID
+            ),
+            # https://t.me/UserGeSpam/359404
+            name="UdInlineFilter"
+        ),
+        group=-2
+    )
+    async def inline_fn(_, inline_query: InlineQuery):
+        query = inline_query.query.split("ud ")[1].strip()
+        try:
+            riqa = await wpraip(query)
+            switch_pm_text = f"Found {len(riqa)} results for {query}"
+        except JSONDecodeError:
+            pass
+        if not riqa:
+            switch_pm_text = f"Sorry, couldn't find any results for: {query}"
+        await inline_query.answer(
+            results=riqa[:49],
+            cache_time=300,
+            is_gallery=False,
+            is_personal=False,
+            next_offset="",
+            switch_pm_text=switch_pm_text,
+            switch_pm_parameter="ud"
+        )
+        inline_query.stop_propagation()
