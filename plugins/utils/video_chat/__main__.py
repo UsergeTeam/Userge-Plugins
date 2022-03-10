@@ -443,7 +443,7 @@ async def play_music(msg: Message, forceplay: bool):
     """ play music """
     global CLIENT  # pylint: disable=global-statement
 
-    input_str = msg.filtered_input_str or getattr(msg.reply_to_message, 'text', '')
+    input_str = msg.filtered_input_str or getattr(msg.reply_to_message, 'text', '') or ''
     flags = msg.flags
     is_video = "-v" in flags
     path = Path(input_str)
