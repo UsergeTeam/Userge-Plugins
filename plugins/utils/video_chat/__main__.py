@@ -298,7 +298,7 @@ async def joinvc(msg: Message):
                 'trying to join group.')
             join = await invite_vc_client(msg)
             if not join:
-                return
+                return await msg_.delete()
             await msg_.delete()
         CHAT_ID = msg.chat.id
         CHAT_NAME = msg.chat.title
@@ -1025,7 +1025,7 @@ async def invite_vc_client(msg: Message) -> bool:
         await reply_text(msg, 'Unable to join this chat since user is banned here.')
         return False
     except Exception as e:
-        await reply_text(f'**ERROR**: {e}')
+        await reply_text(msg, f'**ERROR**: {e}')
         return False
     else:
         await reply_text(msg, 'VC_CLIENT Successfully joined.')
