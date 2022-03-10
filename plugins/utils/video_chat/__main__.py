@@ -839,7 +839,7 @@ async def _on_raw(_, m: BaseMessage, *__) -> None:
         # TODO: chat_id
         for participant in m.participants:
             if participant.is_self:
-                group_call = await userge.send(
+                group_call = await VC_CLIENT.send(
                     GetGroupCall(call=InputGroupCall(
                         access_hash=m.call.access_hash,
                         id=m.call.id), limit=1)
