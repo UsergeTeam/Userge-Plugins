@@ -443,7 +443,7 @@ async def play_music(msg: Message, forceplay: bool):
     """ play music """
     global CLIENT  # pylint: disable=global-statement
 
-    input_str = msg.filtered_input_str
+    input_str = msg.filtered_input_str or getattr(msg.reply_to_message, 'text', '')
     flags = msg.flags
     is_video = "-v" in flags
     path = Path(input_str)
@@ -554,6 +554,10 @@ async def play_music(msg: Message, forceplay: bool):
         else:
             return await reply_text(msg, "Replied media is invalid.")
 
+        if msg.sender_chat:
+            setattr(replied, 'sender_chat', msg.sender_chat)
+        elif msg.from_user:
+            setattr(replied, 'from_user', msg.from_user)
         CLIENT = msg.client
         if forceplay:
             QUEUE.insert(0, replied)
