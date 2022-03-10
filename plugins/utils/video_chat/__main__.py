@@ -1012,7 +1012,8 @@ async def invite_vc_client(msg: Message) -> bool:
         try:
             link = await msg.client.create_chat_invite_link(msg.chat.id)
         except ChatAdminRequired:
-            return await reply_text(msg, '`Provide a invite link along command.!!`')
+            await reply_text(msg, '`Provide a invite link along command.!!`')
+            return False
         else:
             invite_link = link.invite_link
     try:
