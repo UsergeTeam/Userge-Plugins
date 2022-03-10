@@ -127,7 +127,7 @@ async def _init():
 
 
 @userge.on_stop
-async def exit():
+async def stop_vc_client():
     if video_chat.VC_SESSION:
         await VC_CLIENT.stop()
 
@@ -295,8 +295,8 @@ async def joinvc(msg: Message):
         except (ChannelInvalid, ChannelPrivate):
             msg_ = await reply_text(
                 msg,
-                f'You are using VC_SESSION_STRING and it seems that user is not present in this group.\n'
-                'trying to join group.')
+                'You are using VC_SESSION_STRING and it seems that user is '
+                'not present in this group.\ntrying to join group.')
             join = await invite_vc_client(msg)
             if not join:
                 return await msg_.delete()

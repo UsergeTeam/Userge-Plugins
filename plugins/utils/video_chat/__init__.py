@@ -15,4 +15,4 @@ logging.getLogger("pytgcalls").setLevel(logging.WARNING)
 
 YTDL_PATH = os.environ.get("YOUTUBE_DL_PATH", "yt_dlp")
 MAX_DURATION = int(os.environ.get("MAX_DURATION", 900))
-VC_SESSION = os.environ.get("VC_SESSION_STRING", None)
+VC_SESSION = os.environ.get("VC_SESSION_STRING")
