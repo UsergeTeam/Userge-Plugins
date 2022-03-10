@@ -78,7 +78,7 @@ else:
     userge.__class__.__module__ = 'pyrogram.client'
     VC_CLIENT = userge
 
-call = PyTgCalls(userge, overload_quiet_mode=True)
+call = PyTgCalls(VC_CLIENT, overload_quiet_mode=True)
 call._env_checker.check_environment()  # pylint: disable=protected-access
 
 CHANNEL = userge.getCLogger(__name__)
