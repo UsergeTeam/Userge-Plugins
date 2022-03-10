@@ -816,22 +816,9 @@ async def resume_music(msg: Message):
 @vc_chat
 @check_enable_for_all
 async def shuffle_queue(msg: Message):
-    if not QUEUE:
-        out = "`Queue is empty`"
-    else:
+    if QUEUE:
         random.shuffle(QUEUE)
-        out = f"**Shuffled {len(QUEUE)} Songs in Queue:**\n"
-        for i, m in enumerate(QUEUE, start=1):
-            file = m.audio or m.video or m.document or None
-            if hasattr(m, 'file_name'):
-                out += f"\n{i}. {m.file_name}"
-            elif file:
-                out += f"\n{i}. [{file.file_name}]({m.link})"
-            else:
-                title, link = _get_yt_info(m)
-                out += f"\n{i}. [{title}]({link})"
-
-    await reply_text(msg, out)
+    await view_queue(msg)
 
 
 @userge.on_cmd("stopvc", about={
