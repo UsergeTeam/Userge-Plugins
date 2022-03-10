@@ -17,20 +17,25 @@ import time
 import math
 import shlex
 import shutil
+import random
 import asyncio
-import requests
 from pathlib import Path
 from traceback import format_exc
 from typing import List, Tuple, Optional
 from json.decoder import JSONDecodeError
+
+import requests
 from youtubesearchpython import VideosSearch
 
-from pyrogram import ContinuePropagation
+from pyrogram import ContinuePropagation, Client
 from pyrogram.raw import functions
 from pyrogram.raw.base import Message as BaseMessage
 from pyrogram.raw.functions.phone import GetGroupCall
 from pyrogram.raw.types import UpdateGroupCallParticipants, InputGroupCall, GroupCall
-from pyrogram.errors import MessageNotModified, QueryIdInvalid
+from pyrogram.errors import (
+    MessageNotModified, QueryIdInvalid,
+    ChannelInvalid, ChannelPrivate, ChatAdminRequired,
+    UserAlreadyParticipant, UserBannedInChannel)
 from pyrogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -65,11 +70,18 @@ from userge.utils.exceptions import StopConversation
 
 ytdl = get_custom_import_re(video_chat.YTDL_PATH)
 
-# https://github.com/pytgcalls/pytgcalls/blob/master/pytgcalls/mtproto/mtproto_client.py#L18
-userge.__class__.__module__ = 'pyrogram.client'
+if video_chat.VC_SESSION:
+    VC_CLIENT = Client(
+        video_chat.VC_SESSION,
+        config.API_ID,
+        config.API_HASH)
+else:
+    # https://github.com/pytgcalls/pytgcalls/blob/master/pytgcalls/mtproto/mtproto_client.py#L18
+    userge.__class__.__module__ = 'pyrogram.client'
+    VC_CLIENT = userge
+
 call = PyTgCalls(userge, overload_quiet_mode=True)
 call._env_checker.check_environment()  # pylint: disable=protected-access
-
 
 CHANNEL = userge.getCLogger(__name__)
 LOG = userge.getLogger()
@@ -106,6 +118,16 @@ async def _init():
     data = await VC_DB.find_one({'_id': 'VC_CMD_TOGGLE'})
     if data:
         CMDS_FOR_ALL = bool(data['is_enable'])
+    if video_chat.VC_SESSION:
+        await VC_CLIENT.start()
+        me = await VC_CLIENT.get_me()
+        LOG.info(f"Separate VC CLIENT FOUND - {me.first_name}")
+
+
+@userge.on_stop
+async def stop_vc_client():
+    if video_chat.VC_SESSION:
+        await VC_CLIENT.stop()
 
 
 async def reply_text(
@@ -235,7 +257,7 @@ def volume_button_markup():
     allow_bots=False)
 async def joinvc(msg: Message):
     """ join video chat """
-    global CHAT_NAME, CHAT_ID, CONTROL_CHAT_IDS  # pylint: disable=global-statement
+    global CHAT_NAME, CHAT_ID  # pylint: disable=global-statement
 
     await msg.delete()
 
@@ -252,7 +274,7 @@ async def joinvc(msg: Message):
         if chat.strip("-").isnumeric():
             chat = int(chat)
         try:
-            _chat = await userge.get_chat(chat)
+            _chat = await VC_CLIENT.get_chat(chat)
         except Exception as e:
             return await reply_text(msg, f'Invalid Join In Chat Specified\n{e}')
         CHAT_ID = _chat.id
@@ -263,19 +285,33 @@ async def joinvc(msg: Message):
         if _chat.linked_chat:
             CONTROL_CHAT_IDS.append(_chat.linked_chat.id)
     else:
+        chat_id_ = msg.chat.username or msg.chat.id
+        try:
+            # caching the peer in case of public chats to play without joining for VC_SESSION_STRING
+            await VC_CLIENT.get_chat(chat_id_)
+        except (ChannelInvalid, ChannelPrivate):
+            msg_ = await reply_text(
+                msg,
+                'You are using VC_SESSION_STRING and it seems that user is '
+                'not present in this group.\ntrying to join group.')
+            join = await invite_vc_client(msg)
+            await msg_.delete()
+            if not join:
+                return
         CHAT_ID = msg.chat.id
         CHAT_NAME = msg.chat.title
     if join_as:
         if join_as.strip("-").isnumeric():
             join_as = int(join_as)
         try:
-            join_as = (await userge.get_chat(join_as)).id
+            join_as = (await VC_CLIENT.get_chat(join_as)).id
         except Exception as e:
-            CHAT_ID, CHAT_NAME, CONTROL_CHAT_IDS = 0, '', []
+            CHAT_ID, CHAT_NAME = 0, ''
+            CONTROL_CHAT_IDS.clear()
             return await reply_text(msg, f'Invalid Join As Chat Specified\n{e}')
-        join_as_peers = await userge.send(functions.phone.GetGroupCallJoinAs(
+        join_as_peers = await VC_CLIENT.send(functions.phone.GetGroupCallJoinAs(
             peer=(
-                await userge.resolve_peer(CHAT_ID)
+                await VC_CLIENT.resolve_peer(CHAT_ID)
             )
         ))
         raw_id = int(str(join_as).replace("-100", ""))
@@ -284,15 +320,16 @@ async def joinvc(msg: Message):
             or getattr(peers, "channel_id", None)
             for peers in join_as_peers.peers
         ]:
-            CHAT_ID, CHAT_NAME, CONTROL_CHAT_IDS = 0, '', []
+            CHAT_ID, CHAT_NAME = 0, ''
+            CONTROL_CHAT_IDS.clear()
             return await reply_text(msg, "You cant join the video chat as this channel.")
 
     if join_as:
-        peer = await userge.resolve_peer(join_as)
+        peer = await VC_CLIENT.resolve_peer(join_as)
     else:
-        peer = await userge.resolve_peer(userge.id)
+        peer = await VC_CLIENT.resolve_peer('me')
     try:
-        # Initialising NodeJS
+        # Initializing NodeJS
         if not call.is_connected:
             await call.start()
         # Joining with a dummy audio, since py-tgcalls wont allow joining
@@ -307,27 +344,31 @@ async def joinvc(msg: Message):
         )
     except NoActiveGroupCall:
         try:
-            peer = await userge.resolve_peer(CHAT_ID)
-            await userge.send(
+            peer = await VC_CLIENT.resolve_peer(CHAT_ID)
+            await VC_CLIENT.send(
                 functions.phone.CreateGroupCall(
                     peer=peer, random_id=2
                 )
             )
             await asyncio.sleep(3)
-            CHAT_ID, CHAT_NAME, CONTROL_CHAT_IDS = 0, '', []
+            CHAT_ID, CHAT_NAME = 0, ''
+            CONTROL_CHAT_IDS.clear()
             return await joinvc(msg)
         except Exception as err:
-            CHAT_ID, CHAT_NAME, CONTROL_CHAT_IDS = 0, '', []
+            CHAT_ID, CHAT_NAME = 0, ''
+            CONTROL_CHAT_IDS.clear()
             return await reply_text(msg, err)
     except (NodeJSNotInstalled, TooOldNodeJSVersion):
         return await reply_text(msg, "NodeJs is not installed or installed version is too old.")
     except AlreadyJoinedError:
         await call.leave_group_call(CHAT_ID)
         await asyncio.sleep(3)
-        CHAT_ID, CHAT_NAME, CONTROL_CHAT_IDS = 0, '', []
+        CHAT_ID, CHAT_NAME = 0, ''
+        CONTROL_CHAT_IDS.clear()
         return await joinvc(msg)
     except Exception as e:
-        CHAT_ID, CHAT_NAME, CONTROL_CHAT_IDS = 0, '', []
+        CHAT_ID, CHAT_NAME = 0, ''
+        CONTROL_CHAT_IDS.clear()
         return await reply_text(msg, f'Error during Joining the Call\n`{e}`')
 
     await _on_join()
@@ -771,6 +812,19 @@ async def resume_music(msg: Message):
     await reply_text(msg, "◀️ **Resumed** Music Successfully")
 
 
+@userge.on_cmd("shuffle", about={
+    'header': "Shuffle songs in queue.",
+    'usage': "{tr}shuffle"},
+    trigger=config.PUBLIC_TRIGGER, check_client=True,
+    filter_me=False, allow_bots=False)
+@vc_chat
+@check_enable_for_all
+async def shuffle_queue(msg: Message):
+    if QUEUE:
+        random.shuffle(QUEUE)
+    await view_queue(msg)
+
+
 @userge.on_cmd("stopvc", about={
     'header': "Stop vc and clear Queue.",
     'usage': "{tr}stopvc"})
@@ -782,13 +836,13 @@ async def stop_music(msg: Message):
     await reply_text(msg, "`Stopped Userge-Music.`", del_in=5)
 
 
-@userge.on_raw_update()
+@VC_CLIENT.on_raw_update()
 async def _on_raw(_, m: BaseMessage, *__) -> None:
     if isinstance(m, UpdateGroupCallParticipants):
         # TODO: chat_id
         for participant in m.participants:
             if participant.is_self:
-                group_call = await userge.send(
+                group_call = await VC_CLIENT.send(
                     GetGroupCall(call=InputGroupCall(
                         access_hash=m.call.access_hash,
                         id=m.call.id), limit=1)
@@ -952,6 +1006,31 @@ async def replay_music(flags: dict = None) -> bool:
     except KeyError:
         return False
     return True
+
+
+async def invite_vc_client(msg: Message) -> bool:
+    """ Invites the VC_CLIENT to the current chat. """
+    invite_link = msg.filtered_input_str
+    if not invite_link:
+        try:
+            link = await msg.client.create_chat_invite_link(msg.chat.id)
+        except ChatAdminRequired:
+            await reply_text(msg, '`Provide a invite link along command.!!`')
+            return False
+        else:
+            invite_link = link.invite_link
+    try:
+        await VC_CLIENT.join_chat(invite_link)
+    except UserAlreadyParticipant:
+        await reply_text(msg, 'User already present in this chat')
+    except UserBannedInChannel:
+        await reply_text(msg, 'Unable to join this chat since user is banned here.')
+    except Exception as e:
+        await reply_text(msg, f'**ERROR**: {e}')
+    else:
+        await reply_text(msg, 'VC_CLIENT Successfully joined.')
+        return True
+    return False
 
 
 async def yt_down(msg: Message):
