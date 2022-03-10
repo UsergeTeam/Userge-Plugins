@@ -114,6 +114,7 @@ if userge.has_bot:
             switch_pm_text = f"Found {len(riqa)} results for {query}"
         except JSONDecodeError:
             riqa = []
+        if not riqa:
             switch_pm_text = f"Sorry, couldn't find any results for: {query}"
         await inline_query.answer(
             results=riqa[:49],
