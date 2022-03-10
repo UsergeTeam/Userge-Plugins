@@ -8,8 +8,6 @@
 
 """ remove background from image """
 
-import os
+from userge.utils import secured_env
 
-from userge.utils import secure_env
-
-REMOVE_BG_API_KEY = os.environ.get(secure_env("REMOVE_BG_API_KEY"))
+REMOVE_BG_API_KEY = secured_env("REMOVE_BG_API_KEY")

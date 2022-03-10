@@ -8,8 +8,9 @@
 #
 # All rights reserved.
 
-from pytz import timezone
 from datetime import datetime as dt
+
+from pytz import timezone
 
 from userge import userge, Message
 from . import COUNTRY_CITY

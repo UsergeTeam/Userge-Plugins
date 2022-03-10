@@ -8,8 +8,8 @@
 #
 # All rights reserved.
 
-import time
 import asyncio
+import time
 from json import dumps
 
 from emoji import get_emoji_regexp

@@ -8,14 +8,14 @@
 #
 # All rights reserved.
 
-import os
 import asyncio
-from re import sub
+import os
 from collections import deque
 from random import choice, getrandbits, randint
+from re import sub
 
-import wget
 import requests
+import wget
 from cowpy import cow
 
 from userge import userge, Message, pool

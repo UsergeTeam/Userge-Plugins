@@ -8,17 +8,16 @@
 #
 # All rights reserved.
 
-import re
-import json
-import ffmpeg
 import asyncio
-
+import json
+import re
+from asyncio import create_subprocess_exec, subprocess
+from datetime import datetime
 from math import floor
 from pathlib import Path
-from datetime import datetime
 from typing import Tuple, Union
-from asyncio import create_subprocess_exec, subprocess
 
+import ffmpeg
 from ffmpeg._run import Error, compile as ffmpg_compile
 from ffmpeg._utils import convert_kwargs_to_cmd_line_args
 

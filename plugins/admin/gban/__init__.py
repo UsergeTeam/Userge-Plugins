@@ -8,8 +8,8 @@
 
 """ setup gban """
 
-from typing import Dict
 from os import environ
+from typing import Dict
 
 WHITE_CACHE: Dict[int, str] = {}
 FBAN_CHAT_ID = int(environ.get("FBAN_CHAT_ID") or 0)

@@ -22,8 +22,8 @@ from pyrogram.errors import (
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from userge import userge, Message, config, logging, get_collection, pool
-from .. import rss_feed
 from userge.utils.exceptions import UsergeBotNotFound
+from .. import rss_feed
 
 _LOG = logging.getLogger(__name__)
 

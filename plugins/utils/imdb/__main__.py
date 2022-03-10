@@ -8,8 +8,8 @@
 #
 # All rights reserved.
 
-import os
 import json
+import os
 from urllib.parse import urlparse
 
 import requests

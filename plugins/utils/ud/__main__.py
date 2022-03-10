@@ -8,12 +8,11 @@
 #
 # All rights reserved.
 
-import aiohttp
-
+from json.decoder import JSONDecodeError
 from typing import List
 from urllib.parse import quote
-from json.decoder import JSONDecodeError
 
+import aiohttp
 from pyrogram import filters
 from pyrogram.types import (
     InlineQuery,
@@ -21,8 +20,8 @@ from pyrogram.types import (
     InputTextMessageContent
 )
 
-from ..ud import URBAN_API_URL
 from userge import userge, Message, config
+from ..ud import URBAN_API_URL
 
 
 @userge.on_cmd("ud", about={

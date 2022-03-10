@@ -22,8 +22,8 @@ from pyrogram.raw.functions.messages import GetStickerSet
 from pyrogram.raw.types import InputStickerSetShortName
 
 from userge import userge, Message, config
-from .. import kang
 from userge.utils.tools import runcmd
+from .. import kang
 
 
 @userge.on_cmd(

@@ -8,13 +8,13 @@
 #
 # All rights reserved.
 
+import asyncio
+import math
 import os
 import re
-import math
-import asyncio
-from typing import Tuple, Union
 from datetime import datetime
 from json import dumps
+from typing import Tuple, Union
 from urllib.parse import unquote_plus
 
 from pySmartDL import SmartDL

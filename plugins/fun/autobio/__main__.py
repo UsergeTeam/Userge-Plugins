@@ -10,13 +10,13 @@
 
 # By @Krishna_Singhal
 
-import time
 import asyncio
+import time
 
 from pyrogram.errors import FloodWait
 
-from .resources.quotes import ENGLISH_QUOTES, HINDI_QUOTES
 from userge import userge, Message, get_collection
+from .resources.quotes import ENGLISH_QUOTES, HINDI_QUOTES
 
 BIO_UPDATION = False
 AUTOBIO_TIMEOUT = 300

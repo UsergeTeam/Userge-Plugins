@@ -8,8 +8,6 @@
 
 """ convert currency """
 
-import os
+from userge.utils import secured_env
 
-from userge.utils import secure_env
-
-CURRENCY_API = os.environ.get(secure_env("CURRENCY_API"))
+CURRENCY_API = secured_env("CURRENCY_API")

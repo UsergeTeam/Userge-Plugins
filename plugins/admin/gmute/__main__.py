@@ -10,12 +10,12 @@
 
 import asyncio
 
-from pyrogram.types import ChatPermissions
 from pyrogram.errors.exceptions.bad_request_400 import (
     ChatAdminRequired,
     UserAdminInvalid,
     ChannelInvalid,
 )
+from pyrogram.types import ChatPermissions
 
 from userge import userge, Message, get_collection, filters
 from ...builtin import sudo

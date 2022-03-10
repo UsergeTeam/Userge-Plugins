@@ -9,9 +9,9 @@
 # All rights reserved.
 
 
+import asyncio
 import os
 import random
-import asyncio
 
 from hachoir.metadata import extractMetadata as XMan
 from hachoir.parser import createParser as CPR

@@ -17,8 +17,8 @@ from datetime import datetime
 from removebg import RemoveBg
 
 from userge import userge, config, Message
-from .. import removebg
 from userge.utils import progress
+from .. import removebg
 
 IMG_PATH = config.Dynamic.DOWN_PATH + "dl_image.jpg"
 

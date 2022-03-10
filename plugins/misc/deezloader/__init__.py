@@ -8,8 +8,6 @@
 
 """ deezloader """
 
-import os
+from userge.utils import secured_env
 
-from userge.utils import secure_env
-
-ARL_TOKEN = os.environ.get(secure_env("ARL_TOKEN"))
+ARL_TOKEN = secured_env("ARL_TOKEN")

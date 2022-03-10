@@ -11,6 +11,7 @@
 # By @Krishna_Singhal
 
 import random
+
 from emoji import get_emoji_regexp
 
 from userge import userge, Message

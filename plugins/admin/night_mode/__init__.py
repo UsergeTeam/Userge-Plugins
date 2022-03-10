@@ -1,11 +1,11 @@
 """ Night Mode for groups """
 import os
-from userge import config
-
-from pymongo import MongoClient
 
 from apscheduler.jobstores.mongodb import MongoDBJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from pymongo import MongoClient
+
+from userge import config
 
 TZ = os.environ.get("TIME_ZONE", "UTC")
 

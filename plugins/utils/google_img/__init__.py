@@ -10,7 +10,7 @@
 
 import os
 
-from userge.utils import secure_env
+from userge.utils import secured_env
 
-GCS_API_KEY = os.environ.get(secure_env("GCS_API_KEY"))
+GCS_API_KEY = secured_env("GCS_API_KEY")
 GCS_IMAGE_E_ID = os.environ.get("GCS_IMAGE_E_ID")

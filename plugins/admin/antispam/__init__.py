@@ -8,12 +8,10 @@
 
 """ setup antispam """
 
-from os import environ
+from userge.utils import secured_env
 
-from userge.utils import secure_env
-
-USERGE_ANTISPAM_API = environ.get(secure_env("USERGE_ANTISPAM_API"))
-SPAM_WATCH_API = environ.get(secure_env("SPAM_WATCH_API"))
+USERGE_ANTISPAM_API = secured_env("USERGE_ANTISPAM_API")
+SPAM_WATCH_API = secured_env("SPAM_WATCH_API")
 
 
 class Dynamic:

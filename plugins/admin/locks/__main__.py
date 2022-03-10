@@ -11,11 +11,11 @@
 import os
 from typing import Tuple, Optional
 
-from pyrogram.types import ChatPermissions
 from pyrogram.errors import ChatNotModified
-from pyrogram.raw.types import InputPeerChannel, ChatBannedRights
 from pyrogram.raw.functions.channels import GetFullChannel
 from pyrogram.raw.functions.messages import GetFullChat, EditChatDefaultBannedRights
+from pyrogram.raw.types import InputPeerChannel, ChatBannedRights
+from pyrogram.types import ChatPermissions
 
 from userge import userge, Message
 

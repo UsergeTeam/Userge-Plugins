@@ -8,8 +8,6 @@
 
 """ Virus-Total module to check virus in files """
 
-from os import environ
+from userge.utils import secured_env
 
-from userge.utils import secure_env
-
-API_KEY = environ.get(secure_env("VT_API_KEY"))
+API_KEY = secured_env("VT_API_KEY")

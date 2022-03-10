@@ -11,14 +11,15 @@
 # By @Krishna_Singhal
 # Also see https://github.com/uaudith/VirusTotal-Telegram
 
-import os
-import json
 import asyncio
+import json
+import os
+
 import requests
 
 from userge import userge, Message, config
-from .. import virus_total
 from userge.utils import progress, humanbytes
+from .. import virus_total
 
 
 @userge.on_cmd("scan", about={

@@ -9,8 +9,9 @@
 # All rights reserved.
 
 from userge import userge, Message
-from .. import download
 from userge.utils.exceptions import ProcessCanceled
+
+from .. import download
 
 LOGGER = userge.getLogger(__name__)
 

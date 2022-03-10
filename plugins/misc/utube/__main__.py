@@ -8,11 +8,11 @@
 #
 # All rights reserved.
 
-import os
 import glob
+import os
+from math import floor
 from pathlib import Path
 from time import time
-from math import floor
 
 import wget
 
