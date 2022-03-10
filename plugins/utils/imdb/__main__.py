@@ -48,7 +48,9 @@ async def _imdb(message: Message):
         response = await _get(imdb.API_ONE_URL.format(theuserge=movie_name))
         srch_results = json.loads(response.text)
         mov_imdb_id = srch_results.get("d")[0].get("id")
-        image_link, description = await get_movie_description(mov_imdb_id, 4096)
+        image_link, description = await get_movie_description(
+            mov_imdb_id, config.MAX_MESSAGE_LENGTH
+        )
     except (IndexError, json.JSONDecodeError, AttributeError):
         await message.edit("Bruh, Plox enter **Valid movie name** kthx")
         return
@@ -192,7 +194,9 @@ if userge.has_bot:
     async def imdb_callback(_, c_q: CallbackQuery):
         if c_q.from_user and c_q.from_user.id in config.OWNER_ID:
             imdb_id = str(c_q.matches[0].group(1))
-            _, description = await get_movie_description(imdb_id, 4096)
+            _, description = await get_movie_description(
+                imdb_id, config.MAX_MESSAGE_LENGTH
+            )
             await c_q.edit_message_text(
                 text=description,
                 disable_web_page_preview=False,

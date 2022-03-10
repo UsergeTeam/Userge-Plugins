@@ -643,8 +643,12 @@ async def view_queue(msg: Message):
     if not QUEUE:
         out = "`Queue is empty`"
     else:
+        list_out = []
         out = f"**{len(QUEUE)} Songs in Queue:**\n"
         for i, m in enumerate(QUEUE, start=1):
+            if len(out) > config.MAX_MESSAGE_LENGTH:
+                list_out.append(out)
+                out = ''
             file = m.audio or m.video or m.document or None
             if hasattr(m, 'file_name'):
                 out += f"\n{i}. {m.file_name}"
@@ -654,7 +658,7 @@ async def view_queue(msg: Message):
                 title, link = _get_yt_info(m)
                 out += f"\n{i}. [{title}]({link})"
 
-    await reply_text(msg, out)
+    [await reply_text(msg, m) for m in list_out]
 
 
 @userge.on_cmd("volume", about={
@@ -1373,6 +1377,10 @@ if userge.has_bot:
                 out = f"**{len(QUEUE)} Song"
                 out += f"{'s' if len(QUEUE) > 1 else ''} in Queue:**\n"
                 for i, m in enumerate(QUEUE, start=1):
+                    if len(out) > config.MAX_MESSAGE_LENGTH - 100:
+                        out += ('\nQueue too Long, '
+                               'can not display more songs because of telegram restrictions.')
+                        break
                     file = m.audio or m.video or m.document or None
                     if hasattr(m, 'file_name'):
                         out = f"\n{i}. {m.file_name}"
