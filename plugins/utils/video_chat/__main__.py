@@ -306,7 +306,7 @@ async def joinvc(msg: Message):
         try:
             join_as = (await VC_CLIENT.get_chat(join_as)).id
         except Exception as e:
-            CHAT_ID, CHAT_NAME = 0, '',
+            CHAT_ID, CHAT_NAME = 0, ''
             CONTROL_CHAT_IDS.clear()
             return await reply_text(msg, f'Invalid Join As Chat Specified\n{e}')
         join_as_peers = await VC_CLIENT.send(functions.phone.GetGroupCallJoinAs(
