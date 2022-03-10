@@ -33,7 +33,7 @@ from pyrogram.raw.functions.phone import GetGroupCall
 from pyrogram.raw.types import UpdateGroupCallParticipants, InputGroupCall, GroupCall
 from pyrogram.errors import (
     MessageNotModified, QueryIdInvalid,
-    ChannelInvalid, ChatAdminRequired,
+    ChannelInvalid, ChannelPrivate, ChatAdminRequired,
     UserAlreadyParticipant, UserBannedInChannel)
 from pyrogram.types import (
     InlineKeyboardMarkup,
@@ -81,6 +81,7 @@ else:
     # https://github.com/pytgcalls/pytgcalls/blob/master/pytgcalls/mtproto/mtproto_client.py#L18
     userge.__class__.__module__ = 'pyrogram.client'
     call = PyTgCalls(userge, overload_quiet_mode=True)
+    VC_CLIENT = userge
 
 call._env_checker.check_environment()  # pylint: disable=protected-access
 
@@ -119,7 +120,7 @@ async def _init():
     data = await VC_DB.find_one({'_id': 'VC_CMD_TOGGLE'})
     if data:
         CMDS_FOR_ALL = bool(data['is_enable'])
-    if VC_CLIENT:
+    if video_chat.VC_SESSION:
         await VC_CLIENT.start()
         me = await VC_CLIENT.get_me()
         LOG.info(f"Separate VC CLIENT FOUND - {me.first_name}")
@@ -291,7 +292,7 @@ async def joinvc(msg: Message):
         try:
             # caching the peer in case of public chats to play without joining for VC_SESSION_STRING
             await client.get_chat(chat_id_)
-        except ChannelInvalid:
+        except (ChannelInvalid, ChannelPrivate):
             msg_ = await reply_text(
                 msg,
                 f'You are using VC_SESSION_STRING and it seems that user is not present in this group.\n'
@@ -832,8 +833,7 @@ async def stop_music(msg: Message):
     await reply_text(msg, "`Stopped Userge-Music.`", del_in=5)
 
 
-client = VC_CLIENT or userge
-@client.on_raw_update()
+@VC_CLIENT.on_raw_update()
 async def _on_raw(_, m: BaseMessage, *__) -> None:
     if isinstance(m, UpdateGroupCallParticipants):
         # TODO: chat_id
