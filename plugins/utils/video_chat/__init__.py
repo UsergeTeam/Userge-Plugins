@@ -8,8 +8,10 @@
 
 """ manage video chats """
 
-import logging
 import os
+import logging
+
+from userge.utils import secure_env
 
 logging.getLogger("pytgcalls").setLevel(logging.WARNING)
 
