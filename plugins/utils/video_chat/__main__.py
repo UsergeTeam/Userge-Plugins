@@ -292,10 +292,14 @@ async def joinvc(msg: Message):
             # caching the peer in case of public chats to play without joining for VC_SESSION_STRING
             await client.get_chat(chat_id_)
         except ChannelInvalid:
-            return await reply_text(
+            msg_ = await reply_text(
                 msg,
                 f'You are using VC_SESSION_STRING and it seems that user is not present in this group.\n'
-                f'Use {config.CMD_TRIGGER}joinchat to invite the user')
+                'trying to join group.')
+            join = await invite_vc_client(msg)
+            if not join:
+                return
+            await msg_.delete()
         CHAT_ID = msg.chat.id
         CHAT_NAME = msg.chat.title
     if join_as:
@@ -325,7 +329,7 @@ async def joinvc(msg: Message):
     else:
         peer = await client.resolve_peer('me')
     try:
-        # Initialising NodeJS
+        # Initializing NodeJS
         if not call.is_connected:
             await call.start()
         # Joining with a dummy audio, since py-tgcalls wont allow joining
@@ -811,7 +815,7 @@ async def resume_music(msg: Message):
     filter_me=False, allow_bots=False)
 @vc_chat
 @check_enable_for_all
-async def suffle_queue(msg: Message):
+async def shuffle_queue(msg: Message):
     if not QUEUE:
         out = "`Queue is empty`"
     else:
@@ -839,32 +843,6 @@ async def stop_music(msg: Message):
     await msg.delete()
     await _skip(True)
     await reply_text(msg, "`Stopped Userge-Music.`", del_in=5)
-
-
-if VC_CLIENT:
-    @userge.on_cmd("joinchat", about={
-        'header': "Invites the VC_CLIENT to the current chat.",
-        'usage': "{tr}joinchat < Invite Link of the chat >"})
-    async def invite_vc_client(msg: Message):
-        """ Invites the VC_CLIENT to the current chat. """
-        invite_link = msg.filtered_input_str
-        if not invite_link:
-            try:
-                link = await msg.client.create_chat_invite_link(msg.chat.id)
-            except ChatAdminRequired:
-                return await msg.edit('`Provide a invite link!!`')
-            else:
-                invite_link = link.invite_link
-        try:
-            await VC_CLIENT.join_chat(invite_link)
-        except UserAlreadyParticipant:
-            await msg.edit('User already present in this chat')
-        except UserBannedInChannel:
-            await msg.edit('Unable to join this chat since user is banned here.')
-        except Exception as e:
-            await msg.edit(f'**ERROR**: {e}')
-        else:
-            await msg.edit('Successfully joined.')
 
 
 client = VC_CLIENT or userge
@@ -1038,6 +1016,32 @@ async def replay_music(flags: dict = None) -> bool:
     except KeyError:
         return False
     return True
+
+
+async def invite_vc_client(msg: Message) -> bool:
+    """ Invites the VC_CLIENT to the current chat. """
+    invite_link = msg.filtered_input_str
+    if not invite_link:
+        try:
+            link = await msg.client.create_chat_invite_link(msg.chat.id)
+        except ChatAdminRequired:
+            return await reply_text(msg, '`Provide a invite link along command.!!`')
+        else:
+            invite_link = link.invite_link
+    try:
+        await VC_CLIENT.join_chat(invite_link)
+    except UserAlreadyParticipant:
+        await reply_text(msg, 'User already present in this chat')
+        return True
+    except UserBannedInChannel:
+        await reply_text(msg, 'Unable to join this chat since user is banned here.')
+        return False
+    except Exception as e:
+        await reply_text(f'**ERROR**: {e}')
+        return False
+    else:
+        await reply_text(msg, 'VC_CLIENT Successfully joined.')
+        return True
 
 
 async def yt_down(msg: Message):
