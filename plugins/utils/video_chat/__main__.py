@@ -73,6 +73,8 @@ if video_chat.VC_SESSION:
         video_chat.VC_SESSION,
         config.API_ID,
         config.API_HASH)
+    # hmm ...
+    VC_CLIENT.storage.name = video_chat.VC_SESSION
 else:
     # https://github.com/pytgcalls/pytgcalls/blob/master/pytgcalls/mtproto/mtproto_client.py#L18
     userge.__class__.__module__ = 'pyrogram.client'
