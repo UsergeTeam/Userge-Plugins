@@ -41,6 +41,8 @@ async def nightmode_handler(msg: Message):
         if job:
             scheduler.remove_job(job_id=f"enable_nightmode_{chat_id}")
             scheduler.remove_job(job_id=f"disable_nightmode_{chat_id}")
+            if not bool(scheduler.get_jobs()) and bool(scheduler.state):
+                scheduler.shutdown()
             return await msg.edit('nightmode disabled.')
         return await msg.err("nightmode isn't enabled in this chat.")
 
