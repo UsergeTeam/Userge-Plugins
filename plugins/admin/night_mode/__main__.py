@@ -16,7 +16,8 @@ TIME_ZONE = pytz.timezone(TZ)
 
 @userge.on_start
 async def _init():
-    scheduler.start()
+    if bool(scheduler.get_jobs()):
+        scheduler.start()
 
 
 @userge.on_cmd("nightmode", about={
@@ -40,6 +41,8 @@ async def nightmode_handler(msg: Message):
         if job:
             scheduler.remove_job(job_id=f"enable_nightmode_{chat_id}")
             scheduler.remove_job(job_id=f"disable_nightmode_{chat_id}")
+            if not bool(scheduler.get_jobs()) and bool(scheduler.state):
+                scheduler.shutdown()
             return await msg.edit('nightmode disabled.')
         return await msg.err("nightmode isn't enabled in this chat.")
 
@@ -93,6 +96,8 @@ async def nightmode_handler(msg: Message):
         'Successfully enabled nightmode in this chat.\n'
         f'Group will be locked at {start_timestamp.strftime("%H:%M:%S")}'
         f' and will be opened after {flags.get("-e", "6h")} everyday.')
+    if not bool(scheduler.state):
+        scheduler.start()
 
 
 async def un_mute_chat(chat_id: int, perm: ChatPermissions):
