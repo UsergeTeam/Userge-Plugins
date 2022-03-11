@@ -84,14 +84,15 @@ async def flag_checks(message: Message, log):
 
     if 'code' in message.flags or 'c' in message.flags:
         log.debug("Time | FLAG = Code: Grabbing Country_Code...")
+        flags = message.flags
         country_input = message.filtered_input_str.strip()
+        country_input = flags.get('c') or flags.get('code') or country_input
         if not country_input:
             await message.err("No Country_City code found after the flag...")
             return None
         return country_input
-    elif not COUNTRY_CITY:
+    if not COUNTRY_CITY:
         log.debug("Time: No Config Set")
         await message.edit(default_message, disable_web_page_preview=True,
                            parse_mode="html", del_in=30)
-        return None
-    return False
+    return None
