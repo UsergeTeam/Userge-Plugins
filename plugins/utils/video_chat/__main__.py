@@ -660,6 +660,8 @@ async def view_queue(msg: Message):
                 title, link = _get_yt_info(m)
                 out += f"\n{i}. [{title}]({link})"
 
+        list_out.append(out)
+
         for m in list_out:
             await reply_text(msg, m)
 
