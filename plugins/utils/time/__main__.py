@@ -41,9 +41,10 @@ async def grab_time(message: Message):
         timezone(country_code)
     except BaseException:
         LOG.debug("Time: Incorrect Country Code...")
-        await message.err("Unable To Determine Timezone With Given"
-                          + " Country Code | " + country_code +
-                          "\nUse the -l flag to see compatible codes.")
+        await message.err(" ".join([
+            "Unable To Determine Timezone With Given Country Code |",
+            country_code, "\nUse the -l flag to see compatible codes."
+        ]))
         return
     datetime_now = datetime.now(timezone(country_code))
     date_day = datetime_now.strftime("%d")
