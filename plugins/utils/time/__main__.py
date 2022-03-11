@@ -33,7 +33,7 @@ LOG = userge.getLogger(__name__)  # logger object
 }, del_pre=True)
 async def grab_time(message: Message):
     LOG.debug("Time: Starting now...")
-    country_input = await flag_checks(message, LOG)
+    country_input = await flag_checks(message)
     if country_input is None:
         return
     country_code = COUNTRY_CITY if not country_input else country_input
@@ -69,7 +69,7 @@ def ordinal_suffix(day: int):
     return {1: 'st', 2: 'nd', 3: 'rd'}[day % 10]
 
 
-async def flag_checks(message: Message, log):
+async def flag_checks(message: Message):
     default_message = (
         "<code>Below is a list of all the Timezones Avaliable</code> \n<a "
         "href=https://raw.githubusercontent.com/UsergeTeam/Userge-Plugins/main"
@@ -77,13 +77,13 @@ async def flag_checks(message: Message, log):
         " your Config Under</code> (<code>COUNTRY_CITY</code>)\n"
         "<code>Ex: America/Los_Angeles</code>")
     if 'list' in message.flags or 'l' in message.flags:
-        log.debug("Time | FLAG = List: Giving TZ list...")
+        LOG.debug("Time | FLAG = List: Giving TZ list...")
         await message.edit(default_message, disable_web_page_preview=True,
                            parse_mode="html", del_in=30)
         return None
 
     if 'code' in message.flags or 'c' in message.flags:
-        log.debug("Time | FLAG = Code: Grabbing Country_Code...")
+        LOG.debug("Time | FLAG = Code: Grabbing Country_Code...")
         flags = message.flags
         country_input = message.filtered_input_str.strip()
         country_input = flags.get('c') or flags.get('code') or country_input
@@ -92,7 +92,9 @@ async def flag_checks(message: Message, log):
             return None
         return country_input
     if not COUNTRY_CITY:
-        log.debug("Time: No Config Set")
+        LOG.debug("Time: No Config Set")
         await message.edit(default_message, disable_web_page_preview=True,
                            parse_mode="html", del_in=30)
-    return None
+        return None
+
+    return False
