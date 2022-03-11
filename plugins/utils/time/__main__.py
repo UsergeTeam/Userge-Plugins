@@ -66,8 +66,7 @@ async def grab_time(message: Message):
 def ordinal_suffix(day: int):
     if 3 < day < 21 or 23 < day < 31:
         return 'th'
-    else:
-        return {1: 'st', 2: 'nd', 3: 'rd'}[day % 10]
+    return {1: 'st', 2: 'nd', 3: 'rd'}[day % 10]
 
 
 async def flag_checks(message: Message, log):
