@@ -182,7 +182,7 @@ def check_enable_for_all(func):
         user_in_vc = msg.from_user and msg.from_user.id in GROUP_CALL_PARTICIPANTS
         sender_chat_in_vc = msg.sender_chat and msg.sender_chat.id in GROUP_CALL_PARTICIPANTS
 
-        if (is_self or (CMDS_FOR_ALL and ((user_in_vc) or (sender_chat_in_vc)))):
+        if is_self or (CMDS_FOR_ALL and (user_in_vc or sender_chat_in_vc)):
             await func(msg)
 
     checker.__doc__ = func.__doc__
@@ -197,7 +197,7 @@ def check_cq_for_all(func):
         is_self = cq.from_user and cq.from_user.id == userge.id
         user_in_vc = cq.from_user and cq.from_user.id in GROUP_CALL_PARTICIPANTS
 
-        if (is_self or (CMDS_FOR_ALL and user_in_vc)):
+        if is_self or (CMDS_FOR_ALL and user_in_vc):
             await func(cq)
         else:
             await cq.answer(
@@ -357,7 +357,7 @@ async def joinvc(msg: Message):
         except Exception as err:
             CHAT_ID, CHAT_NAME = 0, ''
             CONTROL_CHAT_IDS.clear()
-            return await reply_text(msg, err)
+            return await reply_text(msg, str(err))
     except (NodeJSNotInstalled, TooOldNodeJSVersion):
         return await reply_text(msg, "NodeJs is not installed or installed version is too old.")
     except AlreadyJoinedError:
@@ -466,7 +466,7 @@ async def play_music(msg: Message, forceplay: bool):
                 QUEUE.insert(0, msg)
             else:
                 QUEUE.append(msg)
-        elif (is_url(input_str) or (path.exists() and path.is_file())):
+        elif is_url(input_str) or (path.exists() and path.is_file()):
             if path.exists():
                 if not path.name.endswith(
                     (".mkv", ".mp4", ".webm", ".m4v", ".mp3", ".flac", ".wav", ".m4a")
@@ -628,12 +628,7 @@ async def current(msg: Message):
 
     if not BACK_BUTTON_TEXT:
         return await reply_text(msg, "No song is playing!")
-    await reply_text(
-        msg,
-        BACK_BUTTON_TEXT,
-        markup=default_markup() if userge.has_bot else None,
-        to_reply=True
-    )
+    await reply_text(msg, BACK_BUTTON_TEXT, markup=default_markup() if userge.has_bot else None)
 
 
 @userge.on_cmd("queue", about={
@@ -647,10 +642,11 @@ async def view_queue(msg: Message):
     """ View Queue """
 
     if not QUEUE:
-        out = "`Queue is empty`"
+        await reply_text(msg, "`Queue is empty`")
     else:
         list_out = []
         out = f"**{len(QUEUE)} Songs in Queue:**\n"
+
         for i, m in enumerate(QUEUE, start=1):
             if len(out) > config.MAX_MESSAGE_LENGTH:
                 list_out.append(out)
@@ -664,7 +660,10 @@ async def view_queue(msg: Message):
                 title, link = _get_yt_info(m)
                 out += f"\n{i}. [{title}]({link})"
 
-    [await reply_text(msg, m) for m in list_out]
+        list_out.append(out)
+
+        for m in list_out:
+            await reply_text(msg, m)
 
 
 @userge.on_cmd("volume", about={
@@ -760,17 +759,19 @@ async def seek_music_player(msg: Message):
     """ seek music x sec forward or -x sec backward """
     flags = msg.flags
     dur = msg.filtered_input_str or flags.get('-to', "0")
-    to_reply = ''
+
     try:
         dur = int(dur)
     except ValueError:
         return await reply_text(msg, "Invalid Seek time specified.")
+
     if '-to' in flags:
         seek = await seek_music(dur, True)
         to_reply = f"Jumped to {time_formatter(dur)}."
     else:
         to_reply = f"Seeked {dur} sec {'backward' if dur < 0 else 'forward'}"
         seek = await seek_music(dur)
+
     if seek:
         await reply_text(msg, to_reply)
     else:
@@ -972,7 +973,7 @@ async def seek_music(dur: int, jump: bool = False) -> bool:
     else:
         seek_point = max(0, (time.time() - CURRENT_SONG['start'] + dur))
         # adjusting seek time in start time
-        CURRENT_SONG['start'] = CURRENT_SONG['start'] - dur
+        CURRENT_SONG['start'] -= dur
     if seek_point > CURRENT_SONG['duration']:
         return False
     if CURRENT_SONG['is_video']:
@@ -1055,7 +1056,7 @@ async def yt_down(msg: Message):
 
     flags = msg.flags
     is_video = "-v" in flags
-    duration = flags.get("duration")
+    duration = int(flags.get("duration"))
     quality = max(min(100, int(flags.get('-q', 100))), 1)
     height, width, has_audio, has_video = await get_file_info(stream_link)
 
@@ -1114,6 +1115,7 @@ async def tg_down(msg: Message):
     message = await reply_text(
         msg, f"`{'Preparing' if hasattr(msg, 'file_name') else 'Downloading'} {title}`"
     )
+    duration = 0
     if not hasattr(msg, "path_to_media"):
         path = await msg.client.download_media(
             message=msg,
@@ -1248,13 +1250,14 @@ async def get_stream_link(link: str) -> str:
 
 
 async def get_duration(file: str) -> int:
-    dur = 0
     cmd = "ffprobe -i {file} -v error -show_entries format=duration -of json -select_streams v:0"
     out, _, _, _ = await runcmd(cmd.format(file=file))
+
     try:
         out = json.loads(out)
     except JSONDecodeError:
-        dur = 0
+        pass
+
     dur = int(float((out.get("format", {})).get("duration", 0)))
     return dur
 
@@ -1385,7 +1388,7 @@ if userge.has_bot:
                 for i, m in enumerate(QUEUE, start=1):
                     if len(out) > config.MAX_MESSAGE_LENGTH - 100:
                         out += ('\nQueue too Long, '
-                               'can not display more songs because of telegram restrictions.')
+                                'can not display more songs because of telegram restrictions.')
                         break
                     file = m.audio or m.video or m.document or None
                     if hasattr(m, 'file_name'):
