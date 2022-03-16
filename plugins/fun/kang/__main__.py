@@ -125,24 +125,17 @@ async def kang_(message: Message):
         cmd = '/newvideo'
 
     exist = False
-    try:
-        exist = await message.client.send(
-            GetStickerSet(
-                stickerset=InputStickerSetShortName(
-                    short_name=packname), hash=0))
-    except StickersetInvalid:
-        pass
-    if exist is not False:
-        async with userge.conversation('Stickers', limit=30) as conv:
-            try:
-                await conv.send_message('/addsticker')
-            except YouBlockedUser:
-                return await message.edit('first **unblock** @Stickers')
-            await conv.get_response(mark_read=True)
-            await conv.send_message(packname)
-            msg = await conv.get_response(mark_read=True)
-            limit = "50" if (is_anim or is_video) else "120"
-            while limit in msg.text:
+    while True:
+        try:
+            exist = await message.client.send(
+                GetStickerSet(
+                    stickerset=InputStickerSetShortName(
+                        short_name=packname), hash=0))
+        except StickersetInvalid:
+            break
+        else:
+            limit = 50 if (is_anim or is_video) else 120
+            if exist.set.count >= limit:
                 pack += 1
                 packname = f"a{user.id}_by_userge_{pack}"
                 packnick = f"{custom_packnick} Vol.{pack}"
@@ -153,33 +146,17 @@ async def kang_(message: Message):
                     packname += "_video"
                     packnick += " (Video)"
                 await message.edit(f"`Switching to Pack {pack} due to insufficient space`")
-                await conv.send_message(packname)
-                msg = await conv.get_response(mark_read=True)
-                if msg.text == "Invalid pack selected.":
-                    await conv.send_message(cmd)
-                    await conv.get_response(mark_read=True)
-                    await conv.send_message(packnick)
-                    await conv.get_response(mark_read=True)
-                    await conv.send_document(media)
-                    await conv.get_response(mark_read=True)
-                    await conv.send_message(emoji_)
-                    await conv.get_response(mark_read=True)
-                    await conv.send_message("/publish")
-                    if is_anim:
-                        await conv.get_response(mark_read=True)
-                        await conv.send_message(f"<{packnick}>", parse_mode=None)
-                    await conv.get_response(mark_read=True)
-                    await conv.send_message("/skip")
-                    await conv.get_response(mark_read=True)
-                    await conv.send_message(packname)
-                    await conv.get_response(mark_read=True)
-                    if '-d' in message.flags:
-                        await message.delete()
-                    else:
-                        out = "__kanged__" if '-s' in message.flags else \
-                            f"[kanged](t.me/addstickers/{packname})"
-                        await message.edit(f"**Sticker** {out} __in a Different Pack__**!**")
-                    return
+                continue
+            break
+    if exist is not False:
+        async with userge.conversation('Stickers', limit=30) as conv:
+            try:
+                await conv.send_message('/addsticker')
+            except YouBlockedUser:
+                return await message.edit('first **unblock** @Stickers')
+            await conv.get_response(mark_read=True)
+            await conv.send_message(packname)
+            await conv.get_response(mark_read=True)
             await conv.send_document(media)
             rsp = await conv.get_response(mark_read=True)
             if "Sorry, the file type is invalid." in rsp.text:
