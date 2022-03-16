@@ -37,13 +37,13 @@ async def azan(msg: Message):
             if resp.status != 200:
                 return msg.edit(f"**Something wrong!**\n`Unable to process your request`", del_in=5)
             res = await resp.json()
-            timefor = f"__{res['query']}, {res['country']}, {res['items'][0]['date_for']}__\n"
+            timefor = f"__{res['query']}, {res['country']}, {res['items'][0]['date_for']}.__\n"
             string = (
-                f"\n**Fajr     :** __{res['items'][0]['fajr']}__"
+                f"\n**Fajr          :** __{res['items'][0]['fajr']}__"
                 f"\n**Shurooq  :** __{res['items'][0]['shurooq']}__"
-                f"\n**Dhuhr    :** __{res['items'][0]['dhuhr']}__"
-                f"\n**Asr      :** __{res['items'][0]['asr']}__"
+                f"\n**Dhuhr      :** __{res['items'][0]['dhuhr']}__"
+                f"\n**Asr           :** __{res['items'][0]['asr']}__"
                 f"\n**Maghrib  :** __{res['items'][0]['maghrib']}__"
-                f"\n**Isha     :** __{res['items'][0]['isha']}__"
+                f"\n**Isha          :** __{res['items'][0]['isha']}__"
             )
     return await msg.edit(f"**Islamic prayer times**\n{timefor}{string}")
