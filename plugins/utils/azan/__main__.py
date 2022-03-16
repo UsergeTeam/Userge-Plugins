@@ -7,14 +7,11 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
-
 # Azan Module
 # By: Safone (https://github.com/AsmSafone)
 
-
-import json
-
-import requests
+import aiohttp
+import os
 
 from userge import userge, Message
 
@@ -27,8 +24,8 @@ from userge import userge, Message
         "usage": "{tr}azan [city_name]",
     },
 )
-async def adzan(msg: Message):
-    """Adzan handler, get an time for Islamic prayer."""
+async def azan(msg: Message):
+    """Azan handler, get an time for Islamic prayer."""
     city = msg.input_str
     if not city:
         city = os.environ.get("COUNTRY_CITY")
