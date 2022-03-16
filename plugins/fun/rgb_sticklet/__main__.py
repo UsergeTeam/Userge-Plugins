@@ -14,15 +14,44 @@ import textwrap
 
 from PIL import Image, ImageDraw, ImageFont
 
-from userge import userge, Message
+from userge import userge, Message, get_collection
+
+PLET_FONT = get_collection("PLET_FONT")
+FONTS_FILE_CHANNEL = "@FontsRes"
+DEFAULT_FONTS = [120, 127, 121, 124, 122, 123]
+
+
+@userge.on_start
+async def init():
+    global FONTS_FILE_CHANNEL  # pylint: disable=global-statement
+    data = await PLET_FONT.find_one({"id": "PLET_FONT_CHANNEL"})
+    if data:
+        FONTS_FILE_CHANNEL = data["name"]
 
 
 @userge.on_cmd("plet", about={
     'header': "Get a Random RGB Sticker",
     'description': "Generates A RGB Sticker with provided text",
+    'flags': {'-c': "change fonts channel"},
     'usage': "{tr}plet [text | reply]",
-    'examples': "{tr}plet @theUserge"}, allow_via_bot=False)
+    'examples': "{tr}plet @theUserge"})
 async def sticklet(message: Message):
+    global FONTS_FILE_CHANNEL  # pylint: disable=global-statement
+    if message.flags and '-c' in message.flags and not message.client.is_bot:
+        u = message.flags.get('-c')
+        if not u:
+            return await message.err("Channel Username not found!")
+        try:
+            await userge.resolve_peer(u)
+        except Exception as err:
+            await message.err(str(err))
+        else:
+            FONTS_FILE_CHANNEL = u
+            await PLET_FONT.update_one({"id": "PLET_FONT_CHANNEL"},
+                                       {"$set": {"name": u}},
+                                       upsert=True)
+            await message.edit("`Fonts channel saved successfully...`")
+        return
     R = random.randint(0, 256)
     G = random.randint(0, 256)
     B = random.randint(0, 256)
@@ -47,8 +76,11 @@ async def sticklet(message: Message):
     draw = ImageDraw.Draw(image)
     fontsize = 230
 
-    font_file = await get_font_file()
-    font = ImageFont.truetype(font_file, size=fontsize)
+    font_file = await get_font_file(message)
+    try:
+        font = ImageFont.truetype(font_file, size=fontsize)
+    except Exception:
+        return await message.err("I guess your channel conatins invalid font files!")
 
     while draw.multiline_textsize(sticktext, font=font) > (512, 512):
         fontsize -= 3
@@ -61,7 +93,7 @@ async def sticklet(message: Message):
     image_name = "rgb_sticklet.webp"
     image.save(image_name, "WebP")
 
-    await userge.send_sticker(
+    await message.client.send_sticker(
         chat_id=message.chat.id, sticker=image_name, reply_to_message_id=reply_to)
 
     # cleanup
@@ -72,7 +104,12 @@ async def sticklet(message: Message):
         pass
 
 
-async def get_font_file():
-    font_file_message_s = await userge.get_history("@FontsRes")
-    font_file_message = random.choice(font_file_message_s)
-    return await userge.download_media(font_file_message)
+async def get_font_file(message):
+    if message.client.is_bot:
+        font_file_message_s = await message.client.get_messages(
+            FONTS_FILE_CHANNEL, DEFAULT_FONTS)
+        font_file_message = random.choice(font_file_message_s)
+    else:
+        font_file_message_s = await message.client.get_history(FONTS_FILE_CHANNEL)
+        font_file_message = random.choice(font_file_message_s)
+    return await font_file_message.download()

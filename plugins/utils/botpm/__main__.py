@@ -270,7 +270,8 @@ After Adding a var, you can see your media when you start your Bot.
 """
 
     @bot.on_callback_query(
-        filters.regex("startcq|stngs|bothelp|misc|setmedia|settext|broadcast|stats|en_dis_bot_pm")
+        filters.regex("startcq|stngs|bothelp|misc|setmedia|settext|broadcast|stats|en_dis_bot_pm"),
+        group=1
     )
     async def cq_handler(_, cq: CallbackQuery):
         global BOT_PM, IN_CONVO  # pylint: disable=global-statement
