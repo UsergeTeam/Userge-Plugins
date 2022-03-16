@@ -29,8 +29,8 @@ from userge import userge, Message
 )
 async def adzan(msg: Message):
     """Adzan handler, get an time for Islamic prayer."""
-    arg = msg.input_str
-    if not arg:
+    city = msg.input_str
+    if not city:
         city = os.environ.get("COUNTRY_CITY")
         if city is None:
             return msg.edit(f"`Please input Country, or set datetime env`", del_in=5)
