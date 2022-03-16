@@ -44,6 +44,6 @@ async def azan(msg: Message):
                 f"\n**Dhuhr    :** __{res['items'][0]['dhuhr']}__"
                 f"\n**Asr      :** __{res['items'][0]['asr']}__"
                 f"\n**Maghrib  :** __{res['items'][0]['maghrib']}__"
-                f"\n**Isha     :** __{result['items'][0]['isha']}__"
+                f"\n**Isha     :** __{res['items'][0]['isha']}__"
             )
     return await msg.edit(f"**Islamic prayer times**\n{timefor}{string}")
