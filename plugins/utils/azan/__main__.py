@@ -30,12 +30,12 @@ async def azan(msg: Message):
     if not city:
         city = os.environ.get("COUNTRY_CITY")
         if city is None:
-            return msg.edit(f"`Please input Country, or set datetime env`", del_in=5)
+            return msg.edit("`Please input Country, or set datetime env`", del_in=5)
     async with aiohttp.ClientSession() as ses:
         url = f"http://muslimsalat.com/{city}.json?key=bd099c5825cbedb9aa934e255a81a5fc"
         async with ses.get(url) as resp:
             if resp.status != 200:
-                return msg.edit(f"**Something wrong!**\n`Unable to process your request`", del_in=5)
+                return msg.edit("**Something wrong!**\n`Unable to process your request`", del_in=5)
             res = await resp.json()
             timefor = f"__{res['query']}, {res['country']}, {res['items'][0]['date_for']}.__\n"
             string = (
