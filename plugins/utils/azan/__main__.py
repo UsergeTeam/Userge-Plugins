@@ -12,6 +12,7 @@
 # By: Safone (https://github.com/AsmSafone)
 
 import os
+from json import dumps
 
 import aiohttp
 
@@ -37,15 +38,17 @@ async def azan(msg: Message):
             if resp.status != 200:
                 return await msg.err("Unable to process your request")
             res = await resp.json()
-            timefor = f"__{res['query']}, {res['country']}, {res['items'][0]['date_for']}.__\n"
-            out_str = (
-                "**Islamic prayer times**"
-                f"\n{timefor}"
-                f"\n**Fajr          :** __{res['items'][0]['fajr']}__"
-                f"\n**Shurooq  :** __{res['items'][0]['shurooq']}__"
-                f"\n**Dhuhr      :** __{res['items'][0]['dhuhr']}__"
-                f"\n**Asr           :** __{res['items'][0]['asr']}__"
-                f"\n**Maghrib  :** __{res['items'][0]['maghrib']}__"
-                f"\n**Isha          :** __{res['items'][0]['isha']}__"
-            )
-            await msg.edit(out_str)
+        if res['status_code'] == 0:
+            return await msg.err(dumps(res['status_error']))
+        timefor = f"__{res['query']}, {res['country']}, {res['items'][0]['date_for']}.__\n"
+        out_str = (
+            "**Islamic prayer times**"
+            f"\n{timefor}"
+            f"\n**Fajr          :** __{res['items'][0]['fajr']}__"
+            f"\n**Shurooq  :** __{res['items'][0]['shurooq']}__"
+            f"\n**Dhuhr      :** __{res['items'][0]['dhuhr']}__"
+            f"\n**Asr           :** __{res['items'][0]['asr']}__"
+            f"\n**Maghrib  :** __{res['items'][0]['maghrib']}__"
+            f"\n**Isha          :** __{res['items'][0]['isha']}__"
+        )
+        await msg.edit(out_str)
