@@ -7,42 +7,48 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
-
+#
 # Azan Module
 # By: Safone (https://github.com/AsmSafone)
 
+import os
+from json import dumps
 
-import json
+import aiohttp
 
-import requests
-
-from userge import userge, Message, pool
+from userge import userge, Message
 
 
-@userge.on_cmd("azan", about={
-    'header': "Islamic Prayers Time",
-    'description': "Shows the Islamic prayer times of the given city.",
-    'usage': "{tr}azan [city_name]"})
-async def _azan(message: Message):
-    if " " not in message.text:
-        await message.edit("`Send a city name with command`", del_in=5)
-        return
-    city = message.text.split(" ", 1)[1]
-    url = f"http://muslimsalat.com/{city}.json?key=bd099c5825cbedb9aa934e255a81a5fc"
-    request = await pool.run_in_thread(requests.get)(url)
-    if request.status_code != 200:
-        await message.edit(f"`Couldn't fetch any data about the city {city}`", del_in=5)
-        return
-    result = json.loads(request.text)
-    prayer_time = f"<b>Islamic Prayers Time</b>\
-            \n\n<b>City     : </b><i>{result['query']}</i>\
-            \n<b>Country  : </b><i>{result['country']}</i>\
-            \n<b>Date     : </b><i>{result['items'][0]['date_for']}</i>\
-            \n<b>Fajr     : </b><i>{result['items'][0]['fajr']}</i>\
-            \n<b>Shurooq    : </b><i>{result['items'][0]['shurooq']}</i>\
-            \n<b>Dhuhr    : </b><i>{result['items'][0]['dhuhr']}</i>\
-            \n<b>Asr    : </b><i>{result['items'][0]['asr']}</i>\
-            \n<b>Maghrib    : </b><i>{result['items'][0]['maghrib']}</i>\
-            \n<b>Isha     : </b><i>{result['items'][0]['isha']}</i>\
-    "
-    await message.edit(prayer_time, parse_mode="html")
+@userge.on_cmd(
+    "azan",
+    about={
+        "header": "Islamic Prayers Time",
+        "description": "Shows the Islamic prayer times of the given city.",
+        "usage": "{tr}azan [city_name]",
+    },
+)
+async def azan(msg: Message):
+    """Azan handler, get an time for Islamic prayer."""
+    city = msg.input_str or os.environ.get("COUNTRY_CITY")
+    if not city:
+        return await msg.err("Please input Country, or set datetime env")
+    async with aiohttp.ClientSession() as ses:
+        url = f"http://muslimsalat.com/{city}.json?key=bd099c5825cbedb9aa934e255a81a5fc"
+        async with ses.get(url) as resp:
+            if resp.status != 200:
+                return await msg.err("Unable to process your request")
+            res = await resp.json()
+        if res['status_code'] == 0:
+            return await msg.err(dumps(res['status_error']))
+        timefor = f"__{res['query']}, {res['country']}, {res['items'][0]['date_for']}.__\n"
+        out_str = (
+            "**Islamic prayer times**"
+            f"\n{timefor}"
+            f"\n**Fajr          :** __{res['items'][0]['fajr']}__"
+            f"\n**Shurooq  :** __{res['items'][0]['shurooq']}__"
+            f"\n**Dhuhr      :** __{res['items'][0]['dhuhr']}__"
+            f"\n**Asr           :** __{res['items'][0]['asr']}__"
+            f"\n**Maghrib  :** __{res['items'][0]['maghrib']}__"
+            f"\n**Isha          :** __{res['items'][0]['isha']}__"
+        )
+        await msg.edit(out_str)
