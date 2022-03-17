@@ -132,6 +132,7 @@ async def kang_(message: Message):
                     stickerset=InputStickerSetShortName(
                         short_name=packname), hash=0))
         except StickersetInvalid:
+            exist = False
             break
         else:
             limit = 50 if (is_anim or is_video) else 120
