@@ -7,11 +7,13 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+#
 # Azan Module
 # By: Safone (https://github.com/AsmSafone)
 
-import aiohttp
 import os
+
+import aiohttp
 
 from userge import userge, Message
 
@@ -26,19 +28,19 @@ from userge import userge, Message
 )
 async def azan(msg: Message):
     """Azan handler, get an time for Islamic prayer."""
-    city = msg.input_str
+    city = msg.input_str or os.environ.get("COUNTRY_CITY")
     if not city:
-        city = os.environ.get("COUNTRY_CITY")
-        if city is None:
-            return msg.edit("`Please input Country, or set datetime env`", del_in=5)
+        return await msg.err("Please input Country, or set datetime env")
     async with aiohttp.ClientSession() as ses:
         url = f"http://muslimsalat.com/{city}.json?key=bd099c5825cbedb9aa934e255a81a5fc"
         async with ses.get(url) as resp:
             if resp.status != 200:
-                return msg.edit("**Something wrong!**\n`Unable to process your request`", del_in=5)
+                return await msg.err("Unable to process your request")
             res = await resp.json()
             timefor = f"__{res['query']}, {res['country']}, {res['items'][0]['date_for']}.__\n"
-            string = (
+            out_str = (
+                "**Islamic prayer times**"
+                f"\n{timefor}"
                 f"\n**Fajr          :** __{res['items'][0]['fajr']}__"
                 f"\n**Shurooq  :** __{res['items'][0]['shurooq']}__"
                 f"\n**Dhuhr      :** __{res['items'][0]['dhuhr']}__"
@@ -46,4 +48,4 @@ async def azan(msg: Message):
                 f"\n**Maghrib  :** __{res['items'][0]['maghrib']}__"
                 f"\n**Isha          :** __{res['items'][0]['isha']}__"
             )
-    return await msg.edit(f"**Islamic prayer times**\n{timefor}{string}")
+            await msg.edit(out_str)
