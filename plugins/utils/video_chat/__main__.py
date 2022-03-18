@@ -69,7 +69,7 @@ from . import QUEUE, YTDL_PATH, VC_SESSION, MAX_DURATION, Dynamic
 
 ytdl = get_custom_import_re(YTDL_PATH)
 
-if VC_SESSION:
+if VC_SESSION != config.SESSION_STRING:
     VC_CLIENT = Client(
         VC_SESSION,
         config.API_ID,
@@ -114,7 +114,7 @@ async def _init():
     data = await VC_DB.find_one({'_id': 'VC_CMD_TOGGLE'})
     if data:
         Dynamic.CMDS_FOR_ALL = bool(data['is_enable'])
-    if VC_SESSION:
+    if VC_SESSION != config.SESSION_STRING:
         await VC_CLIENT.start()
         me = await VC_CLIENT.get_me()
         LOG.info(f"Separate VC CLIENT FOUND - {me.first_name}")
@@ -122,7 +122,7 @@ async def _init():
 
 @userge.on_stop
 async def stop_vc_client():
-    if VC_SESSION:
+    if VC_SESSION != config.SESSION_STRING:
         await VC_CLIENT.stop()
 
 
@@ -253,7 +253,7 @@ def volume_button_markup():
     allow_bots=False)
 async def joinvc(msg: Message):
     """ join video chat """
-    global CHAT_NAME, CHAT_ID, STREAM_END_SKIP  # pylint: disable=global-statement
+    global CHAT_NAME, CHAT_ID  # pylint: disable=global-statement
 
     await msg.delete()
 
@@ -338,7 +338,6 @@ async def joinvc(msg: Message):
             join_as=peer,
             stream_type=StreamType().pulse_stream
         )
-        STREAM_END_SKIP = not STREAM_END_SKIP
     except NoActiveGroupCall:
         try:
             peer = await VC_CLIENT.resolve_peer(CHAT_ID)
