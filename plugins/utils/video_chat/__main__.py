@@ -99,8 +99,6 @@ CLIENT = userge
 BACK_BUTTON_TEXT = ""
 CQ_MSG: List[RawMessage] = []
 
-STREAM_END_SKIP = False
-
 yt_regex = re.compile(
     r'(https?://)?(www\.)?'
     r'(youtube|youtu|youtube-nocookie)\.(com|be)/'
@@ -790,6 +788,7 @@ async def replay_song_(msg: Message):
     """ replay current song from beginning """
     replay = await replay_music(flags=msg.flags)
     if replay:
+        Dynamic.PLAYING = True
         await reply_text(msg, 'Replaying current song from beginning.')
     else:
         await reply_text(msg, 'No songs found to play.')
@@ -899,11 +898,7 @@ async def _on_left(group_call: Optional[GroupCall] = None) -> None:
 
 @call.on_stream_end()
 async def _stream_end_handler(_: PyTgCalls, update: Update):
-    global STREAM_END_SKIP  # pylint: disable=global-statement
     if isinstance(update, StreamAudioEnded):
-        if STREAM_END_SKIP:
-            STREAM_END_SKIP = not STREAM_END_SKIP
-            return
         await _skip()
 
 
@@ -916,15 +911,13 @@ async def _participants_change_handler(_: PyTgCalls, update: Update):
 
 
 async def _skip(clear_queue: bool = False):
-    global STREAM_END_SKIP  # pylint: disable=global-statement
     if Dynamic.PLAYING:
         # skip current playing song to play next
-        STREAM_END_SKIP = not STREAM_END_SKIP
         Dynamic.PLAYING = False
         await call.change_stream(
             CHAT_ID,
             AudioPiped(
-                'http://duramecho.com/Misc/SilentCd/Silence01s.mp3'
+                'http://duramecho.com/Misc/SilentCd/Silence32s.mp3'
             )
         )
 
@@ -994,6 +987,7 @@ async def replay_music(flags: dict = None) -> bool:
     is_video = False
     if flags and '-v' in flags:
         is_video = CURRENT_SONG['has_video']
+        CURRENT_SONG['is_video'] = is_video
     elif flags and '-a' in flags:
         is_video = False
     else:
