@@ -8,13 +8,22 @@
 
 """ manage video chats """
 
-import logging
 import os
+import logging
+from typing import List
 
+from userge import Message
 from userge.utils import secured_env
 
 logging.getLogger("pytgcalls").setLevel(logging.WARNING)
 
+QUEUE: List[Message] = []
+
 YTDL_PATH = os.environ.get("YOUTUBE_DL_PATH", "yt_dlp")
 MAX_DURATION = int(os.environ.get("MAX_DURATION", 900))
 VC_SESSION = secured_env("VC_SESSION_STRING")
+
+
+class Dynamic:
+    PLAYING = False
+    CMDS_FOR_ALL = False
