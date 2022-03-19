@@ -84,7 +84,7 @@ class AbstractHandler(Handler, ABC):
 
     async def _do_handle(self, message: Message, user: User, data) -> None:
         reason = self.get_reason(data)
-        msg, log = _get_msg_and_log(message.chat, user, reason, self._name)
+        msg, log = _get_msg_and_log(message.chat, user, reason or 'None', self._name)
         task = asyncio.create_task(message.reply(msg, del_in=10))
         await CHANNEL.log(log)
         await task
@@ -101,28 +101,27 @@ class AbstractHandler(Handler, ABC):
         pass
 
 
-def _get_msg_and_log(chat: Chat, user: User,
-                     reason: Optional[str], fed: Optional[str]) -> Tuple[str, str]:
+def _get_msg_and_log(chat: Chat, user: User, reason: str, fed: Optional[str]) -> Tuple[str, str]:
     user_id = user.id
     first_name = user.first_name
 
     others = f"**$SENTRY {fed} Federation Ban**\n" if fed else ""
     others += (
         f"**User:** [{first_name}](tg://user?id={user_id})\n"
-        f"**ID:** `{user_id}`\n**Reason:** `{reason}`\n\n"
+        f"**ID:** `{user_id}`\n**Reason:** `:reason:`\n\n"
         "**Quick Action:** Banned"
     )
 
     msg = (
         r"\\**#Userge_Antispam**//"
         "\n\nGlobally Banned User Detected in this Chat.\n\n"
-        f"{others}"
+        f"{others.replace(':reason:', reason[:97] + '...' if len(reason) > 97 else reason)}"
     )
 
     log = (
         r"\\**#Antispam_Log**//"
         "\n\n**GBanned User $SPOTTED**\n\n"
-        f"{others} in {chat.title}"
+        f"{others.replace(':reason:', reason)} in {chat.title}"
     )
 
     return msg, log
