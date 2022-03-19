@@ -69,7 +69,7 @@ from . import QUEUE, YTDL_PATH, VC_SESSION, MAX_DURATION, Dynamic
 
 ytdl = get_custom_import_re(YTDL_PATH)
 
-if VC_SESSION != config.SESSION_STRING:
+if VC_SESSION != config.SESSION_STRING or VC_SESSION != "null":
     VC_CLIENT = Client(
         VC_SESSION,
         config.API_ID,
@@ -899,6 +899,7 @@ async def _on_left(group_call: Optional[GroupCall] = None) -> None:
 @call.on_stream_end()
 async def _stream_end_handler(_: PyTgCalls, update: Update):
     if isinstance(update, StreamAudioEnded):
+        Dynamic.PLAYING = False
         await _skip()
 
 
@@ -917,7 +918,9 @@ async def _skip(clear_queue: bool = False):
         await call.change_stream(
             CHAT_ID,
             AudioPiped(
-                'http://duramecho.com/Misc/SilentCd/Silence32s.mp3'
+                "http://duramecho.com/Misc/SilentCd/Silence{}s.mp3".format(
+                    '01' if not QUEUE or clear_queue else '32'
+                )
             )
         )
 
