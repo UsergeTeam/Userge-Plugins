@@ -69,7 +69,7 @@ from . import QUEUE, YTDL_PATH, VC_SESSION, MAX_DURATION, Dynamic
 
 ytdl = get_custom_import_re(YTDL_PATH)
 
-if VC_SESSION != config.SESSION_STRING and VC_SESSION != "null":
+if VC_SESSION:
     VC_CLIENT = Client(
         VC_SESSION,
         config.API_ID,
@@ -112,7 +112,7 @@ async def _init():
     data = await VC_DB.find_one({'_id': 'VC_CMD_TOGGLE'})
     if data:
         Dynamic.CMDS_FOR_ALL = bool(data['is_enable'])
-    if VC_SESSION != config.SESSION_STRING:
+    if VC_SESSION:
         await VC_CLIENT.start()
         me = await VC_CLIENT.get_me()
         LOG.info(f"Separate VC CLIENT FOUND - {me.first_name}")
@@ -120,7 +120,7 @@ async def _init():
 
 @userge.on_stop
 async def stop_vc_client():
-    if VC_SESSION != config.SESSION_STRING:
+    if VC_SESSION:
         await VC_CLIENT.stop()
 
 
