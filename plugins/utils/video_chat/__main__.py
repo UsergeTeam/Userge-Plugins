@@ -69,7 +69,7 @@ from . import QUEUE, YTDL_PATH, VC_SESSION, MAX_DURATION, Dynamic
 
 ytdl = get_custom_import_re(YTDL_PATH)
 
-if VC_SESSION != config.SESSION_STRING or VC_SESSION != "null":
+if VC_SESSION != config.SESSION_STRING and VC_SESSION != "null":
     VC_CLIENT = Client(
         VC_SESSION,
         config.API_ID,
