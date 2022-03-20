@@ -109,7 +109,7 @@ async def _info(msg: Message):
         await msg.edit_or_send_as_file(text=user_info, disable_web_page_preview=True)
 
 
-def reduce_spam(text: Optional[str]) -> Optiona[str]:
+def reduce_spam(text: Optional[str]) -> Optional[str]:
     if text and len(text) > 100:
         return text[:97] + "..."
     return text
