@@ -76,7 +76,7 @@ async def kang_(message: Message):
         await message.delete()
     else:
         await message.edit(f"`{random.choice(KANGING_STR)}`")
-    media = await userge.download_media(message=replied, file_name=config.Dynamic.DOWN_PATH)
+    media = await replied.download(config.Dynamic.DOWN_PATH)
     if not media:
         return await message.edit("`No Media!`")
 
