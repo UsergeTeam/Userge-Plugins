@@ -14,7 +14,7 @@ import random
 from PIL import Image
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
-from pyrogram import emoji
+from pyrogram import emoji as pyro_emojis
 from pyrogram.errors import YouBlockedUser, StickersetInvalid
 from pyrogram.raw.functions.stickers import CreateStickerSet, AddStickerToSet
 from pyrogram.raw.functions.messages import GetStickerSet, UploadMedia
@@ -72,7 +72,10 @@ async def kang_(message: Message):
     else:
         return await message.edit("`Unsupported File!`")
 
-    await message.edit(f"`{random.choice(KANGING_STR)}`")
+    if '-d' in message.flags:
+        await message.delete()
+    else:
+        await message.edit(f"`{random.choice(KANGING_STR)}`")
     media = await userge.download_media(message=replied, file_name=config.Dynamic.DOWN_PATH)
     if not media:
         return await message.edit("`No Media!`")
@@ -93,7 +96,7 @@ async def kang_(message: Message):
         _saved = emoji_
         for k in _emoji:
             if k and k in (
-                getattr(emoji, a) for a in dir(emoji) if not a.startswith("_")
+                getattr(pyro_emojis, a) for a in dir(pyro_emojis) if not a.startswith("_")
             ):
                 emoji_ += k
         if _saved and _saved != emoji_:
@@ -102,6 +105,10 @@ async def kang_(message: Message):
         emoji_ = "🤔"
 
     user = await userge.get_me()
+    bot = None
+    if userge.has_bot:
+        bot = await userge.bot.get_me()
+
     u_name = user.username
     if u_name:
         u_name = "@" + u_name
@@ -124,7 +131,7 @@ async def kang_(message: Message):
     exist = False
     while True:
         if userge.has_bot:
-            packname += f"_by_{(await userge.bot.get_me()).username}"
+            packname += f"_by_{bot.username}"
         try:
             exist = await message.client.send(
                 GetStickerSet(
@@ -156,7 +163,7 @@ async def kang_(message: Message):
         sts = await create_pack(message, packnick, packname, media, emoji_, st_type)
 
     if '-d' in message.flags:
-        await message.delete()
+        pass
     elif sts:
         out = "__kanged__" if '-s' in message.flags else \
             f"[kanged](t.me/addstickers/{packname})"
@@ -268,7 +275,6 @@ async def create_pack(
                         emoji=emoji)],
                 animated=st_type == "anim",
                 videos=st_type == "vid"))
-        return True
     else:
         if st_type == "anim":
             cmd = '/newanimated'
@@ -281,8 +287,8 @@ async def create_pack(
             try:
                 await conv.send_message(cmd)
             except YouBlockedUser:
-                await message.edit('first **unblock** @Stickers')
-                return False
+                await userge.unblock_user("Stickers")
+                await conv.send_message(cmd)
             await conv.get_response(mark_read=True)
             await conv.send_message(pack_name)
             await conv.get_response(mark_read=True)
@@ -303,7 +309,7 @@ async def create_pack(
             await conv.get_response(mark_read=True)
             await conv.send_message(short_name)
             await conv.get_response(mark_read=True)
-            return True
+    return True
 
 
 async def add_sticker(message: Message, short_name: str, sticker: str, emoji: str) -> bool:
@@ -333,7 +339,6 @@ async def add_sticker(message: Message, short_name: str, sticker: str, emoji: st
                         access_hash=media.access_hash,
                         file_reference=media.file_reference),
                     emoji=emoji)))
-        return True
     else:
         async with userge.conversation('Stickers', limit=30) as conv:
             try:
@@ -354,7 +359,7 @@ async def add_sticker(message: Message, short_name: str, sticker: str, emoji: st
             await conv.get_response(mark_read=True)
             await conv.send_message('/done')
             await conv.get_response(mark_read=True)
-            return True
+    return True
 
 KANGING_STR = (
     "Using Witchery to kang this sticker...",
