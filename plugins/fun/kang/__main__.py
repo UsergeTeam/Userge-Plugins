@@ -8,19 +8,19 @@
 #
 # All rights reserved.
 
-import io
 import os
 import random
-from typing import Union
 
 from PIL import Image
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from pyrogram import emoji
 from pyrogram.errors import YouBlockedUser, StickersetInvalid
-from pyrogram.raw.functions.messages import GetStickerSet
-from pyrogram.raw.types import InputStickerSetShortName
-
+from pyrogram.raw.functions.stickers import CreateStickerSet, AddStickerToSet
+from pyrogram.raw.functions.messages import GetStickerSet, UploadMedia
+from pyrogram.raw.types import (
+    InputStickerSetShortName, InputStickerSetItem,
+    InputMediaUploadedDocument, DocumentAttributeFilename, InputDocument)
 from userge import userge, Message, config
 from userge.utils.tools import runcmd
 from .. import kang
@@ -36,7 +36,7 @@ from .. import kang
                  "an image to kang it to your userbot pack.",
         'examples': ["{tr}kang", "{tr}kang -s", "{tr}kang -d",
                      "{tr}kang 🤔😎", "{tr}kang 2", "{tr}kang 🤔🤣😂 2"]},
-    allow_channels=False, allow_via_bot=False)
+    allow_channels=False)
 async def kang_(message: Message):
     """ kang a sticker """
     replied = message.reply_to_message
@@ -111,21 +111,20 @@ async def kang_(message: Message):
     packname = f"a{user.id}_by_userge_{pack}"
     custom_packnick = kang.CUSTOM_PACK_NAME or f"{u_name}'s Kang Pack"
     packnick = f"{custom_packnick} Vol.{pack}"
-    cmd = '/newpack'
 
     if resize:
         media = await resize_media(media, is_video)
     if is_anim:
         packname += "_anim"
         packnick += " (Animated)"
-        cmd = '/newanimated'
     if is_video:
         packname += "_video"
         packnick += " (Video)"
-        cmd = '/newvideo'
 
     exist = False
     while True:
+        if userge.has_bot:
+            packname += f"_by_{(await userge.bot.get_me()).username}"
         try:
             exist = await message.client.send(
                 GetStickerSet(
@@ -149,55 +148,16 @@ async def kang_(message: Message):
                 await message.edit(f"`Switching to Pack {pack} due to insufficient space`")
                 continue
             break
+
     if exist is not False:
-        async with userge.conversation('Stickers', limit=30) as conv:
-            try:
-                await conv.send_message('/addsticker')
-            except YouBlockedUser:
-                return await message.edit('first **unblock** @Stickers')
-            await conv.get_response(mark_read=True)
-            await conv.send_message(packname)
-            await conv.get_response(mark_read=True)
-            await conv.send_document(media)
-            rsp = await conv.get_response(mark_read=True)
-            if "Sorry, the file type is invalid." in rsp.text:
-                await message.edit("`Failed to add sticker, use` @Stickers "
-                                   "`bot to add the sticker manually.`")
-                return
-            await conv.send_message(emoji_)
-            await conv.get_response(mark_read=True)
-            await conv.send_message('/done')
-            await conv.get_response(mark_read=True)
+        sts = await add_sticker(message, packname, media, emoji_)
     else:
-        await message.edit("`Brewing a new Pack...`")
-        async with userge.conversation('Stickers') as conv:
-            try:
-                await conv.send_message(cmd)
-            except YouBlockedUser:
-                return await message.edit('first **unblock** @Stickers')
-            await conv.get_response(mark_read=True)
-            await conv.send_message(packnick)
-            await conv.get_response(mark_read=True)
-            await conv.send_document(media)
-            rsp = await conv.get_response(mark_read=True)
-            if "Sorry, the file type is invalid." in rsp.text:
-                await message.edit("`Failed to add sticker, use` @Stickers "
-                                   "`bot to add the sticker manually.`")
-                return
-            await conv.send_message(emoji_)
-            await conv.get_response(mark_read=True)
-            await conv.send_message("/publish")
-            if is_anim:
-                await conv.get_response(mark_read=True)
-                await conv.send_message(f"<{packnick}>", parse_mode=None)
-            await conv.get_response(mark_read=True)
-            await conv.send_message("/skip")
-            await conv.get_response(mark_read=True)
-            await conv.send_message(packname)
-            await conv.get_response(mark_read=True)
+        st_type = "anim" if is_anim else "vid" if is_video else "static"
+        sts = await create_pack(message, packnick, packname, media, emoji_, st_type)
+
     if '-d' in message.flags:
         await message.delete()
-    else:
+    elif sts:
         out = "__kanged__" if '-s' in message.flags else \
             f"[kanged](t.me/addstickers/{packname})"
         await message.edit(f"**Sticker** {out}**!**")
@@ -238,7 +198,7 @@ async def sticker_pack_info_(message: Message):
     await message.edit(out_str)
 
 
-async def resize_media(media: str, video: bool) -> Union[str, io.BytesIO]:
+async def resize_media(media: str, video: bool) -> str:
     """ Resize the given media to 512x512 """
     if video:
         metadata = extractMetadata(createParser(media))
@@ -265,12 +225,136 @@ async def resize_media(media: str, video: bool) -> Union[str, io.BytesIO]:
     new_size = (int(image.width * scale), int(image.height * scale))
 
     image = image.resize(new_size, Image.LANCZOS)
-    resized_photo = io.BytesIO()
-    resized_photo.name = "sticker.png"
+    resized_photo = "sticker.png"
     image.save(resized_photo, "PNG")
     os.remove(media)
     return resized_photo
 
+
+async def create_pack(
+        message: Message,
+        pack_name: str,
+        short_name: str,
+        sticker: str,
+        emoji: str,
+        st_type: str) -> bool:
+    if userge.has_bot:
+        media = (await userge.bot.send(UploadMedia(
+            peer=await userge.bot.resolve_peer('stickers'),
+            media=InputMediaUploadedDocument(
+                mime_type=userge.guess_mime_type(sticker) or "application/zip",
+                file=(
+                    await userge.bot.save_file(sticker)
+                ),
+                force_file=True,
+                thumb=None,
+                attributes=[
+                    DocumentAttributeFilename(file_name=os.path.basename(sticker))
+                ]
+            )
+        )
+        )).document
+        await userge.bot.send(
+            CreateStickerSet(
+                user_id=await userge.bot.resolve_peer(config.OWNER_ID[0]),
+                title=pack_name,
+                short_name=short_name,
+                stickers=[
+                    InputStickerSetItem(
+                        document=InputDocument(
+                            id=media.id,
+                            access_hash=media.access_hash,
+                            file_reference=media.file_reference),
+                        emoji=emoji)],
+                animated=st_type == "anim",
+                videos=st_type == "vid"))
+        return True
+    else:
+        if st_type == "anim":
+            cmd = '/newanimated'
+        elif st_type == "vid":
+            cmd = '/newvideo'
+        else:
+            cmd = '/newpack'
+        await message.edit("`Brewing a new Pack...`")
+        async with userge.conversation('Stickers') as conv:
+            try:
+                await conv.send_message(cmd)
+            except YouBlockedUser:
+                await message.edit('first **unblock** @Stickers')
+                return False
+            await conv.get_response(mark_read=True)
+            await conv.send_message(pack_name)
+            await conv.get_response(mark_read=True)
+            await conv.send_document(sticker)
+            rsp = await conv.get_response(mark_read=True)
+            if "Sorry, the file type is invalid." in rsp.text:
+                await message.edit("`Failed to add sticker, use` @Stickers "
+                                   "`bot to add the sticker manually.`")
+                return False
+            await conv.send_message(emoji)
+            await conv.get_response(mark_read=True)
+            await conv.send_message("/publish")
+            if st_type == "anim":
+                await conv.get_response(mark_read=True)
+                await conv.send_message(f"<{short_name}>", parse_mode=None)
+            await conv.get_response(mark_read=True)
+            await conv.send_message("/skip")
+            await conv.get_response(mark_read=True)
+            await conv.send_message(short_name)
+            await conv.get_response(mark_read=True)
+            return True
+
+
+async def add_sticker(message: Message, short_name: str, sticker: str, emoji: str) -> bool:
+    if userge.has_bot:
+        media = (await userge.bot.send(UploadMedia(
+            peer=await userge.bot.resolve_peer('stickers'),
+            media=InputMediaUploadedDocument(
+                mime_type=userge.guess_mime_type(sticker) or "application/zip",
+                file=(
+                    await userge.bot.save_file(sticker)
+                ),
+                force_file=True,
+                thumb=None,
+                attributes=[
+                    DocumentAttributeFilename(file_name=os.path.basename(sticker))
+                ]
+            )
+        )
+        )).document
+        await userge.bot.send(
+            AddStickerToSet(
+                stickerset=InputStickerSetShortName(
+                    short_name=short_name),
+                sticker=InputStickerSetItem(
+                    document=InputDocument(
+                        id=media.id,
+                        access_hash=media.access_hash,
+                        file_reference=media.file_reference),
+                    emoji=emoji)))
+        return True
+    else:
+        async with userge.conversation('Stickers', limit=30) as conv:
+            try:
+                await conv.send_message('/addsticker')
+            except YouBlockedUser:
+                await message.edit('first **unblock** @Stickers')
+                return False
+            await conv.get_response(mark_read=True)
+            await conv.send_message(short_name)
+            await conv.get_response(mark_read=True)
+            await conv.send_document(sticker)
+            rsp = await conv.get_response(mark_read=True)
+            if "Sorry, the file type is invalid." in rsp.text:
+                await message.edit("`Failed to add sticker, use` @Stickers "
+                                   "`bot to add the sticker manually.`")
+                return False
+            await conv.send_message(emoji)
+            await conv.get_response(mark_read=True)
+            await conv.send_message('/done')
+            await conv.get_response(mark_read=True)
+            return True
 
 KANGING_STR = (
     "Using Witchery to kang this sticker...",
