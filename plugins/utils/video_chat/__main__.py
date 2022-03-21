@@ -24,7 +24,6 @@ from pyrogram.raw.functions.phone import (GetGroupCall,
 from pyrogram.raw.types import UpdateGroupCallParticipants, InputGroupCall
 
 from pytgcalls import PyTgCalls, StreamType
-from callbacks import vc_callback, vc_control_callback, vol_callback
 from pytgcalls.types import (
     AudioPiped,
     Update,
@@ -56,6 +55,7 @@ from .utils import (
     reply_text, default_markup, volume_button_markup,
     get_yt_info, vc_chat, check_enable_for_all
 )
+from .callbacks import vc_callback, vc_control_callback, vol_callback
 
 VC_DB = get_collection("VC_CMDS_TOGGLE")
 
