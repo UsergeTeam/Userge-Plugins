@@ -567,19 +567,19 @@ async def _participants_change_handler(_: PyTgCalls, update: Update):
 
 
 if userge.has_bot:
-    userge.add_handler(
+    userge.bot.add_handler(
         CallbackQueryHandler(
             vc_callback,
             filters.regex("(skip|queue|back$)")
         )
     )
-    userge.add_handler(
+    userge.bot.add_handler(
         CallbackQueryHandler(
             vol_callback,
             filters.regex(r"vol\((.+)\)")
         )
     )
-    userge.add_handler(
+    userge.bot.add_handler(
         CallbackQueryHandler(
             vc_control_callback,
             filters.regex("(player|seek|rewind|replay)")
