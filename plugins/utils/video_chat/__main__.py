@@ -15,6 +15,7 @@ import random
 import asyncio
 
 from pyrogram import ContinuePropagation
+from pyrogram.handlers import CallbackQueryHandler
 from pyrogram.errors import ChannelInvalid, ChannelPrivate
 from pyrogram.raw.base import Message as BaseMessage
 from pyrogram.raw.functions.phone import (GetGroupCall,
@@ -23,6 +24,7 @@ from pyrogram.raw.functions.phone import (GetGroupCall,
 from pyrogram.raw.types import UpdateGroupCallParticipants, InputGroupCall
 
 from pytgcalls import PyTgCalls, StreamType
+from callbacks import vc_callback, vc_control_callback, vol_callback
 from pytgcalls.types import (
     AudioPiped,
     Update,
@@ -38,7 +40,7 @@ from pytgcalls.exceptions import (
     NotInGroupCallError
 )
 
-from userge import userge, Message, get_collection, config
+from userge import userge, Message, get_collection, config, filters
 from userge.utils import time_formatter
 
 from . import (
@@ -562,3 +564,24 @@ async def _participants_change_handler(_: PyTgCalls, update: Update):
         GROUP_CALL_PARTICIPANTS.append(update.participant.user_id)
     elif isinstance(update, LeftGroupCallParticipant):
         GROUP_CALL_PARTICIPANTS.remove(update.participant.user_id)
+
+
+if userge.has_bot:
+    userge.add_handler(
+        CallbackQueryHandler(
+            vc_callback,
+            filters.regex("(skip|queue|back$)")
+        )
+    )
+    userge.add_handler(
+        CallbackQueryHandler(
+            vol_callback,
+            filters.regex(r"vol\((.+)\)")
+        )
+    )
+    userge.add_handler(
+        CallbackQueryHandler(
+            vc_control_callback,
+            filters.regex("(player|seek|rewind|replay)")
+        )
+    )
