@@ -20,10 +20,10 @@ class TgResource:
 
     @classmethod
     def parse(cls,
-               message: Message,
-               name: str,
-               path: str = "",
-               duration: int = 0) -> 'TgResource':
+              message: Message,
+              name: str,
+              path: str = "",
+              duration: int = 0) -> 'TgResource':
         is_video = '-v' in message.flags
         quality = message.flags.get('-q', 80)
         return cls(message, name, duration, path, quality, is_video)
@@ -56,11 +56,11 @@ class UrlResource:
 
     @classmethod
     def parse(cls,
-               message: Message,
-               name: str,
-               url: str,
-               duration: int,
-               file_info: Tuple[int, int, bool, bool] = None) -> 'UrlResource':
+              message: Message,
+              name: str,
+              url: str,
+              duration: int,
+              file_info: Tuple[int, int, bool, bool] = None) -> 'UrlResource':
         is_video = '-v' in message.flags
         quality = message.flags.get('-q', 80)
         return cls(message, name, url, duration, quality, is_video, file_info)

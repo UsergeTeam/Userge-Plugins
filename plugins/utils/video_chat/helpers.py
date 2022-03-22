@@ -71,10 +71,10 @@ async def play_music(msg: Message, forceplay: bool):
             except Exception:
                 return await reply_text(msg, "`invalid direct link provided to stream!`")
             resource = UrlResource.parse(msg,
-                                          filename.replace('_', ' '),
-                                          input_str,
-                                          duration,
-                                          (height, width, has_audio, has_video))
+                                         filename.replace('_', ' '),
+                                         input_str,
+                                         duration,
+                                         (height, width, has_audio, has_video))
             Vars.CLIENT = msg.client
             if forceplay:
                 QUEUE.insert(0, resource)
@@ -90,9 +90,9 @@ async def play_music(msg: Message, forceplay: bool):
             filename = path.name
             duration = await get_duration(path)
             resource = TgResource.parse(msg,
-                                         filename.replace('_', ' '),
-                                         str(path.absolute()),
-                                         duration)
+                                        filename.replace('_', ' '),
+                                        str(path.absolute()),
+                                        duration)
             Vars.CLIENT = msg.client
             if forceplay:
                 QUEUE.insert(0, resource)
