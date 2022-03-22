@@ -10,17 +10,16 @@
 
 # By @AsmSafone
 
-import asyncio
 import os
 
 from userge import userge, Message, filters, config, get_collection
 from ...utils import ocr
 
 IS_ENABLED = False
-USER_DATA = get_collection("CONFIGS")
+IS_ENABLED_FILTER = filters.create(lambda _, __, ___: IS_ENABLED)
 
+USER_DATA = get_collection("CONFIGS")
 CHANNEL = userge.getCLogger(__name__)
-LOG = userge.getLogger(__name__)
 
 
 @userge.on_start
@@ -37,9 +36,7 @@ async def _init() -> None:
     'usage': "{tr}autofastly"},
     allow_channels=False, allow_via_bot=False)
 async def autofastly(msg: Message):
-    """
-    Auto Fastly Response
-    """
+    """ Auto Fastly Response """
     global IS_ENABLED  # pylint: disable=global-statement
     if ocr.OCR_SPACE_API_KEY is None:
         await msg.edit(
@@ -50,41 +47,31 @@ async def autofastly(msg: Message):
             parse_mode="html", del_in=0)
         return
 
-    if IS_ENABLED:
-        IS_ENABLED = False
-        USER_DATA.update_one({'_id': 'AUTO_FASTLY'},
-                             {"$set": {'on': False}}, upsert=True)
-        await asyncio.sleep(1)
-        await msg.edit(
-            "Auto Fastly Response is **Disabled** Successfully...", log=__name__, del_in=5)
-        return
-
-    IS_ENABLED = True
-    USER_DATA.update_one({'_id': 'AUTO_FASTLY'},
-                         {"$set": {'on': True}}, upsert=True)
-    await asyncio.sleep(1)
+    IS_ENABLED = not IS_ENABLED
+    await USER_DATA.update_one({'_id': 'AUTO_FASTLY'},
+                               {"$set": {'on': IS_ENABLED}}, upsert=True)
     await msg.edit(
-        "Auto Fastly Response is **Enabled** Successfully...", log=__name__, del_in=5)
+        "Auto Fastly Response has been **{}** Successfully...".format(
+            "Enabled" if IS_ENABLED else "Disabled"
+        ),
+        log=True, del_in=5
+    )
 
 
-@userge.on_filters(filters.photo & filters.incoming & filters.group
-                   & filters.user([1806208310, 1983714367, 1877720720, 5053950120]),
+@userge.on_filters(IS_ENABLED_FILTER & filters.group & filters.photo & filters.incoming
+                   & filters.user([1806208310, 1983714367, 1877720720, 5053950120]),  # Bot IDs
                    group=-1, allow_via_bot=False)
 async def fastly_handler(msg: Message):
-    if not IS_ENABLED:
-        return
     img = await msg.download(config.Dynamic.DOWN_PATH)
     parse = await ocr.ocr_space_file(img)
     try:
         text = parse["ParsedResults"][0]["ParsedText"]
-    except Exception as e_x:  # pylint: disable=broad-except
-        LOG.error(e_x)
-        os.remove(img)
-        return
-    else:
         text = text.split("By@")[0].replace("\n", "").replace("\r", "")
         if text:
-            await msg.reply_text(text.capitalize(), quote=True)
-            CHANNEL.log(f'Auto Fastly Responded in {msg.chat.title} [{msg.chat.id}]')
-    if os.path.exists(img):
+            await msg.reply_text(text.capitalize())
+            await CHANNEL.log(f'Auto Fastly Responded in {msg.chat.title} [{msg.chat.id}]')
         os.remove(img)
+    except Exception as e_x:  # pylint: disable=broad-except
+        await CHANNEL.log(str(e_x))
+        if os.path.exists(img):
+            os.remove(img)
