@@ -9,8 +9,8 @@ from pyrogram.errors import MessageNotModified, QueryIdInvalid
 from userge import userge, filters, config
 from userge.utils.exceptions import StopConversation
 from . import call, CQ_MSG, QUEUE, Vars
+from .resource import TgResource
 from .utils import (check_cq_for_all,
-                    get_yt_info,
                     default_markup,
                     get_player_string)
 from .helpers import skip_song, replay_music, seek_music
@@ -48,19 +48,17 @@ async def vc_callback(cq: CallbackQuery):
         else:
             out = f"**{len(QUEUE)} Song"
             out += f"{'s' if len(QUEUE) > 1 else ''} in Queue:**\n"
-            for i, m in enumerate(QUEUE, start=1):
+            for i, r in enumerate(QUEUE, start=1):
                 if len(out) > config.MAX_MESSAGE_LENGTH - 100:
                     out += ('\nQueue too Long, '
                             'can not display more songs because of telegram restrictions.')
                     break
-                file = m.audio or m.video or m.document or None
-                if hasattr(m, 'file_name'):
-                    out = f"\n{i}. {m.file_name}"
-                elif file:
-                    out += f"\n{i}. [{file.file_name}]({m.link})"
+                if isinstance(r, TgResource) and r.path:
+                    out = f"\n{i}. {r}"
+                elif isinstance(r, TgResource):
+                    out += f"\n{i}. [{r}]({r.message.link})"
                 else:
-                    title, link = get_yt_info(m)
-                    out += f"\n{i}. [{title}]({link})"
+                    out += f"\n{i}. [{r}]({r.url})"
 
         out += f"\n\n**Clicked by:** {cq.from_user.mention}"
         button = InlineKeyboardMarkup(
@@ -104,7 +102,7 @@ async def vol_callback(cq: CallbackQuery):
                     return r and r.message_id == cq.message.message_id
 
                 response = await conv.get_response(mark_read=True,
-                                                    filters=filters.create(_filter))
+                                                   filters=filters.create(_filter))
         except StopConversation:
             await cq.edit_message_text("No arguments passed!")
             return

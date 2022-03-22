@@ -166,14 +166,6 @@ def get_player_string() -> str:
     return f"{time_formatter(played_duration)}   {player_string}    {time_formatter(duration)}"
 
 
-def get_yt_info(msg: Message) -> Tuple[str, str]:
-    if msg.entities:
-        for e in msg.entities:
-            if e.url:
-                return msg.text[e.offset:e.length], e.url
-    return "", ""
-
-
 @pool.run_in_thread
 def get_song(name: str) -> Tuple[str, str]:
     results: List[dict] = VideosSearch(name, limit=1).result()['result']
@@ -191,8 +183,9 @@ def get_song_info(url: str) -> Tuple[str, int]:
         duration = info.get("duration") or 0
 
         if duration > MAX_DURATION:
-            return False
+            duration = -1
     return info.get("title"), duration if duration else 0
+
 
 async def get_stream_link(link: str) -> str:
     yt_dl = (os.environ.get("YOUTUBE_DL_PATH", "yt_dlp")).replace("_", "-")

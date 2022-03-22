@@ -47,13 +47,14 @@ from . import (
     CONTROL_CHAT_IDS, LOG, VC_SESSION, VC_CLIENT, call,
     Dynamic, Vars
 )
+from .resource import TgResource
 from .helpers import (
     skip_song, on_join, on_left, play_music,
     invite_vc_client, seek_music, replay_music
 )
 from .utils import (
-    reply_text, default_markup, volume_button_markup,
-    get_yt_info, vc_chat, check_enable_for_all
+    reply_text, default_markup, vc_chat,
+    volume_button_markup, check_enable_for_all
 )
 from .callbacks import vc_callback, vc_control_callback, vol_callback
 
@@ -334,18 +335,16 @@ async def view_queue(msg: Message):
         list_out = []
         out = f"**{len(QUEUE)} Songs in Queue:**\n"
 
-        for i, m in enumerate(QUEUE, start=1):
+        for i, r in enumerate(QUEUE, start=1):
             if len(out) > config.MAX_MESSAGE_LENGTH:
                 list_out.append(out)
                 out = ''
-            file = m.audio or m.video or m.document or None
-            if hasattr(m, 'file_name'):
-                out += f"\n{i}. {m.file_name}"
-            elif file:
-                out += f"\n{i}. [{file.file_name}]({m.link})"
+            if isinstance(r, TgResource) and r.path:
+                out += f"\n{i}. {r}"
+            elif isinstance(r, TgResource):
+                out += f"\n{i}. [{r}]({r.message.link})"
             else:
-                title, link = get_yt_info(m)
-                out += f"\n{i}. [{title}]({link})"
+                out += f"\n{i}. [{r}]({r.url})"
 
         list_out.append(out)
 
@@ -399,15 +398,13 @@ async def skip_music(msg: Message):
         and msg.input_str.isnumeric()
         and (len(QUEUE) >= int(msg.input_str) > 0)
     ):
-        m = QUEUE.pop(int(msg.input_str) - 1)
-        file = m.audio or m.video or m.document or None
-        if hasattr(m, 'file_name'):
-            out = f"`Skipped` {m.file_name}"
-        elif file:
-            out = f"`Skipped` [{file.file_name}]({m.link})"
+        r = QUEUE.pop(int(msg.input_str) - 1)
+        if isinstance(r, TgResource) and r.path:
+            out = f"`Skipped` {r}"
+        elif isinstance(r, TgResource):
+            out = f"`Skipped` [{r}]({r.message.link})"
         else:
-            title, link = get_yt_info(m)
-            out = f"`Skipped` [{title}]({link})"
+            out = f"`Skipped` [{r}]({r.url})"
         await reply_text(msg, out)
         return
     await reply_text(msg, "`Skipped`")

@@ -10,14 +10,15 @@
 
 import os
 import logging
-from typing import List
+from typing import List, Union
 
 from pyrogram import Client
 from pyrogram.types import Message as RawMessage
 from pytgcalls import PyTgCalls
 
-from userge import userge, Message, config
+from userge import userge, config
 from userge.utils import secured_env
+from .resource import TgResource, UrlResource
 
 logging.getLogger("pytgcalls").setLevel(logging.WARNING)
 
@@ -44,7 +45,7 @@ LOG = userge.getLogger()
 CURRENT_SONG = {}
 CONTROL_CHAT_IDS: List[int] = []
 CQ_MSG: List[RawMessage] = []
-QUEUE: List[Message] = []
+QUEUE: List[Union[TgResource, UrlResource]] = []
 GROUP_CALL_PARTICIPANTS: List[int] = []
 
 

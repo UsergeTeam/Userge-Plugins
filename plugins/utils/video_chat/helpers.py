@@ -29,138 +29,120 @@ from . import (
     CONTROL_CHAT_IDS, CURRENT_SONG, VC_CLIENT,
     MAX_DURATION, LOG, CHANNEL, Dynamic, Vars
 )
+from .resource import TgResource, UrlResource
 from .utils import (
     reply_text, is_yt_url, requester, default_markup,
     get_scheduled_text, get_song_info, get_song,
-    get_file_info, get_quality_ratios, get_yt_info,
-    get_stream_link, get_duration
+    get_file_info, get_quality_ratios, get_duration,
+    get_stream_link
 )
 
 
 async def play_music(msg: Message, forceplay: bool):
     """ play music """
-    input_str = msg.filtered_input_str or getattr(msg.reply_to_message, 'text', '') or ''
-    flags = msg.flags
-    is_video = "-v" in flags
+    input_str = msg.filtered_input_str or getattr(msg.reply_to_message, 'text', '')
     path = Path(input_str)
-    quality = flags.get('-q', 80)
     if input_str:
         if is_yt_url(input_str):
-            details = await get_song_info(input_str)
-            if not details:
+            name, duration = await get_song_info(input_str)
+            if duration == -1:
                 return await reply_text(msg, "**ERROR:** `Max song duration limit reached!`")
-            name, duration = details
             if Dynamic.PLAYING and not forceplay:
                 msg = await reply_text(msg, get_scheduled_text(name, input_str))
-            else:
-                msg = await reply_text(msg, f"[{name}]({input_str})")
-            flags["duration"] = duration
-            setattr(msg, '_flags', flags)
+            resource = UrlResource._parse(msg, name, input_str, duration)
             if forceplay:
-                QUEUE.insert(0, msg)
+                QUEUE.insert(0, resource)
             else:
-                QUEUE.append(msg)
-        elif is_url(input_str) or (path.exists() and path.is_file()):
-            if path.exists():
-                if not path.name.endswith(
-                    (".mkv", ".mp4", ".webm", ".m4v", ".mp3", ".flac", ".wav", ".m4a")
-                ):
-                    return await reply_text(msg, "`invalid file path provided to stream!`")
-                path_to_media = str(path.absolute())
-                filename = path.name
-            else:
+                QUEUE.append(resource)
+        elif is_url(input_str):
+            try:
+                height, width, has_audio, has_video = await get_file_info(input_str)
+                if not has_audio and not has_video:
+                    raise Exception
+                duration = await get_duration(shlex.quote(input_str))
+                res = await pool.run_in_thread(requests.get)(input_str,
+                                                             allow_redirects=True,
+                                                             stream=True)
+                headers = dict(res.headers)               
                 try:
-                    res = await pool.run_in_thread(
-                        requests.get
-                    )(input_str, allow_redirects=True, stream=True)
-                    headers = dict(res.headers)
-                    if (
-                        "video" not in headers.get("Content-Type", '')
-                        and "audio" not in headers.get("Content-Type", '')
-                    ):
-                        height, width, has_audio, has_video = await get_file_info(input_str)
-                        setattr(
-                            msg, 'file_info', (height, width, has_audio, has_video))
-                        if not has_audio and not has_video:
-                            raise Exception
-                    path_to_media = input_str
-                    try:
-                        filename = headers["Content-Disposition"].split('=', 1)[1].strip('"') or ''
-                    except KeyError:
-                        filename = None
-                    if not filename:
-                        if hasattr(msg, 'file_info'):
-                            _, _, _, has_video = msg.file_info
-                            filename = "Video" if has_video else "Music"
-                        else:
-                            filename = 'Link'
-                except Exception as e:
-                    LOG.exception(e)
-                    return await reply_text(msg, "`invalid direct link provided to stream!`")
-            setattr(msg, 'path_to_media', path_to_media)
-            setattr(msg, 'file_name', filename.replace('_', ' '))
-            setattr(msg, 'is_video', is_video)
-            setattr(msg, 'quality', quality)
+                    filename = headers["Content-Disposition"].split('=', 1)[1].strip('"') or ''
+                except KeyError:
+                    filename = "Video" if has_video else "Music"
+            except Exception:
+                return await reply_text(msg, "`invalid direct link provided to stream!`")
+            resource = UrlResource._parse(msg,
+                                          filename.replace('_', ' '),
+                                          input_str,
+                                          duration,
+                                          (height, width, has_audio, has_video))
             Vars.CLIENT = msg.client
             if forceplay:
-                QUEUE.insert(0, msg)
+                QUEUE.insert(0, resource)
             else:
                 if Dynamic.PLAYING:
-                    await reply_text(msg, get_scheduled_text(msg.file_name))
-                QUEUE.append(msg)
+                    await reply_text(msg, get_scheduled_text(resource, resource.url))
+                QUEUE.append(resource)
+        elif (path.exists() and path.is_file()):
+            if not path.name.endswith(
+                (".mkv", ".mp4", ".webm", ".m4v", ".mp3", ".flac", ".wav", ".m4a")
+            ):
+                return await reply_text(msg, "`invalid file path provided to stream!`")
+            filename = path.name
+            duration = await get_duration(path)
+            resource = TgResource._parse(msg,
+                                         filename.replace('_', ' '),
+                                         str(path.absolute()),
+                                         duration)
+            Vars.CLIENT = msg.client
+            if forceplay:
+                QUEUE.insert(0, resource)
+            else:
+                if Dynamic.PLAYING:
+                    await reply_text(msg, get_scheduled_text(resource))
+                QUEUE.append(resource)
         else:
             mesg = await reply_text(msg, f"Searching `{input_str}` on YouTube")
             title, link = await get_song(input_str)
             if link:
-                details = await get_song_info(link)
-                if not details:
+                _, duration = await get_song_info(link)
+                if duration == -1:
                     return await mesg.edit("Invalid YouTube link found during search!")
-                _, duration = details
                 if Dynamic.PLAYING and not forceplay:
                     msg = await reply_text(msg, get_scheduled_text(title, link))
-                else:
-                    msg = await msg.edit(f"[{title}]({link})")
-                flags["duration"] = duration
                 await mesg.delete()
-                setattr(msg, '_flags', flags)
+                resource = UrlResource._parse(msg, title, link, duration)
                 if forceplay:
-                    QUEUE.insert(0, msg)
+                    QUEUE.insert(0, resource)
                 else:
-                    QUEUE.append(msg)
+                    QUEUE.append(resource)
             else:
                 await mesg.edit("No results found.")
     elif msg.reply_to_message:
         replied = msg.reply_to_message
         replied_file = replied.audio or replied.video or replied.document
-        if not replied_file:
+        if not (replied.audio
+                or replied.video
+                or (replied.document and "video" in replied.document.mime_type)):
             return await reply_text(msg, "Input not found")
         if replied.audio:
-            setattr(
-                replied.audio,
-                'file_name',
-                replied_file.title or replied_file.file_name or "Song")
-            setattr(replied.audio, 'is_video', False)
-            setattr(replied.audio, 'quality', 100)
-        elif replied.video:
-            setattr(replied.video, 'is_video', is_video)
-            setattr(replied.video, 'quality', quality)
-        elif replied.document and "video" in replied.document.mime_type:
-            setattr(replied.document, 'is_video', is_video)
-            setattr(replied.document, 'quality', quality)
+            resource = TgResource._parse(
+                msg, replied_file.title or replied_file.file_name or "Song",
+                duration=replied.audio.duration
+            )
         else:
-            return await reply_text(msg, "Replied media is invalid.")
+            resource = TgResource._parse(msg, replied_file.file_name)
 
         if msg.sender_chat:
-            setattr(replied, 'sender_chat', msg.sender_chat)
+            setattr(resource.message, 'sender_chat', msg.sender_chat)
         elif msg.from_user:
-            setattr(replied, 'from_user', msg.from_user)
+            setattr(resource.message, 'from_user', msg.from_user)
         Vars.CLIENT = msg.client
         if forceplay:
-            QUEUE.insert(0, replied)
+            QUEUE.insert(0, resource)
         else:
             if Dynamic.PLAYING:
-                await reply_text(msg, get_scheduled_text(replied_file.file_name, replied.link))
-            QUEUE.append(replied)
+                await reply_text(msg, get_scheduled_text(resource, replied.link))
+            QUEUE.append(resource)
     else:
         return await reply_text(msg, "Input not found")
 
@@ -189,18 +171,19 @@ async def skip_song(clear_queue: bool = False):
     if clear_queue:
         QUEUE.clear()
 
+    shutil.rmtree("temp_music_dir", ignore_errors=True)
+
     if not QUEUE:
         return
 
-    shutil.rmtree("temp_music_dir", ignore_errors=True)
-    msg = QUEUE.pop(0)
+    resource = QUEUE.pop(0)
 
     try:
         Dynamic.PLAYING = True
-        if msg.audio or msg.video or msg.document or hasattr(msg, "file_name"):
-            await tg_down(msg)
+        if isinstance(resource, TgResource):
+            await tg_down(resource)
         else:
-            await yt_down(msg)
+            await url_down(resource)
     except Exception as err:
         Dynamic.PLAYING = False
         out = f'**ERROR:** `{err}`'
@@ -278,33 +261,34 @@ async def invite_vc_client(msg: Message) -> bool:
     return False
 
 
-async def yt_down(msg: Message):
+async def url_down(resource: UrlResource):
     """ youtube downloader """
-    title, url = get_yt_info(msg)
-    message = await reply_text(msg, f"`Preparing {title}`")
-    stream_link = await get_stream_link(url)
+    message = await reply_text(resource.message, f"`Preparing {resource}`")
+    stream_link = await get_stream_link(resource.url)
 
     if not stream_link:
         raise Exception("Song not Downloaded, add again in Queue [your wish]")
 
-    flags = msg.flags
-    is_video = "-v" in flags
-    duration = int(flags.get("duration"))
-    quality = max(min(100, int(flags.get('-q', 100))), 1)
-    height, width, has_audio, has_video = await get_file_info(stream_link)
+    msg = resource.message
+    duration = resource.duration
+    quality = max(min(100, int(resource.quality)), 1)
+    if resource.file_info:
+        height, width, has_audio, has_video = resource.file_info
+    else:
+        height, width, has_audio, has_video = await get_file_info(stream_link)
 
     CURRENT_SONG.update({
         'file': stream_link,
         "height": height,
         "width": width,
         "has_video": has_video,
-        "is_video": is_video and has_video,
+        "is_video": resource.is_video and has_video,
         "duration": duration,
         "quality": quality,
         "is_live": duration == 0
     })
 
-    if is_video and has_video:
+    if resource.is_video and has_video:
         await play_video(stream_link, height, width, quality)
     elif has_audio:
         await play_audio(stream_link)
@@ -312,16 +296,13 @@ async def yt_down(msg: Message):
         out = "Invalid media found in queue, and skipped"
         if QUEUE:
             out += "\n\n`Playing next Song.`"
-        await reply_text(
-            msg,
-            out
-        )
+        await reply_text(msg, out)
         return await skip_song()
 
     await message.delete()
 
     Vars.BACK_BUTTON_TEXT = (
-        f"🎶 **Now playing:** [{title}]({url})\n"
+        f"🎶 **Now playing:** [{resource}]({resource.url})\n"
         f"⏳ **Duration:** `{'Live' if not duration else time_formatter(duration)}`\n"
         f"🎧 **Requested By:** {requester(msg)}")
 
@@ -337,52 +318,44 @@ async def yt_down(msg: Message):
         await msg.delete()
 
 
-async def tg_down(msg: Message):
+async def tg_down(resource: TgResource):
     """ TG downloader """
-    file = msg.audio or msg.video or msg.document or msg
-    title = file.file_name
+    msg = resource.message
     setattr(msg, '_client', Vars.CLIENT)
     message = await reply_text(
-        msg, f"`{'Preparing' if hasattr(msg, 'file_name') else 'Downloading'} {title}`"
+        msg, f"`{'Preparing' if resource.path else 'Downloading'} {resource}`"
     )
-    duration = 0
-    if not hasattr(msg, "path_to_media"):
+    if not resource.path:
         path = await msg.client.download_media(
             message=msg,
             file_name="temp_music_dir/",
             progress=progress,
             progress_args=(message, "Downloading..."))
         filename = os.path.join("temp_music_dir", os.path.basename(path))
-        if msg.audio:
-            duration = msg.audio.duration
-        elif msg.video or msg.document:
-            duration = await get_duration(shlex.quote(filename))
+        if msg.video or msg.document:
+            resource.duration = await get_duration(shlex.quote(filename))
     else:
-        filename = msg.path_to_media
-        duration = await get_duration(shlex.quote(msg.path_to_media))
-    if duration > MAX_DURATION:
+        filename = resource.path
+        resource.duration = await get_duration(shlex.quote(resource.path))
+    if resource.duration > MAX_DURATION:
         await reply_text(msg, "**ERROR:** `Max song duration limit reached!`")
         return await skip_song()
-    if hasattr(msg, 'file_info'):
-        height, width, has_audio, has_video = msg.file_info
-    else:
-        height, width, has_audio, has_video = await get_file_info(shlex.quote(filename))
+    height, width, has_audio, has_video = await get_file_info(shlex.quote(filename))
 
-    is_video = file.is_video
-    quality = max(min(100, int(getattr(file, 'quality', 100))), 1)
+    quality = max(min(100, int(resource.quality)), 1)
 
     CURRENT_SONG.update({
         'file': filename,
         "height": height,
         "width": width,
         "has_video": has_video,
-        "is_video": is_video and has_video,
-        "duration": duration,
+        "is_video": resource.is_video and has_video,
+        "duration": resource.duration,
         "quality": quality,
-        "is_live": duration == 0
+        "is_live": resource.duration == 0
     })
 
-    if is_video and has_video:
+    if resource.is_video and has_video:
         await play_video(filename, height, width, quality)
     elif has_audio:
         await play_audio(filename)
@@ -397,10 +370,11 @@ async def tg_down(msg: Message):
         return await skip_song()
 
     await message.delete()
+    d = resource.duration
 
     Vars.BACK_BUTTON_TEXT = (
-        f"🎶 **Now playing:** [{title}]({msg.link})\n"
-        f"⏳ **Duration:** `{'Live' if not duration else time_formatter(duration)}`\n"
+        f"🎶 **Now playing:** [{resource}]({msg.link})\n"
+        f"⏳ **Duration:** `{'Live' if not d else time_formatter(d)}`\n"
         f"🎧 **Requested By:** {requester(msg)}")
 
     raw_msg = await reply_text(
