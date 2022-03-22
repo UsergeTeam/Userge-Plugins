@@ -83,7 +83,8 @@ async def fastly_handler(msg: Message):
         return
     else:
         text = text.split("By@")[0].replace("\n", "").replace("\r", "")
-        await msg.reply_text(text.capitalize(), quote=True)
-        CHANNEL.log(f'Auto Fastly Responded in {msg.chat.title} [{msg.chat.id}]')
+        if text:
+            await msg.reply_text(text.capitalize(), quote=True)
+            CHANNEL.log(f'Auto Fastly Responded in {msg.chat.title} [{msg.chat.id}]')
     if os.path.exists(img):
         os.remove(img)
