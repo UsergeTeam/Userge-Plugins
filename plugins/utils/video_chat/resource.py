@@ -19,11 +19,11 @@ class TgResource:
         self.is_video = is_video
 
     @classmethod
-    def _parse(cls,
+    def parse(cls,
                message: Message,
                name: str,
                path: str = "",
-               duration: int = 0) -> 'UrlResource':
+               duration: int = 0) -> 'TgResource':
         is_video = '-v' in message.flags
         quality = message.flags.get('-q', 80)
         return cls(message, name, duration, path, quality, is_video)
@@ -55,7 +55,7 @@ class UrlResource:
         self.file_info = file_info
 
     @classmethod
-    def _parse(cls,
+    def parse(cls,
                message: Message,
                name: str,
                url: str,

@@ -49,7 +49,7 @@ async def play_music(msg: Message, forceplay: bool):
                 return await reply_text(msg, "**ERROR:** `Max song duration limit reached!`")
             if Dynamic.PLAYING and not forceplay:
                 msg = await reply_text(msg, get_scheduled_text(name, input_str))
-            resource = UrlResource._parse(msg, name, input_str, duration)
+            resource = UrlResource.parse(msg, name, input_str, duration)
             if forceplay:
                 QUEUE.insert(0, resource)
             else:
@@ -63,14 +63,14 @@ async def play_music(msg: Message, forceplay: bool):
                 res = await pool.run_in_thread(requests.get)(input_str,
                                                              allow_redirects=True,
                                                              stream=True)
-                headers = dict(res.headers)               
+                headers = dict(res.headers)
                 try:
                     filename = headers["Content-Disposition"].split('=', 1)[1].strip('"') or ''
                 except KeyError:
                     filename = "Video" if has_video else "Music"
             except Exception:
                 return await reply_text(msg, "`invalid direct link provided to stream!`")
-            resource = UrlResource._parse(msg,
+            resource = UrlResource.parse(msg,
                                           filename.replace('_', ' '),
                                           input_str,
                                           duration,
@@ -89,7 +89,7 @@ async def play_music(msg: Message, forceplay: bool):
                 return await reply_text(msg, "`invalid file path provided to stream!`")
             filename = path.name
             duration = await get_duration(path)
-            resource = TgResource._parse(msg,
+            resource = TgResource.parse(msg,
                                          filename.replace('_', ' '),
                                          str(path.absolute()),
                                          duration)
@@ -110,7 +110,7 @@ async def play_music(msg: Message, forceplay: bool):
                 if Dynamic.PLAYING and not forceplay:
                     msg = await reply_text(msg, get_scheduled_text(title, link))
                 await mesg.delete()
-                resource = UrlResource._parse(msg, title, link, duration)
+                resource = UrlResource.parse(msg, title, link, duration)
                 if forceplay:
                     QUEUE.insert(0, resource)
                 else:
@@ -125,12 +125,12 @@ async def play_music(msg: Message, forceplay: bool):
                 or (replied.document and "video" in replied.document.mime_type)):
             return await reply_text(msg, "Input not found")
         if replied.audio:
-            resource = TgResource._parse(
+            resource = TgResource.parse(
                 msg, replied_file.title or replied_file.file_name or "Song",
                 duration=replied.audio.duration
             )
         else:
-            resource = TgResource._parse(msg, replied_file.file_name)
+            resource = TgResource.parse(msg, replied_file.file_name)
 
         if msg.sender_chat:
             setattr(resource.message, 'sender_chat', msg.sender_chat)
