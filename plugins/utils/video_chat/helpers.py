@@ -126,11 +126,11 @@ async def play_music(msg: Message, forceplay: bool):
             return await reply_text(msg, "Input not found")
         if replied.audio:
             resource = TgResource.parse(
-                msg, replied_file.title or replied_file.file_name or "Song",
+                replied, replied_file.title or replied_file.file_name or "Song",
                 duration=replied.audio.duration
             )
         else:
-            resource = TgResource.parse(msg, replied_file.file_name)
+            resource = TgResource.parse(replied, replied_file.file_name)
 
         if msg.sender_chat:
             setattr(resource.message, 'sender_chat', msg.sender_chat)
