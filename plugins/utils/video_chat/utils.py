@@ -204,7 +204,7 @@ async def get_duration(file: str) -> int:
     try:
         out = json.loads(out)
     except JSONDecodeError:
-        pass
+        return 0
 
     dur = int(float((out.get("format", {})).get("duration", 0)))
     return dur
