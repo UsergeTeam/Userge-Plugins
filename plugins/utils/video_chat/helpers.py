@@ -133,8 +133,8 @@ async def play_music(msg: Message, forceplay: bool):
             resource = TgResource(replied,
                                   replied_file.file_name,
                                   0,
-                                  quality=int(message.flags.get('-q', "80")),
-                                  is_video='-v' in message.flags)
+                                  quality=int(msg.flags.get('-q', "80")),
+                                  is_video='-v' in msg.flags)
 
         if msg.sender_chat:
             setattr(resource.message, 'sender_chat', msg.sender_chat)
