@@ -40,7 +40,7 @@ from .utils import (
 
 async def play_music(msg: Message, forceplay: bool):
     """ play music """
-    input_str = msg.filtered_input_str or getattr(msg.reply_to_message, 'text', '')
+    input_str = msg.filtered_input_str or getattr(msg.reply_to_message, 'text', '') or ''
     path = Path(input_str)
     if input_str:
         if is_yt_url(input_str):
