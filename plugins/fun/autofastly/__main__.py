@@ -61,14 +61,15 @@ async def autofastly(msg: Message):
 
     IS_ENABLED = True
     USER_DATA.update_one({'_id': 'AUTO_FASTLY'},
-                            {"$set": {'on': True}}, upsert=True)
+                         {"$set": {'on': True}}, upsert=True)
     await asyncio.sleep(1)
     await msg.edit(
         "Auto Fastly Response is **Enabled** Successfully...", log=__name__, del_in=5)
 
 
 @userge.on_filters(filters.photo & filters.incoming & filters.group
-    & filters.user([1806208310, 1983714367, 1877720720, 5053950120]), group=-1)
+                   & filters.user([1806208310, 1983714367, 1877720720, 5053950120]),
+                   group=-1, allow_via_bot=False)
 async def fastly_handler(msg: Message):
     if not IS_ENABLED:
         return
