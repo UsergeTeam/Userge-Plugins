@@ -10,44 +10,10 @@
 
 import os
 
-import requests
-
-from userge import userge, Message, pool
+from userge import userge, Message, config
 from .. import ocr
 
 CHANNEL = userge.getCLogger(__name__)
-
-
-@pool.run_in_thread
-def ocr_space_file(filename,
-                   language='eng',
-                   overlay=False,
-                   api_key=ocr.OCR_SPACE_API_KEY):
-    """
-    OCR.space API request with local file.
-        Python3.5 - not tested on 2.7
-    :param filename: Your file path & name.
-    :param overlay: Is OCR.space overlay required in your response.
-                    Defaults to False.
-    :param api_key: OCR.space API key.
-                    Defaults to 'helloworld'.
-    :param language: Language code to be used in OCR.
-                    List of available language codes can be found on https://ocr.space/OCRAPI
-                    Defaults to 'en'.
-    :return: Result in JSON format.
-    """
-    payload = {
-        'isOverlayRequired': overlay,
-        'apikey': api_key,
-        'language': language,
-    }
-    with open(filename, 'rb') as f:
-        r = requests.post(
-            'https://api.ocr.space/parse/image',
-            files={filename: f},
-            data=payload,
-        )
-    return r.json()
 
 
 @userge.on_cmd("ocr", about={
@@ -69,33 +35,24 @@ async def ocr_gen(message: Message):
             parse_mode="html", del_in=0)
         return
 
-    if message.reply_to_message:
-
-        if message.input_str:
-            lang_code = message.input_str
-        else:
-            lang_code = "eng"
-
-        await message.edit(r"`Trying to Read.. 📖")
-        downloaded_file_name = await message.client.download_media(message.reply_to_message)
-        test_file = await ocr_space_file(downloaded_file_name, lang_code)
-        try:
-            ParsedText = test_file["ParsedResults"][0]["ParsedText"]
-        except Exception as e_f:
-            await message.edit(
-                r"`Couldn't read it.. (╯‵□′)╯︵┻━┻`"
-                "\n`I guess I need new glasses.. 👓`"
-                f"\n\n**ERROR**: `{e_f}`", del_in=0)
-            os.remove(downloaded_file_name)
-            return
-        else:
-            await message.edit(
-                "**Here's what I could read from it:**"
-                f"\n\n`{ParsedText}`")
-            os.remove(downloaded_file_name)
-            await CHANNEL.log("`ocr` command succefully executed")
-            return
-
-    else:
-        await message.err(r"i can't read nothing (°ー°〃)")
+    if not message.reply_to_message:
+        return await message.err(r"i can't read nothing (°ー°〃)")
+    lang_code = message.input_str or "eng"
+    await message.edit(r"`Trying to Read.. 📖")
+    file_name = await message.reply_to_message.download(config.Dynamic.DOWN_PATH)
+    test_file = await ocr.ocr_space_file(file_name, lang_code)
+    try:
+        ParsedText = test_file["ParsedResults"][0]["ParsedText"]
+    except Exception as e_f:
+        await message.edit(
+            r"`Couldn't read it.. (╯‵□′)╯︵┻━┻`"
+            "\n`I guess I need new glasses.. 👓`"
+            f"\n\n**ERROR**: `{e_f}`", del_in=0)
+        os.remove(file_name)
         return
+    else:
+        await message.edit(
+            "**Here's what I could read from it:**"
+            f"\n\n`{ParsedText}`")
+        os.remove(file_name)
+        return await CHANNEL.log("`ocr` command succefully executed")
