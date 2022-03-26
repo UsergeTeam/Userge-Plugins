@@ -19,6 +19,14 @@ FILTER = filters.create(
     lambda _, __, q: '-' in q.query and q.from_user and q.from_user.id in config.OWNER_ID)
 MEDIA_FID_S = {}
 OMKVU = None
+DEEP_LINK_FLITER = filters.create(
+    lambda _, __, msg: (msg and
+                    msg.chat and
+                    msg.chat.type == "private" and
+                    msg.text and
+                    msg.text.startswith("/start prvtmsg") and
+                    msg.from_user and
+                    not msg.sender_chat))
 
 
 @userge.bot.on_callback_query(filters=filters.regex(pattern=r"prvtmsg\((.+)\)"))
@@ -114,16 +122,7 @@ async def recv_s_m_o(msg: Message):
     )]]))
 
 
-@userge.bot.on_message(
-    filters=(filters.create(
-        lambda _, __, msg: (msg and
-                            msg.chat and
-                            msg.chat.type == "private" and
-                            msg.text and
-                            msg.text.startswith("/start prvtmsg") and
-                            msg.from_user and
-                            not msg.sender_chat)))
-)
+@userge.bot.on_message(filters=DEEP_LINK_FLITER)
 async def bot_prvtmsg_start_dl(_, message: PyroMessage):
     msg_id = message.text[14:]
     user_id, _, msg = PRVT_MSGS[msg_id]
