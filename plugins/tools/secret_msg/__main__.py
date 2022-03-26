@@ -32,7 +32,7 @@ async def prvt_msg(_, c_q: CallbackQuery):
     global OMKVU  # pylint: disable=global-statement
     if not OMKVU:
         OMKVU = (await userge.bot.get_me()).username
-    
+
     user_id, flname, msg = PRVT_MSGS[msg_id]
 
     if c_q.from_user.id == user_id or c_q.from_user.id in config.OWNER_ID:
@@ -106,7 +106,7 @@ async def recv_s_m_o(msg: Message):
     ] = {
         "file_id": media_ifdd.file_id,
         "caption": (
-            msg.reply_to_message.caption and 
+            msg.reply_to_message.caption and
             msg.reply_to_message.caption.html
         ) or ""
     }
@@ -119,15 +119,13 @@ async def recv_s_m_o(msg: Message):
 @userge.bot.on_message(
     filters=(
         filters.create(
-            lambda _, __, msg: (
-                msg and
+            lambda _, __, msg: (msg and
                 msg.chat and
                 msg.chat.type == "private" and
                 msg.text and
                 msg.text.startswith("/start prvtmsg") and
                 msg.from_user and
-                not msg.sender_chat
-            )
+                not msg.sender_chat)
         )
     )
 )
