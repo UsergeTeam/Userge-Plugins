@@ -99,7 +99,8 @@ async def inline_answer(_, inline_query: InlineQuery):
 async def recv_s_m_o(msg: Message):
     if not msg.reply_to_message:
         await msg.reply_text("reply to a media")
-    media_type = msg.reply_to_message.media
+    replied = msg.reply_to_message
+    media_type = replied.media
     if media_type and media_type in [
         "contact",
         "dice",
@@ -109,22 +110,22 @@ async def recv_s_m_o(msg: Message):
     ]:
         await msg.reply_text("invalid media type")
         return
-    media_ifdd = getattr(msg.reply_to_message, media_type)
+    media_ifdd = getattr(replied, media_type)
     if media_type:
+        rc = replied.caption and replied.caption.html
         MEDIA_FID_S[
             str(msg.message_id)
         ] = {
             "file_id": media_ifdd.file_id,
-            "caption": (msg.reply_to_message.caption and
-                        msg.reply_to_message.caption.html) or ""
+            "caption": rc or ""
         }
     else:
+        rc = replied.text and replied.text.html
         MEDIA_FID_S[
             str(msg.message_id)
         ] = {
             "file_id": "0",
-            "caption": (msg.reply_to_message.text and
-                        msg.reply_to_message.text.html) or ""
+            "caption": rc or ""
         }
     await msg.reply_text("click here", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
         text="send something",
