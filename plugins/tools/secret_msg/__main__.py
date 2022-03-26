@@ -94,7 +94,7 @@ async def inline_answer(_, inline_query: InlineQuery):
 
 
 @userge.bot.on_cmd("secretmsg", about={
-    'header': "send a media in bot personal message, and reply `{tr}secretmsg`",
+    'header': "send a media in bot personal message, and reply <code>{tr}secretmsg</code>",
     'usage': "{tr}secretmsg [reply to media]"})
 async def recv_s_m_o(msg: Message):
     if not msg.reply_to_message:
