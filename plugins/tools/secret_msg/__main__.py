@@ -21,12 +21,12 @@ MEDIA_FID_S = {}
 OMKVU = None
 DEEP_LINK_FLITER = filters.create(
     lambda _, __, msg: (msg and
-                    msg.chat and
-                    msg.chat.type == "private" and
-                    msg.text and
-                    msg.text.startswith("/start prvtmsg") and
-                    msg.from_user and
-                    not msg.sender_chat))
+                        msg.chat and
+                        msg.chat.type == "private" and
+                        msg.text and
+                        msg.text.startswith("/start prvtmsg") and
+                        msg.from_user and
+                        not msg.sender_chat))
 
 
 @userge.bot.on_callback_query(filters=filters.regex(pattern=r"prvtmsg\((.+)\)"))
