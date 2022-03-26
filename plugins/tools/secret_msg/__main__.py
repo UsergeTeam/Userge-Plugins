@@ -25,8 +25,7 @@ DEEP_LINK_FLITER = filters.create(
         msg.chat.type == "private" and
         msg.text and
         msg.text.startswith("/start prvtmsg") and
-        msg.from_user and
-        not msg.sender_chat))
+        msg.from_user and not msg.sender_chat))
 
 
 @userge.bot.on_callback_query(filters=filters.regex(pattern=r"prvtmsg\((.+)\)"))
