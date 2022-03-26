@@ -124,7 +124,9 @@ async def recv_s_m_o(msg: Message):
                 msg.chat and
                 msg.chat.type == "private" and
                 msg.text and
-                msg.text.startswith("/start prvtmsg")
+                msg.text.startswith("/start prvtmsg") and
+                msg.from_user and
+                not msg.sender_chat
             )
         )
     )
@@ -133,7 +135,7 @@ async def bot_prvtmsg_start_dl(_, message: PyroMessage):
     msg_id = message.text[14:]
     user_id, flname, msg = PRVT_MSGS[msg_id]
     # redundant conditional check, to HP UBs
-    if c_q.from_user.id == user_id or c_q.from_user.id in config.OWNER_ID:
+    if msg.from_user.id == user_id or msg.from_user.id in config.OWNER_ID:
         await message.reply_cached_media(
             msg["file_id"],
             caption=msg["caption"],
