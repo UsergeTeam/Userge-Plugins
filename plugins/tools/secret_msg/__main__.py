@@ -49,7 +49,7 @@ async def recv_s_m_o(msg: Message):
         rc = replied.text and replied.text.html
         MEDIA_FID_S[str(msg.message_id)] = {"file_id": "0",
                                             "caption": rc or ""}
-    if msg.client.is_bot
+    if msg.client.is_bot:
         await msg.edit(
             "Done, Now send this message to someone.",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
