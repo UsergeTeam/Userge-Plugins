@@ -11,12 +11,14 @@ from uuid import uuid4
 from pyrogram.types import (
     CallbackQuery, InlineQuery, InlineKeyboardButton,
     InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup)
-
-from userge import userge, filters, config
+from pyrogram.types import Message as PyroMessage
+from userge import userge, filters, config, Message
 
 PRVT_MSGS = {}
 FILTER = filters.create(
     lambda _, __, q: '-' in q.query and q.from_user and q.from_user.id in config.OWNER_ID)
+MEDIA_FID_S = {}
+OMKVU = None
 
 
 @userge.bot.on_callback_query(filters=filters.regex(pattern=r"prvtmsg\((.+)\)"))
@@ -27,10 +29,17 @@ async def prvt_msg(_, c_q: CallbackQuery):
         await c_q.answer("message now outdated !", show_alert=True)
         return
 
+    global OMKVU  # pylint: disable=global-statement
+    if not OMKVU:
+        OMKVU = (await userge.bot.get_me()).username
+    
     user_id, flname, msg = PRVT_MSGS[msg_id]
 
     if c_q.from_user.id == user_id or c_q.from_user.id in config.OWNER_ID:
-        await c_q.answer(msg, show_alert=True)
+        if isinstance(msg, str):
+            await c_q.answer(msg, show_alert=True)
+        else:
+            await c_q.answer(url=f"https://t.me/{OMKVU}?start=prvtmsg{msg_id}")
     else:
         await c_q.answer(
             f"Only {flname} can see this Private Msg... 😔", show_alert=True)
@@ -49,7 +58,11 @@ async def inline_answer(_, inline_query: InlineQuery):
         inline_query.stop_propagation()
         return
 
-    PRVT_MSGS[inline_query.id] = (user.id, user.first_name, msg.strip(': '))
+    c_m_e = MEDIA_FID_S.get(msg[:-1], None)
+    if not c_m_e:
+        PRVT_MSGS[inline_query.id] = (user.id, user.first_name, msg.strip(': '))
+    else:
+        PRVT_MSGS[inline_query.id] = (user.id, user.first_name, c_m_e)
 
     prvte_msg = [[InlineKeyboardButton(
         "Show Message 🔐", callback_data=f"prvtmsg({inline_query.id})")]]
@@ -63,9 +76,68 @@ async def inline_answer(_, inline_query: InlineQuery):
             title=f"A Private Msg to {user.first_name}",
             input_message_content=InputTextMessageContent(msg_c),
             description="Only he/she can open it",
-            thumb_url="https://imgur.com/download/Inyeb1S",
+            thumb_url="https://te.legra.ph/file/16133ab3297b3f73c8da5.png",
             reply_markup=InlineKeyboardMarkup(prvte_msg)
         )
     ]
 
     await inline_query.answer(results=results, cache_time=3)
+
+
+@userge.bot.on_cmd("secretmsg", about={
+    'header': "-_-",
+    'usage': "{tr}secretmsg [reply to media]"})
+async def recv_s_m_o(msg: Message):
+    if not msg.reply_to_message:
+        await msg.reply_text("reply to a media")
+    media_type = msg.reply_to_message.media
+    if media_type in [
+        "contact",
+        "dice",
+        "poll",
+        "location",
+        "venue",
+    ]:
+        await msg.reply_text("invalid media type")
+        return
+    media_ifdd = getattr(msg.reply_to_message, media_type)
+    MEDIA_FID_S[
+        str(msg.message_id)
+    ] = {
+        "file_id": media_ifdd.file_id,
+        "caption": (
+            msg.reply_to_message.caption and 
+            msg.reply_to_message.caption.html
+        ) or ""
+    }
+    await msg.reply_text("click here", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
+        text="send something",
+        switch_inline_query=f"@theuserge - {msg.message_id}:"
+    )]]))
+
+
+@userge.bot.on_message(
+    filters=(
+        filters.create(
+            lambda _, __, msg: (
+                msg and
+                msg.chat and
+                msg.chat.type == "private" and
+                msg.text and
+                msg.text.startswith("/start prvtmsg")
+            )
+        )
+    )
+)
+async def bot_prvtmsg_start_dl(_, message: PyroMessage):
+    msg_id = message.text[14:]
+    user_id, flname, msg = PRVT_MSGS[msg_id]
+    # redundant conditional check, to HP UBs
+    if c_q.from_user.id == user_id or c_q.from_user.id in config.OWNER_ID:
+        await message.reply_cached_media(
+            msg["file_id"],
+            caption=msg["caption"],
+            parse_mode="html"
+        )
+    else:
+        await message.delete()
