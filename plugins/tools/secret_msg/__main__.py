@@ -18,14 +18,78 @@ PRVT_MSGS = {}
 FILTER = filters.create(
     lambda _, __, q: '-' in q.query and q.from_user and q.from_user.id in config.OWNER_ID)
 MEDIA_FID_S = {}
-OMKVU = None
-DEEP_LINK_FLITER = filters.create(
-    lambda _, __, msg: (
-        msg and msg.chat
-        and msg.chat.type == "private"
-        and msg.text
-        and msg.text.startswith("/start prvtmsg")
-        and msg.from_user and not msg.sender_chat))
+DEEP_LINK_FLITER = filters.private & filters.create(
+    lambda _, __, msg: msg.text and msg.text.startswith("/start prvtmsg")
+)
+
+
+@userge.on_cmd("secretmsg", about={
+    'header': "send a media in bot personal message, and reply <code>{tr}secretmsg</code>",
+    'usage': "{tr}secretmsg [reply to media]"})
+async def recv_s_m_o(msg: Message):
+    replied = msg.reply_to_message
+    if not replied:
+        await msg.reply_text("reply to a media")
+    media_type = replied.media
+    if media_type and media_type in [
+        "contact",
+        "dice",
+        "poll",
+        "location",
+        "venue",
+    ]:
+        await msg.reply_text("invalid media type")
+        return
+    media_ifdd = getattr(replied, media_type)
+    if media_type:
+        rc = replied.caption and replied.caption.html
+        MEDIA_FID_S[str(msg.message_id)] = {"file_id": media_ifdd.file_id,
+                                            "caption": rc or ""}
+    else:
+        rc = replied.text and replied.text.html
+        MEDIA_FID_S[str(msg.message_id)] = {"file_id": "0",
+                                            "caption": rc or ""}
+    if msg.client.is_bot
+        await msg.edit(
+            "Done, Now send this message to someone.",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
+                text="click here",
+                switch_inline_query=f"@target_username - {msg.message_id}:"
+            )]])
+        )
+    else:
+        bot_username = (await userge.bot.get_me()).username
+        await msg.edit(
+            "Done, Now type: `@{bot_username} target_username {msg.message_id}:`"
+        )
+
+
+@userge.bot.on_message(DEEP_LINK_FLITER, -2)
+async def bot_prvtmsg_start_dl(_, message: PyroMessage):
+    msg_id = message.text[14:]
+
+    if msg_id not in PRVT_MSGS:
+        await message.reply("message not found!")
+        message.stop_propagation()
+        return
+
+    user_id, flname, msg = PRVT_MSGS[msg_id]
+    # redundant conditional check, to HP UBs
+    if msg.from_user.id == user_id or msg.from_user.id in config.OWNER_ID:
+        if msg["file_id"] != "0":
+            await message.reply_cached_media(
+                msg["file_id"],
+                caption=msg["caption"],
+                parse_mode="html"
+            )
+        else:
+            await message.reply_text(
+                msg["caption"],
+                parse_mode="html"
+            )
+    else:
+        await message.reply(f"only {flname} can see this Private Msg!")
+    message.stop_propagation()
 
 
 @userge.bot.on_callback_query(filters=filters.regex(pattern=r"prvtmsg\((.+)\)"))
@@ -36,9 +100,7 @@ async def prvt_msg(_, c_q: CallbackQuery):
         await c_q.answer("message now outdated !", show_alert=True)
         return
 
-    global OMKVU  # pylint: disable=global-statement
-    if not OMKVU:
-        OMKVU = (await userge.bot.get_me()).username
+    bot_username = (await userge.bot.get_me()).username
 
     user_id, flname, msg = PRVT_MSGS[msg_id]
 
@@ -46,10 +108,10 @@ async def prvt_msg(_, c_q: CallbackQuery):
         if isinstance(msg, str):
             await c_q.answer(msg, show_alert=True)
         else:
-            await c_q.answer(url=f"https://t.me/{OMKVU}?start=prvtmsg{msg_id}")
+            await c_q.answer(url=f"https://t.me/{bot_username}?start=prvtmsg{msg_id}")
     else:
         await c_q.answer(
-            f"Only {flname} can see this Private Msg... 😔", show_alert=True)
+            f"only {flname} can see this Private Msg!", show_alert=True)
 
 
 @userge.bot.on_inline_query(FILTER)
@@ -89,64 +151,3 @@ async def inline_answer(_, inline_query: InlineQuery):
     ]
 
     await inline_query.answer(results=results, cache_time=3)
-
-
-@userge.bot.on_cmd("secretmsg", about={
-    'header': "send a media in bot personal message, and reply <code>{tr}secretmsg</code>",
-    'usage': "{tr}secretmsg [reply to media]"})
-async def recv_s_m_o(msg: Message):
-    if not msg.reply_to_message:
-        await msg.reply_text("reply to a media")
-    replied = msg.reply_to_message
-    media_type = replied.media
-    if media_type and media_type in [
-        "contact",
-        "dice",
-        "poll",
-        "location",
-        "venue",
-    ]:
-        await msg.reply_text("invalid media type")
-        return
-    media_ifdd = getattr(replied, media_type)
-    if media_type:
-        rc = replied.caption and replied.caption.html
-        MEDIA_FID_S[
-            str(msg.message_id)
-        ] = {
-            "file_id": media_ifdd.file_id,
-            "caption": rc or ""
-        }
-    else:
-        rc = replied.text and replied.text.html
-        MEDIA_FID_S[
-            str(msg.message_id)
-        ] = {
-            "file_id": "0",
-            "caption": rc or ""
-        }
-    await msg.reply_text("click here", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
-        text="send something",
-        switch_inline_query=f"@theuserge - {msg.message_id}:"
-    )]]))
-
-
-@userge.bot.on_message(filters=DEEP_LINK_FLITER)
-async def bot_prvtmsg_start_dl(_, message: PyroMessage):
-    msg_id = message.text[14:]
-    user_id, _, msg = PRVT_MSGS[msg_id]
-    # redundant conditional check, to HP UBs
-    if msg.from_user.id == user_id or msg.from_user.id in config.OWNER_ID:
-        if msg["file_id"] != "0":
-            await message.reply_cached_media(
-                msg["file_id"],
-                caption=msg["caption"],
-                parse_mode="html"
-            )
-        else:
-            await message.reply_text(
-                msg["caption"],
-                parse_mode="html"
-            )
-    else:
-        await message.delete()
