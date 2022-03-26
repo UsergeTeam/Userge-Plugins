@@ -60,7 +60,7 @@ async def recv_s_m_o(msg: Message):
     else:
         bot_username = (await userge.bot.get_me()).username
         await msg.edit(
-            "Done, Now type: `@{bot_username} target_username {msg.message_id}:`"
+            f"Done, Now type: `@{bot_username} target_username {msg.message_id}:`"
         )
 
 
