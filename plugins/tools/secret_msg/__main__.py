@@ -20,13 +20,14 @@ FILTER = filters.create(
 MEDIA_FID_S = {}
 OMKVU = None
 DEEP_LINK_FLITER = filters.create(
-    lambda _, __, msg: (msg and
-                        msg.chat and
-                        msg.chat.type == "private" and
-                        msg.text and
-                        msg.text.startswith("/start prvtmsg") and
-                        msg.from_user and
-                        not msg.sender_chat))
+    lambda _, __, msg: (
+        msg and
+        msg.chat and
+        msg.chat.type == "private" and
+        msg.text and
+        msg.text.startswith("/start prvtmsg") and
+        msg.from_user and
+        not msg.sender_chat))
 
 
 @userge.bot.on_callback_query(filters=filters.regex(pattern=r"prvtmsg\((.+)\)"))
@@ -93,7 +94,7 @@ async def inline_answer(_, inline_query: InlineQuery):
 
 
 @userge.bot.on_cmd("secretmsg", about={
-    'header': "-_-",
+    'header': "send a media in bot personal message, and reply `{tr}secretmsg`",
     'usage': "{tr}secretmsg [reply to media]"})
 async def recv_s_m_o(msg: Message):
     if not msg.reply_to_message:
