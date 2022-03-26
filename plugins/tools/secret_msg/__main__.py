@@ -100,7 +100,7 @@ async def recv_s_m_o(msg: Message):
     if not msg.reply_to_message:
         await msg.reply_text("reply to a media")
     media_type = msg.reply_to_message.media
-    if media_type in [
+    if media_type and media_type in [
         "contact",
         "dice",
         "poll",
@@ -110,15 +110,26 @@ async def recv_s_m_o(msg: Message):
         await msg.reply_text("invalid media type")
         return
     media_ifdd = getattr(msg.reply_to_message, media_type)
-    MEDIA_FID_S[
-        str(msg.message_id)
-    ] = {
-        "file_id": media_ifdd.file_id,
-        "caption": (
-            msg.reply_to_message.caption and
-            msg.reply_to_message.caption.html
-        ) or ""
-    }
+    if media_type:
+        MEDIA_FID_S[
+            str(msg.message_id)
+        ] = {
+            "file_id": media_ifdd.file_id,
+            "caption": (
+                msg.reply_to_message.caption and
+                msg.reply_to_message.caption.html
+            ) or ""
+        }
+    else:
+        MEDIA_FID_S[
+            str(msg.message_id)
+        ] = {
+            "file_id": "0",
+            "caption": (
+                msg.reply_to_message.text and
+                msg.reply_to_message.text.html
+            ) or ""
+        }
     await msg.reply_text("click here", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
         text="send something",
         switch_inline_query=f"@theuserge - {msg.message_id}:"
@@ -131,10 +142,16 @@ async def bot_prvtmsg_start_dl(_, message: PyroMessage):
     user_id, _, msg = PRVT_MSGS[msg_id]
     # redundant conditional check, to HP UBs
     if msg.from_user.id == user_id or msg.from_user.id in config.OWNER_ID:
-        await message.reply_cached_media(
-            msg["file_id"],
-            caption=msg["caption"],
-            parse_mode="html"
-        )
+        if msg["file_id"] != "0":
+            await message.reply_cached_media(
+                msg["file_id"],
+                caption=msg["caption"],
+                parse_mode="html"
+            )
+        else:
+            await message.reply_text(
+                msg["caption"],
+                parse_mode="html"
+            )
     else:
         await message.delete()
