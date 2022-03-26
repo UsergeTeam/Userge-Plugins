@@ -117,17 +117,13 @@ async def recv_s_m_o(msg: Message):
 
 
 @userge.bot.on_message(
-    filters=(
-        filters.create(
-            lambda _, __, msg: (msg and
-                msg.chat and
-                msg.chat.type == "private" and
-                msg.text and
-                msg.text.startswith("/start prvtmsg") and
-                msg.from_user and
-                not msg.sender_chat)
-        )
-    )
+    filters=(filters.create(lambda _, __, msg: (msg and
+        msg.chat and
+        msg.chat.type == "private" and
+        msg.text and
+        msg.text.startswith("/start prvtmsg") and
+        msg.from_user and
+        not msg.sender_chat)))
 )
 async def bot_prvtmsg_start_dl(_, message: PyroMessage):
     msg_id = message.text[14:]
