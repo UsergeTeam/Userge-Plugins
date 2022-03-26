@@ -21,8 +21,7 @@ MEDIA_FID_S = {}
 OMKVU = None
 DEEP_LINK_FLITER = filters.create(
     lambda _, __, msg: (
-        msg and
-        msg.chat and
+        msg and msg.chat and
         msg.chat.type == "private" and
         msg.text and
         msg.text.startswith("/start prvtmsg") and
