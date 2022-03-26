@@ -116,8 +116,7 @@ async def recv_s_m_o(msg: Message):
         ] = {
             "file_id": media_ifdd.file_id,
             "caption": (msg.reply_to_message.caption and
-                        msg.reply_to_message.caption.html
-                       ) or ""
+                        msg.reply_to_message.caption.html) or ""
         }
     else:
         MEDIA_FID_S[
@@ -125,8 +124,7 @@ async def recv_s_m_o(msg: Message):
         ] = {
             "file_id": "0",
             "caption": (msg.reply_to_message.text and
-                        msg.reply_to_message.text.html
-                       ) or ""
+                        msg.reply_to_message.text.html) or ""
         }
     await msg.reply_text("click here", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
         text="send something",
