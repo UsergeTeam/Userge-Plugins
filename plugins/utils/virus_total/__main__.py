@@ -117,7 +117,7 @@ def get_report(sha1: str) -> str:
     """ get report of files """
     url = 'https://www.virustotal.com/vtapi/v2/file/report'
     params = {
-        'apikey': virus_total.Config.API_KEY, 'resource': sha1, 'allinfo': 'False'
+        'apikey': virus_total.API_KEY, 'resource': sha1, 'allinfo': 'False'
     }
     response = requests.get(url, params=params)
     return response
