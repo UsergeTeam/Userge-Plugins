@@ -12,7 +12,7 @@ from pyrogram.types import (
     CallbackQuery, InlineQuery, InlineKeyboardButton,
     InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup)
 from pyrogram.types import Message as PyroMessage
-from userge import userge, filters, config, Message
+from userge import userge, filters, config
 
 PRVT_MSGS = {}
 FILTER = filters.create(
@@ -23,13 +23,14 @@ DEEP_LINK_FLITER = filters.private & filters.create(
 )
 
 
-@userge.on_cmd("secretmsg", about={
-    'header': "send a media in bot personal message, and reply <code>{tr}secretmsg</code>",
-    'usage': "{tr}secretmsg [reply to media]"})
-async def recv_s_m_o(msg: Message):
+@userge.bot.on_message(
+    filters.user(list(config.OWNER_ID)) & ~filters.edited
+    & filters.command("secretmsg", config.SUDO_TRIGGER)
+)
+async def recv_s_m_o(_, msg: PyroMessage):
     replied = msg.reply_to_message
     if not replied:
-        await msg.reply_text("reply to a media")
+        return await msg.reply_text("reply to a message")
     media_type = replied.media
     if media_type and media_type in [
         "contact",
@@ -49,19 +50,13 @@ async def recv_s_m_o(msg: Message):
         rc = replied.text and replied.text.html
         MEDIA_FID_S[str(msg.message_id)] = {"file_id": "0",
                                             "caption": rc or ""}
-    if msg.client.is_bot:
-        await msg.edit(
-            "Done, Now send this message to someone.",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
-                text="click here",
-                switch_inline_query=f"@target_username - {msg.message_id}:"
-            )]])
-        )
-    else:
-        bot_username = (await userge.bot.get_me()).username
-        await msg.edit(
-            f"Done, Now type: `@{bot_username} target_username {msg.message_id}:`"
-        )
+    await msg.reply(
+        "Done, Now send this message to someone.",
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
+            text="click here",
+            switch_inline_query=f"@target_username - {msg.message_id}:"
+        )]])
+    )
 
 
 @userge.bot.on_message(DEEP_LINK_FLITER, -2)
@@ -75,7 +70,7 @@ async def bot_prvtmsg_start_dl(_, message: PyroMessage):
 
     user_id, flname, msg = PRVT_MSGS[msg_id]
     # redundant conditional check, to HP UBs
-    if msg.from_user.id == user_id or msg.from_user.id in config.OWNER_ID:
+    if message.from_user.id == user_id or message.from_user.id in config.OWNER_ID:
         if msg["file_id"] != "0":
             await message.reply_cached_media(
                 msg["file_id"],
@@ -116,9 +111,11 @@ async def prvt_msg(_, c_q: CallbackQuery):
 
 @userge.bot.on_inline_query(FILTER)
 async def inline_answer(_, inline_query: InlineQuery):
-    _id, msg = inline_query.query.split('-', maxsplit=1)
+    data = inline_query.query.split('-', maxsplit=1)
+    _id = data[0].strip()
+    msg = data[1].strip()
 
-    if not (msg and msg.strip().endswith(':')):
+    if not (msg and msg.endswith(':')):
         inline_query.stop_propagation()
 
     try:
