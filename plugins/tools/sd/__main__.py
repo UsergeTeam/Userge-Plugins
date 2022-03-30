@@ -36,7 +36,7 @@ async def selfdestruct(message: Message):
 async def raw_handler(_, update: Update, *__):
     if isinstance(update, (UpdateReadChannelOutbox, UpdateReadHistoryOutbox)):
         chat_id = get_chat_id(getattr(update, 'peer', None)) or int(
-            '-100' + str(getattr(update, 'channel_id')))
+            '-100' + str(getattr(update, 'channel_id', 0)))
         msgs = MSGS.get(chat_id)
         if msgs:
             MSGS[chat_id] = []  # clear the fetched list
