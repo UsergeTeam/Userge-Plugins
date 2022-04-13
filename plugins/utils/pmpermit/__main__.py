@@ -306,7 +306,7 @@ async def uninvitedPmHandler(message: Message):
                 k = await userge.get_inline_bot_results(bot_username, "pmpermit")
                 await userge.send_inline_bot_result(
                     message.chat.id, query_id=k.query_id,
-                    result_id=k.results[0].id, hide_via=True
+                    result_id=k.results[0].id
                 )
             except (IndexError, BotInlineDisabled):
                 await message.reply(
