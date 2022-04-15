@@ -26,7 +26,7 @@ async def being_logical(message: Message):
     'header': "Get a Pro Tip",
     'usage': "{tr}tips"}, allow_via_bot=False)
 async def pro_tips(message: Message):
-    raw_list = await userge.get_history("@Interesting_Knowledge")
+    raw_list = await userge.get_history("Knowledge_Facts_Quotes_Reddit")
     try:
         raw_message = random.choice(raw_list)
         pru_text = raw_message.text
