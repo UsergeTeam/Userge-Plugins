@@ -48,8 +48,7 @@ async def anime_sticker(message: Message):
             await userge.send_inline_bot_result(
                 chat_id=message.chat.id,
                 query_id=stickers.query_id,
-                result_id=stickers.results[0].id,
-                hide_via=True)
+                result_id=stickers.results[0].id)
         except IndexError:
             await message.err("List index out of range")
         else:
@@ -71,8 +70,7 @@ async def anime_sticker(message: Message):
         saved = await userge.send_inline_bot_result(
             chat_id="me",
             query_id=stickers.query_id,
-            result_id=stickers.results[0].id,
-            hide_via=True
+            result_id=stickers.results[0].id
         )
         saved = await userge.get_messages("me", int(saved.updates[1].message.id))
         message_id = replied.message_id if replied else None
