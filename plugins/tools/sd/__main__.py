@@ -7,6 +7,7 @@
 # Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
 #
 # All rights reserved.
+
 import asyncio
 from userge import userge, Message
 from pyrogram.raw.types import (
@@ -26,6 +27,12 @@ MSGS = {}
 async def selfdestruct(message: Message):
     seconds = int(message.matches[0].group(1) or 10)
     text = str(message.matches[0].group(2))
+    if message.client.is_bot:
+        if message.chat.type == "private":
+            return await message.edit(text=text, del_in=seconds)
+    else:
+        if message.chat.type == "bot" or message.chat.id == message.from_user.id:
+            return await message.edit(text=text, del_in=seconds)
     msg = await message.edit(text=text)
 
     MSGS[msg.chat.id] = MSGS.get(msg.chat.id, []) + \
@@ -47,7 +54,8 @@ async def raw_handler(_, update: Update, *__):
             del_in_time = set()
             for msg_dict in msg_ids:
                 msgs.remove(msg_dict)
-                del_in_time.add(msg_dict['del_in'])
+                if msg_dict['del_in'] not in del_in_time:
+                    del_in_time.add(msg_dict['del_in'])
             MSGS[chat_id] += msgs  # re-adding unread msgs
             old_sleep = 0
             for sec in del_in_time:
