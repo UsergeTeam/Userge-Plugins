@@ -87,6 +87,7 @@ async def doc_upload(message: Message, path, del_path: bool = False,
             thumb=thumb,
             caption=path.name,
             parse_mode="html",
+            force_document=True,
             disable_notification=True,
             progress=progress,
             progress_args=(message, f"uploading {extra}", str_path)
