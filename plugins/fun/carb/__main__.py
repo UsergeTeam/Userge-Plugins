@@ -66,7 +66,7 @@ async def carb(message: Message):
     await message.edit("⚡️ Carbonizing ⚡️")
     try:
         carbon_result = requests.get(
-            "https://sjprojectsapi.herokuapp.com/carbon/?"
+            "https://sumanjay.up.railway.app/carbon/?"
             f"text={text}&theme={theme}&bg={bg}").json()
         await message.client.send_photo(chat_id=message.chat.id, photo=carbon_result['link'])
         await message.delete()
