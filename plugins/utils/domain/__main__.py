@@ -81,9 +81,9 @@ async def creator(m: Message):
         + ("(__None__)" if not c_str else c_str)
     )
 
-    
+
 @userge.on_cmd("stats", about={
-    "header": "Shows user account stats!",})
+    "header": "Shows user account stats!", })
 async def stats(message: Message):
     await message.edit("Processing ...This may take a bit time")
     u = 0
