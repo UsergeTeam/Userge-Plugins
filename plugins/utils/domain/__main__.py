@@ -80,3 +80,38 @@ async def creator(m: Message):
         + f"\n<u>**CHANNELS**</u> __({status})__:\n"
         + ("(__None__)" if not c_str else c_str)
     )
+
+
+@userge.on_cmd("stats",
+               about="Shows user account stats!",
+               allow_via_bot=False)
+async def stats(message: Message):
+    await message.edit("Processing ...This may take a bit time")
+    u = 0
+    g = 0
+    sg = 0
+    c = 0
+    b = 0
+    a_chat = 0
+    async for dialog in userge.iter_dialogs():
+        if dialog.chat.type == "private":
+            u += 1
+        elif dialog.chat.type == "bot":
+            b += 1
+        elif dialog.chat.type == "group":
+            g += 1
+        elif dialog.chat.type == "supergroup":
+            sg += 1
+            user_s = await dialog.chat.get_member(int(message.client.id))
+            if user_s.status in ("creator", "administrator"):
+                a_chat += 1
+        elif dialog.chat.type == "channel":
+            c += 1
+    await message.edit('''
+`You have __{}__ Private Messages.`
+`You are in __{}__ Groups.`
+`You are in __{}__ Super Groups.`
+`You Are in __{}__ Channels.`
+`You Are Admin in __{}__ Chats.`
+`Bots Started = __{}__`
+'''.format(u, g, sg, c, a_chat, b))
