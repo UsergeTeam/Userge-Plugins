@@ -82,8 +82,9 @@ async def creator(m: Message):
     )
 
 
-@userge.on_cmd("stats", about={
-    "header": "Shows user account stats!", })
+@userge.on_cmd("stats",
+               about="Shows user account stats!",
+               allow_via_bot=False)
 async def stats(message: Message):
     await message.edit("Processing ...This may take a bit time")
     u = 0
@@ -112,5 +113,5 @@ async def stats(message: Message):
 `You are in __{}__ Super Groups.`
 `You Are in __{}__ Channels.`
 `You Are Admin in __{}__ Chats.`
-`Bots Started = __{}__
-``'''.format(u, g, sg, c, a_chat, b))
+`Bots Started = __{}__`
+'''.format(u, g, sg, c, a_chat, b))
