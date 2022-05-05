@@ -18,7 +18,7 @@ from userge.utils import progress
 
 
 @userge.on_cmd("web ?(.+?|) (anonfiles|transfer|filebin|anonymousfiles"
-               "|megaupload|bayfiles|vshare|0x0|fileio|ninja|infura|bashupload)",
+               "|megaupload|bayfiles|vshare|0x0|fileio|ninja|infura|bashupload|cat)",
                about={
                    'header': "upload files to web",
                    'usage': "{tr}web [file path | reply to media] [site name]",
@@ -26,7 +26,7 @@ from userge.utils import progress
                    'types': [
                        'anonfiles', 'transfer', 'filebin', 'anonymousfiles',
                        'megaupload', 'bayfiles', 'vshare', '0x0', 'fileio',
-                       'ninja', 'infura', 'bashupload']})
+                       'ninja', 'infura', 'bashupload', 'cat']})
 async def web(message: Message):
     await message.edit("`Processing ...`")
     input_str = message.matches[0].group(1)
