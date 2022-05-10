@@ -40,7 +40,7 @@ _PARENT_ID = ""
 OAUTH_SCOPE = ["https://www.googleapis.com/auth/drive",
                "https://www.googleapis.com/auth/drive.file",
                "https://www.googleapis.com/auth/drive.metadata"]
-REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
+REDIRECT_URI = "http://127.0.0.1:1/"
 G_DRIVE_DIR_MIME_TYPE = "application/vnd.google-apps.folder"
 G_DRIVE_FILE_LINK = "📄 <a href='https://drive.google.com/open?id={}'>{}</a> __({})__"
 G_DRIVE_FOLDER_LINK = "📁 <a href='https://drive.google.com/drive/folders/{}'>{}</a> __(folder)__"
