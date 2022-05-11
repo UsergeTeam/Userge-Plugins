@@ -24,7 +24,7 @@ from userge import userge, Message, config, get_collection, pool
 
 
 _CREDS: object = None
-_SERVERS: object = None
+_SERVERS: list = []
 _ACTIVE_SERVER: object = None
 
 
