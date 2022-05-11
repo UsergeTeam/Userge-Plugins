@@ -25,7 +25,8 @@ from userge import userge, Message
     },
     allow_via_bot=False
 )
-async def creator(m: Message):
+async def creator(m: Message) -> None:
+    """ View Your Domain """
 
     await m.edit("__This may take a while, please wait ...__")
 
@@ -85,7 +86,8 @@ async def creator(m: Message):
 @userge.on_cmd("stats",
                about="Shows user account stats!",
                allow_via_bot=False)
-async def stats(message: Message):
+async def stats(message: Message) -> None:
+    """ Your accounts stats """
     await message.edit("Processing ...This may take a bit time")
     u = 0
     g = 0
