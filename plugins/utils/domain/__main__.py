@@ -26,7 +26,7 @@ from userge import userge, Message
     allow_via_bot=False
 )
 async def creator(m: Message) -> None:
-    """ View Your Domain """
+    """ View Your Domain\nFlags:\n-c: List all groups & channels created by you.\n-a: List all groups and channels administered by you"""
 
     await m.edit("__This may take a while, please wait ...__")
 
