@@ -118,7 +118,7 @@ async def pservers(message: Message):
     servers = [s for s in _CREDS.resources() if 'server' in s.provides]
     msg = ""
     for i in range(len(servers)):
-        msg+=f"{i}. {servers[i]}\n"
+        msg+=f"{i}. {servers[i].name}\n"
 
     await message.edit("The servers are:\n{}".format(msg))
 
@@ -169,8 +169,6 @@ def get_item_from_url(url, account=None):
         raise SystemExit('Unknown or ambiguous client id: %s' % clientid)
     server = servers[0].connect()
     return server.fetchItem(key)
-
-
 
 
 
