@@ -115,7 +115,7 @@ async def pservers(message: Message):
     if message.input_str:
         pass
 
-    server    s = [s for s in account.resources() if 'server' in s.provides]
+    servers = [s for s in account.resources() if 'server' in s.provides]
     msg = ""
     for i in range(len(servers)):
         msg+=f"{i}. {servers[i]}\n"
