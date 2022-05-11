@@ -76,6 +76,8 @@ def creds_dec(func):
     return wrapper
 
 def _get_servers():
+    global _SERVERS
+    
     _SERVERS = [s for s in _CREDS.resources() if 'server' in s.provides]
     return _SERVERS
 
@@ -134,6 +136,7 @@ async def pservers(message: Message):
             _SERVERS[inp].connect()
             await message.edit(f"Connected to {_SERVERS[inp].name}")
     else:
+        _LOG.debug(_SERVERS)
         msg = ""
         for i in range(len(_SERVERS)):
             msg+=f"{i}. {_SERVERS[i].name}\n"
