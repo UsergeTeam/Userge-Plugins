@@ -24,6 +24,7 @@ from userge import userge, Message, config, get_collection, pool
 
 
 _CREDS: object = None
+_SERVERS: object = None
 _ACTIVE_SERVER: object = None
 
 
@@ -74,6 +75,11 @@ def creds_dec(func):
             await self._message.edit("Please run `.plogin` first", del_in=5)
     return wrapper
 
+def _get_servers():
+    _SERVERS = [s for s in _CREDS.resources() if 'server' in s.provides]
+    return _SERVERS
+
+
 @userge.on_cmd("plogin", about={'header': "Login Plex",
 'usage': "{tr}plogin [username password]",'examples': "{tr}plogin uname passwd"})
 async def plogin(message: Message):
@@ -112,15 +118,27 @@ def __get_filename(part):
 "description": "Command to get server list and set default active server"})
 async def pservers(message: Message):
     """ plex list servers """
-    if message.input_str:
-        pass
+    global _SERVERS
+    global _ACTIVE_SERVER
+    if len(_SERVERS) == 0:
+        if len(_get_servers()) == 0:
+            await message.edit("There is no plex server available")    
+            return
+    inp = message.input_str.strip()
+    if inp:
+        try:
+            inp = int(inp)
+        except ValueError as e:
+            await message.edit("Invalid input for plex server number. Please enter only the server number.")
+        else:
+            _SERVERS[inp].connect()
+            await message.edit(f"Connected to {_SERVERS[inp].name}")
+    else:
+        msg = ""
+        for i in range(len(_SERVERS)):
+            msg+=f"{i}. {_SERVERS[i].name}\n"
 
-    servers = [s for s in _CREDS.resources() if 'server' in s.provides]
-    msg = ""
-    for i in range(len(servers)):
-        msg+=f"{i}. {servers[i].name}\n"
-
-    await message.edit("The servers are:\n{}".format(msg))
+        await message.edit("The servers are:\n{}".format(msg))
 
 
 def search_for_item(url=None, account=None):
