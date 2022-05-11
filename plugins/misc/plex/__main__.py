@@ -79,7 +79,7 @@ def creds_dec(func):
 async def plogin(message: Message):
     """ setup creds """
     msg = message.input_str.split(" ")
-    if len(msg) is not 2:
+    if len(msg) != 2:
         await message.edit("Invalid usage. Please check usage `.help plogin`")
     else:
         trimmed_uname = msg[0].strip()
@@ -115,12 +115,12 @@ async def pservers(message: Message):
     if message.input_str:
         pass
 
-    # servers = [s for s in account.resources() if 'server' in s.provides]
-    # msg = ""
-    # for i in range(len(servers)):
-    #     msg+=f"{i}. {servers[i]}\n"
+    server    s = [s for s in account.resources() if 'server' in s.provides]
+    msg = ""
+    for i in range(len(servers)):
+        msg+=f"{i}. {servers[i]}\n"
 
-    # await message.edit("The servers are:\n{}".format(msg))
+    await message.edit("The servers are:\n{}".format(msg))
 
 
 def search_for_item(url=None, account=None):
