@@ -92,6 +92,7 @@ async def plogin(message: Message):
                 username = trimmed_uname
                 password = trimmed_passwd 
             try:
+                _LOG.debug(Opts.username,Opts.password)
                 account = utils.getMyPlexAccount(Opts)
             except BadRequest as e:
                 await message.edit("Plex login failed. Please check logs.")
@@ -99,7 +100,7 @@ async def plogin(message: Message):
             else:
                 await asyncio.gather(
                 _set_creds(account),
-                message._message.edit("`Saved Plex Creds!`", del_in=3, log=__name__))
+                message.message.edit("`Saved Plex Creds!`", del_in=3, log=__name__))
 
 # u = User(session=account._session, token=account.authenticationToken)
 
