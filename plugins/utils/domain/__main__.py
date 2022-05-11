@@ -113,5 +113,5 @@ async def stats(message: Message):
 `You are in __{}__ Super Groups.`
 `You Are in __{}__ Channels.`
 `You Are Admin in __{}__ Chats.`
-`Bots Started = __{}__`
+`Bots Started = __{}__Times`
 '''.format(u, g, sg, c, a_chat, b))
