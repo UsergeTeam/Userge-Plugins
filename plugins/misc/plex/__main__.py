@@ -79,11 +79,11 @@ def creds_dec(func):
 async def plogin(message: Message):
     """ setup creds """
     msg = message.input_str.split(" ")
-    if len(msg) is not 3:
+    if len(msg) is not 2:
         await message.edit("Invalid usage. Please check usage `.help plogin`")
     else:
-        trimmed_uname = msg[1].strip()
-        trimmed_passwd = msg[2].strip()
+        trimmed_uname = msg[0].strip()
+        trimmed_passwd = msg[1].strip()
         if trimmed_uname == "" and trimmed_passwd == "":
             await message.edit("Username or password seem to be empty. Check them.")
             return
