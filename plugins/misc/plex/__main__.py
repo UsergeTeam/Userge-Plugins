@@ -100,7 +100,7 @@ async def plogin(message: Message):
             else:
                 await asyncio.gather(
                 _set_creds(account),
-                message.message.edit("`Saved Plex Creds!`", del_in=3, log=__name__))
+                message.edit("`Saved Plex Creds!`", del_in=3, log=__name__))
 
 # u = User(session=account._session, token=account.authenticationToken)
 
