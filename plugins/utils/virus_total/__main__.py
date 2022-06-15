@@ -107,7 +107,7 @@ def scan_file(path: str) -> str:
 
     params = {'apikey': virus_total.API_KEY}
     files = {
-        'file': (path_name, open(path, 'rb'))
+        'file': (path_name, open(path, 'rb'))  # skipcq
     }
     response = requests.post(url, files=files, params=params)
     return response

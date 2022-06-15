@@ -18,31 +18,42 @@ import bs4
 from userge import userge, Message
 
 
-@userge.on_cmd("app", about={
-    'header': "Search application details of any app in play store.",
-    'usage': "{tr}app telegram"})
+@userge.on_cmd(
+    "app",
+    about={
+        "header": "Search application details of any app in play store.",
+        "usage": "{tr}app telegram",
+    },
+)
 async def app(message: Message):
     try:
         await message.edit("`Searching...`")
-        app_name = '+'.join(message.input_str.split(' '))
+        app_name = "+".join(message.input_str.split(" "))
         async with aiohttp.ClientSession() as ses, ses.get(
             f"https://play.google.com/store/search?q={app_name}&c=apps"
         ) as res:
-            soup = bs4.BeautifulSoup(await res.text(), 'lxml')
-        results = soup.findAll("div", "ZmHEEd")
+            result = bs4.BeautifulSoup(
+                await res.text(),
+                "lxml",
+                parse_only=bs4.SoupStrainer("div", class_="ipRz4"),
+            )
 
-        app_name = results[0].findNext('div', 'Vpfmgd').findNext('div', 'WsMG1c nnK0zc').text
-        app_dev = results[0].findNext('div', 'Vpfmgd').findNext('div', 'KoLSrc').text
-        app_dev_link = "https://play.google.com" + results[0].findNext(
-            'div', 'Vpfmgd').findNext('a', 'mnKHRc')['href']
-        app_rating = results[0].findNext('div', 'Vpfmgd').findNext(
-            'div', 'pf5lIe'
-        ).find('div')['aria-label'].replace("Rated ", "⭐️ ").replace(
-            " out of ", "/"
-        ).replace(" stars", "", 1).replace(" stars", "⭐️").replace("five", "5")
-        app_link = "https://play.google.com" + results[0].findNext(
-            'div', 'Vpfmgd').findNext('div', 'vU6FJ p63iDd').a['href']
-        app_icon = results[0].findNext('div', 'Vpfmgd').findNext('div', 'uzcko').img['data-src']
+        app_name = result.find("div", class_="vWM94c").text
+        app_dev = result.find("div", class_="LbQbAe").text
+        app_dev_link = (
+            "https://play.google.com/store/apps/developer?id="
+            + app_dev.replace(" ", "+")
+        )
+        app_rating = (
+            result.find("div", class_="TT9eCd")["aria-label"]
+            .replace("Rated ", "⭐️ ")
+            .replace(" out of ", "/")
+            .replace(" stars", "", 1)
+            .replace(" stars", "⭐️")
+            .replace("five", "5")
+        )
+        app_link = "https://play.google.com" + result.find("a", class_="Qfxief")["href"]
+        app_icon = result.find("img", class_="T75of bzqKMd")["src"]
 
         app_details = f"[📲]({app_icon}) **{app_name}**\n\n"
         app_details += f"`Developer :` [{app_dev}]({app_dev_link})\n"
@@ -56,14 +67,14 @@ async def app(message: Message):
 
 
 @userge.on_cmd(
-    'magisk',
+    "magisk",
     about={
-        'header': "Fetch all magisk release from source.",
-        'usage': "{tr}magisk",
+        "header": "Fetch all magisk release from source.",
+        "usage": "{tr}magisk",
     },
 )
 async def magisk(message: Message):
-    """ Scrap all magisk version from source. """
+    """Scrap all magisk version from source."""
     magisk_branch = {"Stable": "stable", "Beta": "beta", "Canary": "canary"}
     magisk_raw_uri = "https://raw.githubusercontent.com/topjohnwu/magisk-files/master/"
     releases = "**Latest Magisk Releases:**\n"

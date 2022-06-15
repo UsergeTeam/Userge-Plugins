@@ -33,7 +33,7 @@ _LOG = logging.getLogger(__name__)
 _IS_TELEGRAPH = False
 _IS_STICKER = False
 
-_DEFAULT = "https://t.me/theUserge/31"
+_DEFAULT = "https://t.me/UserGeSpam/457297"
 _CHAT, _MSG_ID = None, None
 _LOGO_ID = None
 
