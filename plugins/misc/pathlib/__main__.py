@@ -24,6 +24,7 @@ from typing import Union, List, Tuple, Sequence
 from zipfile import ZipFile, is_zipfile
 
 from rarfile import RarFile, is_rarfile
+from pyrogram import enums
 
 from userge import userge, Message, config, pool
 from userge.utils import humanbytes, time_formatter, sort_file_name_key
@@ -374,7 +375,7 @@ async def ls_dir(message: Message) -> None:
     else:
         size = os.stat(str(path_)).st_size
         out += f"📄 <code>{path_.name}</code> <i>({humanbytes(size)})</i>\n"
-    await message.edit_or_send_as_file(out, parse_mode='html')
+    await message.edit_or_send_as_file(out, parse_mode=enums.ParseMode.HTML)
 
 
 @userge.on_cmd('dset', about={

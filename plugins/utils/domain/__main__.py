@@ -10,6 +10,7 @@
 
 
 from pyrogram.errors import UserNotParticipant, ChannelPrivate
+from pyrogram import enums
 
 from userge import userge, Message
 
@@ -19,8 +20,8 @@ from userge import userge, Message
     about={
         "header": "Your Domain",
         "flags": {
-            "-c": "List all gropus and channels created by you.",
-            "-a": "List all gropus and channels administered by you.",
+            "-c": "List all groups and channels created by you.",
+            "-a": "List all groups and channels administered by you.",
         },
     },
     allow_via_bot=False
@@ -30,9 +31,9 @@ async def creator(m: Message):
     await m.edit("__This may take a while, please wait ...__")
 
     if "-c" in m.flags:
-        status = "creator"
+        status = enums.ChatMemberStatus.OWNER
     elif "-a" in m.flags:
-        status = "administrator"
+        status = enums.ChatMemberStatus.ADMINISTRATOR
     else:
         await m.err("Invalid flag!")
         return
@@ -42,8 +43,8 @@ async def creator(m: Message):
     c_n = 0
     g_n = 0
 
-    async for d in userge.iter_dialogs():
-        if d.chat.type in ["group", "supergroup", "channel"]:
+    async for d in userge.get_dialogs():
+        if d.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP, enums.ChatType.CHANNEL]:
             try:
                 if (
                     await userge.get_chat_member(d.chat.id, m.client.id)
@@ -65,7 +66,7 @@ async def creator(m: Message):
                             + " | "
                             + f"**Chat ID**: `{d.chat.id}`"
                         )
-                    if d.chat.type == "channel":
+                    if d.chat.type == enums.ChatType.CHANNEL:
                         c_n += 1
                         c_str += f"{c_n}. {c}\n"
                     else:
@@ -93,19 +94,19 @@ async def stats(message: Message):
     c = 0
     b = 0
     a_chat = 0
-    async for dialog in userge.iter_dialogs():
-        if dialog.chat.type == "private":
+    async for dialog in userge.get_dialogs():
+        if dialog.chat.type == enums.ChatType.PRIVATE:
             u += 1
-        elif dialog.chat.type == "bot":
+        elif dialog.chat.type == enums.ChatType.BOT:
             b += 1
-        elif dialog.chat.type == "group":
+        elif dialog.chat.type == enums.ChatType.GROUP:
             g += 1
-        elif dialog.chat.type == "supergroup":
+        elif dialog.chat.type == enums.ChatType.SUPERGROUP:
             sg += 1
             user_s = await dialog.chat.get_member(int(message.client.id))
-            if user_s.status in ("creator", "administrator"):
+            if user_s.status in (enums.ChatMemberStatus.OWNER, enums.ChatMemberStatus.ADMINISTRATOR):
                 a_chat += 1
-        elif dialog.chat.type == "channel":
+        elif dialog.chat.type == enums.ChatType.CHANNEL:
             c += 1
     await message.edit('''
 `You have __{}__ Private Messages.`

@@ -124,7 +124,7 @@ async def stt_(message: Message):
     """ Speech to text using Wit.ai """
     send_text = bool('t' in message.flags)
     replied = message.reply_to_message
-    message_id = replied.message_id if replied else message.message_id
+    message_id = replied.id if replied else message.id
     regex = re.compile(r'([\S]*)(?: |)([\s\S]*)')
     match = regex.search(message.filtered_input_str)
     if not match:

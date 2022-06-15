@@ -85,7 +85,7 @@ async def meme_(message: Message):
         await conv.send_message(message.input_str)
         response = await conv.get_response(mark_read=True)
         if response.sticker:
-            await response.copy(message.chat.id, reply_to_message_id=replied.message_id)
+            await response.copy(message.chat.id, reply_to_message_id=replied.id)
     await message.delete()
     for file in (meme_file, dls_loc):
         if file and os.path.exists(file):

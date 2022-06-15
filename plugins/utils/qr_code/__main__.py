@@ -48,7 +48,7 @@ async def make_qr(message: Message):
     await userge.send_sticker(
         message.chat.id,
         "qrcode.webp",
-        reply_to_message_id=replied.message_id if replied else None
+        reply_to_message_id=replied.id if replied else None
     )
     os.remove("qrcode.webp")
 

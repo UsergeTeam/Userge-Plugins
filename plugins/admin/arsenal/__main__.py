@@ -9,9 +9,10 @@
 # All rights reserved.
 
 import asyncio
-import time
+import datetime
 
 from pyrogram.errors import FloodWait
+from pyrogram import enums
 
 from userge import userge, logging, Message, config
 
@@ -19,7 +20,7 @@ _LOG = logging.getLogger(__name__)
 
 
 async def banager(
-    message: Message, chat_id: int, user_id: int, until_date: int
+    message: Message, chat_id: int, user_id: int, until_date: datetime.datetime
 ) -> str:
     try:
         await message.client.ban_chat_member(chat_id=chat_id,
@@ -28,7 +29,7 @@ async def banager(
         log_msg = 'Success'
     except FloodWait as fw:
         _LOG.info("Sleeping for some time due to flood wait")
-        await asyncio.sleep(fw.x + 10)
+        await asyncio.sleep(fw.value + 10)
         return await banager(message, chat_id, user_id, until_date)
     except Exception as u_e:
         if hasattr(u_e, 'NAME'):
@@ -52,7 +53,7 @@ async def banager(
 async def snapper(message: Message):
     if not message.from_user:
         return
-    if (await message.chat.get_member(message.from_user.id)).status != "creator":
+    if (await message.chat.get_member(message.from_user.id)).status != enums.ChatMemberStatus.OWNER:
         await message.err("required chat creator !")
         return
     chat_id = message.chat.id
@@ -67,17 +68,17 @@ async def snapper(message: Message):
     _LOG.info(f'Wiping out Members in {message.chat.title}')
     s_c = 0
     e_c = 0
-    async for member in message.client.iter_chat_members(chat_id):
+    async for member in message.client.get_chat_members(chat_id):
         if message.process_is_canceled:
             await message.edit("`Exiting snap...`")
             break
         if (
-            member.status in ("administrator", "creator") or
+            member.status in (enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER) or
             member.user.is_self or
             member.user.id in config.OWNER_ID
         ):
             continue
-        until = int(time.time()) + 45 if '-k' in message.flags else 0
+        until = datetime.datetime.now() + datetime.timedelta(seconds=45) if '-k' in message.flags else None
         log_msg = await banager(message, chat_id, member.user.id, until)
         user_tag = f"[{member.user.first_name}]: Ban Status --> "
         if log_msg.lower() == 'success':

@@ -29,7 +29,7 @@ async def create_poll(msg: Message):
     replied = msg.reply_to_message
     if replied:
         query = "Do you agree with that replied Suggestion..?"
-        msg_id = replied.message_id
+        msg_id = replied.id
         await userge.send_poll(
             chat_id=msg.chat.id,
             question=query,
@@ -63,7 +63,7 @@ async def vote_poll(msg: Message):
             option = random.randint(0, len(replied.poll.options) - 1)
 
         try:
-            await userge.vote_poll(msg.chat.id, replied.message_id, option)
+            await userge.vote_poll(msg.chat.id, replied.id, option)
         except Exception as e_f:
             await msg.err(e_f)
         else:
@@ -83,7 +83,7 @@ async def stop_poll(msg: Message):
 
     if replied and replied.poll:
         try:
-            await userge.stop_poll(msg.chat.id, replied.message_id)
+            await userge.stop_poll(msg.chat.id, replied.id)
         except Exception as e_f:
             await msg.err(e_f)
         else:
@@ -103,7 +103,7 @@ async def retract_vote(msg: Message):
 
     if replied and replied.poll:
         try:
-            await userge.retract_vote(msg.chat.id, replied.message_id)
+            await userge.retract_vote(msg.chat.id, replied.id)
         except Exception as e_f:
             await msg.err(e_f)
         else:

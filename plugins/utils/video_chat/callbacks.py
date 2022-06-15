@@ -35,7 +35,7 @@ async def vc_callback(cq: CallbackQuery):
 
         if CQ_MSG:
             for i, msg in enumerate(CQ_MSG):
-                if msg.message_id == cq.message.message_id:
+                if msg.id == cq.message.id:
                     CQ_MSG.pop(i)
                     break
 
@@ -99,7 +99,7 @@ async def vol_callback(cq: CallbackQuery):
 
                 def _filter(_, __, m: RawMessage) -> bool:
                     r = m.reply_to_message
-                    return r and r.message_id == cq.message.message_id
+                    return r and r.id == cq.message.id
 
                 response = await conv.get_response(mark_read=True,
                                                    filters=filters.create(_filter))

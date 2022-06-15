@@ -13,7 +13,7 @@
 # Modded from @AHToolsBot by @Discovery_Updates
 
 import aiohttp
-
+from pyrogram import enums
 from userge import userge, Message
 
 
@@ -60,5 +60,5 @@ async def _ip_look_up(message: Message):
               f"**Location:** `{localisation}`\n"
               f"**Google Map:** {gmap_lock}"),
         disable_web_page_preview=True,
-        parse_mode="Markdown"
+        parse_mode=enums.ParseMode.MARKDOWN
     )

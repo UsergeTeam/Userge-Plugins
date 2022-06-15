@@ -23,7 +23,7 @@ from userge import userge, Message
 async def pat(message: Message):
     username = message.filtered_input_str
     reply = message.reply_to_message
-    reply_id = reply.message_id if reply else message.message_id
+    reply_id = reply.id if reply else message.id
     if not username and not reply:
         await message.edit("**Bruh** ~`Reply to a message or provide username`", del_in=3)
         return

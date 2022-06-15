@@ -17,6 +17,7 @@ from PIL import Image
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from pyrogram.errors import FloodWait
+from pyrogram import enums
 
 from userge import userge, Message
 from userge.utils import progress, take_screen_shot, humanbytes, sort_file_name_key
@@ -48,7 +49,7 @@ async def upload_path(message: Message, path: Path, del_path: bool):
         try:
             await upload(message, p_t, del_path, f"{current}/{len(file_paths)}")
         except FloodWait as f_e:
-            time.sleep(f_e.x)  # asyncio sleep ?
+            time.sleep(f_e.value)  # asyncio sleep ?
         if message.process_is_canceled:
             break
 
@@ -86,7 +87,7 @@ async def doc_upload(message: Message, path, del_path: bool = False,
             document=str_path,
             thumb=thumb,
             caption=path.name,
-            parse_mode="html",
+            parse_mode=enums.ParseMode.HTML,
             force_document=True,
             disable_notification=True,
             progress=progress,
@@ -133,7 +134,7 @@ async def vid_upload(message: Message, path, del_path: bool = False,
             width=width,
             height=height,
             caption=path.name,
-            parse_mode="html",
+            parse_mode=enums.ParseMode.HTML,
             disable_notification=True,
             progress=progress,
             progress_args=(message, f"uploading {extra}", str_path)
@@ -192,7 +193,7 @@ async def audio_upload(message: Message, path, del_path: bool = False,
             title=title,
             performer=artist,
             duration=duration,
-            parse_mode="html",
+            parse_mode=enums.ParseMode.HTML,
             disable_notification=True,
             progress=progress,
             progress_args=(message, f"uploading {extra}", str_path)
@@ -223,7 +224,7 @@ async def photo_upload(message: Message, path, del_path: bool = False, extra: st
             chat_id=message.chat.id,
             photo=str_path,
             caption=path.name,
-            parse_mode="html",
+            parse_mode=enums.ParseMode.HTML,
             disable_notification=True,
             progress=progress,
             progress_args=(message, f"uploading {extra}", str_path)

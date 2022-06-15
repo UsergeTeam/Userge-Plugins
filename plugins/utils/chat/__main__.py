@@ -22,6 +22,7 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     UsernameInvalid,
     UsernameNotOccupied,
     PeerIdInvalid)
+from pyrogram import enums
 
 from userge import userge, config, Message
 
@@ -89,7 +90,7 @@ async def invite_link(message: Message):
         try:
             chat = await userge.get_chat(chat_id)
             chat_name = chat.title
-            if chat.type in ['group', 'supergroup']:
+            if chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
                 link = await userge.export_chat_invite_link(chat_id)
                 await message.edit(
                     "**Invite link Generated Successfully for\n"
@@ -122,9 +123,9 @@ async def tagall_(message: Message):
     c_id = message.chat.id
     await message.edit(f"`Tagging recent members in {c_title}...`")
     text = f"**{text}**\n" if text else ""
-    message_id = replied.message_id if replied else None
+    message_id = replied.id if replied else None
     try:
-        async for members in message.client.iter_chat_members(c_id, filter="recent"):
+        async for members in message.client.get_chat_members(c_id, filter=enums.ChatMembersFilter.RECENT):
             if not members.user.is_bot:
                 u_id = members.user.id
                 u_name = members.user.username or None
@@ -154,9 +155,8 @@ async def stagall_(message: Message):
         await message.err("Without any reason, I will not tag Members...(=_=)")
         return
     text = f"`{text}`" if text else ""
-    message_id = replied.message_id if replied else None
-    member = userge.iter_chat_members(chat_id)
-    async for members in member:
+    message_id = replied.id if replied else None
+    async for members in userge.get_chat_members(chat_id):
         if not members.user.is_bot:
             text += mention_html(members.user.id, "\u200b")
     await message.delete()
@@ -179,19 +179,19 @@ async def tadmins_(message: Message):
     c_id = message.chat.id
     await message.edit(f"```Tagging admins in {c_title}...```")
     text = f"**{text}**\n" if text else ""
-    message_id = replied.message_id if replied else None
+    message_id = replied.id if replied else None
     try:
-        async for members in message.client.iter_chat_members(c_id, filter="administrators"):
+        async for members in message.client.get_chat_members(c_id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
             status = members.status
             u_id = members.user.id
             u_name = members.user.username or None
             f_name = (await message.client.get_user_dict(u_id))['fname']
-            if status == "administrator":
+            if status == enums.ChatMemberStatus.ADMINISTRATOR:
                 if u_name:
                     text += f"@{u_name} "
                 else:
                     text += f"[{f_name}](tg://user?id={u_id}) "
-            elif status == "creator":
+            elif status == enums.ChatMemberStatus.OWNER:
                 if u_name:
                     text += f"@{u_name} "
                 else:
@@ -234,7 +234,7 @@ async def set_chat(message: Message):
         await message.edit("```Chat Title is Successfully Updated...```", del_in=3)
     elif '-uname' in message.flags:
         try:
-            await userge.update_chat_username(message.chat.id, args.strip())
+            await userge.set_chat_username(message.chat.id, args.strip())
         except ValueError:
             await message.edit("```I think its a private chat...(^_-)```", del_in=3)
             return
@@ -276,20 +276,20 @@ async def view_chat(message: Message):
     if '-title' in message.flags:
         await message.edit("```Checking, wait plox !...```", del_in=3)
         title = chat.title
-        await message.edit("<code>{}</code>".format(title), parse_mode='html')
+        await message.edit("<code>{}</code>".format(title), parse_mode=enums.ParseMode.HTML)
     elif '-uname' in message.flags:
         if not chat.username:
             await message.err("```I think its private chat !...( ･ิω･ิ)```", del_in=3)
         else:
             await message.edit("```Checking, wait plox !...```", del_in=3)
             uname = chat.username
-            await message.edit("<code>{}</code>".format(uname), parse_mode='html')
+            await message.edit("<code>{}</code>".format(uname), parse_mode=enums.ParseMode.HTML)
     elif '-des' in message.flags:
         if not chat.description:
             await message.err("```I think, Chat haven't any description...```", del_in=3)
         else:
             await message.edit("```checking, Wait plox !...```", del_in=3)
-            await message.edit("<code>{}</code>".format(chat.description), parse_mode='html')
+            await message.edit("<code>{}</code>".format(chat.description), parse_mode=enums.ParseMode.HTML)
     else:
         if not chat.photo:
             await message.err("```Chat haven't any photo... ```", del_in=3)

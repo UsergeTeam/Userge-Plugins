@@ -19,6 +19,7 @@ from pyrogram.types import (
     InlineQueryResultArticle,
     InputTextMessageContent
 )
+from pyrogram import enums
 
 from userge import userge, Message, config
 from ..ud import URBAN_API_URL
@@ -55,7 +56,7 @@ async def urban_dict(message: Message):
         return
 
     output = f"<b>Query:</b> <code>{query}</code>\n<b>Limit:</b> <code>{limit}</code>\n\n{output}"
-    await message.edit_or_send_as_file(text=output, caption=query, parse_mode="html")
+    await message.edit_or_send_as_file(text=output, caption=query, parse_mode=enums.ParseMode.HTML)
 
 
 async def wpraip(query: str) -> List[InlineQueryResultArticle]:
@@ -81,7 +82,7 @@ async def wpraip(query: str) -> List[InlineQueryResultArticle]:
                     title=term.get("word", " "),
                     input_message_content=InputTextMessageContent(
                         message_text=message_text,
-                        parse_mode="html",
+                        parse_mode=enums.ParseMode.HTML,
                         disable_web_page_preview=False
                     ),
                     url=term.get("permalink"),

@@ -22,6 +22,7 @@ from pyrogram.raw.functions.phone import (GetGroupCall,
                                           GetGroupCallJoinAs,
                                           CreateGroupCall)
 from pyrogram.raw.types import UpdateGroupCallParticipants, InputGroupCall
+from pyrogram import enums
 
 from pytgcalls import PyTgCalls, StreamType
 from pytgcalls.types import (
@@ -97,7 +98,7 @@ async def joinvc(msg: Message):
     join_as = flags.get('-as')
     chat = flags.get('-at')
 
-    if not chat and msg.chat.type == "private":
+    if not chat and msg.chat.type == enums.ChatType.PRIVATE:
         return await msg.err("Invalid chat, either use in group / channel or use -at flag.")
     if chat:
         if chat.strip("-").isnumeric():
@@ -138,7 +139,7 @@ async def joinvc(msg: Message):
             Vars.CHAT_ID, Vars.CHAT_NAME = 0, ''
             CONTROL_CHAT_IDS.clear()
             return await reply_text(msg, f'Invalid Join As Chat Specified\n{e}')
-        join_as_peers = await VC_CLIENT.send(GetGroupCallJoinAs(
+        join_as_peers = await VC_CLIENT.invoke(GetGroupCallJoinAs(
             peer=(
                 await VC_CLIENT.resolve_peer(Vars.CHAT_ID)
             )
@@ -171,7 +172,7 @@ async def joinvc(msg: Message):
     except NoActiveGroupCall:
         try:
             peer = await VC_CLIENT.resolve_peer(Vars.CHAT_ID)
-            await VC_CLIENT.send(
+            await VC_CLIENT.invoke(
                 CreateGroupCall(
                     peer=peer, random_id=2
                 )
@@ -196,6 +197,7 @@ async def joinvc(msg: Message):
         Vars.CHAT_ID, Vars.CHAT_NAME = 0, ''
         CONTROL_CHAT_IDS.clear()
         return await reply_text(msg, f'Error during Joining the Call\n`{e}`')
+        
     await on_join()
     await reply_text(msg, "`Joined VideoChat Successfully`", del_in=5)
 
@@ -293,14 +295,14 @@ async def _help(msg: Message):
             out_str += (
                 f"    🤖 <b>cmd(<code>{i}</code>):</b>  <code>{cmd.name}</code>\n"
                 f"    📚 <b>info:</b>  <i>{cmd.doc}</i>\n\n")
-        return await reply_text(msg, out_str, parse_mode="html")
+        return await reply_text(msg, out_str, parse_mode=enums.ParseMode.HTML)
 
     key = config.PUBLIC_TRIGGER + key
     if key in raw_cmds:
         for cmd in cmds:
             if cmd.name == key:
                 out_str = f"<code>{key}</code>\n\n{cmd.about}"
-                await reply_text(msg, out_str, parse_mode="html")
+                await reply_text(msg, out_str, parse_mode=enums.ParseMode.HTML)
                 break
 
 
@@ -535,7 +537,7 @@ async def _on_raw(_, m: BaseMessage, *__) -> None:
         # TODO: chat_id
         for participant in m.participants:
             if participant.is_self:
-                group_call = await VC_CLIENT.send(
+                group_call = await VC_CLIENT.invoke(
                     GetGroupCall(call=InputGroupCall(
                         access_hash=m.call.access_hash,
                         id=m.call.id), limit=1)
@@ -560,7 +562,8 @@ async def _participants_change_handler(_: PyTgCalls, update: Update):
     if isinstance(update, JoinedGroupCallParticipant):
         GROUP_CALL_PARTICIPANTS.append(update.participant.user_id)
     elif isinstance(update, LeftGroupCallParticipant):
-        GROUP_CALL_PARTICIPANTS.remove(update.participant.user_id)
+        if update.participant.user_id in GROUP_CALL_PARTICIPANTS:
+            GROUP_CALL_PARTICIPANTS.remove(update.participant.user_id)
 
 
 if userge.has_bot:

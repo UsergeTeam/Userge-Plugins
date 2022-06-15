@@ -12,6 +12,8 @@ import asyncio
 import time
 from random import choice, randint
 
+from pyrogram import enums
+
 from userge import userge, Message, filters, get_collection
 from userge.utils import time_formatter, get_custom_import_re
 
@@ -24,7 +26,7 @@ AFK_COLLECTION = get_collection("AFK")
 IS_AFK = False
 IS_AFK_FILTER = filters.create(lambda _, __, ___: bool(IS_AFK))
 AFK_INCOMING_FILTER = (
-    IS_AFK_FILTER & ~filters.me & ~filters.bot & ~filters.edited & ~filters.service)
+    IS_AFK_FILTER & ~filters.me & ~filters.bot & ~filters.service)
 if pmpermit is not None:
     AFK_PM_FILTER = (filters.private & (
         filters.create(
@@ -97,11 +99,11 @@ async def handle_afk_incomming(message: Message) -> None:
         else:
             out_str = choice(AFK_REASONS)
         coro_list.append(message.reply(out_str))
-        if chat.type == 'private':
+        if chat.type == enums.ChatType.PRIVATE:
             USERS[user_id] = [1, 0, user_dict['mention']]
         else:
             USERS[user_id] = [0, 1, user_dict['mention']]
-    if chat.type == 'private':
+    if chat.type == enums.ChatType.PRIVATE:
         coro_list.append(CHANNEL.log(
             f"#PRIVATE\n{user_dict['mention']} send you\n\n"
             f"{message.text}"))
@@ -110,7 +112,7 @@ async def handle_afk_incomming(message: Message) -> None:
             "#GROUP\n"
             f"{user_dict['mention']} tagged you in [{chat.title}](http://t.me/{chat.username})\n\n"
             f"{message.text}\n\n"
-            f"[goto_msg](https://t.me/c/{str(chat.id)[4:]}/{message.message_id})"))
+            f"[goto_msg](https://t.me/c/{str(chat.id)[4:]}/{message.id})"))
     coro_list.append(AFK_COLLECTION.update_one({'_id': user_id},
                                                {"$set": {
                                                    'pcount': USERS[user_id][0],

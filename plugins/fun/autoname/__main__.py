@@ -157,7 +157,7 @@ async def _autoname_worker():
                     await userge.update_profile(first_name=fname)
                 except FloodWait as s_c:
                     await CHANNEL.log(f"Sleeping for {s_c} seconds because of Autoname.")
-                    await asyncio.sleep(s_c.x)
+                    await asyncio.sleep(s_c.value)
                 except Exception as e:
                     LOG.error(e)
                     await CHANNEL.log(f"**ERROR:** `{str(e)}")

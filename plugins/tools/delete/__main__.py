@@ -21,11 +21,11 @@ async def del_msg(message: Message):
         o_msg_ids = []
         for m in filter(lambda _: _, (message, message.reply_to_message)):
             if m.from_user and m.from_user.id == userge.id:
-                u_msg_ids.append(m.message_id)
+                u_msg_ids.append(m.id)
             elif m.from_user and m.from_user.id == userge.bot.id:
-                b_msg_ids.append(m.message_id)
+                b_msg_ids.append(m.id)
             else:
-                o_msg_ids.append(m.message_id)
+                o_msg_ids.append(m.id)
         if u_msg_ids:
             await userge.delete_messages(message.chat.id, u_msg_ids)
         if b_msg_ids:

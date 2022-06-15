@@ -75,7 +75,7 @@ async def deepfryer(message: Message):
 
     await message.client.send_photo(chat_id=message.chat.id,
                                     photo=fried_file,
-                                    reply_to_message_id=replied.message_id)
+                                    reply_to_message_id=replied.id)
     await message.delete()
     os.remove(fried_file)
 
@@ -195,13 +195,13 @@ async def fry_(message: Message):
         await userge.send_message(
             chat,
             "/deepfry {}".format(args),
-            reply_to_message_id=media.message_id,
+            reply_to_message_id=media.id,
         )
         response = await conv.get_response(mark_read=True)
         if not response.photo:
             await message.err("Bot is Down, try to restart Bot !...", del_in=5)
             return
-        message_id = replied.message_id
+        message_id = replied.id
         deep_fry = None
         if response.photo:
             directory = config.Dynamic.DOWN_PATH

@@ -27,6 +27,7 @@ from httplib2 import Http
 from oauth2client import file, client
 
 from userge import userge, Message, config
+from pyrogram import enums
 from userge.plugins.misc.download import tg_download, url_download
 from userge.utils import progress
 from .. import google_photos
@@ -86,10 +87,10 @@ async def create_token_file():
         await imp_gsem.reply_text(
             "#GPHOTOS #setup #completed\n\n"
             "please set <code>G_PHOTOS_AUTH_TOKEN_ID</code> = "
-            f"<u>{imp_gsem.message_id}</u> ..!"
+            f"<u>{imp_gsem.id}</u> ..!"
             "\n\n<i>This is only required, "
             "if you are running in an ephimeral file-system</i>.",
-            parse_mode="html"
+            parse_mode=enums.ParseMode.HTML
         )
         return storage
 
@@ -122,7 +123,7 @@ async def check_creds(message):
 async def upload_google_photos(message: Message):
     creds = await check_creds(message)
     if not creds:
-        await message.edit_text("😏 <code>gpsetup</code> first 😡😒😒", parse_mode="html")
+        await message.edit_text("😏 <code>gpsetup</code> first 😡😒😒", parse_mode=enums.ParseMode.HTML)
         return
     path_ = ""
     if message.input_str:

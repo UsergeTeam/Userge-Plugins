@@ -186,11 +186,11 @@ async def get_note(message: Message) -> None:
         replied = message.reply_to_message
         user_id = message.from_user.id
         if replied:
-            reply_to_message_id = replied.message_id
+            reply_to_message_id = replied.id
             if replied.from_user:
                 user_id = replied.from_user.id
         else:
-            reply_to_message_id = message.message_id
+            reply_to_message_id = message.id
         await CHANNEL.forward_stored(client=message.client,
                                      message_id=mid,
                                      chat_id=message.chat.id,

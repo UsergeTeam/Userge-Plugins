@@ -14,6 +14,8 @@ from collections import deque
 from random import choice, getrandbits, randint
 from re import sub
 
+from pyrogram import enums
+
 import requests
 import wget
 from cowpy import cow
@@ -41,7 +43,7 @@ async def lol_(message: Message):
         if i % 3 == 0:
             lol = "-_ "
         lol = lol[:-1] + "_-"
-        await message.try_to_edit(lol, parse_mode="html")
+        await message.try_to_edit(lol, parse_mode=enums.ParseMode.HTML)
 
 
 @userge.on_cmd(r"(?:Fun|;_;)$",
@@ -54,7 +56,7 @@ async def fun_(message: Message):
         if i % 3 == 0:
             fun = ";_ "
         fun = fun[:-1] + "_;"
-        await message.try_to_edit(fun, parse_mode="html")
+        await message.try_to_edit(fun, parse_mode=enums.ParseMode.HTML)
 
 
 @userge.on_cmd("Oof$", about={'header': "Ooooof"},
@@ -97,13 +99,13 @@ async def facepalm_(message: Message):
 @userge.on_cmd("cry$", about={'header': "y u du dis, i cri"})
 async def cry_(message: Message):
     """cry"""
-    await check_and_send(message, choice(CRI), parse_mode="html")
+    await check_and_send(message, choice(CRI), parse_mode=enums.ParseMode.HTML)
 
 
 @userge.on_cmd("insult$", about={'header': "Check yourself ;)"})
 async def insult_(message: Message):
     """insult"""
-    await check_and_send(message, choice(INSULT_STRINGS), parse_mode="html")
+    await check_and_send(message, choice(INSULT_STRINGS), parse_mode=enums.ParseMode.HTML)
 
 
 @userge.on_cmd("hi", about={
@@ -113,7 +115,7 @@ async def hi_(message: Message):
     """hi"""
     input_str = message.input_str
     if not input_str:
-        await message.edit(choice(HELLOSTR), parse_mode="html")
+        await message.edit(choice(HELLOSTR), parse_mode=enums.ParseMode.HTML)
     else:
         args = input_str.split()
         if len(args) == 2:
@@ -165,31 +167,31 @@ async def react_(message: Message):
         out = choice(DOG)
     else:
         out = choice(FACEREACTS)
-    await check_and_send(message, out, parse_mode="html")
+    await check_and_send(message, out, parse_mode=enums.ParseMode.HTML)
 
 
 @userge.on_cmd("shg$", about={'header': "Shrug at it !!"})
 async def shrugger(message: Message):
     """shrugger"""
-    await check_and_send(message, choice(SHGS), parse_mode="html")
+    await check_and_send(message, choice(SHGS), parse_mode=enums.ParseMode.HTML)
 
 
 @userge.on_cmd("chase$", about={'header': "You better start running"})
 async def chase_(message: Message):
     """chase"""
-    await check_and_send(message, choice(CHASE_STR), parse_mode="html")
+    await check_and_send(message, choice(CHASE_STR), parse_mode=enums.ParseMode.HTML)
 
 
 @userge.on_cmd("run$", about={'header': "Let Me Run, run, RUNNN!"})
 async def run_(message: Message):
     """run"""
-    await check_and_send(message, choice(RUNS_STR), parse_mode="html")
+    await check_and_send(message, choice(RUNS_STR), parse_mode=enums.ParseMode.HTML)
 
 
 @userge.on_cmd("metoo$", about={'header': "Haha yes"})
 async def metoo_(message: Message):
     """metoo"""
-    await check_and_send(message, choice(METOOSTR), parse_mode="html")
+    await check_and_send(message, choice(METOOSTR), parse_mode=enums.ParseMode.HTML)
 
 
 @userge.on_cmd("10iq$", about={'header': "You retard !!"}, name="10iq")
@@ -351,7 +353,7 @@ async def decide_(message: Message):
         r = requests.get("https://yesno.wtf/api").json()
     path = await pool.run_in_thread(wget.download)(r["image"])
     chat_id = message.chat.id
-    message_id = message.reply_to_message.message_id if message.reply_to_message else None
+    message_id = message.reply_to_message.id if message.reply_to_message else None
     await message.delete()
     if '-gif' in message.flags:
         await message.client.send_animation(chat_id=chat_id,
@@ -524,21 +526,22 @@ async def scam_(message: Message):
     input_str = message.input_str
     args = input_str.split()
     if len(args) == 0:  # Let bot decide action and time
-        scam_action = choice(options)
+        _scam_action = choice(options)
         scam_time = randint(30, 60)
     elif len(args) == 1:  # User decides time/action, bot decides the other.
         try:
-            scam_action = str(args[0]).lower()
+            _scam_action = str(args[0]).lower()
             scam_time = randint(30, 60)
         except ValueError:
-            scam_action = choice(options)
+            _scam_action = choice(options)
             scam_time = int(args[0])
     elif len(args) == 2:  # User decides both action and time
-        scam_action = str(args[0]).lower()
+        _scam_action = str(args[0]).lower()
         scam_time = int(args[1])
     else:
         await message.err("`Invalid Syntax !!`")
         return
+    scam_action = getattr(enums.ChatAction, _scam_action)
     try:
         if scam_time > 0:
             chat_id = message.chat.id

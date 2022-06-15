@@ -68,7 +68,7 @@ async def autopic(message: Message):
     if os.path.exists(BASE_PIC) and not image_path:
         pass
     elif not image_path:
-        profile_photo = await userge.get_profile_photos("me", limit=1)
+        profile_photo = [pic async for pic in userge.get_chat_photos("me", limit=1)]
         if not profile_photo:
             await message.err("sorry, couldn't find any picture!")
             return
