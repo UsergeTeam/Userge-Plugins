@@ -32,7 +32,8 @@ PATH = config.Dynamic.DOWN_PATH + "chat_pic.jpg"
 
 
 def mention_html(user_id, name):
-    return u'<a href="tg://user?id={}">{}</a>'.format(user_id, html.escape(name))
+    return u'<a href="tg://user?id={}">{}</a>'.format(
+        user_id, html.escape(name))
 
 
 @userge.on_cmd("join", about={
@@ -65,11 +66,11 @@ async def join_chat(message: Message):
         await asyncio.sleep(2)
 
 
-@userge.on_cmd("leave", about={
-    'header': "Leave Chat",
-    'usage': "{tr}leave\n{tr}leave [chat username | reply to Chat username text]",
-    'examples': "{tr}leave"},
-    allow_private=False)
+@userge.on_cmd("leave",
+               about={'header': "Leave Chat",
+                      'usage': "{tr}leave\n{tr}leave [chat username | reply to Chat username text]",
+                      'examples': "{tr}leave"},
+               allow_private=False)
 async def leave_chat(message: Message):
     """ Leave chat """
     await message.edit("`Good bye, Cruel World... :-) `")

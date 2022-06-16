@@ -66,7 +66,7 @@ async def promote_usr(message: Message):
     chat_id = message.chat.id
     try:
         await message.client.promote_chat_member(chat_id, user_id,
-            ChatPrivileges(can_invite_users=True, can_pin_messages=True))
+                                                 ChatPrivileges(can_invite_users=True, can_pin_messages=True))
         if custom_rank:
             await asyncio.sleep(2)
             await message.client.set_administrator_title(chat_id, user_id, custom_rank)
@@ -189,7 +189,7 @@ def _get_period_and_time(flags: Dict[str, str]) -> Tuple[int, str]:
     elif days:
         _period = days * 86400
         _time = f"{days}d"
-    
+
     return _period, _time
 
 
@@ -236,12 +236,13 @@ async def unban_usr(message: Message):
             f"CHAT: `{message.chat.title}` (`{message.chat.id}`)")
 
 
-@userge.on_cmd("kick", about={
-    'header': "use this to kick group members",
-    'description': "Kick member from supergroup. member can rejoin the group again if they want.\n"
-                   "[NOTE: Requires proper admin rights in the chat!!!]",
-    'examples': "{tr}kick [username | userid] or [reply to user]"},
-    allow_channels=False, check_restrict_perm=True)
+@userge.on_cmd("kick",
+               about={'header': "use this to kick group members",
+                      'description': "Kick member from supergroup. member can rejoin the group again if they want.\n"
+                      "[NOTE: Requires proper admin rights in the chat!!!]",
+                      'examples': "{tr}kick [username | userid] or [reply to user]"},
+               allow_channels=False,
+               check_restrict_perm=True)
 async def kick_usr(message: Message):
     """ kick user from tg group """
     user_id, _ = message.extract_user_and_text
@@ -341,22 +342,25 @@ async def unmute_usr(message: Message):
             f"CHAT: `{message.chat.title}` (`{message.chat.id}`)")
 
 
-@userge.on_cmd("zombies", about={
-    'header': "use this to clean zombie accounts",
-    'description': "check & remove zombie (deleted) accounts from supergroup.\n"
-                   "[NOTE: Requires proper admin rights in the chat!!!]",
-    'flags': {'-c': "clean"},
-    'examples': [
-        "{tr}zombies [check deleted accounts in group]",
-        "{tr}zombies -c [remove deleted accounts from group]"]},
-    allow_channels=False, allow_bots=False, allow_private=False)
+@userge.on_cmd("zombies",
+               about={'header': "use this to clean zombie accounts",
+                      'description': "check & remove zombie (deleted) accounts from supergroup.\n"
+                      "[NOTE: Requires proper admin rights in the chat!!!]",
+                      'flags': {'-c': "clean"},
+                      'examples': ["{tr}zombies [check deleted accounts in group]",
+                                   "{tr}zombies -c [remove deleted accounts from group]"]},
+               allow_channels=False,
+               allow_bots=False,
+               allow_private=False)
 async def zombie_clean(message: Message):
     """ remove deleted accounts from tg group """
     chat_id = message.chat.id
     check_user = await message.client.get_chat_member(message.chat.id, message.from_user.id)
     flags = message.flags
     rm_delaccs = '-c' in flags
-    can_clean = check_user.status in (enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER)
+    can_clean = check_user.status in (
+        enums.ChatMemberStatus.ADMINISTRATOR,
+        enums.ChatMemberStatus.OWNER)
     if rm_delaccs:
         del_users = 0
         del_admins = 0
@@ -648,11 +652,12 @@ async def enable_ban(message: Message):
             await message.edit('Enabled with delete mode')
 
 
-@userge.on_cmd("allow_channel", about={
-    'header': "Whitelist a channel to from send_as channel.",
-    'description': "To allow the replied channel or given channel id / username "
-                   "to chat as channel, even if restriction is enabled."},
-               allow_channels=False, check_restrict_perm=True)
+@userge.on_cmd("allow_channel",
+               about={'header': "Whitelist a channel to from send_as channel.",
+                      'description': "To allow the replied channel or given channel id / username "
+                      "to chat as channel, even if restriction is enabled."},
+               allow_channels=False,
+               check_restrict_perm=True)
 async def allow_a_channel(message: Message):
     """ add a channel to whitelist """
     channel = await _get_channel(message)
@@ -671,11 +676,12 @@ async def allow_a_channel(message: Message):
     await message.edit(f'Successfully Whitelisted {channel.title} (`{channel_id}`)')
 
 
-@userge.on_cmd("disallow_channel", about={
-    'header': "Remove an already whitelisted channel from allowed list.",
-    'description': "To disallow the replied channel or given channel id / username "
-                   "to chat as channel, if the channel is already whitelisted"},
-               allow_channels=False, check_restrict_perm=True)
+@userge.on_cmd("disallow_channel",
+               about={'header': "Remove an already whitelisted channel from allowed list.",
+                      'description': "To disallow the replied channel or given channel id / username "
+                      "to chat as channel, if the channel is already whitelisted"},
+               allow_channels=False,
+               check_restrict_perm=True)
 async def disallow_a_channel(message: Message):
     """ remove a channel from whitelist """
     channel = await _get_channel(message)
@@ -725,9 +731,10 @@ async def _update_chat_data(chat_id: int, allowed: List[int]) -> None:
             'enabled': enabled,
             'allowed': allowed}}, upsert=True)
 
-def get_datetime_obj(time: int)-> datetime.datetime:
+
+def get_datetime_obj(time: int) -> datetime.datetime:
     if time:
-        return datetime.datetime.now() + datetime.timedelta(seconds=time) 
+        return datetime.datetime.now() + datetime.timedelta(seconds=time)
     return datetime.datetime.fromtimestamp(0, datetime.timezone.utc)
 
 

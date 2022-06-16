@@ -117,7 +117,8 @@ async def joinvc(msg: Message):
     else:
         chat_id_ = msg.chat.username or msg.chat.id
         try:
-            # caching the peer in case of public chats to play without joining for VC_SESSION_STRING
+            # caching the peer in case of public chats to play without joining
+            # for VC_SESSION_STRING
             await VC_CLIENT.get_chat(chat_id_)
         except (ChannelInvalid, ChannelPrivate):
             msg_ = await reply_text(
@@ -197,7 +198,7 @@ async def joinvc(msg: Message):
         Vars.CHAT_ID, Vars.CHAT_NAME = 0, ''
         CONTROL_CHAT_IDS.clear()
         return await reply_text(msg, f'Error during Joining the Call\n`{e}`')
-        
+
     await on_join()
     await reply_text(msg, "`Joined VideoChat Successfully`", del_in=5)
 
@@ -561,9 +562,8 @@ async def _stream_end_handler(_: PyTgCalls, update: Update):
 async def _participants_change_handler(_: PyTgCalls, update: Update):
     if isinstance(update, JoinedGroupCallParticipant):
         GROUP_CALL_PARTICIPANTS.append(update.participant.user_id)
-    elif isinstance(update, LeftGroupCallParticipant):
-        if update.participant.user_id in GROUP_CALL_PARTICIPANTS:
-            GROUP_CALL_PARTICIPANTS.remove(update.participant.user_id)
+    elif isinstance(update, LeftGroupCallParticipant) and update.participant.user_id in GROUP_CALL_PARTICIPANTS:
+        GROUP_CALL_PARTICIPANTS.remove(update.participant.user_id)
 
 
 if userge.has_bot:

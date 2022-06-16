@@ -21,7 +21,6 @@ from pyrogram.raw.functions.messages import GetStickerSet, UploadMedia
 from pyrogram.raw.types import (
     InputStickerSetShortName, InputStickerSetItem,
     InputMediaUploadedDocument, DocumentAttributeFilename, InputDocument)
-from pyrogram import enums
 
 from userge import userge, Message, config
 from userge.utils.tools import runcmd

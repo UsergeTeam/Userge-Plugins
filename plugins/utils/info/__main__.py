@@ -13,7 +13,6 @@
 
 import json
 from typing import Optional
-from datetime import datetime
 
 import aiohttp
 import spamwatch

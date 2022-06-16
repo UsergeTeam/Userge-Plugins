@@ -44,19 +44,21 @@ async def creator(m: Message):
     g_n = 0
 
     async for d in userge.get_dialogs():
-        if d.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP, enums.ChatType.CHANNEL]:
+        if d.chat.type in [
+            enums.ChatType.GROUP,
+            enums.ChatType.SUPERGROUP,
+                enums.ChatType.CHANNEL]:
             try:
                 if (
                     await userge.get_chat_member(d.chat.id, m.client.id)
                 ).status == status:
                     if d.chat.username:
                         c = (
-                            f"[{d.chat.title}](https://t.me/{d.chat.username})\n"
-                            + "  "
-                            + "**Privacy**: __public__"
-                            + " | "
-                            + f"**Chat ID**: `{d.chat.id}`"
-                        )
+                            f"[{d.chat.title}](https://t.me/{d.chat.username})\n" +
+                            "  " +
+                            "**Privacy**: __public__" +
+                            " | " +
+                            f"**Chat ID**: `{d.chat.id}`")
                     else:
                         i_l = (await userge.get_chat(d.chat.id)).invite_link
                         c = (
@@ -104,7 +106,9 @@ async def stats(message: Message):
         elif dialog.chat.type == enums.ChatType.SUPERGROUP:
             sg += 1
             user_s = await dialog.chat.get_member(int(message.client.id))
-            if user_s.status in (enums.ChatMemberStatus.OWNER, enums.ChatMemberStatus.ADMINISTRATOR):
+            if user_s.status in (
+                    enums.ChatMemberStatus.OWNER,
+                    enums.ChatMemberStatus.ADMINISTRATOR):
                 a_chat += 1
         elif dialog.chat.type == enums.ChatType.CHANNEL:
             c += 1

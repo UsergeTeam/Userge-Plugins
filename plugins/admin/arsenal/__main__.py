@@ -72,13 +72,11 @@ async def snapper(message: Message):
         if message.process_is_canceled:
             await message.edit("`Exiting snap...`")
             break
-        if (
-            member.status in (enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER) or
-            member.user.is_self or
-            member.user.id in config.OWNER_ID
-        ):
+        if (member.status in (enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER)
+                or member.user.is_self or member.user.id in config.OWNER_ID):
             continue
-        until = datetime.datetime.now() + datetime.timedelta(seconds=45) if '-k' in message.flags else None
+        until = datetime.datetime.now(
+        ) + datetime.timedelta(seconds=45) if '-k' in message.flags else None
         log_msg = await banager(message, chat_id, member.user.id, until)
         user_tag = f"[{member.user.first_name}]: Ban Status --> "
         if log_msg.lower() == 'success':

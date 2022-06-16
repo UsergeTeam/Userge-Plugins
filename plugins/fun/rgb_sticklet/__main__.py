@@ -88,7 +88,14 @@ async def sticklet(message: Message):
 
     width, height = draw.multiline_textsize(sticktext, font=font)
     draw.multiline_text(
-        ((512 - width) / 2, (512 - height) / 2), sticktext, font=font, fill=(R, G, B))
+        ((512 - width) / 2,
+         (512 - height) / 2),
+        sticktext,
+        font=font,
+        fill=(
+            R,
+            G,
+            B))
 
     image_name = "rgb_sticklet.webp"
     image.save(image_name, "WebP")
