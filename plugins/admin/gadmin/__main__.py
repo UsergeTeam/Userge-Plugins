@@ -66,7 +66,8 @@ async def promote_usr(message: Message):
     chat_id = message.chat.id
     try:
         await message.client.promote_chat_member(chat_id, user_id,
-                                                 ChatPrivileges(can_invite_users=True, can_pin_messages=True))
+                                                 ChatPrivileges(can_invite_users=True,
+                                                 can_pin_messages=True))
         if custom_rank:
             await asyncio.sleep(2)
             await message.client.set_administrator_title(chat_id, user_id, custom_rank)
@@ -104,7 +105,8 @@ async def demote_usr(message: Message):
     await message.edit("`Trying to Demote User.. Hang on!! ⏳`")
     chat_id = message.chat.id
     try:
-        await message.client.promote_chat_member(chat_id, user_id, ChatPrivileges(can_manage_chat=False))
+        await message.client.promote_chat_member(chat_id, user_id, 
+                                                    ChatPrivileges(can_manage_chat=False))
     except UsernameInvalid:
         await message.err("invalid username, try again with valid info ⚠")
     except PeerIdInvalid:
@@ -238,7 +240,8 @@ async def unban_usr(message: Message):
 
 @userge.on_cmd("kick",
                about={'header': "use this to kick group members",
-                      'description': "Kick member from supergroup. member can rejoin the group again if they want.\n"
+                      'description': "Kick member from supergroup. "
+                                    "member can rejoin the group again if they want.\n"
                       "[NOTE: Requires proper admin rights in the chat!!!]",
                       'examples': "{tr}kick [username | userid] or [reply to user]"},
                allow_channels=False,
@@ -678,7 +681,7 @@ async def allow_a_channel(message: Message):
 
 @userge.on_cmd("disallow_channel",
                about={'header': "Remove an already whitelisted channel from allowed list.",
-                      'description': "To disallow the replied channel or given channel id / username "
+                      'description': "To disallow the replied channel or given channel id/username"
                       "to chat as channel, if the channel is already whitelisted"},
                allow_channels=False,
                check_restrict_perm=True)

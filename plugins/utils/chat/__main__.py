@@ -126,7 +126,8 @@ async def tagall_(message: Message):
     text = f"**{text}**\n" if text else ""
     message_id = replied.id if replied else None
     try:
-        async for members in message.client.get_chat_members(c_id, filter=enums.ChatMembersFilter.RECENT):
+        async for members in message.client.get_chat_members(c_id,
+                                                            filter=enums.ChatMembersFilter.RECENT):
             if not members.user.is_bot:
                 u_id = members.user.id
                 u_name = members.user.username or None
@@ -182,7 +183,8 @@ async def tadmins_(message: Message):
     text = f"**{text}**\n" if text else ""
     message_id = replied.id if replied else None
     try:
-        async for members in message.client.get_chat_members(c_id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
+        async for members in message.client.get_chat_members(c_id,
+                                                            filter=enums.ChatMembersFilter.ADMINISTRATORS):
             status = members.status
             u_id = members.user.id
             u_name = members.user.username or None
@@ -290,7 +292,8 @@ async def view_chat(message: Message):
             await message.err("```I think, Chat haven't any description...```", del_in=3)
         else:
             await message.edit("```checking, Wait plox !...```", del_in=3)
-            await message.edit("<code>{}</code>".format(chat.description), parse_mode=enums.ParseMode.HTML)
+            await message.edit("<code>{}</code>".format(chat.description),
+                                    parse_mode=enums.ParseMode.HTML)
     else:
         if not chat.photo:
             await message.err("```Chat haven't any photo... ```", del_in=3)

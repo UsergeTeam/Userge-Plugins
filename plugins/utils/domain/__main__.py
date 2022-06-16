@@ -54,11 +54,12 @@ async def creator(m: Message):
                 ).status == status:
                     if d.chat.username:
                         c = (
-                            f"[{d.chat.title}](https://t.me/{d.chat.username})\n" +
-                            "  " +
-                            "**Privacy**: __public__" +
-                            " | " +
-                            f"**Chat ID**: `{d.chat.id}`")
+                            f"[{d.chat.title}](https://t.me/{d.chat.username})\n"
+                            + "  "
+                            + "**Privacy**: __public__"
+                            + " | "
+                            + f"**Chat ID**: `{d.chat.id}`"
+                        )
                     else:
                         i_l = (await userge.get_chat(d.chat.id)).invite_link
                         c = (
