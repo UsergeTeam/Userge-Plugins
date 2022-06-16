@@ -562,7 +562,7 @@ async def _stream_end_handler(_: PyTgCalls, update: Update):
 async def _participants_change_handler(_: PyTgCalls, update: Update):
     if isinstance(update, JoinedGroupCallParticipant):
         GROUP_CALL_PARTICIPANTS.append(update.participant.user_id)
-    elif isinstance(update, 
+    elif isinstance(update,
                     LeftGroupCallParticipant) and update.participant.user_id in GROUP_CALL_PARTICIPANTS:
         GROUP_CALL_PARTICIPANTS.remove(update.participant.user_id)
 

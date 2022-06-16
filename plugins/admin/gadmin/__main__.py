@@ -67,7 +67,7 @@ async def promote_usr(message: Message):
     try:
         await message.client.promote_chat_member(chat_id, user_id,
                                                  ChatPrivileges(can_invite_users=True,
-                                                 can_pin_messages=True))
+                                                                can_pin_messages=True))
         if custom_rank:
             await asyncio.sleep(2)
             await message.client.set_administrator_title(chat_id, user_id, custom_rank)
@@ -105,8 +105,8 @@ async def demote_usr(message: Message):
     await message.edit("`Trying to Demote User.. Hang on!! ⏳`")
     chat_id = message.chat.id
     try:
-        await message.client.promote_chat_member(chat_id, user_id, 
-                                                    ChatPrivileges(can_manage_chat=False))
+        await message.client.promote_chat_member(chat_id, user_id,
+                                                 ChatPrivileges(can_manage_chat=False))
     except UsernameInvalid:
         await message.err("invalid username, try again with valid info ⚠")
     except PeerIdInvalid:
@@ -241,7 +241,7 @@ async def unban_usr(message: Message):
 @userge.on_cmd("kick",
                about={'header': "use this to kick group members",
                       'description': "Kick member from supergroup. "
-                                    "member can rejoin the group again if they want.\n"
+                      "member can rejoin the group again if they want.\n"
                       "[NOTE: Requires proper admin rights in the chat!!!]",
                       'examples': "{tr}kick [username | userid] or [reply to user]"},
                allow_channels=False,
