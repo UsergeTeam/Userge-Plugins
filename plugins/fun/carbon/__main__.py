@@ -141,7 +141,7 @@ async def carbon_(message: Message):
         chrome_options.add_argument("--disable-gpu")
         prefs = {'download.default_directory': config.Dynamic.DOWN_PATH}
         chrome_options.add_experimental_option('prefs', prefs)
-        driver = webdriver.Chrome(chrome_options=chrome_options)
+        driver = webdriver.Chrome(chrome_options=chrome_options, executable_path=carbon.GOOGLE_CHROME_DRIVER, )
         driver.get(url)
         await message.edit("`Processing... 40%`")
         driver.command_executor._commands["send_command"] = (  # pylint: disable=protected-access
