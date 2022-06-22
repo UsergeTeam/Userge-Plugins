@@ -54,7 +54,7 @@ async def _imdb(message: Message):
     except (IndexError, json.JSONDecodeError, AttributeError):
         movie_name = message.input_str
         await message.edit(f"__searching IMDB for__ : `{movie_name}`")
-        response = await _get("imdb.API_ONE_URL.format(theuserge=movie_name))
+        response = await _get(imdb.API_ONE_URL.format(theuserge=movie_name))
         srch_results = json.loads(response.text)
         mov_imdb_id = srch_results.get("d")[1].get("id")
         image_link, description = await get_movie_description(
