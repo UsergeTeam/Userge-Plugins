@@ -52,7 +52,16 @@ async def _imdb(message: Message):
             mov_imdb_id, config.MAX_MESSAGE_LENGTH
         )
     except (IndexError, json.JSONDecodeError, AttributeError):
-        await message.edit("Bruh, Plox enter **Valid movie name** kthx")
+        movie_name = message.input_str
+        await message.edit(f"__searching IMDB for__ : `{movie_name}`")
+        response = await _get("imdb.API_ONE_URL.format(theuserge=movie_name))
+        srch_results = json.loads(response.text)
+        mov_imdb_id = srch_results.get("d")[1].get("id")
+        image_link, description = await get_movie_description(
+            mov_imdb_id, config.MAX_MESSAGE_LENGTH
+        )
+    except (IndexError, json.JSONDecodeError, AttributeError):
+        await message.edit("check spelling or movie not available on imdb")
         return
 
     if os.path.exists(THUMB_PATH):
@@ -66,7 +75,7 @@ async def _imdb(message: Message):
     elif image_link is not None:
         await message.client.send_photo(
             chat_id=message.chat.id,
-            photo=image_link.replace("_V1_", "_V1_UX720"),
+            photo=image_link,
             caption=description,
             parse_mode="html"
         )
