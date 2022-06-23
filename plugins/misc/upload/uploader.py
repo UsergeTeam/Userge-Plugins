@@ -80,7 +80,7 @@ async def doc_upload(message: Message, path, del_path: bool = False,
         message.chat.id, f"`Uploading {str_path} as a doc ... {extra}`")
     start_t = datetime.now()
     thumb = await get_thumb(str_path) if with_thumb else None
-    await message.client.send_chat_action(message.chat.id, "upload_document")
+    await message.client.send_chat_action(message.chat.id, enums.ChatAction.UPLOAD_DOCUMENT)
     try:
         msg = await message.client.send_document(
             chat_id=message.chat.id,
@@ -116,7 +116,7 @@ async def vid_upload(message: Message, path, del_path: bool = False,
     sent: Message = await message.client.send_message(
         message.chat.id, f"`Uploading {str_path} as a video ... {extra}`")
     start_t = datetime.now()
-    await message.client.send_chat_action(message.chat.id, "upload_video")
+    await message.client.send_chat_action(message.chat.id, enums.ChatAction.UPLOAD_VIDEO)
     width = 0
     height = 0
     if thumb:
@@ -183,7 +183,7 @@ async def audio_upload(message: Message, path, del_path: bool = False,
     sent: Message = await message.client.send_message(
         message.chat.id, f"`Uploading {str_path} as audio ... {extra}`")
     start_t = datetime.now()
-    await message.client.send_chat_action(message.chat.id, "upload_audio")
+    await message.client.send_chat_action(message.chat.id, enums.ChatAction.UPLOAD_AUDIO)
     try:
         msg = await message.client.send_audio(
             chat_id=message.chat.id,
@@ -218,7 +218,7 @@ async def photo_upload(message: Message, path, del_path: bool = False, extra: st
     sent: Message = await message.client.send_message(
         message.chat.id, f"`Uploading {path.name} as photo ... {extra}`")
     start_t = datetime.now()
-    await message.client.send_chat_action(message.chat.id, "upload_photo")
+    await message.client.send_chat_action(message.chat.id, enums.ChatAction.UPLOAD_PHOTO)
     try:
         msg = await message.client.send_photo(
             chat_id=message.chat.id,
