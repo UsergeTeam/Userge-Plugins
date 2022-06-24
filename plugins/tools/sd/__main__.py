@@ -17,6 +17,7 @@ from pyrogram.raw.types import (
     PeerChannel)
 from pyrogram.raw.base import Update, Peer
 from pyrogram import ContinuePropagation
+from pyrogram import enums
 
 MSGS = {}
 
@@ -28,15 +29,15 @@ async def selfdestruct(message: Message):
     seconds = int(message.matches[0].group(1) or 10)
     text = str(message.matches[0].group(2))
     if message.client.is_bot:
-        if message.chat.type == "private":
+        if message.chat.type == enums.ChatType.PRIVATE:
             return await message.edit(text=text, del_in=seconds)
     else:
-        if message.chat.type == "bot" or message.chat.id == message.from_user.id:
+        if message.chat.type == enums.ChatType.BOT or message.chat.id == message.from_user.id:
             return await message.edit(text=text, del_in=seconds)
     msg = await message.edit(text=text)
 
     MSGS[msg.chat.id] = MSGS.get(msg.chat.id, []) + \
-        [{'msg': msg.message_id, 'del_in': seconds}]
+        [{'msg': msg.id, 'del_in': seconds}]
 
 
 @userge.on_raw_update(group=-2)

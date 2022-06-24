@@ -100,7 +100,7 @@ if userge.has_bot:
     userge_id = userge.id if userge.dual_mode else config.OWNER_ID[0]
     bot = userge.bot
 
-    @bot.on_message(~bannedFilter & ~filters.edited
+    @bot.on_message(~bannedFilter
                     & filters.private & filters.command("start"), group=1)
     async def start(_, msg: PyroMessage):
         user_id = msg.from_user.id
@@ -144,7 +144,7 @@ if userge.has_bot:
             return
         await send_start_text(msg, text, path, markup)
 
-    @bot.on_message(filters.user(userge_id) & ~filters.edited
+    @bot.on_message(filters.user(userge_id)
                     & filters.private & filters.command("settext"), group=1)
     async def set_text(_, msg: PyroMessage):
         global START_TEXT  # pylint: disable=global-statement
@@ -161,7 +161,7 @@ if userge.has_bot:
             )
             await msg.reply("Custom Bot Pm text Saved Successfully.")
 
-    @bot.on_message(filters.user(userge_id) & ~filters.edited
+    @bot.on_message(filters.user(userge_id)
                     & filters.private & filters.command("pmban"), group=1)
     async def pm_ban(_, msg: PyroMessage):
         replied = msg.reply_to_message
@@ -174,10 +174,10 @@ if userge.has_bot:
             if replied:
                 if replied.forward_from:
                     user_id = replied.forward_from.id
-                elif replied.message_id not in _U_ID_F_M_ID:
+                elif replied.id not in _U_ID_F_M_ID:
                     return await msg.reply("You can't reply old message of this user.")
                 else:
-                    user_id = _U_ID_F_M_ID.get(replied.message_id)
+                    user_id = _U_ID_F_M_ID.get(replied.id)
             else:
                 # noinspection PyBroadException
                 try:
@@ -199,7 +199,7 @@ if userge.has_bot:
             except Exception:
                 pass
 
-    @bot.on_message(filters.user(userge_id) & ~filters.edited
+    @bot.on_message(filters.user(userge_id)
                     & filters.private & filters.command("pmunban"), group=1)
     async def pm_unban(_, msg: PyroMessage):
         replied = msg.reply_to_message
@@ -212,10 +212,10 @@ if userge.has_bot:
             if replied:
                 if replied.forward_from:
                     user_id = replied.forward_from.id
-                elif replied.message_id not in _U_ID_F_M_ID:
+                elif replied.id not in _U_ID_F_M_ID:
                     return await msg.reply("You can't reply old message of this user.")
                 else:
-                    user_id = _U_ID_F_M_ID.get(replied.message_id)
+                    user_id = _U_ID_F_M_ID.get(replied.id)
             else:
                 # noinspection PyBroadException
                 try:
@@ -237,7 +237,7 @@ if userge.has_bot:
             except Exception:
                 pass
 
-    @bot.on_message(botPmFilter & ~bannedFilter & ~filters.edited
+    @bot.on_message(botPmFilter & ~bannedFilter
                     & filters.private & filters.incoming, group=1)
     async def bot_pm_handler(_, msg: PyroMessage):
         if not hasattr(msg, '_client'):
@@ -441,7 +441,7 @@ After Adding a var, you can see your media when you start your Bot.
             m = await msg.forward(userge_id)
             if msg.audio:
                 await bot.send_message(userge_id, f"{msg.from_user.mention} sent you a audio file.",
-                                       reply_to_message_id=m.message_id)
+                                       reply_to_message_id=m.id)
                 m.forward_sender_name = msg.from_user.first_name
             if m.forward_from or m.forward_sender_name or m.forward_date:
                 id_ = 0
@@ -454,9 +454,9 @@ After Adding a var, you can see your media when you start your Bot.
                     await U_ID_F_M_ID.delete_one({"user_id": user_id})
 
                 await U_ID_F_M_ID.insert_one(
-                    {"user_id": user_id, "msg_id": m.message_id}
+                    {"user_id": user_id, "msg_id": m.id}
                 )
-                _U_ID_F_M_ID[m.message_id] = user_id
+                _U_ID_F_M_ID[m.id] = user_id
         except Exception as err:
             await CHANNEL.log(str(err), "INCOMING_HANDLER")
             await msg.reply("Your message is not received, try to send it again after some time.")
@@ -476,10 +476,10 @@ After Adding a var, you can see your media when you start your Bot.
         else:
             if replied.forward_from:
                 reply_id = replied.forward_from.id
-            elif replied.message_id not in _U_ID_F_M_ID:
+            elif replied.id not in _U_ID_F_M_ID:
                 return await msg.reply("You can't reply old message of this user.")
             else:
-                reply_id = _U_ID_F_M_ID.get(replied.message_id)
+                reply_id = _U_ID_F_M_ID.get(replied.id)
             try:
                 if msg.text:
                     await bot.send_message(reply_id, msg.text, disable_web_page_preview=True)
@@ -527,7 +527,7 @@ Type /send to confirm or /cancel to exit.
         async with userge.bot.conversation(
                 msg.chat.id, timeout=30, limit=7) as conv:  # 5 post msgs and 2 command msgs
             await conv.send_message(MESSAGE)
-            filter_ = filters.create(lambda _, __, ___: filters.incoming & ~filters.edited)
+            filter_ = filters.create(lambda _, __, ___: filters.incoming)
             while True:
                 response = await conv.get_response(filters=filter_)
                 if response.text and response.text.startswith("/cancel"):
@@ -582,7 +582,7 @@ Type /send to confirm or /cancel to exit.
                 try:
                     await message.copy(chat_id)
                 except FloodWait as e:
-                    await asyncio.sleep(e.x + 5)
+                    await asyncio.sleep(e.value + 5)
                 except UserIsBlocked:
                     blocked_users.append(chat_id)
                     error = True
@@ -602,7 +602,7 @@ Type /send to confirm or /cancel to exit.
                     else:
                         await sent.edit(out_str)
                 except FloodWait as err:
-                    await asyncio.sleep(err.x)
+                    await asyncio.sleep(err.value)
         if count % 5 != 0:
             percentage: str = f"{(count / len(_USERS)) * 100}%"
             out_str = f"Sent `{success}` from `{len(_USERS)}` (`{percentage}`)\n"
@@ -613,7 +613,7 @@ Type /send to confirm or /cancel to exit.
                 else:
                     await sent.edit(out_str)
             except FloodWait as err:
-                await asyncio.sleep(err.x)
+                await asyncio.sleep(err.value)
         end_time = time.time()
         if blocked_users:
             for user in blocked_users:

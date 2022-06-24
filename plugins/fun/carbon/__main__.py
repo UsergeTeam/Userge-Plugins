@@ -72,7 +72,7 @@ async def carbon_(message: Message):
                 userge.send_document(chat_id=message.chat.id,
                                      document=file_id,
                                      caption='`' + caption + '`',
-                                     reply_to_message_id=replied.message_id if replied else None)
+                                     reply_to_message_id=replied.id if replied else None)
             )
     else:
         input_str = message.filtered_input_str
@@ -86,7 +86,7 @@ async def carbon_(message: Message):
         bg_ = f"rgba({red}, {green}, {blue}, {alpha})"
         if replied and (replied.text
                         or (replied.document and 'text' in replied.document.mime_type)):
-            message_id = replied.message_id
+            message_id = replied.id
             if replied.document:
                 await message.edit("`Downloading File...`")
                 path_ = await message.client.download_media(
@@ -107,7 +107,7 @@ async def carbon_(message: Message):
                 else:
                     theme = input_str
         elif input_str:
-            message_id = message.message_id
+            message_id = message.id
             if '|' in input_str:
                 args = input_str.split('|')
                 if len(args) == 3:

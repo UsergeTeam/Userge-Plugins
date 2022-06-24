@@ -19,6 +19,8 @@ from urllib.parse import urlparse
 import requests
 from bs4 import BeautifulSoup
 
+from pyrogram import enums
+
 from userge import userge, Message, pool
 from userge.utils import humanbytes
 
@@ -64,7 +66,7 @@ async def direct_(message: Message):
             reply += f" 👉 {await onedrive(link)}\n"
         else:
             reply += f" 👀 {link} is not supported!\n"
-    await message.edit(reply, parse_mode="md")
+    await message.edit(reply, parse_mode=enums.ParseMode.MARKDOWN)
 
 
 @pool.run_in_thread

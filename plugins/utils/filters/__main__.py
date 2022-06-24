@@ -168,7 +168,7 @@ async def add_filter(message: Message) -> None:
     await message.edit(text=out, del_in=3, log=__name__)
 
 
-@userge.on_filters(~filters.me & ~filters.edited & FILTERS_CHATS, group=1)
+@userge.on_filters(~filters.me & FILTERS_CHATS, group=1)
 async def chat_filter(message: Message) -> None:
     """ filter handler """
     if not message.from_user:
@@ -193,6 +193,6 @@ async def chat_filter(message: Message) -> None:
                                              message_id=FILTERS_DATA[message.chat.id][name],
                                              chat_id=message.chat.id,
                                              user_id=message.from_user.id,
-                                             reply_to_message_id=message.message_id)
+                                             reply_to_message_id=message.id)
     except RuntimeError:
         pass

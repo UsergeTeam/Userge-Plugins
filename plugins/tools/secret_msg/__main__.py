@@ -12,6 +12,8 @@ from pyrogram.types import (
     CallbackQuery, InlineQuery, InlineKeyboardButton,
     InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup)
 from pyrogram.types import Message as PyroMessage
+from pyrogram import enums
+
 from userge import userge, filters, config
 
 PRVT_MSGS = {}
@@ -24,7 +26,7 @@ DEEP_LINK_FLITER = filters.private & filters.create(
 
 
 @userge.bot.on_message(
-    filters.user(list(config.OWNER_ID)) & ~filters.edited
+    filters.user(list(config.OWNER_ID))
     & filters.command("secretmsg", config.SUDO_TRIGGER)
 )
 async def recv_s_m_o(_, msg: PyroMessage):
@@ -33,28 +35,28 @@ async def recv_s_m_o(_, msg: PyroMessage):
         return await msg.reply_text("reply to a message")
     media_type = replied.media
     if media_type and media_type in [
-        "contact",
-        "dice",
-        "poll",
-        "location",
-        "venue",
+        enums.MessageMediaType.CONTACT,
+        enums.MessageMediaType.DICE,
+        enums.MessageMediaType.POLL,
+        enums.MessageMediaType.LOCATION,
+        enums.MessageMediaType.VENUE,
     ]:
         await msg.reply_text("invalid media type")
         return
-    media_ifdd = getattr(replied, media_type)
+    media_ifdd = getattr(replied, media_type.value)
     if media_type:
         rc = replied.caption and replied.caption.html
-        MEDIA_FID_S[str(msg.message_id)] = {"file_id": media_ifdd.file_id,
-                                            "caption": rc or ""}
+        MEDIA_FID_S[str(msg.id)] = {"file_id": media_ifdd.file_id,
+                                    "caption": rc or ""}
     else:
         rc = replied.text and replied.text.html
-        MEDIA_FID_S[str(msg.message_id)] = {"file_id": "0",
-                                            "caption": rc or ""}
+        MEDIA_FID_S[str(msg.id)] = {"file_id": "0",
+                                    "caption": rc or ""}
     await msg.reply(
         "Done, Now send this message to someone.",
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
             text="click here",
-            switch_inline_query=f"@target_username - {msg.message_id}:"
+            switch_inline_query=f"@target_username - {msg.id}:"
         )]])
     )
 
@@ -75,12 +77,12 @@ async def bot_prvtmsg_start_dl(_, message: PyroMessage):
             await message.reply_cached_media(
                 msg["file_id"],
                 caption=msg["caption"],
-                parse_mode="html"
+                parse_mode=enums.ParseMode.HTML
             )
         else:
             await message.reply_text(
                 msg["caption"],
-                parse_mode="html"
+                parse_mode=enums.ParseMode.HTML
             )
     else:
         await message.reply(f"only {flname} can see this Private Msg!")

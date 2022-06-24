@@ -63,9 +63,9 @@ async def sticklet(message: Message):
     await message.delete()
 
     if message.reply_to_message:
-        reply_to = message.reply_to_message.message_id
+        reply_to = message.reply_to_message.id
     else:
-        reply_to = message.message_id
+        reply_to = message.id
 
     # https://docs.python.org/3/library/textwrap.html#textwrap.wrap
 
@@ -88,7 +88,14 @@ async def sticklet(message: Message):
 
     width, height = draw.multiline_textsize(sticktext, font=font)
     draw.multiline_text(
-        ((512 - width) / 2, (512 - height) / 2), sticktext, font=font, fill=(R, G, B))
+        ((512 - width) / 2,
+         (512 - height) / 2),
+        sticktext,
+        font=font,
+        fill=(
+            R,
+            G,
+            B))
 
     image_name = "rgb_sticklet.webp"
     image.save(image_name, "WebP")
@@ -104,12 +111,13 @@ async def sticklet(message: Message):
         pass
 
 
-async def get_font_file(message):
+async def get_font_file(message: Message):
     if message.client.is_bot:
         font_file_message_s = await message.client.get_messages(
             FONTS_FILE_CHANNEL, DEFAULT_FONTS)
         font_file_message = random.choice(font_file_message_s)
     else:
-        font_file_message_s = await message.client.get_history(FONTS_FILE_CHANNEL)
+        font_file_message_s = [msg async for msg in message.client.get_chat_history(
+            FONTS_FILE_CHANNEL)]
         font_file_message = random.choice(font_file_message_s)
     return await font_file_message.download()

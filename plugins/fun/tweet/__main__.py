@@ -133,7 +133,7 @@ async def _tweets(msg: Message, text: str, username: str = '', type_: str = "twe
     img = Image.open(tmp_file)
     img.save(CONVERTED_IMG)
     await msg.delete()
-    msg_id = msg.reply_to_message.message_id if msg.reply_to_message else None
+    msg_id = msg.reply_to_message.id if msg.reply_to_message else None
     await msg.client.send_photo(chat_id=msg.chat.id,
                                 photo=CONVERTED_IMG,
                                 reply_to_message_id=msg_id)

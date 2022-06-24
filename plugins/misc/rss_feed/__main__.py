@@ -16,6 +16,7 @@ from typing import Dict, List, Tuple
 import feedparser
 import wget
 from dateutil import parser
+from pyrogram import enums
 from pyrogram.errors import (
     ChatWriteForbidden, ChannelPrivate, UserNotParticipant, ChatIdInvalid
 )
@@ -101,14 +102,14 @@ async def send_new_post(entries):
     if thumb:
         args = {
             'caption': out_str,
-            'parse_mode': "md",
+            'parse_mode': enums.ParseMode.MARKDOWN,
             'reply_markup': markup if userge.has_bot else None
         }
     else:
         args = {
             'text': out_str,
             'disable_web_page_preview': True,
-            'parse_mode': "md",
+            'parse_mode': enums.ParseMode.MARKDOWN,
             'reply_markup': markup if userge.has_bot else None
         }
     for chat_id in rss_feed.RSS_CHAT_ID:

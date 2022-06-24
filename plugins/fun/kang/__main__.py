@@ -21,6 +21,7 @@ from pyrogram.raw.functions.messages import GetStickerSet, UploadMedia
 from pyrogram.raw.types import (
     InputStickerSetShortName, InputStickerSetItem,
     InputMediaUploadedDocument, DocumentAttributeFilename, InputDocument)
+
 from userge import userge, Message, config
 from userge.utils.tools import runcmd
 from .. import kang
@@ -133,7 +134,7 @@ async def kang_(message: Message):
         if userge.has_bot:
             packname += f"_by_{bot.username}"
         try:
-            exist = await message.client.send(
+            exist = await message.client.invoke(
                 GetStickerSet(
                     stickerset=InputStickerSetShortName(
                         short_name=packname), hash=0))
@@ -185,7 +186,7 @@ async def sticker_pack_info_(message: Message):
         await message.err("`Reply to a sticker to get the pack details`")
         return
     await message.edit("`Fetching details of the sticker pack, please wait..`")
-    get_stickerset = await message.client.send(
+    get_stickerset = await message.client.invoke(
         GetStickerSet(
             stickerset=InputStickerSetShortName(
                 short_name=replied.sticker.set_name), hash=0))
@@ -246,7 +247,7 @@ async def create_pack(
         emoji: str,
         st_type: str) -> bool:
     if userge.has_bot:
-        media = (await userge.bot.send(UploadMedia(
+        media = (await userge.bot.invoke(UploadMedia(
             peer=await userge.bot.resolve_peer('stickers'),
             media=InputMediaUploadedDocument(
                 mime_type=userge.guess_mime_type(sticker) or "application/zip",
@@ -261,7 +262,7 @@ async def create_pack(
             )
         )
         )).document
-        await userge.bot.send(
+        await userge.bot.invoke(
             CreateStickerSet(
                 user_id=await userge.bot.resolve_peer(config.OWNER_ID[0]),
                 title=pack_name,
@@ -314,7 +315,7 @@ async def create_pack(
 
 async def add_sticker(message: Message, short_name: str, sticker: str, emoji: str) -> bool:
     if userge.has_bot:
-        media = (await userge.bot.send(UploadMedia(
+        media = (await userge.bot.invoke(UploadMedia(
             peer=await userge.bot.resolve_peer('stickers'),
             media=InputMediaUploadedDocument(
                 mime_type=userge.guess_mime_type(sticker) or "application/zip",
@@ -329,7 +330,7 @@ async def add_sticker(message: Message, short_name: str, sticker: str, emoji: st
             )
         )
         )).document
-        await userge.bot.send(
+        await userge.bot.invoke(
             AddStickerToSet(
                 stickerset=InputStickerSetShortName(
                     short_name=short_name),

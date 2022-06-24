@@ -22,6 +22,7 @@ from pyrogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup
 )
+from pyrogram import enums
 
 from userge import userge, Message, config, pool
 from .. import imdb
@@ -60,7 +61,7 @@ async def _imdb(message: Message):
             chat_id=message.chat.id,
             photo=THUMB_PATH,
             caption=description,
-            parse_mode="html"
+            parse_mode=enums.ParseMode.HTML
         )
         await message.delete()
     elif image_link is not None:
@@ -68,14 +69,14 @@ async def _imdb(message: Message):
             chat_id=message.chat.id,
             photo=image_link.replace("_V1_", "_V1_UX720"),
             caption=description,
-            parse_mode="html"
+            parse_mode=enums.ParseMode.HTML
         )
         await message.delete()
     else:
         await message.edit(
             description,
             disable_web_page_preview=True,
-            parse_mode="HTML"
+            parse_mode=enums.ParseMode.HTML
         )
 
 
@@ -247,7 +248,7 @@ if userge.has_bot:
                     title=f" {title} {year}",
                     input_message_content=InputTextMessageContent(
                         message_text=message_text,
-                        parse_mode="html",
+                        parse_mode=enums.ParseMode.HTML,
                         disable_web_page_preview=False
                     ),
                     url=imdb_url,

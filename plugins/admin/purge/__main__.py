@@ -30,9 +30,9 @@ async def purge_(message: Message):
     start_message = 0
     if 'l' in message.flags:
         limit = min(100, int(message.flags['l']))
-        start_message = message.message_id - limit
+        start_message = message.id - limit
     if message.reply_to_message:
-        start_message = message.reply_to_message.message_id
+        start_message = message.reply_to_message_id
         if 'u' in message.flags:
             from_user_id = message.reply_to_message.from_user.id
     if not start_message:
@@ -45,9 +45,9 @@ async def purge_(message: Message):
         nonlocal list_of_messages, purged_messages_count
         if (from_user_id and _msg and _msg.from_user
                 and _msg.from_user.id == from_user_id):
-            list_of_messages.append(_msg.message_id)
+            list_of_messages.append(_msg.id)
         if not from_user_id:
-            list_of_messages.append(_msg.message_id)
+            list_of_messages.append(_msg.id)
         if len(list_of_messages) >= 100:
             await message.client.delete_messages(
                 chat_id=message.chat.id,
@@ -60,11 +60,11 @@ async def purge_(message: Message):
     if message.client.is_bot:
         for msg in await message.client.get_messages(
                 chat_id=message.chat.id, replies=0,
-                message_ids=range(start_message, message.message_id)):
+                message_ids=range(start_message, message.id)):
             await handle_msg(msg)
     else:
-        async for msg in message.client.iter_history(
-                chat_id=message.chat.id, offset_id=start_message, reverse=True):
+        async for msg in message.client.get_chat_history(
+                chat_id=message.chat.id, offset_id=start_message):
             await handle_msg(msg)
     if list_of_messages:
         await message.client.delete_messages(chat_id=message.chat.id,

@@ -51,7 +51,7 @@ async def setname_(message: Message):
         await message.edit("```Last Name is Successfully Removed ...```", del_in=3)
         return
     if '-duname' in message.flags:
-        await userge.update_username(username="")
+        await userge.set_username(username="")
         await message.edit("```Username is successfully Removed ...```", del_in=3)
         return
     arg = message.filtered_input_str
@@ -66,7 +66,7 @@ async def setname_(message: Message):
         await message.edit("```Last Name is Successfully Updated ...```", del_in=3)
     elif '-uname' in message.flags:
         try:
-            await userge.update_username(username=arg.strip())
+            await userge.set_username(username=arg.strip())
         except UsernameOccupied:
             await message.err("Username is Not Available...")
         else:
@@ -254,7 +254,7 @@ async def del_pfp(message: Message):
         await message.edit(f"```Deleting first {del_c} Profile Photos ...```")
         start = datetime.now()
         ctr = 0
-        async for photo in userge.iter_profile_photos("me", limit=del_c):
+        async for photo in userge.get_chat_photos("me", limit=del_c):
             await userge.delete_profile_photos(photo.file_id)
             ctr += 1
         end = datetime.now()
@@ -368,7 +368,7 @@ async def revert_(message: Message):
         USER_DATA.clear()
     if os.path.exists(PHOTO):
         me = await userge.get_me()
-        photo = (await userge.get_profile_photos(me.id, limit=1))[0]
+        photo = [prof async for prof in userge.get_chat_photos(me.id, limit=1)][0]
         await userge.delete_profile_photos(photo.file_id)
         os.remove(PHOTO)
     await message.edit("```Profile is Successfully Reverted...```", del_in=3)

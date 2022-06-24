@@ -296,5 +296,5 @@ async def raw_say(message: Message, name, collection):
                                      message_id=found['mid'],
                                      chat_id=message.chat.id,
                                      user_id=user.id,
-                                     reply_to_message_id=message.message_id,
+                                     reply_to_message_id=message.id,
                                      del_in=WELCOME_DELETE_TIMEOUT)

@@ -61,9 +61,9 @@ async def _webss(message: Message):
     await asyncio.sleep(int(wait_for))
     im_png = driver.get_screenshot_as_png()
     driver.close()
-    message_id = message.message_id
+    message_id = message.id
     if message.reply_to_message:
-        message_id = message.reply_to_message.message_id
+        message_id = message.reply_to_message.id
     file_path = os.path.join(config.Dynamic.DOWN_PATH, "webss.png")
     async with aiofiles.open(file_path, 'wb') as out_file:
         await out_file.write(im_png)

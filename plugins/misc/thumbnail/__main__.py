@@ -81,7 +81,7 @@ async def get_thumb_nail(message: Message):
         msg = await message.client.send_document(chat_id=message.chat.id,
                                                  document=thumbnail.Dynamic.THUMB_PATH,
                                                  disable_notification=True,
-                                                 reply_to_message_id=message.message_id)
+                                                 reply_to_message_id=message.id)
         await CHANNEL.fwd_msg(msg)
         await message.delete()
     else:

@@ -10,6 +10,8 @@
 
 import os
 
+from pyrogram import enums
+
 from userge import userge, Message, config
 from .. import ocr
 
@@ -32,7 +34,7 @@ async def ocr_gen(message: Message):
             "<a href='http://eepurl.com/bOLOcf'>HERE</a> "
             "<code>& add it to Heroku config vars</code> (<code>OCR_SPACE_API_KEY</code>)",
             disable_web_page_preview=True,
-            parse_mode="html", del_in=0)
+            parse_mode=enums.ParseMode.HTML, del_in=0)
         return
 
     if not message.reply_to_message:
