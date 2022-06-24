@@ -47,11 +47,11 @@ async def recv_s_m_o(_, msg: PyroMessage):
     if media_type:
         rc = replied.caption and replied.caption.html
         MEDIA_FID_S[str(msg.id)] = {"file_id": media_ifdd.file_id,
-                                            "caption": rc or ""}
+                                    "caption": rc or ""}
     else:
         rc = replied.text and replied.text.html
         MEDIA_FID_S[str(msg.id)] = {"file_id": "0",
-                                            "caption": rc or ""}
+                                    "caption": rc or ""}
     await msg.reply(
         "Done, Now send this message to someone.",
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
