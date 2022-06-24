@@ -183,8 +183,8 @@ async def tadmins_(message: Message):
     text = f"**{text}**\n" if text else ""
     message_id = replied.id if replied else None
     try:
-        async for members in message.client.get_chat_members(c_id,
-                                                             filter=enums.ChatMembersFilter.ADMINISTRATORS):
+        async for members in message.client.get_chat_members(
+                c_id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
             status = members.status
             u_id = members.user.id
             u_name = members.user.username or None

@@ -32,7 +32,7 @@ if VC_SESSION:
         config.API_ID,
         config.API_HASH,
         session_string=VC_SESSION)
-    VC_CLIENT.storage.name = VC_SESSION
+    VC_CLIENT.storage.session_string = VC_SESSION
 else:
     userge.__class__.__module__ = 'pyrogram.client'
     VC_CLIENT = userge
