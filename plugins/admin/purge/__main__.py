@@ -64,7 +64,7 @@ async def purge_(message: Message):
             await handle_msg(msg)
     else:
         async for msg in message.client.get_chat_history(
-                chat_id=message.chat.id, offset_id=start_message, reverse=True):
+                chat_id=message.chat.id, offset_id=start_message):
             await handle_msg(msg)
     if list_of_messages:
         await message.client.delete_messages(chat_id=message.chat.id,
