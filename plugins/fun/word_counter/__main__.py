@@ -22,7 +22,7 @@ async def word_count(message: Message):
     words = custom()
     await message.edit("```Processed 0 messages...```")
     total = 0
-    async for msg in userge.iter_history(message.chat.id, 1000):
+    async for msg in userge.get_chat_history(message.chat.id, 1000):
         total += 1
         if total % 200 == 0:
             await message.edit(f"```Processed {total} messages...```")

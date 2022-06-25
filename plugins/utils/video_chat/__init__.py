@@ -28,10 +28,11 @@ VC_SESSION = secured_env("VC_SESSION_STRING")
 
 if VC_SESSION:
     VC_CLIENT = Client(
-        VC_SESSION,
+        "usergeMusic",
         config.API_ID,
-        config.API_HASH)
-    VC_CLIENT.storage.name = VC_SESSION
+        config.API_HASH,
+        session_string=VC_SESSION)
+    VC_CLIENT.storage.session_string = VC_SESSION
 else:
     userge.__class__.__module__ = 'pyrogram.client'
     VC_CLIENT = userge

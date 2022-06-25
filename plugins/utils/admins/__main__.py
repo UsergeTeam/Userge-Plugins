@@ -9,6 +9,7 @@
 # All rights reserved.
 
 from userge import userge, Message
+from pyrogram import enums
 
 
 @userge.on_cmd("admins", about={
@@ -28,12 +29,13 @@ async def mentionadmins(message: Message):
     if not chat_id:
         chat_id = message.chat.id
     try:
-        async for x in message.client.iter_chat_members(chat_id=chat_id, filter="administrators"):
+        async for x in message.client.get_chat_members(
+                chat_id=chat_id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
             status = x.status
             u_id = x.user.id
             username = x.user.username or None
             full_name = (await message.client.get_user_dict(u_id))['flname']
-            if status == "creator":
+            if status == enums.ChatMemberStatus.OWNER:
                 if men_admins or men_creator:
                     mentions += f"\n 👑 [{full_name}](tg://user?id={u_id})"
                 elif username:
@@ -42,7 +44,7 @@ async def mentionadmins(message: Message):
                     mentions += f"\n 👑 {full_name}"
                 if show_id:
                     mentions += f" `{u_id}`"
-            elif status == "administrator":
+            elif status == enums.ChatMemberStatus.ADMINISTRATOR:
                 if men_admins:
                     mentions += f"\n ⚜ [{full_name}](tg://user?id={u_id})"
                 elif username:
@@ -55,4 +57,4 @@ async def mentionadmins(message: Message):
         mentions += " " + str(e) + "\n"
     await message.delete()
     await message.client.send_message(
-        chat_id=message.chat.id, text=mentions,  disable_web_page_preview=True)
+        chat_id=message.chat.id, text=mentions, disable_web_page_preview=True)

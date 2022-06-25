@@ -134,7 +134,7 @@ async def encode_x256(message: Message):
             f"[{humanbytes(Path(video_file).stat().st_size)}]\n"
             f"{replied.caption if hasattr(replied, 'media') else file_name}"
         )
-        message_id = replied.message_id if replied else None
+        message_id = replied.id if replied else None
         await asyncio.gather(
             message.delete(),
             message.client.send_video(
@@ -182,7 +182,7 @@ async def video_to_audio(message: Message):
     else:
         await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
 
-        message_id = replied.message_id if replied else None
+        message_id = replied.id if replied else None
         caption = (
             f"[{humanbytes(Path(FF_MPEG_DOWN_LOAD_MEDIA_PATH / audio_file).stat().st_size)}]\n"
             f"{replied.caption if hasattr(replied, 'media') else file_name}"
@@ -238,7 +238,7 @@ async def scale_video(message: Message):
     except ffmpeg.Error as e:
         await message.err(f"{e.stderr}")
     else:
-        message_id = replied.message_id if replied else None
+        message_id = replied.id if replied else None
         await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
         caption = (
             f"[{humanbytes(Path(video_file).stat().st_size)}]\n"
@@ -286,7 +286,7 @@ async def video_thumbnail(message: Message):
         if not Path(thumbnail_file).exists():
             return await message.err("not able to get thumbnail")
         await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
-        message_id = replied.message_id if replied else None
+        message_id = replied.id if replied else None
         await asyncio.gather(
             message.delete(),
             message.client.send_photo(
@@ -350,7 +350,7 @@ async def video_trim(message: Message):
         await message.err(f"{e.stderr}")
     else:
         await message.edit(f"`Done in in {(datetime.now() - start).seconds} seconds!`")
-        message_id = replied.message_id if replied else None
+        message_id = replied.id if replied else None
         caption = (
             f"[{humanbytes(Path(video_file).stat().st_size)}]\n"
             f"{replied.caption if hasattr(replied, 'media') else file_name}"
@@ -408,7 +408,7 @@ async def video_compress(message: Message):
     except ffmpeg.Error as e:
         await message.err(f"{e.stderr}")
     else:
-        message_id = replied.message_id if replied else None
+        message_id = replied.id if replied else None
         caption = (
             f"[{humanbytes(Path(video_file).stat().st_size)}]\n"
             f"{replied.caption if hasattr(replied, 'media') else file_name}"

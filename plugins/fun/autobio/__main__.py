@@ -106,7 +106,7 @@ async def _autobio_worker():
                 await userge.update_profile(bio=quote)
             except FloodWait as s_c:
                 LOG.warn(s_c)
-                time.sleep(s_c.x)
+                time.sleep(s_c.value)
                 await CHANNEL.log(s_c)
             except Exception as e_x:  # pylint: disable=broad-except
                 LOG.error(e_x)

@@ -13,6 +13,7 @@
 import asyncio
 
 from pyrogram.errors import FloodWait
+from pyrogram import enums
 
 from userge import userge, Message
 
@@ -22,7 +23,7 @@ from userge import userge, Message
     'usage': "{tr}livesubs [chat id]"})
 async def live_subs(msg: Message):
     input_ = msg.input_str
-    chat = msg.chat if msg.chat.type != "private" else None
+    chat = msg.chat if msg.chat.type != enums.ChatType.PRIVATE else None
     if input_:
         try:
             chat = await msg.client.get_chat(input_)
@@ -42,6 +43,6 @@ async def live_subs(msg: Message):
                 )
                 await asyncio.sleep(3)
             except FloodWait as fw:
-                await asyncio.sleep(fw.x)
+                await asyncio.sleep(fw.value)
     else:
         await msg.err("chat id required")

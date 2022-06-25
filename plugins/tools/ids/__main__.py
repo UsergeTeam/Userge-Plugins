@@ -17,7 +17,7 @@ from userge import userge, Message
 async def getids(message: Message):
     msg = message.reply_to_message or message
     out_str = f"👥 **Chat ID** : `{(msg.forward_from_chat or msg.chat).id}`\n"
-    out_str += f"💬 **Message ID** : `{msg.forward_from_message_id or msg.message_id}`\n"
+    out_str += f"💬 **Message ID** : `{msg.forward_from_message_id or msg.id}`\n"
     if msg.from_user:
         out_str += f"🙋‍♂️ **From User ID** : `{msg.from_user.id}`\n"
     if msg.sender_chat:

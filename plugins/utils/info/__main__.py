@@ -13,11 +13,13 @@
 
 import json
 from typing import Optional
-from datetime import datetime
 
 import aiohttp
 import spamwatch
 from UsergeAntiSpamApi import Client
+
+from pyrogram.types import User
+from pyrogram import enums
 
 from userge import userge, Message, get_collection
 from .. import info
@@ -115,20 +117,20 @@ def reduce_spam(text: Optional[str]) -> Optional[str]:
     return text
 
 
-def last_online(user):
+def last_online(user: User):
     time = ""
     if user.is_bot:
         time += "🤖 Bot :("
-    elif user.status == 'recently':
+    elif user.status == enums.UserStatus.RECENTLY:
         time += "Recently"
-    elif user.status == 'within_week':
+    elif user.status == enums.UserStatus.LAST_WEEK:
         time += "Within the last week"
-    elif user.status == 'within_month':
+    elif user.status == enums.UserStatus.LAST_MONTH:
         time += "Within the last month"
-    elif user.status == 'long_time_ago':
+    elif user.status == enums.UserStatus.LONG_AGO:
         time += "A long time ago :("
-    elif user.status == 'online':
+    elif user.status == enums.UserStatus.ONLINE:
         time += "Currently Online"
-    elif user.status == 'offline':
-        time += datetime.fromtimestamp(user.last_online_date).strftime("%a, %d %b %Y, %H:%M:%S")
+    elif user.status == enums.UserStatus.OFFLINE:
+        time += user.last_online_date.strftime("%a, %d %b %Y, %H:%M:%S")
     return time

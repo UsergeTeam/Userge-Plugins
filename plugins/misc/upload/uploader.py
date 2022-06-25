@@ -17,6 +17,7 @@ from PIL import Image
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from pyrogram.errors import FloodWait
+from pyrogram import enums
 
 from userge import userge, Message
 from userge.utils import progress, take_screen_shot, humanbytes, sort_file_name_key
@@ -48,7 +49,7 @@ async def upload_path(message: Message, path: Path, del_path: bool):
         try:
             await upload(message, p_t, del_path, f"{current}/{len(file_paths)}")
         except FloodWait as f_e:
-            time.sleep(f_e.x)  # asyncio sleep ?
+            time.sleep(f_e.value)  # asyncio sleep ?
         if message.process_is_canceled:
             break
 
@@ -79,14 +80,14 @@ async def doc_upload(message: Message, path, del_path: bool = False,
         message.chat.id, f"`Uploading {str_path} as a doc ... {extra}`")
     start_t = datetime.now()
     thumb = await get_thumb(str_path) if with_thumb else None
-    await message.client.send_chat_action(message.chat.id, "upload_document")
+    await message.client.send_chat_action(message.chat.id, enums.ChatAction.UPLOAD_DOCUMENT)
     try:
         msg = await message.client.send_document(
             chat_id=message.chat.id,
             document=str_path,
             thumb=thumb,
             caption=path.name,
-            parse_mode="html",
+            parse_mode=enums.ParseMode.HTML,
             force_document=True,
             disable_notification=True,
             progress=progress,
@@ -115,7 +116,7 @@ async def vid_upload(message: Message, path, del_path: bool = False,
     sent: Message = await message.client.send_message(
         message.chat.id, f"`Uploading {str_path} as a video ... {extra}`")
     start_t = datetime.now()
-    await message.client.send_chat_action(message.chat.id, "upload_video")
+    await message.client.send_chat_action(message.chat.id, enums.ChatAction.UPLOAD_VIDEO)
     width = 0
     height = 0
     if thumb:
@@ -133,7 +134,7 @@ async def vid_upload(message: Message, path, del_path: bool = False,
             width=width,
             height=height,
             caption=path.name,
-            parse_mode="html",
+            parse_mode=enums.ParseMode.HTML,
             disable_notification=True,
             progress=progress,
             progress_args=(message, f"uploading {extra}", str_path)
@@ -182,7 +183,7 @@ async def audio_upload(message: Message, path, del_path: bool = False,
     sent: Message = await message.client.send_message(
         message.chat.id, f"`Uploading {str_path} as audio ... {extra}`")
     start_t = datetime.now()
-    await message.client.send_chat_action(message.chat.id, "upload_audio")
+    await message.client.send_chat_action(message.chat.id, enums.ChatAction.UPLOAD_AUDIO)
     try:
         msg = await message.client.send_audio(
             chat_id=message.chat.id,
@@ -192,7 +193,7 @@ async def audio_upload(message: Message, path, del_path: bool = False,
             title=title,
             performer=artist,
             duration=duration,
-            parse_mode="html",
+            parse_mode=enums.ParseMode.HTML,
             disable_notification=True,
             progress=progress,
             progress_args=(message, f"uploading {extra}", str_path)
@@ -217,13 +218,13 @@ async def photo_upload(message: Message, path, del_path: bool = False, extra: st
     sent: Message = await message.client.send_message(
         message.chat.id, f"`Uploading {path.name} as photo ... {extra}`")
     start_t = datetime.now()
-    await message.client.send_chat_action(message.chat.id, "upload_photo")
+    await message.client.send_chat_action(message.chat.id, enums.ChatAction.UPLOAD_PHOTO)
     try:
         msg = await message.client.send_photo(
             chat_id=message.chat.id,
             photo=str_path,
             caption=path.name,
-            parse_mode="html",
+            parse_mode=enums.ParseMode.HTML,
             disable_notification=True,
             progress=progress,
             progress_args=(message, f"uploading {extra}", str_path)
@@ -275,7 +276,7 @@ async def remove_thumb(thumb: str) -> None:
 async def finalize(message: Message, msg: Message, start_t):
     if 'df' not in message.flags:
         await CHANNEL.fwd_msg(msg)
-    await message.client.send_chat_action(message.chat.id, "cancel")
+    await message.client.send_chat_action(message.chat.id, enums.ChatAction.CANCEL)
     if message.process_is_canceled:
         await message.canceled()
     else:

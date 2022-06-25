@@ -81,7 +81,7 @@ async def glitch_(message: Message):
         glitch_file = dls_loc
     glitcher = ImageGlitcher()
     img = Image.open(glitch_file)
-    message_id = replied.message_id
+    message_id = replied.id
     if '-s' in message.flags:
         glitched = config.Dynamic.DOWN_PATH + "glitched.webp"
         glitch_img = glitcher.glitch_image(img, args, color_offset=True)

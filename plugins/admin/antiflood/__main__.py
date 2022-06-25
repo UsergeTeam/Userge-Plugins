@@ -9,9 +9,9 @@
 # All rights reserved.
 
 import asyncio
-import time
+import datetime
 
-from pyrogram import filters
+from pyrogram import filters, enums
 from pyrogram.types import ChatPermissions
 
 from userge import userge, Message, get_collection
@@ -36,9 +36,9 @@ async def _init() -> None:
         }
 
 
-async def cache_admins(msg):
+async def cache_admins(msg: Message):
     au_ids = []
-    async for admins in msg.chat.iter_members(filter="administrators"):
+    async for admins in msg.chat.get_members(filter=enums.ChatMembersFilter.ADMINISTRATORS):
         au_ids.append(admins.user.id)
     ADMINS[msg.chat.id] = au_ids
 
@@ -152,7 +152,7 @@ async def view_flood_settings(msg: Message):
 
 
 @userge.on_filters(
-    filters.group & filters.incoming & ~filters.edited, group=3, check_restrict_perm=True
+    filters.group & filters.incoming, group=3, check_restrict_perm=True
 )
 async def anti_flood_handler(msg: Message):
     """ Filtering msgs for Handling Flooding """
@@ -186,7 +186,7 @@ async def anti_flood_handler(msg: Message):
             exec_str = "#BANNED"
         elif mode.lower() == 'kick':
             await msg.client.ban_chat_member(
-                chat_id, user_id, int(time.time() + 60))
+                chat_id, user_id, (datetime.datetime.now() + datetime.timedelta(seconds=60)))
             exec_str = "#KICKED"
         else:
             await msg.client.restrict_chat_member(

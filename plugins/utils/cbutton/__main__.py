@@ -39,7 +39,7 @@ async def create_button(msg: Message):
             try:
                 replied = await client.get_messages(
                     replied.chat.id,
-                    replied.message_id
+                    replied.id
                 )
             except ChannelInvalid:
                 await msg.err("`Are you sure that your bot is here?`\n"
@@ -62,7 +62,7 @@ async def create_button(msg: Message):
     if not text:
         await msg.err("`need text too!`")
         return
-    message_id = replied.message_id if replied else None
+    message_id = replied.id if replied else None
     try:
         if replied and replied.media and file_id:
             await client.send_cached_media(

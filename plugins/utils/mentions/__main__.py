@@ -10,6 +10,7 @@
 
 from pyrogram.errors import PeerIdInvalid
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram import enums
 
 from userge import userge, Message, config, filters, get_collection
 
@@ -44,7 +45,7 @@ async def toggle_mentions(msg: Message):
 
 
 @userge.on_filters(
-    ~filters.me & ~filters.bot & ~filters.edited & ~filters.service
+    ~filters.me & ~filters.bot & ~filters.service
     & (filters.mentioned | filters.private), group=1, allow_via_bot=False)
 async def handle_mentions(msg: Message):
 
@@ -54,8 +55,8 @@ async def handle_mentions(msg: Message):
     if not msg.from_user or msg.from_user.is_verified:
         return
 
-    if msg.chat.type == "private":
-        link = f"tg://openmessage?user_id={msg.chat.id}&message_id={msg.message_id}"
+    if msg.chat.type == enums.ChatType.PRIVATE:
+        link = f"tg://openmessage?user_id={msg.chat.id}&message_id={msg.id}"
         text = f"{msg.from_user.mention} 💻 sent you a **Private message.**"
     else:
         link = msg.link

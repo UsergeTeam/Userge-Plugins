@@ -14,6 +14,8 @@ from datetime import datetime
 import aiohttp
 from pytz import country_timezones as c_tz, timezone as tz, country_names as c_n
 
+from pyrogram import enums
+
 from userge import userge, Message
 from .. import weather
 
@@ -51,7 +53,7 @@ async def weather_get(message: Message):
             "<a href='https://openweathermap.org'>HERE</a> "
             "<code>& add it to Heroku config vars</code> (<code>OPEN_WEATHER_MAP</code>)",
             disable_web_page_preview=True,
-            parse_mode="html", del_in=0)
+            parse_mode=enums.ParseMode.HTML, del_in=0)
         return
 
     APPID = OWM_API

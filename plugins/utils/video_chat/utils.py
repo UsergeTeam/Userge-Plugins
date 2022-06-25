@@ -11,6 +11,7 @@ from youtubesearchpython import VideosSearch
 from pyrogram.types import (InlineKeyboardMarkup,
                             InlineKeyboardButton,
                             CallbackQuery)
+from pyrogram import enums
 
 from userge import userge, Message, pool
 from userge.utils import runcmd, time_formatter, get_custom_import_re
@@ -40,14 +41,14 @@ async def reply_text(
     text: str,
     markup=None,
     to_reply: bool = True,
-    parse_mode: str = None,
+    parse_mode: enums.ParseMode = None,
     del_in: int = -1
 ) -> Message:
     kwargs = {
         'chat_id': msg.chat.id,
         'text': text,
         'del_in': del_in,
-        'reply_to_message_id': msg.message_id if to_reply else None,
+        'reply_to_message_id': msg.id if to_reply else None,
         'reply_markup': markup,
         'disable_web_page_preview': True
     }

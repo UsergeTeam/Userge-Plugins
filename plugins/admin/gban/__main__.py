@@ -13,6 +13,7 @@ from typing import AsyncGenerator, Tuple
 
 from pyrogram.errors.exceptions.bad_request_400 import (
     ChatAdminRequired, UserAdminInvalid, ChannelInvalid)
+from pyrogram import enums
 
 from userge import userge, Message, get_collection
 from .. import gban
@@ -113,7 +114,7 @@ async def gban_user(message: Message):
             mention = message.reply_to_message.from_user.mention
         elif message.entities:
             for i in message.entities:
-                if i.type == "text_mention":
+                if i.type == enums.MessageEntityType.TEXT_MENTION:
                     mention = i.user.mention
                     break
         if mention:
@@ -170,7 +171,7 @@ async def ungban_user(message: Message):
             mention = message.reply_to_message.from_user.mention
         elif message.entities:
             for i in message.entities:
-                if i.type == "text_mention":
+                if i.type == enums.MessageEntityType.TEXT_MENTION:
                     mention = i.user.mention
                     break
         if mention:

@@ -19,14 +19,15 @@ from datetime import datetime
 from functools import wraps
 from json import dumps
 from mimetypes import guess_type
-from urllib.parse import quote
+from typing import Optional
+from urllib.parse import quote, urlparse, parse_qs
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from httplib2 import Http
 from oauth2client.client import (
-    OAuth2WebServerFlow, HttpAccessTokenRefreshError, FlowExchangeError)
+    OAuth2Credentials, OAuth2WebServerFlow, HttpAccessTokenRefreshError, FlowExchangeError)
 
 from userge import userge, Message, config, get_collection, pool
 from userge.plugins.misc.download import url_download, tg_download
@@ -34,13 +35,13 @@ from userge.utils import humanbytes, time_formatter, is_url
 from userge.utils.exceptions import ProcessCanceled
 from .. import gdrive
 
-_CREDS: object = None
-_AUTH_FLOW: object = None
+_CREDS: Optional[OAuth2Credentials] = None
+_AUTH_FLOW: Optional[OAuth2WebServerFlow] = None
 _PARENT_ID = ""
 OAUTH_SCOPE = ["https://www.googleapis.com/auth/drive",
                "https://www.googleapis.com/auth/drive.file",
                "https://www.googleapis.com/auth/drive.metadata"]
-REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
+REDIRECT_URI = "http://localhost:5000"
 G_DRIVE_DIR_MIME_TYPE = "application/vnd.google-apps.folder"
 G_DRIVE_FILE_LINK = "📄 <a href='https://drive.google.com/open?id={}'>{}</a> __({})__"
 G_DRIVE_FOLDER_LINK = "📁 <a href='https://drive.google.com/drive/folders/{}'>{}</a> __(folder)__"
@@ -94,7 +95,8 @@ def creds_dec(func):
     async def wrapper(self):
         # pylint: disable=protected-access
         if _CREDS:
-            await _refresh_creds()
+            if _CREDS.access_token_expired:
+                await _refresh_creds()
             await func(self)
         else:
             await self._message.edit("Please run `.gsetup` first", del_in=5)
@@ -617,7 +619,7 @@ class Worker(_GDrive):
                                              redirect_uri=REDIRECT_URI)
             reply_string = f"please visit {_AUTH_FLOW.step1_get_authorize_url()} and "
             reply_string += "send back "
-            reply_string += "<code>.gconf [auth_code]</code>"
+            reply_string += "<code>.gconf [auth_code or url]</code>"
             await self._message.edit(
                 text=reply_string, disable_web_page_preview=True)
 
@@ -628,16 +630,20 @@ class Worker(_GDrive):
             await self._message.edit("Please run `.gsetup` first", del_in=5)
             return
         await self._message.edit("Checking Auth Code...")
+        code = self._message.input_str
+        if code.startswith(REDIRECT_URI):
+            code = parse_qs(urlparse(code).query).get('code')
+            if isinstance(code, list):
+                code = code[0]
         try:
-            cred = _AUTH_FLOW.step2_exchange(self._message.input_str)
+            cred = _AUTH_FLOW.step2_exchange(code)
         except FlowExchangeError as c_i:
             _LOG.exception(c_i)
             await self._message.err(str(c_i))
         else:
             _AUTH_FLOW = None
-            await asyncio.gather(
-                _set_creds(cred),
-                self._message.edit("`Saved GDrive Creds!`", del_in=3, log=__name__))
+            await _set_creds(cred)
+            await self._message.edit("`Saved GDrive Creds!`", del_in=3, log=__name__)
 
     async def clear(self) -> None:
         """ Clear Creds """
@@ -959,7 +965,11 @@ async def gsetup_(message: Message):
 
 @userge.on_cmd("gconf", about={
     'header': "Confirm GDrive Setup",
-    'usage': "{tr}gconf [auth token]"})
+    'usage': "{tr}gconf [auth code or url]",
+    'examples': [
+        "{tr}gconf 4/0AX5XfWjgra2oHuQymWng7IzlqWrQ9icjRzcHryjJ4xhBpFsX0xmk_SUwjveF8c_AEd4k6A",
+        "{tr}gconf http://localhost:5000/?code=4/0AX5XfWjgra2oHuQymWng7IzlqWrQ9icjRzcHryjJ4x"
+        "hBpFsX0xmk_SUwjveF2c_AEd3k8A&scope=https://www.googleapis.com/auth/drive"]})
 async def gconf_(message: Message):
     """ confirm creds """
     await Worker(message).confirm_setup()

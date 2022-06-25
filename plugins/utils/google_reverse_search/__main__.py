@@ -15,6 +15,8 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
+from pyrogram import enums
+
 from userge import userge, Message, config
 from userge.utils import take_screen_shot
 
@@ -83,4 +85,4 @@ async def google_rs(message: Message):
 <b>More Info</b>: Open this <a href="{the_location}">Link</a>
 
 <b>Time Taken</b>: {ms} seconds"""
-    await message.edit(out_str, parse_mode="HTML", disable_web_page_preview=True)
+    await message.edit(out_str, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)

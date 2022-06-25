@@ -51,7 +51,7 @@ async def gifify(msg: Message):
         msg.chat.id,
         converted_gif,
         unsave=True,
-        reply_to_message_id=replied.message_id)
+        reply_to_message_id=replied.id)
     await msg.delete()
     os.remove(converted_gif)
 

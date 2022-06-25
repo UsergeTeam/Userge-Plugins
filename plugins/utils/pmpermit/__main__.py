@@ -13,6 +13,7 @@ from typing import Dict
 from uuid import uuid4
 
 from pyrogram.errors import BotInlineDisabled
+from pyrogram.enums import ChatType
 from pyrogram.types import (InlineKeyboardMarkup,
                             InlineKeyboardButton,
                             InlineQueryResultArticle,
@@ -124,7 +125,7 @@ async def list_pm(msg: Message):
 
 async def get_id(message: Message):
     userid = None
-    if message.chat.type in ['private', 'bot']:
+    if message.chat.type in [ChatType.PRIVATE, ChatType.BOT]:
         userid = message.chat.id
     if message.reply_to_message:
         userid = message.reply_to_message.from_user.id
@@ -318,7 +319,7 @@ async def uninvitedPmHandler(message: Message):
         await CHANNEL.log(f"#NEW_MESSAGE\n{user_dict['mention']} has messaged you")
 
 
-@userge.on_filters(~allowAllFilter & filters.outgoing & ~filters.edited
+@userge.on_filters(~allowAllFilter & filters.outgoing
                    & filters.private & ~pmpermit.ALLOWED_CHATS, allow_via_bot=False)
 async def outgoing_auto_approve(message: Message):
     """ outgoing handler """

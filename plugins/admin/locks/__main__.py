@@ -16,6 +16,7 @@ from pyrogram.raw.functions.channels import GetFullChannel
 from pyrogram.raw.functions.messages import GetFullChat, EditChatDefaultBannedRights
 from pyrogram.raw.types import InputPeerChannel, ChatBannedRights
 from pyrogram.types import ChatPermissions
+from pyrogram import enums
 
 from userge import userge, Message
 
@@ -28,10 +29,10 @@ _types = ('msg', 'media', 'polls', 'invite', 'pin', 'info', 'webprev',
 async def _get_banned_rights(message: Message) -> ChatBannedRights:
     peer = await message.client.resolve_peer(message.chat.id)
     if isinstance(peer, InputPeerChannel):
-        return (await message.client.send(
+        return (await message.client.invoke(
             GetFullChannel(
                 channel=peer))).chats[0].default_banned_rights
-    return (await message.client.send(
+    return (await message.client.invoke(
         GetFullChat(
             chat_id=peer.chat_id))).chats[0].default_banned_rights
 
@@ -95,7 +96,7 @@ async def _edit_ban_rights(message: Message, rights: Optional[ChatBannedRights] 
             invite_users=False,
             pin_messages=False)
 
-    await message.client.send(
+    await message.client.invoke(
         EditChatDefaultBannedRights(
             peer=await message.client.resolve_peer(message.chat.id),
             banned_rights=rights))
@@ -229,7 +230,7 @@ async def view_perm(message: Message):
         await message.client.send_photo(chat_id=message.chat.id,
                                         photo=local_chat_photo,
                                         caption=permission_view_str,
-                                        parse_mode="html")
+                                        parse_mode=enums.ParseMode.HTML)
         os.remove(local_chat_photo)
         await message.delete()
     else:
