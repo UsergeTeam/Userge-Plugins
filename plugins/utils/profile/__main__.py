@@ -211,7 +211,8 @@ async def view_profile(message: Message):
     elif '-flname' in message.flags:
         await message.edit("```checking, wait plox !...```", del_in=3)
         if not user.last_name:
-            await message.edit("<code>{}</code>".format(user.first_name), parse_mode=enums.ParseMode.HTML)
+            await message.edit(
+                "<code>{}</code>".format(user.first_name), parse_mode=enums.ParseMode.HTML)
         else:
             full_name = user.first_name + " " + user.last_name
             await message.edit("<code>{}</code>".format(full_name), parse_mode=enums.ParseMode.HTML)
