@@ -88,7 +88,7 @@ async def handle_afk_incomming(message: Message) -> None:
             else:
                 out_str = choice(AFK_REASONS)
             coro_list.append(message.reply(out_str))
-        if chat.type == 'private':
+        if chat.type == enums.ChatType.PRIVATE:
             USERS[user_id][0] += 1
         else:
             USERS[user_id][1] += 1
