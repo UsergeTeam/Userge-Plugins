@@ -29,7 +29,7 @@ async def spam(message: Message):
     replied = message.reply_to_message
     delay = str(0.1)
     is_str = "|" in message.input_str
-    if (replied and replied.media and not is_str):
+    if replied and replied.media and not is_str:
         if not os.path.isdir(config.Dynamic.DOWN_PATH):
             os.makedirs(config.Dynamic.DOWN_PATH)
         if replied.sticker:
@@ -52,7 +52,7 @@ async def spam(message: Message):
                 await asyncio.sleep(delay)
             await S_LOG.log(f"Spammed Sticker in Chat» {message.chat.title}, {count} times")
             await message.delete()
-        elif (replied.animation or replied.video or replied.photo or replied.document):
+        elif replied.animation or replied.video or replied.photo or replied.document:
             to_spam = get_file_id_of_media(replied)
             count = message.input_str
             if " " in count:
@@ -72,7 +72,7 @@ async def spam(message: Message):
                 await asyncio.sleep(delay)
             await S_LOG.log(f"Spammed Media in Chat» {message.chat.title}, {count} times")
             await message.delete()
-    elif (replied and replied.text and not is_str):
+    elif replied and replied.text and not is_str:
         count = message.input_str
         if " " in count:
             count, delay = count.split(" ", maxsplit=1)

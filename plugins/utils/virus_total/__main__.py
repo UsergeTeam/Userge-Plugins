@@ -16,6 +16,7 @@ import json
 import os
 
 import requests
+from requests import Response
 
 from userge import userge, Message, config
 from userge.utils import progress, humanbytes
@@ -100,7 +101,7 @@ async def _scan_file(msg: Message):
         await msg.edit('`File is clean ✅`')
 
 
-def scan_file(path: str) -> str:
+def scan_file(path: str) -> Response:
     """ scan file """
     url = 'https://www.virustotal.com/vtapi/v2/file/scan'
     path_name = path.split('/')[-1]
@@ -109,15 +110,13 @@ def scan_file(path: str) -> str:
     files = {
         'file': (path_name, open(path, 'rb'))  # skipcq
     }
-    response = requests.post(url, files=files, params=params)
-    return response
+    return requests.post(url, files=files, params=params)
 
 
-def get_report(sha1: str) -> str:
+def get_report(sha1: str) -> Response:
     """ get report of files """
     url = 'https://www.virustotal.com/vtapi/v2/file/report'
     params = {
         'apikey': virus_total.API_KEY, 'resource': sha1, 'allinfo': 'False'
     }
-    response = requests.get(url, params=params)
-    return response
+    return requests.get(url, params=params)

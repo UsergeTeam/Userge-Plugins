@@ -96,11 +96,11 @@ async def fetch_watch_sources(message: Message):
 
     output_ = f"**Movie:**\n`{title}`\n**Release Date:**\n`{release_date}`"
     if imdb_score:
-        output_ = output_ + f"\n**IMDB: **{imdb_score}"
+        output_ += f"\n**IMDB: **{imdb_score}"
     if tmdb_score:
-        output_ = output_ + f"\n**TMDB: **{tmdb_score}"
+        output_ += f"\n**TMDB: **{tmdb_score}"
 
-    output_ = output_ + "\n\n**Available on:**\n"
+    output_ += "\n\n**Available on:**\n"
     for provider, link in stream_providers.items():
         if 'sonyliv' in link:
             link = link.replace(" ", "%20")

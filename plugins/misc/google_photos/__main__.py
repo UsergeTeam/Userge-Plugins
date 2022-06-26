@@ -173,7 +173,7 @@ async def upload_google_photos(message: Message):
                     "X-Goog-Upload-Offset": str(offset),
                     "Authorization": "Bearer " + creds.access_token,
                 }
-                response = await session.post(real_upload_url, headers=headers, data=current_chunk)
+                await session.post(real_upload_url, headers=headers, data=current_chunk)
                 loop.create_task(progress(offset + part_size, file_size,
                                           message, "uploading(gphoto)🧐?"))
                 # LOG.info(response.headers)

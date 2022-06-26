@@ -76,9 +76,9 @@ async def labstack(message: Message):
                     progress_str = progress_str.format(
                         "Downloading",
                         ''.join((config.FINISHED_PROGRESS_STR
-                                 for i in range(math.floor(percentage / 5)))),
+                                 for _ in range(math.floor(percentage / 5)))),
                         ''.join((config.UNFINISHED_PROGRESS_STR
-                                 for i in range(20 - math.floor(percentage / 5)))),
+                                 for _ in range(20 - math.floor(percentage / 5)))),
                         round(percentage, 2),
                         url,
                         file_name,
@@ -136,7 +136,7 @@ async def labstack(message: Message):
     send_url = "https://up.labstack.com/api/v1/links/{}/send".format(
         r['code'])
     response = requests.post(send_url, files=files, **kwargs)
-    if (response.status_code) == 200:
+    if response.status_code == 200:
         link = (
             "https://up.labstack.com/api/v1/links/{}/receive".format(r['code']))
         await message.edit(f"**Filename**: `{filename}`\n**Size**: "

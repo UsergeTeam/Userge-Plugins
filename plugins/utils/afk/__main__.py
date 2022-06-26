@@ -110,7 +110,7 @@ async def handle_afk_incomming(message: Message) -> None:
     else:
         coro_list.append(CHANNEL.log(
             "#GROUP\n"
-            f"{user_dict['mention']} tagged you in [{chat.title}](http://t.me/{chat.username})\n\n"
+            f"{user_dict['mention']} tagged you in [{chat.title}](https://t.me/{chat.username})\n\n"
             f"{message.text}\n\n"
             f"[goto_msg](https://t.me/c/{str(chat.id)[4:]}/{message.id})"))
     coro_list.append(AFK_COLLECTION.update_one({'_id': user_id},

@@ -16,6 +16,7 @@ import shutil
 import requests
 import wget
 from PIL import Image
+from pyrogram.enums import ChatAction
 from pyrogram.types import InputMediaPhoto, InputMediaDocument
 
 from userge import userge, Message, pool
@@ -74,7 +75,7 @@ async def wall_(msg: Message):
             ss.append(InputMediaPhoto(str(img)))
 
         await msg.reply_chat_action(
-            "upload_photo" if '-doc' not in msg.flags else "upload_document")
+            ChatAction.UPLOAD_DOCUMENT if '-doc' in msg.flags else ChatAction.UPLOAD_PHOTO)
         await msg.reply_media_group(ss, True)
         shutil.rmtree("wallpapers/", ignore_errors=True)
         await msg.delete()

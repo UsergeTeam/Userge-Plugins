@@ -14,6 +14,7 @@
 import os
 from datetime import datetime
 
+from pyrogram import enums
 from pyrogram.errors.exceptions.bad_request_400 import (
     UsernameOccupied, AboutTooLong, UsernameNotOccupied, VideoFileInvalid)
 
@@ -199,34 +200,34 @@ async def view_profile(message: Message):
     if '-fname' in message.flags:
         await message.edit("```checking, wait plox !...```", del_in=3)
         first_name = user.first_name
-        await message.edit("<code>{}</code>".format(first_name), parse_mode='html')
+        await message.edit("<code>{}</code>".format(first_name), parse_mode=enums.ParseMode.HTML)
     elif '-lname' in message.flags:
         if not user.last_name:
             await message.err("User not have last name...")
         else:
             await message.edit("```checking, wait plox !...```", del_in=3)
             last_name = user.last_name
-            await message.edit("<code>{}</code>".format(last_name), parse_mode='html')
+            await message.edit("<code>{}</code>".format(last_name), parse_mode=enums.ParseMode.HTML)
     elif '-flname' in message.flags:
         await message.edit("```checking, wait plox !...```", del_in=3)
         if not user.last_name:
-            await message.edit("<code>{}</code>".format(user.first_name), parse_mode='html')
+            await message.edit("<code>{}</code>".format(user.first_name), parse_mode=enums.ParseMode.HTML)
         else:
             full_name = user.first_name + " " + user.last_name
-            await message.edit("<code>{}</code>".format(full_name), parse_mode='html')
+            await message.edit("<code>{}</code>".format(full_name), parse_mode=enums.ParseMode.HTML)
     elif '-bio' in message.flags:
         if not bio:
             await message.err("User not have bio...")
         else:
             await message.edit("`checking, wait plox !...`", del_in=3)
-            await message.edit("<code>{}</code>".format(bio), parse_mode='html')
+            await message.edit("<code>{}</code>".format(bio), parse_mode=enums.ParseMode.HTML)
     elif '-uname' in message.flags:
         if not user.username:
             await message.err("User not have username...")
         else:
             await message.edit("```checking, wait plox !...```", del_in=3)
             username = user.username
-            await message.edit("<code>{}</code>".format(username), parse_mode='html')
+            await message.edit("<code>{}</code>".format(username), parse_mode=enums.ParseMode.HTML)
     elif '-pp' in message.flags:
         if not user.photo:
             await message.err("profile photo not found!...")

@@ -129,7 +129,6 @@ async def kang_(message: Message):
         packname += "_video"
         packnick += " (Video)"
 
-    exist = False
     while True:
         if userge.has_bot:
             packname += f"_by_{bot.username}"
@@ -250,16 +249,11 @@ async def create_pack(
         media = (await userge.bot.invoke(UploadMedia(
             peer=await userge.bot.resolve_peer('stickers'),
             media=InputMediaUploadedDocument(
-                mime_type=userge.guess_mime_type(sticker) or "application/zip",
-                file=(
+                mime_type=userge.guess_mime_type(sticker) or "application/zip", file=(
                     await userge.bot.save_file(sticker)
-                ),
-                force_file=True,
-                thumb=None,
-                attributes=[
+                ), force_file=True, attributes=[
                     DocumentAttributeFilename(file_name=os.path.basename(sticker))
-                ]
-            )
+                ])
         )
         )).document
         await userge.bot.invoke(
@@ -318,16 +312,11 @@ async def add_sticker(message: Message, short_name: str, sticker: str, emoji: st
         media = (await userge.bot.invoke(UploadMedia(
             peer=await userge.bot.resolve_peer('stickers'),
             media=InputMediaUploadedDocument(
-                mime_type=userge.guess_mime_type(sticker) or "application/zip",
-                file=(
+                mime_type=userge.guess_mime_type(sticker) or "application/zip", file=(
                     await userge.bot.save_file(sticker)
-                ),
-                force_file=True,
-                thumb=None,
-                attributes=[
+                ), force_file=True, attributes=[
                     DocumentAttributeFilename(file_name=os.path.basename(sticker))
-                ]
-            )
+                ])
         )
         )).document
         await userge.bot.invoke(

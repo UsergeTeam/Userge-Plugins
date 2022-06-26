@@ -203,7 +203,7 @@ async def rotate_(message: Message):
     if rotate_file is None:
         rotate_file = dls_loc
     im = Image.open(rotate_file).convert('RGB')
-    IMG = im.rotate(args, expand=1)
+    IMG = im.rotate(args, expand=True)
     IMG.save(Converted, quality=95)
     await message.client.send_sticker(
         message.chat.id,

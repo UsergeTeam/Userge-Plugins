@@ -17,7 +17,7 @@ from userge import userge, Message
     'header': "Attach any link's preview in a message",
     'usage': "{tr}attach [link] [reply to a message]"})
 async def attach(update: Message):
-    '''Attach links in message'''
+    """Attach links in message"""
     link = update.text.split()[1]
     replied = update.reply_to_message
     if replied is None or not link:

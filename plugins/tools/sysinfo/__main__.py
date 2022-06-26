@@ -45,10 +45,10 @@ async def generate_sysinfo(workdir):
     info['DISK'] = (f"{bytes2human(du.used)} / {bytes2human(du.total)} "
                     f"({du.percent}%)")
     if dio:
-        info['DISK I/O'] = (f"R {bytes2human(dio.read_bytes)} | W {bytes2human(dio.write_bytes)}")
+        info['DISK I/O'] = f"R {bytes2human(dio.read_bytes)} | W {bytes2human(dio.write_bytes)}"
     # Network
     nio = psutil.net_io_counters()
-    info['NET I/O'] = (f"TX {bytes2human(nio.bytes_sent)} | RX {bytes2human(nio.bytes_recv)}")
+    info['NET I/O'] = f"TX {bytes2human(nio.bytes_sent)} | RX {bytes2human(nio.bytes_recv)}"
     # Sensors
     sensors_temperatures = psutil.sensors_temperatures()
     if sensors_temperatures:

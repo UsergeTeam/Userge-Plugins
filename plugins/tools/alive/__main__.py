@@ -125,7 +125,7 @@ async def _send_alive(message: Message,
             if _IS_STICKER:
                 raise ChatSendMediaForbidden
         except SlowmodeWait as s_m:
-            await asyncio.sleep(s_m.x)
+            await asyncio.sleep(s_m.value)
             text = f'<b>{str(s_m).replace(" is ", " was ")}</b>\n\n{text}'
             return await _send_alive(message, text, reply_markup)
         except MediaEmpty:

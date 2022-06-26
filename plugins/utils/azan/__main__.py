@@ -33,7 +33,7 @@ async def azan(msg: Message):
     if not city:
         return await msg.err("Please input Country, or set datetime env")
     async with aiohttp.ClientSession() as ses:
-        url = f"http://muslimsalat.com/{city}.json?key=bd099c5825cbedb9aa934e255a81a5fc"
+        url = f"https://muslimsalat.com/{city}.json?key=bd099c5825cbedb9aa934e255a81a5fc"
         async with ses.get(url) as resp:
             if resp.status != 200:
                 return await msg.err("Unable to process your request")

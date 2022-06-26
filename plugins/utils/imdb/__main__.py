@@ -130,7 +130,6 @@ async def get_movie_description(imdb_id, max_length):
 def get_countries_and_languages(soup):
     languages = soup.get("Language")
     countries = soup.get("CountryOfOrigin")
-    lg_text = ""
     if languages:
         if len(languages) > 1:
             lg_text = ', '.join(languages)
@@ -267,15 +266,9 @@ if userge.has_bot:
                 )
             )
         resfo = srch_results.get("q")
-        await inline_query.answer(
-            results=oorse,
-            cache_time=300,
-            is_gallery=False,
-            is_personal=False,
-            next_offset="",
-            switch_pm_text=f"Found {len(oorse)} results for {resfo}",
-            switch_pm_parameter="imdb"
-        )
+        await inline_query.answer(results=oorse,
+                                  switch_pm_text=f"Found {len(oorse)} results for {resfo}",
+                                  switch_pm_parameter="imdb")
         inline_query.stop_propagation()
 
 

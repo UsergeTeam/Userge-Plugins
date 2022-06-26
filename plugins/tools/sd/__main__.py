@@ -48,10 +48,7 @@ async def raw_handler(_, update: Update, *__):
         msgs = MSGS.get(chat_id)
         if msgs:
             MSGS[chat_id] = []  # clear the fetched list
-            msg_ids = list(
-                filter(
-                    lambda msg_dict: msg_dict['msg'] <= update.max_id,
-                    msgs))
+            msg_ids = list(filter(lambda _: _['msg'] <= update.max_id, msgs))
             del_in_time = set()
             for msg_dict in msg_ids:
                 msgs.remove(msg_dict)

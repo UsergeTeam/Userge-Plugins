@@ -116,13 +116,6 @@ if userge.has_bot:
             riqa = []
         if not riqa:
             switch_pm_text = f"Sorry, couldn't find any results for: {query}"
-        await inline_query.answer(
-            results=riqa[:49],
-            cache_time=300,
-            is_gallery=False,
-            is_personal=False,
-            next_offset="",
-            switch_pm_text=switch_pm_text,
-            switch_pm_parameter="ud"
-        )
+        await inline_query.answer(results=riqa[:49], switch_pm_text=switch_pm_text,
+                                  switch_pm_parameter="ud")
         inline_query.stop_propagation()

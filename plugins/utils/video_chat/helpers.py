@@ -82,7 +82,7 @@ async def play_music(msg: Message, forceplay: bool):
                 if Dynamic.PLAYING:
                     await reply_text(msg, get_scheduled_text(resource, resource.url))
                 QUEUE.append(resource)
-        elif (path.exists() and path.is_file()):
+        elif path.exists() and path.is_file():
             if not path.name.endswith(
                 (".mkv", ".mp4", ".webm", ".m4v", ".mp3", ".flac", ".wav", ".m4a")
             ):
@@ -419,7 +419,6 @@ async def seek_music(dur: int, jump: bool = False) -> bool:
 
 
 async def replay_music(flags: dict = None) -> bool:
-    is_video = False
     if flags and '-v' in flags:
         is_video = CURRENT_SONG['has_video']
         CURRENT_SONG['is_video'] = is_video

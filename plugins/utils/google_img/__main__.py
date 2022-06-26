@@ -14,6 +14,7 @@ import shutil
 
 from PIL import Image
 from google_images_search import GoogleImagesSearch as GIS
+from pyrogram import enums
 from pyrogram.types import InputMediaPhoto
 
 from userge import userge, Message
@@ -80,7 +81,7 @@ async def google_img(message: Message):
         ss.append(InputMediaPhoto(str(imgs)))
         if len(ss) == 9:
             break
-    await message.reply_chat_action("upload_photo")
+    await message.reply_chat_action(enums.ChatAction.UPLOAD_PHOTO)
     await message.reply_media_group(ss, True)
     shutil.rmtree(PATH, ignore_errors=True)
     await message.delete()

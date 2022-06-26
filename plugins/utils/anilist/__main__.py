@@ -519,7 +519,6 @@ async def character_search(message: Message):
         out += cf.get('description', "N/A") + "<br>"
         cntnt += out
         sp += 1
-        out = ""
         if sp > 5:
             break
 

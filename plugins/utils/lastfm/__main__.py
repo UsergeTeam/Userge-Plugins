@@ -333,7 +333,7 @@ class LastFm:
     async def get_loved(self) -> None:
         await self.msg.edit("`Getting your loved tracks...`")
         limit = 20
-        if self.msg.input_str and self.msg.input_str.is_numeric():
+        if self.msg.input_str and self.msg.input_str.isnumeric():
             limit = int(self.msg.input_str)
         tracks = (self.get_user()).get_loved_tracks(limit=limit)
         out = ""
@@ -362,7 +362,7 @@ class LastFm:
         for i, t in enumerate(recent_tracks, start=1):
             track = self._format_track(t)
             out += f"\n{i}. {track}"
-            if track.get_userloved():
+            if t.get_userloved():
                 out += " 💕"
         if not out:
             return None
@@ -395,7 +395,7 @@ du = "https://last.fm/user/"
 
 async def resp(params: dict):
     async with aiohttp.ClientSession() as session, \
-            session.get("http://ws.audioscrobbler.com/2.0", params=params) as res:
+            session.get("https://ws.audioscrobbler.com/2.0", params=params) as res:
         return res.status, await res.json()
 
 
