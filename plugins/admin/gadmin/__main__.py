@@ -747,7 +747,7 @@ def get_datetime_obj(time: int) -> datetime.datetime:
 async def ban_spammers(message: Message):
     chat_id = message.chat.id
     sender_chat_id = message.sender_chat.username or message.sender_chat.id
-    if sender_chat_id not in gadmin.ALLOWED.get(chat_id, [chat_id]):
+    if message.sender_chat.id not in gadmin.ALLOWED.get(chat_id, [chat_id]):
         await message.delete()
         if chat_id in gadmin.BAN_CHANNELS:
             await message.chat.ban_member(sender_chat_id)
