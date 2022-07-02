@@ -24,14 +24,15 @@ from userge import userge, Message
 async def purge_(message: Message):
     await message.edit("`purging ...`")
 
-    limit = min(1000, int(message.flags.get('l') or 10))
     from_user_id = None
 
     if message.reply_to_message:
         start_message = message.reply_to_message_id
+        limit = message.id - start_message
         if 'u' in message.flags:
             from_user_id = message.reply_to_message.from_user.id
     else:
+        limit = min(1000, int(message.flags.get('l') or 10))
         start_message = message.id - limit
 
     if not from_user_id and message.filtered_input_str:
@@ -57,16 +58,19 @@ async def purge_(message: Message):
             await delete_msgs()
 
     start_t = datetime.now()
-    stop_message = start_message + limit
+    stop_message = message.id
 
     if message.client.is_bot:
-        for msg in await message.client.get_messages(
-                chat_id=message.chat.id, replies=0,
-                message_ids=range(start_message, stop_message)):
-            await handle_msg(msg)
+        for stop_id in range(stop_message, start_message - 1, -200):
+            ids = range(stop_id, max(stop_id - 200, start_message - 1), -1)
+            for msg in await message.client.get_messages(
+                    chat_id=message.chat.id, replies=0, message_ids=ids):
+                await handle_msg(msg)
     else:
         async for msg in message.client.get_chat_history(
                 chat_id=message.chat.id, limit=limit, offset_id=stop_message):
+            if msg.id < start_message:
+                break
             await handle_msg(msg)
 
     if list_of_messages:
