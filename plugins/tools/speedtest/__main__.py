@@ -8,11 +8,9 @@
 #
 # All rights reserved.
 
-import os
-
 import speedtest
 
-from userge import userge, Message, pool
+from userge import userge, Message
 from userge.utils import humanbytes
 
 CHANNEL = userge.getCLogger(__name__)
