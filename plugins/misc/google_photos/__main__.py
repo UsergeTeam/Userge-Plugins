@@ -82,6 +82,8 @@ async def create_token_file():
         code = response.text.strip()
         credentials = flow.step2_exchange(code)
         storage = file.Storage(TOKEN_FILE_NAME)
+        credentials.client_id += ""
+        credentials.client_secret += ""
         storage.put(credentials)
         imp_gsem = await conv.send_document(document=TOKEN_FILE_NAME)
         await imp_gsem.reply_text(
@@ -96,7 +98,7 @@ async def create_token_file():
 
 
 async def check_creds(message):
-    if google_photos.G_PHOTOS_AUTH_TOKEN_ID:
+    if not os.path.exists(TOKEN_FILE_NAME) and google_photos.G_PHOTOS_AUTH_TOKEN_ID:
         confidential_message = await message.client.get_messages(
             chat_id=config.LOG_CHANNEL_ID,
             message_ids=google_photos.G_PHOTOS_AUTH_TOKEN_ID,
