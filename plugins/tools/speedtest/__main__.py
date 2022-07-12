@@ -26,7 +26,10 @@ async def speedtst(message: Message):
         test.download()
         await message.try_to_edit("`Performing upload test . . .`")
         test.upload()
-        test.results.share()
+        try:
+            test.results.share()
+        except speedtest.ShareResultsConnectFailure:
+            pass
         result = test.results.dict()
     except Exception as e:
         await message.err(e)
@@ -50,8 +53,11 @@ Sent: `{humanbytes(result['bytes_sent'])}`
 Received: `{humanbytes(result['bytes_received'])}`
 Download: `{humanbytes(result['download'] / 8)}/s`
 Upload: `{humanbytes(result['upload'] / 8)}/s`**"""
-    msg = await message.client.send_photo(chat_id=message.chat.id,
-                                          photo=result['share'],
-                                          caption=output)
+    if result['share']:
+        msg = await message.client.send_photo(chat_id=message.chat.id,
+                                              photo=result['share'],
+                                              caption=output)
+    else:
+        msg = await message.client.send_message(chat_id=message.chat.id, text=output)
     await CHANNEL.fwd_msg(msg)
     await message.delete()
