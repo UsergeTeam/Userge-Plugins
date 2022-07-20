@@ -11,7 +11,8 @@
 import json
 import os
 from urllib.parse import urlparse
-
+import urllib.request
+from apiclient.discovery import build
 import requests
 from pyrogram import filters
 from pyrogram.types import (
@@ -28,7 +29,9 @@ from userge import userge, Message, config, pool
 from .. import imdb
 
 THUMB_PATH = config.Dynamic.DOWN_PATH + "imdb_thumb.jpg"
-
+TMDB_KEY = "5dae31e75ff0f7a0befc272d5deadd73"
+api_key = "AIzaSyA3VaZAgxEaGOc0kZJ_Cc40thm4Nha3o_M"
+youtube = build('youtube','v3',developerKey = api_key)
 
 @userge.on_cmd("imdb", about={
     'header': "Scrap Movies & Tv Shows from IMDB",
@@ -46,17 +49,26 @@ async def _imdb(message: Message):
     try:
         movie_name = message.input_str
         await message.edit(f"__searching IMDB for__ : `{movie_name}`")
-        response = await _get(imdb.API_ONE_URL.format(theuserge=movie_name))
+        response = await _get("https://betterimdbot.herokuapp.com/search.php?_="+movie_name)
         srch_results = json.loads(response.text)
         mov_imdb_id = srch_results.get("d")[0].get("id")
         image_link, description = await get_movie_description(
             mov_imdb_id, config.MAX_MESSAGE_LENGTH
         )
     except (IndexError, json.JSONDecodeError, AttributeError):
-        await message.edit("Bruh, Plox enter **Valid movie name** kthx")
+        mov_imdb_id = srch_results.get("d")[1].get("id")
+        image_link, description = await get_movie_description(
+            mov_imdb_id, config.MAX_MESSAGE_LENGTH
+        )
+    except (IndexError, json.JSONDecodeError, AttributeError):
+        await message.edit("check spelling or movie not available on imdb")
         return
 
     if os.path.exists(THUMB_PATH):
+        os.remove(THUMB_PATH)
+        fb = open(THUMB_PATH,'wb')
+        fb.write(urllib.request.urlopen(image_link.replace("_V1_", "_V1_UX720")).read())
+        fb.close()
         await message.client.send_photo(
             chat_id=message.chat.id,
             photo=THUMB_PATH,
@@ -65,9 +77,12 @@ async def _imdb(message: Message):
         )
         await message.delete()
     elif image_link is not None:
+        fb = open(THUMB_PATH,'wb')
+        fb.write(urllib.request.urlopen(image_link.replace("_V1_", "_V1_UX720")).read())
+        fb.close()
         await message.client.send_photo(
             chat_id=message.chat.id,
-            photo=image_link.replace("_V1_", "_V1_UX720"),
+            photo=THUMB_PATH,
             caption=description,
             parse_mode=enums.ParseMode.HTML
         )
@@ -79,11 +94,24 @@ async def _imdb(message: Message):
             parse_mode=enums.ParseMode.HTML
         )
 
-
 async def get_movie_description(imdb_id, max_length):
-    response = await _get(imdb.API_TWO_URL.format(imdbttid=imdb_id))
+    response = await _get("https://i-m-d-b.herokuapp.com/?tt="+imdb_id)
     soup = json.loads(response.text)
-
+    response2 = await _get("http://api.themoviedb.org/3/movie/"+imdb_id+"/videos?api_key="+TMDB_KEY)
+    soup2 = json.loads(response2.text)
+    try: 
+        yt_code = soup2.get("results")[0].get("key")
+        yt_link = f"https://m.youtube.com/watch?v={yt_code}"
+    except (IndexError, json.JSONDecodeError, AttributeError, TypeError):
+        if soup.get("trailer_vid_id") == None:
+            YT_NAME = soup.get('title') + " trailer hindi"
+            request = youtube.search().list(q=YT_NAME,part='snippet',type='video',maxResults=1)
+            YTFIND = request.execute()
+            YTID = YTFIND['items'][0]["id"]["videoId"]
+            yt_link = f"https://m.youtube.com/watch?v={YTID}"
+        else:
+            yt_code = soup.get("trailer_vid_id")
+            yt_link = f"https://m.imdb.com/video/{yt_code}" 
     mov_link = f"https://www.imdb.com/title/{imdb_id}"
     mov_name = soup.get('title')
     image_link = soup.get('poster')
@@ -113,10 +141,10 @@ async def get_movie_description(imdb_id, max_length):
   <b>Director📽: </b><code>{director}</code>
   <b>Writer📄: </b><code>{writer}</code>
   <b>Stars🎭: </b><code>{stars}</code>
-
-<b>IMDB URL Link🔗: </b>{mov_link}
-
-<b>Story Line : </b><em>{story_line}</em>"""
+<b>IMDB :</b> https://www.imdb.com/title/{imdb_id}
+<b>YOUTUBE TRAILER 🎦 : </b> {yt_link}
+<b>Story Line : </b><em>{story_line}</em>
+<b>Available On : 👇👇👇👇 </b>"""
 
     povas = await search_jw(mov_name, imdb.WATCH_COUNTRY)
     if len(description + povas) > max_length:
@@ -180,8 +208,8 @@ def get_credits_text(soup):
 def _get(url: str, attempts: int = 0) -> requests.Response:
     while True:
         abc = requests.get(url)
-        if attempts > 5:
-            raise IndexError
+        if attempts > 10:
+            return abc
         if abc.status_code == 200:
             break
         attempts += 1
@@ -274,12 +302,7 @@ if userge.has_bot:
 
 async def search_jw(movie_name: str, locale: str):
     m_t_ = ""
-    if not imdb.API_THREE_URL:
-        return m_t_
-    response = await _get(imdb.API_THREE_URL.format(
-        q=movie_name,
-        L=locale
-    ))
+    response = await _get("https://justwatch.imdbot.workers.dev/?q="+movie_name+"&L="+locale)
     soup = json.loads(response.text)
     items = soup["items"]
     for item in items:
