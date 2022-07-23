@@ -113,11 +113,11 @@ async def stats(message: Message):
                 a_chat += 1
         elif dialog.chat.type == enums.ChatType.CHANNEL:
             c += 1
-    await message.edit('''
-`You have __{}__ Private Messages.`
-`You are in __{}__ Groups.`
-`You are in __{}__ Super Groups.`
-`You Are in __{}__ Channels.`
-`You Are Admin in __{}__ Chats.`
-`Bots Started = __{}__`
-'''.format(u, g, sg, c, a_chat, b))
+    await message.edit(f'''
+You have `{u}` Private Messages.
+You are in `{g}` Groups.
+You are in `{sg}` Super Groups.
+You Are in `{c}` Channels.
+You Are Admin in `{a_chat}` Chats.
+Bots Started = `{b}`
+''')
