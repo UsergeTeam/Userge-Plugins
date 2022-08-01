@@ -21,7 +21,7 @@ from userge import userge, Message
     'usage': "just reply to any user message or add user_id or username",
     'examples': "{tr}whois [user_id | username]"}, allow_channels=False)
 async def who_is(message: Message):
-    await message.edit("`Collecting Whois Info.. Hang on!`")
+    await message.edit("`Mengambil informasi dari Durov...!`")
     user_id = message.input_str
     if user_id:
         try:
@@ -34,30 +34,30 @@ async def who_is(message: Message):
         from_user = await message.client.get_users(message.reply_to_message.from_user.id)
         from_chat = await message.client.get_chat(message.reply_to_message.from_user.id)
     else:
-        await message.err("no valid user_id or message specified")
+        await message.err("id tidak valid atau pesan yang ditentukan")
         return
     if from_user or from_chat is not None:
         pp_c = await message.client.get_chat_photos_count(from_user.id)
         message_out_str = "<b>USER INFO:</b>\n\n"
-        message_out_str += f"<b>🗣 First Name:</b> <code>{from_user.first_name}</code>\n"
-        message_out_str += f"<b>🗣 Last Name:</b> <code>{from_user.last_name}</code>\n"
+        message_out_str += f"<b>🗣 Nama depan:</b> <code>{from_user.first_name}</code>\n"
+        message_out_str += f"<b>🗣 Nama akhir:</b> <code>{from_user.last_name}</code>\n"
         message_out_str += f"<b>👤 Username:</b> @{from_user.username}\n"
         message_out_str += f"<b>🏢 DC ID:</b> <code>{from_user.dc_id}</code>\n"
-        message_out_str += f"<b>🤖 Is Bot:</b> <code>{from_user.is_bot}</code>\n"
-        message_out_str += f"<b>🚫 Is Restricted:</b> <code>{from_user.is_scam}</code>\n"
-        message_out_str += "<b>✅ Is Verified by Telegram:</b> "
+        message_out_str += f"<b>🤖 Apakah bot:</b> <code>{from_user.is_bot}</code>\n"
+        message_out_str += f"<b>🚫 Apakah Dibatasi:</b> <code>{from_user.is_scam}</code>\n"
+        message_out_str += "<b>✅ Diverifikasi oleh Telegram:</b> "
         message_out_str += f"<code>{from_user.is_verified}</code>\n"
-        message_out_str += f"<b>🕵️‍♂️ User ID:</b> <code>{from_user.id}</code>\n"
-        message_out_str += f"<b>🖼 Profile Photos:</b> <code>{pp_c}</code>\n"
+        message_out_str += f"<b>🕵️‍♂️ ID pengguna:</b> <code>{from_user.id}</code>\n"
+        message_out_str += f"<b>🖼 Foto Profil:</b> <code>{pp_c}</code>\n"
         try:
             cc_no = len(await message.client.get_common_chats(from_user.id))
         except BotMethodInvalid:
             pass
         else:
-            message_out_str += f"<b>👥 Common Chats:</b> <code>{cc_no}</code>\n"
+            message_out_str += f"<b>👥 Obrolan Umum:</b> <code>{cc_no}</code>\n"
         message_out_str += f"<b>📝 Bio:</b> <code>{from_chat.bio}</code>\n\n"
-        message_out_str += f"<b>👁 Last Seen:</b> <code>{from_user.status}</code>\n"
-        message_out_str += "<b>🔗 Permanent Link To Profile:</b> "
+        message_out_str += f"<b>👁 Terakhir terlihat:</b> <code>{from_user.status}</code>\n"
+        message_out_str += "<b>🔗 Tautan Permanen Ke Profil:</b> "
         message_out_str += f"<a href='tg://user?id={from_user.id}'>{from_user.first_name}</a>"
 
         s_perm = True
