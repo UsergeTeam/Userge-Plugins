@@ -52,10 +52,10 @@ async def _init() -> None:
 
 
 @userge.on_cmd("afk", about={
-    'header': "Set to AFK mode",
-    'description': "Sets your status as AFK. Responds to anyone who tags/PM's.\n"
-                   "you telling you are AFK. Switches off AFK when you type back anything.",
-    'usage': "{tr}afk or {tr}afk [reason]"}, allow_channels=False)
+    'header': "Setel ke mode AFK",
+    'description': "Tetapkan status Anda sebagai AFK. Merespon siapa saja yang menandai/PM.\n"
+                   "kamu bilang kamu AFK. Mematikan AFK saat Anda mengetik kembali apa pun.",
+    'usage': "{tr}afk atau {tr}afk [alasan]"}, allow_channels=False)
 async def active_afk(message: Message) -> None:
     """ turn on or off afk mode """
     global REASON, IS_AFK, TIME  # pylint: disable=global-statement
@@ -94,8 +94,8 @@ async def handle_afk_incomming(message: Message) -> None:
             USERS[user_id][1] += 1
     else:
         if REASON:
-            out_str = (f"I'm **AFK** right now.\nReason: <code>{REASON}</code>\n"
-                       f"Last Seen: `{afk_time} ago`")
+            out_str = (f"Aku sedang **AFK**.\nAlasan: <code>{REASON}</code>\n"
+                       f"Terakhir terlihat: `{afk_time} yang lalu`")
         else:
             out_str = choice(AFK_REASONS)
         coro_list.append(message.reply(out_str))
@@ -105,12 +105,12 @@ async def handle_afk_incomming(message: Message) -> None:
             USERS[user_id] = [0, 1, user_dict['mention']]
     if chat.type == enums.ChatType.PRIVATE:
         coro_list.append(CHANNEL.log(
-            f"#PRIVATE\n{user_dict['mention']} send you\n\n"
+            f"#PRIVATE\n{user_dict['mention']} mengirimkan\n\n"
             f"{message.text}"))
     else:
         coro_list.append(CHANNEL.log(
             "#GROUP\n"
-            f"{user_dict['mention']} tagged you in [{chat.title}](https://t.me/{chat.username})\n\n"
+            f"{user_dict['mention']} menandai kamu di [{chat.title}](https://t.me/{chat.username})\n\n"
             f"{message.text}\n\n"
             f"[goto_msg](https://t.me/c/{str(chat.id)[4:]}/{message.id})"))
     coro_list.append(AFK_COLLECTION.update_one({'_id': user_id},
