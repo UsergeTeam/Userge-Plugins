@@ -47,18 +47,18 @@ async def _iter_whitelist() -> AsyncGenerator[Tuple[int, str], None]:
 
 
 @userge.on_cmd("gban", about={
-    'header': "Globally Ban A User",
-    'description': "Adds User to your GBan List. "
-                   "Bans a Globally Banned user if they join or message. "
-                   "[NOTE: Works only in groups where you are admin.]",
-    'examples': "{tr}gban [userid | reply] [reason for gban] (mandatory)"},
+    'header': "Global Ban Pengguna",
+    'description': "Menambahkan Pengguna ke Daftar GBan Anda. "
+                   "Banned pengguna yang Dicekal Secara Global jika mereka bergabung atau mengirim pesan. "
+                   "[CATATAN: Hanya berfungsi di grup tempat Anda menjadi admin.]",
+    'examples': "{tr}gban [id user | balas pesan] [alasan di gban] (mandatory)"},
     allow_channels=False, allow_bots=False)
 async def gban_user(message: Message):
-    """ ban a user globally """
-    await message.edit("`GBanning...`")
+    """ ban pengguna secara global """
+    await message.edit("`Proses Gban...`")
     user_id, reason = message.extract_user_and_text
     if not user_id:
-        await message.err("no valid user_id or message specified")
+        await message.err("user_id tidak valid atau pesan yang ditentukan")
         return
     get_mem = await message.client.get_user_dict(user_id)
     firstname = get_mem['fname']
@@ -69,22 +69,22 @@ async def gban_user(message: Message):
         return
     user_id = get_mem['id']
     if user_id == message.client.id:
-        await message.edit(r"LoL. Why would I GBan myself ¯\(°_o)/¯")
+        await message.edit(r"Blok. Ngapain gban gw sendiri ¯\(°_o)/¯")
         return
     if user_id in sudo.USERS:
         await message.edit(
-            "That user is in my Sudo List, Hence I can't ban him.\n\n"
-            "**Tip:** Remove them from Sudo List and try again. (¬_¬)", del_in=5)
+            "Pengguna itu ada di daftar sudo, Aku tidak bisa ban dia.\n\n"
+            "**Tips:** Hapus dia dari Daftar Sudo dan coba lagi. (¬_¬)", del_in=5)
         return
     found = await GBAN_USER_BASE.find_one({'user_id': user_id})
     if found:
         await message.edit(
-            "**#Already_GBanned**\n\nUser Already Exists in My Gban List.\n"
-            f"**Reason For GBan:** `{found['reason']}`", del_in=5)
+            "**#Already_GBanned**\n\nPengguna sudah ada di daftar GBan saya.\n"
+            f"**Alasan GBan:** `{found['reason']}`", del_in=5)
         return
     await message.edit(r"\\**#GBanned_User**//"
-                       f"\n\n**First Name:** [{firstname}](tg://user?id={user_id})\n"
-                       f"**User ID:** `{user_id}`\n**Reason:** `{reason}`")
+                       f"\n\n**Nama depan:** [{firstname}](tg://user?id={user_id})\n"
+                       f"**ID pengguna:** `{user_id}`\n**Alasan:** `{reason}`")
     # TODO: can we add something like "GBanned by {any_sudo_user_fname}"
     if message.client.is_bot:
         chats = [message.chat]
@@ -97,11 +97,11 @@ async def gban_user(message: Message):
             gbanned_chats.append(chat.id)
             await CHANNEL.log(
                 r"\\**#Antispam_Log**//"
-                f"\n**User:** [{firstname}](tg://user?id={user_id})\n"
-                f"**User ID:** `{user_id}`\n"
-                f"**Chat:** {chat.title}\n"
-                f"**Chat ID:** `{chat.id}`\n"
-                f"**Reason:** `{reason}`\n\n$GBAN #id{user_id}")
+                f"\n**Pengguna:** [{firstname}](tg://user?id={user_id})\n"
+                f"**ID pengguna:** `{user_id}`\n"
+                f"**Obrolan:** {chat.title}\n"
+                f"**ID Obrolan:** `{chat.id}`\n"
+                f"**Alasan:** `{reason}`\n\n$GBAN #id{user_id}")
         except (ChatAdminRequired, UserAdminInvalid, ChannelInvalid):
             pass
     await GBAN_USER_BASE.insert_one({'firstname': firstname,
@@ -132,23 +132,23 @@ async def gban_user(message: Message):
 
 
 @userge.on_cmd("ungban", about={
-    'header': "Globally Unban an User",
-    'description': "Removes an user from your Gban List",
-    'examples': "{tr}ungban [userid | reply]"},
+    'header': "Lepas ban global pengguna",
+    'description': "Menghapus pengguna dari Daftar Gban Anda",
+    'examples': "{tr}ungban [id pengguna | balas pesan]"},
     allow_channels=False, allow_bots=False)
 async def ungban_user(message: Message):
-    """ unban a user globally """
+    """ unban global pengguna """
     await message.edit("`UnGBanning...`")
     user_id, _ = message.extract_user_and_text
     if not user_id:
-        await message.err("user-id not found")
+        await message.err("user-id tidak ditemukan")
         return
     get_mem = await message.client.get_user_dict(user_id)
     firstname = get_mem['fname']
     user_id = get_mem['id']
     found = await GBAN_USER_BASE.find_one({'user_id': user_id})
     if not found:
-        await message.edit("`User Not Found in My Gban List`", del_in=5)
+        await message.edit("`Pengguna Tidak Ditemukan di Daftar Gban Saya`", del_in=5)
         return
     if 'chat_ids' in found:
         for chat_id in found['chat_ids']:
@@ -156,14 +156,14 @@ async def ungban_user(message: Message):
                 await userge.unban_chat_member(chat_id, user_id)
                 await CHANNEL.log(
                     r"\\**#Antispam_Log**//"
-                    f"\n**User:** [{firstname}](tg://user?id={user_id})\n"
-                    f"**User ID:** `{user_id}`\n\n"
+                    f"\n**Pengguna:** [{firstname}](tg://user?id={user_id})\n"
+                    f"**ID pengguna:** `{user_id}`\n\n"
                     f"$UNGBAN #id{user_id}")
             except (ChatAdminRequired, UserAdminInvalid, ChannelInvalid):
                 pass
     await message.edit(r"\\**#UnGbanned_User**//"
-                       f"\n\n**First Name:** [{firstname}](tg://user?id={user_id})\n"
-                       f"**User ID:** `{user_id}`")
+                       f"\n\n**Nama depan:** [{firstname}](tg://user?id={user_id})\n"
+                       f"**ID pengguna:** `{user_id}`")
     await GBAN_USER_BASE.delete_one({'firstname': firstname, 'user_id': user_id})
     if gban.FBAN_CHAT_ID and not message.client.is_bot:
         mention = None  # to avoid peer id invalid
@@ -184,99 +184,99 @@ async def ungban_user(message: Message):
 
 
 @userge.on_cmd("glist", about={
-    'header': "Get a List of Gbanned Users",
-    'description': "Get Up-to-date list of users Gbanned by you.",
-    'examples': "Lol. Just type {tr}glist"},
+    'header': "Dapatkan Daftar Pengguna yang Di-GBan",
+    'description': "Dapatkan daftar pengguna terbaru yang diblokir oleh Anda.",
+    'examples': "Blok. Hanya ketik {tr}glist"},
     allow_channels=False)
 async def list_gbanned(message: Message):
     """ vies gbanned users """
     msg = ''
     async for c in GBAN_USER_BASE.find():
-        msg += ("**User** : " + str(c['firstname']) + "-> **ID** : "
-                + str(c['user_id']) + " is **GBanned for** : " + str(c.get('reason')) + "\n\n")
+        msg += ("**Pengguna** : " + str(c['firstname']) + "-> **ID** : "
+                + str(c['user_id']) + " is **GBan karena** : " + str(c.get('reason')) + "\n\n")
     await message.edit_or_send_as_file(
-        f"**--Globally Banned Users List--**\n\n{msg}" if msg else "`glist empty!`")
+        f"**--Daftar Pengguna yang Di-GBan Secara Global--**\n\n{msg}" if msg else "`glist kosong!`")
 
 
 @userge.on_cmd("whitelist", about={
-    'header': "Whitelist a User",
-    'description': "Use whitelist to add users to bypass API Bans",
-    'usage': "{tr}whitelist [userid | reply to user]",
+    'header': "Daftar Putih Pengguna",
+    'description': "Gunakan daftar putih untuk menambahkan pengguna untuk melewati banned",
+    'usage': "{tr}whitelist [id user | balas pesan pengguna]",
     'examples': "{tr}whitelist 5231147869"},
     allow_channels=False, allow_bots=False)
 async def whitelist(message: Message):
-    """ add user to whitelist """
+    """ tambahkan pengguna ke daftar putih """
     user_id, _ = message.extract_user_and_text
     if not user_id:
-        await message.err("user-id not found")
+        await message.err("user-id tidak ditemukan")
         return
     get_mem = await message.client.get_user_dict(user_id)
     firstname = get_mem['fname']
     user_id = int(get_mem['id'])
     found = await gban.is_whitelist(user_id)
     if found:
-        await message.edit("`User Already in My WhiteList`", del_in=5)
+        await message.edit("`Pengguna Sudah di Daftar Putih Saya`", del_in=5)
         return
     await asyncio.gather(
         _add_whitelist(firstname, user_id),
         message.edit(
             r"\\**#Whitelisted_User**//"
-            f"\n\n**First Name:** [{firstname}](tg://user?id={user_id})\n"
-            f"**User ID:** `{user_id}`"),
+            f"\n\n**Nama depan:** [{firstname}](tg://user?id={user_id})\n"
+            f"**ID pengguna:** `{user_id}`"),
         CHANNEL.log(
             r"\\**#Antispam_Log**//"
-            f"\n**User:** [{firstname}](tg://user?id={user_id})\n"
-            f"**User ID:** `{user_id}`\n"
+            f"\n**Pengguna:** [{firstname}](tg://user?id={user_id})\n"
+            f"**ID pengguna:** `{user_id}`\n"
             f"**Chat:** {message.chat.title}\n"
-            f"**Chat ID:** `{message.chat.id}`\n\n$WHITELISTED #id{user_id}")
+            f"**ID obrolan:** `{message.chat.id}`\n\n$WHITELISTED #id{user_id}")
     )
     LOG.info("WhiteListed %s", str(user_id))
 
 
 @userge.on_cmd("rmwhite", about={
-    'header': "Removes a User from Whitelist",
-    'description': "Use it to remove users from WhiteList",
-    'useage': "{tr}rmwhite [userid | reply to user]",
+    'header': "Menghapus Pengguna dari Daftar Putih",
+    'description': "Gunakan untuk menghapus pengguna dari Daftar Putih",
+    'useage': "{tr}rmwhite [id pengguna | balas pesan pengguna]",
     'examples': "{tr}rmwhite 5231147869"},
     allow_channels=False, allow_bots=False)
 async def rmwhitelist(message: Message):
-    """ remove a user from whitelist """
+    """ hapus pengguna dari daftar putih """
     user_id, _ = message.extract_user_and_text
     if not user_id:
-        await message.err("user-id not found")
+        await message.err("user-id tidak ditemukan")
         return
     get_mem = await message.client.get_user_dict(user_id)
     firstname = get_mem['fname']
     user_id = int(get_mem['id'])
     found = await gban.is_whitelist(user_id)
     if not found:
-        await message.edit("`User Not Found in My WhiteList`", del_in=5)
+        await message.edit("`Pengguna Tidak Ditemukan di Daftar Putih Saya`", del_in=5)
         return
     await asyncio.gather(
         _remove_whitelist(user_id),
         message.edit(
             r"\\**#Removed_Whitelisted_User**//"
-            f"\n\n**First Name:** [{firstname}](tg://user?id={user_id})\n"
-            f"**User ID:** `{user_id}`"),
+            f"\n\n**Nama depan:** [{firstname}](tg://user?id={user_id})\n"
+            f"**ID pengguna:** `{user_id}`"),
         CHANNEL.log(
             r"\\**#Antispam_Log**//"
-            f"\n**User:** [{firstname}](tg://user?id={user_id})\n"
-            f"**User ID:** `{user_id}`\n"
-            f"**Chat:** {message.chat.title}\n"
-            f"**Chat ID:** `{message.chat.id}`\n\n$RMWHITELISTED #id{user_id}")
+            f"\n**Pengguna:** [{firstname}](tg://user?id={user_id})\n"
+            f"**ID pengguna:** `{user_id}`\n"
+            f"**Obrolan:** {message.chat.title}\n"
+            f"**ID Obrolan:** `{message.chat.id}`\n\n$RMWHITELISTED #id{user_id}")
     )
     LOG.info("WhiteListed %s", str(user_id))
 
 
 @userge.on_cmd("listwhite", about={
-    'header': "Get a List of Whitelisted Users",
-    'description': "Get Up-to-date list of users WhiteListed by you.",
-    'examples': "Lol. Just type {tr}listwhite"},
+    'header': "Dapatkan Daftar Pengguna yang Masuk Daftar Putih",
+    'description': "Dapatkan daftar pengguna terbaru yang masuk Daftar Putih oleh Anda.",
+    'examples': "Blok. Hanya ketik {tr}listwhite"},
     allow_channels=False)
 async def list_white(message: Message):
     """ list whitelist """
     msg = ''
     async for user_id, firstname in _iter_whitelist():
-        msg += f"**User** : {firstname} -> **ID** : {user_id}\n"
+        msg += f"**Pengguna** : {firstname} -> **ID** : {user_id}\n"
     await message.edit_or_send_as_file(
-        f"**--Whitelisted Users List--**\n\n{msg}" if msg else "`whitelist empty!`")
+        f"**--Daftar Pengguna yang Masuk Daftar Putih--**\n\n{msg}" if msg else "`daftar putih kosong!`")
