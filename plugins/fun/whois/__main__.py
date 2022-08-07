@@ -47,6 +47,7 @@ async def who_is(message: Message):
         message_out_str += f"<b>🚫 Is Restricted:</b> <code>{from_user.is_scam}</code>\n"
         message_out_str += "<b>✅ Is Verified by Telegram:</b> "
         message_out_str += f"<code>{from_user.is_verified}</code>\n"
+        message_out_str += f"<b>⭐ Is Premium:</b> <code>{from_user.is_premium}</code>\n"
         message_out_str += f"<b>🕵️‍♂️ User ID:</b> <code>{from_user.id}</code>\n"
         message_out_str += f"<b>🖼 Profile Photos:</b> <code>{pp_c}</code>\n"
         try:
