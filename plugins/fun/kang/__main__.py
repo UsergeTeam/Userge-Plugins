@@ -15,7 +15,7 @@ from PIL import Image
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from pyrogram import emoji as pyro_emojis
-from pyrogram.errors import YouBlockedUser, StickersetInvalid
+from pyrogram.errors import StickersetInvalid
 from pyrogram.raw.functions.stickers import CreateStickerSet, AddStickerToSet
 from pyrogram.raw.functions.messages import GetStickerSet, UploadMedia
 from pyrogram.raw.types import (
@@ -152,10 +152,10 @@ async def kang_(message: Message):
             break
 
     if exist is not False:
-        sts = await add_sticker(message, packname, media, emoji_)
+        sts = await add_sticker(packname, media, emoji_)
     else:
         st_type = "anim" if is_anim else "vid" if is_video else "static"
-        sts = await create_pack(message, packnick, packname, media, emoji_, st_type)
+        sts = await create_pack(packnick, packname, media, emoji_, st_type)
 
     if '-d' in message.flags:
         pass
@@ -234,7 +234,6 @@ async def resize_media(media: str, video: bool) -> str:
 
 
 async def create_pack(
-        message: Message,
         pack_name: str,
         short_name: str,
         sticker: str,
@@ -267,7 +266,7 @@ async def create_pack(
     return True
 
 
-async def add_sticker(message: Message, short_name: str, sticker: str, emoji: str) -> bool:
+async def add_sticker(short_name: str, sticker: str, emoji: str) -> bool:
     media = (await userge.invoke(UploadMedia(
         peer=await userge.resolve_peer('stickers'),
         media=InputMediaUploadedDocument(
