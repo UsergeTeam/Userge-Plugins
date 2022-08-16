@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/UsergeTeam/Userge-Plugins.svg?branch=master)](https://travis-ci.com/UsergeTeam/Userge-Plugins) ![Python Version](https://img.shields.io/badge/python-3.8-lightgrey) ![Release](https://img.shields.io/github/v/release/UsergeTeam/Userge) ![Stars](https://img.shields.io/github/stars/UsergeTeam/Userge-Plugins) ![Forks](https://img.shields.io/github/forks/UsergeTeam/Userge-Plugins) ![Issues Open](https://img.shields.io/github/issues/UsergeTeam/Userge-Plugins) ![Issues Closed](https://img.shields.io/github/issues-closed/UsergeTeam/Userge-Plugins) ![PR Open](https://img.shields.io/github/issues-pr/UsergeTeam/Userge-Plugins) ![PR Closed](https://img.shields.io/github/issues-pr-closed/UsergeTeam/Userge-Plugins) ![Contributors](https://img.shields.io/github/contributors/UsergeTeam/Userge-Plugins) ![Repo Size](https://img.shields.io/github/repo-size/UsergeTeam/Userge-Plugins) ![License](https://img.shields.io/github/license/UsergeTeam/Userge-Plugins) ![Commit Activity](https://img.shields.io/github/commit-activity/m/UsergeTeam/Userge-Plugins) [![Main Repo!](https://img.shields.io/badge/Main%20Repo-!-orange)](https://github.com/UsergeTeam/Userge) [![Join Channel!](https://img.shields.io/badge/Join%20Channel-!-red)](https://t.me/theUserge) [![DeepSource](https://static.deepsource.io/deepsource-badge-light-mini.svg)](https://deepsource.io/gh/UsergeTeam/Userge-Plugins/?ref=repository-badge)
 
-## [Documentation](http://theuserge.tech) 📘
+## [Documentation](https://userge.tech) 📘
 
 ## [Main Repo](https://github.com/UsergeTeam/Userge) 💡
 
