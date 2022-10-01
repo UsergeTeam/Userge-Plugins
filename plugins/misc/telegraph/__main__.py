@@ -12,7 +12,10 @@ import aiofiles
 from PIL import Image
 from aiofiles import os
 from telegraph import upload_file, Telegraph
-from ..telegraph import TE_LEGRA_PH_DOMA_IN
+from ..telegraph import (
+    TE_LEGRA_PH_DOMA_IN,
+    TE_LEGRA_PH_ACCESS_TOKEN
+)
 from userge import userge, Message, config, pool
 from userge.utils import progress
 
@@ -68,7 +71,27 @@ async def telegraph_(message: Message):
             else:
                 text = content
                 header = "Pasted content by @theuserge"
-        t_url = await pool.run_in_thread(post_to_telegraph)(header, text.replace("\n", "<br>"))
+        at = None
+        if TE_LEGRA_PH_ACCESS_TOKEN != 0:
+            at = (
+                await message.client.get_messages(
+                    config.LOG_CHANNEL_ID,
+                    TE_LEGRA_PH_ACCESS_TOKEN
+                )
+            ).text
+        else:
+            at = await pool.run_in_thread(pcreate_access_token)(header)
+            TE_LEGRA_PH_ACCESS_TOKEN = (
+                await message.client.send_message(
+                    config.LOG_CHANNEL_ID,
+                    at
+                )
+            ).id
+        t_url = await pool.run_in_thread(post_to_telegraph)(
+            access_token,
+            header,
+            text.replace("\n", "<br>")
+        )
         jv_text = f"**[Here Your Telegra.ph Link!]({t_url})**"
         await message.edit(text=jv_text, disable_web_page_preview=True)
         return
@@ -94,17 +117,25 @@ async def telegraph_(message: Message):
         await os.remove(dl_loc)
 
 
-def post_to_telegraph(a_title: str, content: str) -> str:
+def post_to_telegraph(at: str, a_title: str, content: str) -> str:
     """ Create a Telegram Post using HTML Content """
     telegraph = Telegraph()
-    auth_name = "@TheUserge"
-    telegraph.create_account(
-        short_name=a_title,
-        author_name=auth_name,
-        author_url="https://telegram.me/theUserge",
+    telegraph = Telegraph(
+        access_token=at
     )
     response = telegraph.create_page(
         a_title,
         html_content=content
     )
     return TE_LEGRA_PH_DOMA_IN + response['path']
+
+
+def create_access_token(a_title: str) -> str:
+    telegraph = Telegraph()
+    auth_name = "@TheUserge"
+    resp = telegraph.create_account(
+        short_name=a_title,
+        author_name=auth_name,
+        author_url="https://telegram.me/theUserge",
+    )
+    return resp["access_token"]

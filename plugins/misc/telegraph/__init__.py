@@ -14,3 +14,9 @@ TE_LEGRA_PH_DOMA_IN = os.environ.get(
     "TE_LEGRA_PH_DOMA_IN",
     "https://te.legra.ph"
 )
+TE_LEGRA_PH_ACCESS_TOKEN = int(
+    os.environ.get(
+        "TE_LEGRA_PH_ACCESS_TOKEN",
+        "0"
+    )
+)
