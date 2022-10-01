@@ -11,9 +11,8 @@
 import aiofiles
 from PIL import Image
 from aiofiles import os
-from html_telegraph_poster import TelegraphPoster
-from telegraph import upload_file
-
+from telegraph import upload_file, Telegraph
+from ..telegraph import TE_LEGRA_PH_DOMA_IN
 from userge import userge, Message, config, pool
 from userge.utils import progress
 
@@ -90,20 +89,22 @@ async def telegraph_(message: Message):
     except Exception as t_e:
         await message.err(str(t_e))
     else:
-        await message.edit(f"**[Here Your Telegra.ph Link!](https://telegra.ph{response[0]})**")
+        await message.edit(f"**[Here Your Telegra.ph Link!]({TE_LEGRA_PH_DOMA_IN}{response[0]})**")
     finally:
         await os.remove(dl_loc)
 
 
 def post_to_telegraph(a_title: str, content: str) -> str:
     """ Create a Telegram Post using HTML Content """
-    post_client = TelegraphPoster(use_api=True)
+    telegraph = Telegraph()
     auth_name = "@TheUserge"
-    post_client.create_api_token(auth_name)
-    post_page = post_client.post(
-        title=a_title,
-        author=auth_name,
+    post_client = telegraph.create_account(
+        short_name=a_title,
+        author_name=auth_name,
         author_url="https://telegram.me/theUserge",
-        text=content
     )
-    return post_page['url']
+    response = telegraph.create_page(
+        title_of_page,
+        html_content=content
+    )
+    return TE_LEGRA_PH_DOMA_IN + response['path']

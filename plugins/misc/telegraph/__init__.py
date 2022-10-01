@@ -7,3 +7,10 @@
 # All rights reserved.
 
 """ telegraph uploader """
+
+import os
+
+TE_LEGRA_PH_DOMA_IN = os.environ.get(
+    "TE_LEGRA_PH_DOMA_IN",
+    "https://te.legra.ph"
+)
