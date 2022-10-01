@@ -18,7 +18,7 @@ from userge.utils import progress
 
 
 @userge.on_cmd("web ?(.+?|) (anonfiles|transfer|filebin|anonymousfiles"
-               "|megaupload|bayfiles|vshare|0x0|fileio|ninja|infura|bashupload|cat)",
+               "|megaupload|bayfiles|vshare|0x0|fileio|ninja|infura|bashupload|cat|litter)",
                about={
                    'header': "upload files to web",
                    'usage': "{tr}web [file path | reply to media] [site name]",
@@ -26,7 +26,7 @@ from userge.utils import progress
                    'types': [
                        'anonfiles', 'transfer', 'filebin', 'anonymousfiles',
                        'megaupload', 'bayfiles', 'vshare', '0x0', 'fileio',
-                       'ninja', 'infura', 'bashupload', 'cat']})
+                       'ninja', 'infura', 'bashupload', 'cat', 'litter']})
 async def web(message: Message):
     await message.edit("`Processing ...`")
     input_str = message.matches[0].group(1)
@@ -58,6 +58,7 @@ async def web(message: Message):
         "fileio": "curl -F \"file =@{}\" https://file.io",
         "ninja": "curl -i -F file=@{} https://tmp.ninja/api.php?d=upload-tool",
         "cat": "curl -F reqtype=fileupload -F \"fileToUpload=@{}\" https://catbox.moe/user/api.php",
+        "litter": "curl -F reqtype=fileupload -F time=24h -F \"fileToUpload=@{}\" https://litterbox.catbox.moe/resources/internals/api.php",
         "infura": "curl -X POST -F file=@'{}' \"https://ipfs.infura.io:5001/api/v0/add?pin=true\""
     }
 
