@@ -80,15 +80,13 @@ async def telegraph_(message: Message):
                 )
             ).text
         else:
-            at = await pool.run_in_thread(pcreate_access_token)(header)
-            TE_LEGRA_PH_ACCESS_TOKEN = (
-                await message.client.send_message(
-                    config.LOG_CHANNEL_ID,
-                    at
-                )
-            ).id
+            at = await pool.run_in_thread(create_access_token)(header)
+            await message.client.send_message(
+                config.LOG_CHANNEL_ID,
+                at
+            )
         t_url = await pool.run_in_thread(post_to_telegraph)(
-            access_token,
+            at,
             header,
             text.replace("\n", "<br>")
         )
