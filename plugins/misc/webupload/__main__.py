@@ -45,21 +45,23 @@ async def web(message: Message):
             return
 
     hosts = {
-        "anonfiles": "curl -F \"file=@{}\" https://anonfiles.com/api/upload",
-        "transfer": "curl --upload-file \"{}\" https://transfer.sh/" + os.path.basename(file_name),
-        "filebin": "curl -X POST --data-binary \"@test.png\" -H \"filename"
-                   ": {}\" \"https://filebin.net\"",
-        "anonymousfiles": "curl -F file=\"@{}\" https://api.anonymousfiles.io/",
-        "megaupload": "curl -F \"file=@{}\" https://megaupload.is/api/upload",
-        "bayfiles": "curl -F \"file=@{}\" https://api.bayfiles.com/upload",
-        "vshare": "curl -F \"file=@{}\" https://api.vshare.is/upload",
-        "0x0": "curl -F \"file=@{}\" https://0x0.st",
-        "bashupload": "curl -T \"{}\" https://bashupload.com",
-        "fileio": "curl -F \"file =@{}\" https://file.io",
+        "anonfiles": 'curl -F "file=@{}" https://anonfiles.com/api/upload',
+        "transfer": 'curl --upload-file "{}" https://transfer.sh/'
+        + os.path.basename(file_name),
+        "filebin": 'curl -X POST --data-binary "@test.png" -H "filename'
+        ': {}" "https://filebin.net"',
+        "anonymousfiles": 'curl -F file="@{}" https://api.anonymousfiles.io/',
+        "megaupload": 'curl -F "file=@{}" https://megaupload.is/api/upload',
+        "bayfiles": 'curl -F "file=@{}" https://api.bayfiles.com/upload',
+        "vshare": 'curl -F "file=@{}" https://api.vshare.is/upload',
+        "0x0": 'curl -F "file=@{}" https://0x0.st',
+        "bashupload": 'curl -T "{}" https://bashupload.com',
+        "fileio": 'curl -F "file =@{}" https://file.io',
         "ninja": "curl -i -F file=@{} https://tmp.ninja/api.php?d=upload-tool",
-        "cat": "curl -F reqtype=fileupload -F \"fileToUpload=@{}\" https://catbox.moe/user/api.php",
-        "litter": "curl -F reqtype=fileupload -F time=24h -F \"fileToUpload=@{}\" https://litterbox.catbox.moe/resources/internals/api.php",
-        "infura": "curl -X POST -F file=@'{}' \"https://ipfs.infura.io:5001/api/v0/add?pin=true\""
+        "cat": 'curl -F reqtype=fileupload -F "fileToUpload=@{}" https://catbox.moe/user/api.php',
+        "litter": 'curl -F reqtype=fileupload -F time=24h -F "fileToUpload=@{}"'
+        + "https://litterbox.catbox.moe/resources/internals/api.php",
+        "infura": "curl -X POST -F file=@'{}' \"https://ipfs.infura.io:5001/api/v0/add?pin=true\"",
     }
 
     cmd = hosts[selected_transfer].format(file_name)
