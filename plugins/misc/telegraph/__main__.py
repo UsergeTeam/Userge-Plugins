@@ -98,13 +98,13 @@ def post_to_telegraph(a_title: str, content: str) -> str:
     """ Create a Telegram Post using HTML Content """
     telegraph = Telegraph()
     auth_name = "@TheUserge"
-    post_client = telegraph.create_account(
+    telegraph.create_account(
         short_name=a_title,
         author_name=auth_name,
         author_url="https://telegram.me/theUserge",
     )
     response = telegraph.create_page(
-        title_of_page,
+        a_title,
         html_content=content
     )
     return TE_LEGRA_PH_DOMA_IN + response['path']
