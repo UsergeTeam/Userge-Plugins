@@ -51,7 +51,7 @@ async def hack_func(message):
         "<pre>Uploading Data to Server... 89%\n████████████████████▒▒▒</pre>",
         "<pre>Uploaded Data to Server... 100%\n███████████████████████</pre>",
         "<b>User Data Upload Completed:</b> Target's User Data Stored "
-        "at <mono>downloads/victim/telegram-authuser.data.sql</mono>",
+        "at <code>downloads/victim/telegram-authuser.data.sql</code>",
     ]
     hecked = (
         f"<b>Targeted Account Hacked</b>\n\n<pre>Pay 69$ To</pre> {heckerman}<pre> "
