@@ -248,7 +248,7 @@ class _GDrive:
                     eta = round((f_size - uploaded) / speed)
                     tmp = \
                         "__Uploading to GDrive...__\n" + \
-                        "```[{}{}]({}%)```\n" + \
+                        "```\n[{}{}]({}%)```\n" + \
                         "**File Name** : `{}`\n" + \
                         "**File Size** : `{}`\n" + \
                         "**Uploaded** : `{}`\n" + \
@@ -345,7 +345,7 @@ class _GDrive:
                     eta = round((f_size - downloaded) / speed)
                     tmp = \
                         "__Downloading From GDrive...__\n" + \
-                        "```[{}{}]({}%)```\n" + \
+                        "```\n[{}{}]({}%)```\n" + \
                         "**File Name** : `{}`\n" + \
                         "**File Size** : `{}`\n" + \
                         "**Downloaded** : `{}`\n" + \
@@ -441,7 +441,7 @@ class _GDrive:
         percentage = (self._completed / self._list) * 100
         tmp = \
             "__Copying Files In GDrive...__\n" + \
-            "```[{}{}]({}%)```\n" + \
+            "```\n[{}{}]({}%)```\n" + \
             "**Completed** : `{}/{}`"
         self._progress = tmp.format(
             "".join((config.FINISHED_PROGRESS_STR

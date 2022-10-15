@@ -31,9 +31,9 @@ async def make_qr(message: Message):
     elif replied:
         text = input_ if input_ else replied.text
     else:
-        await message.err("```Input not found...```")
+        await message.err("```\nInput not found...```")
         return
-    await message.edit("```Creating a Qr Code...```")
+    await message.edit("```\nCreating a Qr Code...```")
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -60,16 +60,16 @@ async def get_qr(message: Message):
     """ Get Qr code data """
     replied = message.reply_to_message
     if not (replied and replied.media and (replied.photo or replied.sticker)):
-        await message.err("```reply to qr code to get data...```", del_in=5)
+        await message.err("```\nreply to qr code to get data...```", del_in=5)
         return
     if not os.path.isdir(config.Dynamic.DOWN_PATH):
         os.makedirs(config.Dynamic.DOWN_PATH)
-    await message.edit("```Downloading media to my local...```")
+    await message.edit("```\nDownloading media to my local...```")
     down_load = await message.client.download_media(
         message=replied,
         file_name=config.Dynamic.DOWN_PATH
     )
-    await message.edit("```Processing your QR Code...```")
+    await message.edit("```\nProcessing your QR Code...```")
     cmd = [
         "curl",
         "-X", "POST",
@@ -88,7 +88,7 @@ async def get_qr(message: Message):
     os.remove(down_load)
 
     if not (out_response or err_response):
-        await message.err("```Couldn't get data of this QR Code...```")
+        await message.err("```\nCouldn't get data of this QR Code...```")
         return
     try:
         soup = BeautifulSoup(out_response, "html.parser")

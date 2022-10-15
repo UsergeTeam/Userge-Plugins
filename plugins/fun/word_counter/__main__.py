@@ -20,12 +20,12 @@ from userge import userge, Message
 async def word_count(message: Message):
     """ Finds most words used """
     words = custom()
-    await message.edit("```Processed 0 messages...```")
+    await message.edit("```\nProcessed 0 messages...```")
     total = 0
     async for msg in userge.get_chat_history(message.chat.id, 1000):
         total += 1
         if total % 200 == 0:
-            await message.edit(f"```Processed {total} messages...```")
+            await message.edit(f"```\nProcessed {total} messages...```")
             await asyncio.sleep(0.5)
         if msg.text:
             for word in msg.text.split():

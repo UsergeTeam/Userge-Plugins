@@ -474,7 +474,7 @@ async def split_(message: Message) -> None:
     s_obj.split(split_size)
     tmp = \
         "__Splitting file path...__\n" + \
-        "```{}({}%)```\n" + \
+        "```\n{}({}%)```\n" + \
         "**File Path** : `{}`\n" + \
         "**Dest** : `{}`\n" + \
         "**Completed** : `{}`\n" + \
@@ -542,7 +542,7 @@ async def combine_(message: Message) -> None:
     c_obj.combine()
     tmp = \
         "__Combining file path...__\n" + \
-        "```{}({}%)```\n" + \
+        "```\n{}({}%)```\n" + \
         "**File Path** : `{}`\n" + \
         "**Dest** : `{}`\n" + \
         "**Completed** : `{}`\n" + \
@@ -617,7 +617,7 @@ async def _pack_helper(message: Message, tar: bool = False) -> None:
     p_obj.pack_path(tar)
     tmp = \
         "__Packing file path...__\n" + \
-        "```{}({}%)```\n" + \
+        "```\n{}({}%)```\n" + \
         "**File Path** : `{}`\n" + \
         "**Dest** : `{}`\n" + \
         "**Completed** : `{}/{}`"
@@ -676,7 +676,7 @@ async def unpack_(message: Message) -> None:
     p_obj.unpack_path()
     tmp = \
         "__UnPacking file path...__\n" + \
-        "```{}({}%)```\n" + \
+        "```\n{}({}%)```\n" + \
         "**File Path** : `{}`\n" + \
         "**Dest** : `{}`\n" + \
         "**Completed** : `{}/{}`"

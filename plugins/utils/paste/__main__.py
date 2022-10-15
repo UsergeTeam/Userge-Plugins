@@ -105,7 +105,7 @@ class Rentry(PasteService):
         if not token:
             return None
         if file_type:
-            text = f"```{file_type}\n" + text + "\n```"
+            text = f"```\n{file_type}\n" + text + "\n```"
         async with ses.post(self._url,
                             data=dict(csrfmiddlewaretoken=token, text=text),
                             headers=dict(Referer=self._url)) as resp:

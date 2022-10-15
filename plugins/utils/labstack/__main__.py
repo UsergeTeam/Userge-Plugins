@@ -65,7 +65,7 @@ async def labstack(message: Message):
                     estimated_total_time = downloader.get_eta(human=True)
                     progress_str = \
                         "__{}__\n" + \
-                        "```[{}{}]```\n" + \
+                        "```\n[{}{}]```\n" + \
                         "**Progress** : `{}%`\n" + \
                         "**URL** : `{}`\n" + \
                         "**FILENAME** : `{}`\n" + \
