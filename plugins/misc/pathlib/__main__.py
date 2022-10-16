@@ -247,16 +247,6 @@ class SCLib(_BaseLib):
         return int(round((self._cmp_size / self._file_size) * 100, 2))
 
     @property
-    def progress(self) -> str:
-        """ Returns progress """
-        percentage = self.percentage
-        return "[{}{}]".format(  # pylint: disable=consider-using-f-string
-            ''.join((config.FINISHED_PROGRESS_STR
-                     for _ in range(floor(percentage / 5)))),
-            ''.join((config.UNFINISHED_PROGRESS_STR
-                     for _ in range(20 - floor(percentage / 5)))))
-
-    @property
     def speed(self) -> float:
         """ Returns speed """
         return int(round(self._cmp_size / (time() - self._s_time), 2))
