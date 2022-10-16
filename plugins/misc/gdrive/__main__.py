@@ -99,7 +99,7 @@ def creds_dec(func):
                 await _refresh_creds()
             await func(self)
         else:
-            await self._message.edit("Please run `.gsetup` first", del_in=5)
+            await self._message.edit("Please run `.gsetup` first", del_in=5)  # skipcq: PYL-W0212
     return wrapper
 
 

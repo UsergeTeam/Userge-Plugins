@@ -194,7 +194,7 @@ async def fry_(message: Message):
         await conv.get_response(mark_read=True)
         await userge.send_message(
             chat,
-            "/deepfry {}".format(args),
+            f"/deepfry {args}",
             reply_to_message_id=media.id,
         )
         response = await conv.get_response(mark_read=True)

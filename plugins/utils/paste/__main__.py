@@ -45,7 +45,7 @@ class PasteService:
 
     # pylint: disable = W0613, R0201
     async def paste(self, ses: aiohttp.ClientSession,
-                    text: str, file_type: Optional[str]) -> Optional[str]:
+                    text: str, file_type: Optional[str]) -> Optional[str]:  # skipcq: PYL-W0613
         """ returns the success url or None if failed """
         return None
 

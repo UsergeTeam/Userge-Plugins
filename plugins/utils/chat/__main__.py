@@ -32,7 +32,7 @@ PATH = config.Dynamic.DOWN_PATH + "chat_pic.jpg"
 
 
 def mention_html(user_id, name):
-    return u'<a href="tg://user?id={}">{}</a>'.format(
+    return u'<a href="tg://user?id={}">{}</a>'.format(  # pylint: disable=consider-using-f-string
         user_id, html.escape(name))
 
 
@@ -279,20 +279,20 @@ async def view_chat(message: Message):
     if '-title' in message.flags:
         await message.edit("```\nChecking, wait plox !...```", del_in=3)
         title = chat.title
-        await message.edit("<code>{}</code>".format(title), parse_mode=enums.ParseMode.HTML)
+        await message.edit(f"<code>{title}</code>", parse_mode=enums.ParseMode.HTML)
     elif '-uname' in message.flags:
         if not chat.username:
             await message.err("```\nI think its private chat !...( ･ิω･ิ)```", del_in=3)
         else:
             await message.edit("```\nChecking, wait plox !...```", del_in=3)
             uname = chat.username
-            await message.edit("<code>{}</code>".format(uname), parse_mode=enums.ParseMode.HTML)
+            await message.edit(f"<code>{uname}</code>", parse_mode=enums.ParseMode.HTML)
     elif '-des' in message.flags:
         if not chat.description:
             await message.err("```\nI think, Chat haven't any description...```", del_in=3)
         else:
             await message.edit("```\nchecking, Wait plox !...```", del_in=3)
-            await message.edit("<code>{}</code>".format(chat.description),
+            await message.edit(f"<code>{chat.description}</code>",
                                parse_mode=enums.ParseMode.HTML)
     else:
         if not chat.photo:
