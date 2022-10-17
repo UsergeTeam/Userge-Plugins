@@ -32,23 +32,23 @@ async def glitch_(message: Message):
     replied = message.reply_to_message
     if not (replied and (
             replied.photo or replied.sticker or replied.video or replied.animation)):
-        await message.edit("```Media not found...```")
+        await message.edit("```\nMedia not found...```")
         await message.reply_sticker('CAADBQADVAUAAjZgsCGE7PH3Wt1wSRYE')
         return
     if message.filtered_input_str:
         if not message.filtered_input_str.isdigit():
-            await message.err("```You input is invalid, check help...```", del_in=5)
+            await message.err("```\nYou input is invalid, check help...```", del_in=5)
             return
         input_ = int(message.filtered_input_str)
         if not 0 < input_ < 9:
-            await message.err("```Invalid Range...```", del_in=5)
+            await message.err("```\nInvalid Range...```", del_in=5)
             return
         args = input_
     else:
         args = 2
     if not os.path.isdir(config.Dynamic.DOWN_PATH):
         os.makedirs(config.Dynamic.DOWN_PATH)
-    await message.edit("```Glitching... 😁```")
+    await message.edit("```\nGlitching... 😁```")
     dls = await message.client.download_media(
         message=replied,
         file_name=config.Dynamic.DOWN_PATH
@@ -60,21 +60,21 @@ async def glitch_(message: Message):
         cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dls_loc} {file_1}"
         stdout, stderr = (await runcmd(cmd))[:2]
         if not os.path.lexists(file_1):
-            await message.err("```Sticker not found...```")
+            await message.err("```\nSticker not found...```")
             raise Exception(stdout + stderr)
         glitch_file = file_1
     elif replied.sticker and replied.sticker.file_name.endswith(".webp"):
         file_2 = os.path.join(config.Dynamic.DOWN_PATH, "glitch.png")
         os.rename(dls_loc, file_2)
         if not os.path.lexists(file_2):
-            await message.err("```Sticker not found...```")
+            await message.err("```\nSticker not found...```")
             return
         glitch_file = file_2
     elif replied.animation or replied.video:
         file_3 = os.path.join(config.Dynamic.DOWN_PATH, "glitch.png")
         await take_screen_shot(dls_loc, 0, file_3)
         if not os.path.lexists(file_3):
-            await message.err("```Sticker not found...```")
+            await message.err("```\nSticker not found...```")
             return
         glitch_file = file_3
     if glitch_file is None:

@@ -63,7 +63,7 @@ class _BaseLib:
     def progress(self) -> str:
         """ Returns progress """
         percentage = self.percentage
-        return "[{}{}]".format(
+        return "[{}{}]".format(  # pylint: disable=consider-using-f-string
             ''.join((config.FINISHED_PROGRESS_STR
                      for _ in range(floor(percentage / 5)))),
             ''.join((config.UNFINISHED_PROGRESS_STR
@@ -245,16 +245,6 @@ class SCLib(_BaseLib):
     def percentage(self) -> int:
         """ Returns percentage """
         return int(round((self._cmp_size / self._file_size) * 100, 2))
-
-    @property
-    def progress(self) -> str:
-        """ Returns progress """
-        percentage = self.percentage
-        return "[{}{}]".format(
-            ''.join((config.FINISHED_PROGRESS_STR
-                     for _ in range(floor(percentage / 5)))),
-            ''.join((config.UNFINISHED_PROGRESS_STR
-                     for _ in range(20 - floor(percentage / 5)))))
 
     @property
     def speed(self) -> float:
@@ -474,7 +464,7 @@ async def split_(message: Message) -> None:
     s_obj.split(split_size)
     tmp = \
         "__Splitting file path...__\n" + \
-        "```{}({}%)```\n" + \
+        "```\n{}({}%)```\n" + \
         "**File Path** : `{}`\n" + \
         "**Dest** : `{}`\n" + \
         "**Completed** : `{}`\n" + \
@@ -542,7 +532,7 @@ async def combine_(message: Message) -> None:
     c_obj.combine()
     tmp = \
         "__Combining file path...__\n" + \
-        "```{}({}%)```\n" + \
+        "```\n{}({}%)```\n" + \
         "**File Path** : `{}`\n" + \
         "**Dest** : `{}`\n" + \
         "**Completed** : `{}`\n" + \
@@ -617,7 +607,7 @@ async def _pack_helper(message: Message, tar: bool = False) -> None:
     p_obj.pack_path(tar)
     tmp = \
         "__Packing file path...__\n" + \
-        "```{}({}%)```\n" + \
+        "```\n{}({}%)```\n" + \
         "**File Path** : `{}`\n" + \
         "**Dest** : `{}`\n" + \
         "**Completed** : `{}/{}`"
@@ -676,7 +666,7 @@ async def unpack_(message: Message) -> None:
     p_obj.unpack_path()
     tmp = \
         "__UnPacking file path...__\n" + \
-        "```{}({}%)```\n" + \
+        "```\n{}({}%)```\n" + \
         "**File Path** : `{}`\n" + \
         "**Dest** : `{}`\n" + \
         "**Completed** : `{}/{}`"

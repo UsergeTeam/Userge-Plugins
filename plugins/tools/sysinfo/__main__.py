@@ -60,7 +60,7 @@ async def generate_sysinfo(workdir):
         info['TEMP'] = f"{temperatures}\u00b0C"
     info = {f"{key}:": value for (key, value) in info.items()}
     max_len = max(len(x) for x in info)
-    return ("```"
+    return ("```\n"
             + "\n".join([f"{x:<{max_len}} {y}" for x, y in info.items()])
             + "```")
 

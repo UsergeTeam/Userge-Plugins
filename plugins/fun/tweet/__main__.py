@@ -34,7 +34,7 @@ async def trump_tweet(msg: Message):
     if not text:
         await msg.err("Trump Need some Text for Tweet 🙄")
         return
-    await msg.edit("```Requesting trump to tweet... 😃```")
+    await msg.edit("```\nRequesting trump to tweet... 😃```")
     await _tweets(msg, text, type_="trumptweet")
 
 
@@ -50,7 +50,7 @@ async def modi_tweet(msg: Message):
     if not text:
         await msg.err("Modi Need some Text for Tweet 😗")
         return
-    await msg.edit("```Requesting Modi to tweet... 😉```")
+    await msg.edit("```\nRequesting Modi to tweet... 😉```")
     await _tweets(msg, text, "narendramodi")
 
 
@@ -66,7 +66,7 @@ async def Change_My_Mind(msg: Message):
     if not text:
         await msg.err("Need some Text to Change My Mind 🙂")
         return
-    await msg.edit("```Writing Banner of Change My Mind 😁```")
+    await msg.edit("```\nWriting Banner of Change My Mind 😁```")
     await _tweets(msg, text, type_="changemymind")
 
 
@@ -82,7 +82,7 @@ async def kanna(msg: Message):
     if not text:
         await msg.err("Kanna Need some text to Write 😚")
         return
-    await msg.edit("```Kanna is writing for You 😀```")
+    await msg.edit("```\nKanna is writing for You 😀```")
     await _tweets(msg, text, type_="kannagen")
 
 
@@ -98,7 +98,7 @@ async def carry_minati(msg: Message):
     if not text:
         await msg.err("Carry Need some text to Write 😚")
         return
-    await msg.edit("```Carry Minati is writing for You 😀```")
+    await msg.edit("```\nCarry Minati is writing for You 😀```")
     await _tweets(msg, text, "carryminati")
 
 
@@ -113,7 +113,7 @@ async def tweet(msg: Message):
     if not (username or text):
         await msg.err("`input not found!`")
         return
-    await msg.edit("```Creating a Tweet Sticker 😏```")
+    await msg.edit("```\nCreating a Tweet Sticker 😏```")
     await _tweets(msg, text, username)
 
 

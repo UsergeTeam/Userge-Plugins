@@ -45,7 +45,7 @@ class PasteService:
 
     # pylint: disable = W0613, R0201
     async def paste(self, ses: aiohttp.ClientSession,
-                    text: str, file_type: Optional[str]) -> Optional[str]:
+                    text: str, file_type: Optional[str]) -> Optional[str]:  # skipcq: PYL-W0613
         """ returns the success url or None if failed """
         return None
 
@@ -105,7 +105,7 @@ class Rentry(PasteService):
         if not token:
             return None
         if file_type:
-            text = f"```{file_type}\n" + text + "\n```"
+            text = f"```\n{file_type}\n" + text + "\n```"
         async with ses.post(self._url,
                             data=dict(csrfmiddlewaretoken=token, text=text),
                             headers=dict(Referer=self._url)) as resp:

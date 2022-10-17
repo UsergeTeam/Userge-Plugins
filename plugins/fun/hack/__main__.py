@@ -13,49 +13,52 @@
 import asyncio
 
 from userge import userge
+from pyrogram.enums import ParseMode
 
 
-@userge.on_cmd("hack$", about={'header': "kensar hacking animation"})
+@userge.on_cmd("hack$", about={"header": "kensar hacking animation"})
 async def hack_func(message):
     user = await message.client.get_user_dict(message.from_user.id)
-    heckerman = user['mention']
+    heckerman = user["mention"]
     animation_chars = [
-        "```Connecting To Private Server \\```",
-        "```Connecting To Private Server |```",
-        "```Connecting To Private Server /```",
-        "```Connecting To Private Server \\```",
-        "```Connection Established ```",
-        "```Target Selected```",
-        "```Backdoor Found In Target```",
-        "```Trying To Hack```",
-        "```Hacking... 0%\n▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒```",
-        "```Hacking... 4%\n█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒```",
-        "```Hacking... 8%\n██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒```",
-        "```Hacking... 20%\n█████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒```",
-        "```Hacking... 36%\n█████████▒▒▒▒▒▒▒▒▒▒▒▒▒```",
-        "```Hacking... 52%\n█████████████▒▒▒▒▒▒▒▒▒```",
-        "```Hacking... 70%\n█████████████████▒▒▒▒▒```",
-        "```Hacking... 88%\n█████████████████████▒```",
-        "```Hacking... 100%\n███████████████████████```",
-        "```Preparing Data... 1%\n▒██████████████████████```",
-        "```Preparing Data... 14%\n████▒██████████████████```",
-        "```Preparing Data... 30%\n████████▒██████████████```",
-        "```Preparing Data... 55%\n████████████▒██████████```",
-        "```Preparing Data... 72%\n████████████████▒██████```",
-        "```Preparing Data... 88%\n████████████████████▒██```",
-        "```Prepared Data... 100%\n███████████████████████```",
-        "```Uploading Data to Server... 12%\n███▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒```",
-        "```Uploading Data to Server... 44%\n█████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒```",
-        "```Uploading Data to Server... 68%\n███████████████▒▒▒▒▒▒▒▒```",
-        "```Uploading Data to Server... 89%\n████████████████████▒▒▒```",
-        "```Uploaded Data to Server... 100%\n███████████████████████```",
-        "**User Data Upload Completed:** Target's User Data Stored "
-        "at `downloads/victim/telegram-authuser.data.sql`",
+        "<pre>Connecting To Private Server \\</pre>",
+        "<pre>Connecting To Private Server |</pre>",
+        "<pre>Connecting To Private Server /</pre>",
+        "<pre>Connecting To Private Server \\</pre>",
+        "<pre>Connection Established </pre>",
+        "<pre>Target Selected</pre>",
+        "<pre>Backdoor Found In Target</pre>",
+        "<pre>Trying To Hack</pre>",
+        "<pre>Hacking... 0%\n▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒</pre>",
+        "<pre>Hacking... 4%\n█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒</pre>",
+        "<pre>Hacking... 8%\n██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒</pre>",
+        "<pre>Hacking... 20%\n█████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒</pre>",
+        "<pre>Hacking... 36%\n█████████▒▒▒▒▒▒▒▒▒▒▒▒▒</pre>",
+        "<pre>Hacking... 52%\n█████████████▒▒▒▒▒▒▒▒▒</pre>",
+        "<pre>Hacking... 70%\n█████████████████▒▒▒▒▒</pre>",
+        "<pre>Hacking... 88%\n█████████████████████▒</pre>",
+        "<pre>Hacking... 100%\n███████████████████████</pre>",
+        "<pre>Preparing Data... 1%\n▒██████████████████████</pre>",
+        "<pre>Preparing Data... 14%\n████▒██████████████████</pre>",
+        "<pre>Preparing Data... 30%\n████████▒██████████████</pre>",
+        "<pre>Preparing Data... 55%\n████████████▒██████████</pre>",
+        "<pre>Preparing Data... 72%\n████████████████▒██████</pre>",
+        "<pre>Preparing Data... 88%\n████████████████████▒██</pre>",
+        "<pre>Prepared Data... 100%\n███████████████████████</pre>",
+        "<pre>Uploading Data to Server... 12%\n███▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒</pre>",
+        "<pre>Uploading Data to Server... 44%\n█████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒</pre>",
+        "<pre>Uploading Data to Server... 68%\n███████████████▒▒▒▒▒▒▒▒</pre>",
+        "<pre>Uploading Data to Server... 89%\n████████████████████▒▒▒</pre>",
+        "<pre>Uploaded Data to Server... 100%\n███████████████████████</pre>",
+        "<b>User Data Upload Completed:</b> Target's User Data Stored "
+        "at <code>downloads/victim/telegram-authuser.data.sql</code>",
     ]
-    hecked = (f"**Targeted Account Hacked**\n\n```Pay 69$ To``` {heckerman}``` "
-              "To Remove This Hack```")
+    hecked = (
+        f"<b>Targeted Account Hacked</b>\n\n<pre>Pay 69$ To</pre> {heckerman}<pre> "
+        "To Remove This Hack</pre>"
+    )
     max_ani = len(animation_chars)
     for i in range(max_ani):
         await asyncio.sleep(2)
-        await message.edit(animation_chars[i % max_ani])
-    await message.edit(hecked)
+        await message.edit(animation_chars[i % max_ani], parse_mode=ParseMode.HTML)
+    await message.edit(hecked, parse_mode=ParseMode.HTML)

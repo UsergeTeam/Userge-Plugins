@@ -25,7 +25,7 @@ async def _calendar(message: Message):
         try:
             today = datetime.today()
             input_ = calendar.month(today.year, today.month)
-            await message.edit(f"```{input_}```")
+            await message.edit(f"```\n{input_}```")
         except Exception as e:
             await message.err(e)
         return
@@ -36,6 +36,6 @@ async def _calendar(message: Message):
     year, month = message.input_str.split('|', maxsplit=1)
     try:
         input_ = calendar.month(int(year.strip()), int(month.strip()))
-        await message.edit(f"```{input_}```")
+        await message.edit(f"```\n{input_}```")
     except Exception as e:
         await message.err(e)

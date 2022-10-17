@@ -26,17 +26,17 @@ async def sangmata_(message: Message):
     """ Get User's Updated previous Names and Usernames """
     replied = message.reply_to_message
     if not replied:
-        await message.err("```Reply to get Name and Username History...```", del_in=5)
+        await message.err("```\nReply to get Name and Username History...```", del_in=5)
         return
     user = replied.from_user.id
     chat = "@Sangmatainfo_bot"
-    await message.edit("```Getting info, Wait plox ...```")
+    await message.edit("```\nGetting info, Wait plox ...```")
     msgs = []
     ERROR_MSG = "For your kind information, you blocked @Sangmatainfo_bot, Unblock it"
     try:
         async with userge.conversation(chat) as conv:
             try:
-                await conv.send_message("/search_id {}".format(user))
+                await conv.send_message(f"/search_id {user}")
             except YouBlockedUser:
                 await message.err(f"**{ERROR_MSG}**", del_in=5)
                 return
@@ -50,13 +50,13 @@ async def sangmata_(message: Message):
     for msg in msgs:
         if '-u' in message.flags:
             if msg.text.startswith("No records found"):
-                await message.edit("```User never changed his Username...```", del_in=5)
+                await message.edit("```\nUser never changed his Username...```", del_in=5)
                 return
             if msg.text.startswith(username):
                 await message.edit(f"`{msg.text}`")
         else:
             if msg.text.startswith("No records found"):
-                await message.edit("```User never changed his Name...```", del_in=5)
+                await message.edit("```\nUser never changed his Name...```", del_in=5)
                 return
             if msg.text.startswith(name):
                 await message.edit(f"`{msg.text}`")

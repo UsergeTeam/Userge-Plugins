@@ -32,7 +32,7 @@ PATH = config.Dynamic.DOWN_PATH + "chat_pic.jpg"
 
 
 def mention_html(user_id, name):
-    return u'<a href="tg://user?id={}">{}</a>'.format(
+    return u'<a href="tg://user?id={}">{}</a>'.format(  # pylint: disable=consider-using-f-string
         user_id, html.escape(name))
 
 
@@ -49,17 +49,17 @@ async def join_chat(message: Message):
         text = message.input_str
     if not text:
         await message.edit(
-            "```Bruh, Without chat name, I can't Join... :0```", del_in=3)
+            "```\nBruh, Without chat name, I can't Join... :0```", del_in=3)
         return
     try:
         chat = await userge.get_chat(text)
         await userge.join_chat(text)
-        await userge.send_message(text, f"```Joined {chat.title} Successfully...```")
+        await userge.send_message(text, f"```\nJoined {chat.title} Successfully...```")
     except UsernameNotOccupied:
-        await message.edit("```Username, you entered, does not exist... ```", del_in=3)
+        await message.edit("```\nUsername, you entered, does not exist... ```", del_in=3)
         return
     except PeerIdInvalid:
-        await message.edit("```Chat id, you entered, does not exist... ```", del_in=3)
+        await message.edit("```\nChat id, you entered, does not exist... ```", del_in=3)
         return
     else:
         await message.delete()
@@ -139,7 +139,7 @@ async def tagall_(message: Message):
     except Exception as e:
         text += " " + str(e)
     await message.client.send_message(c_id, text, reply_to_message_id=message_id)
-    await message.edit("```Tagged recent Members Successfully...```", del_in=3)
+    await message.edit("```\nTagged recent Members Successfully...```", del_in=3)
 
 
 @userge.on_cmd("stagall", about={
@@ -150,7 +150,7 @@ async def stagall_(message: Message):
     """ tag recent members without spam """
     chat_id = message.chat.id
     chat = await userge.get_chat(chat_id)
-    await message.edit(f"```Tagging everyone in {chat.title}```")
+    await message.edit(f"```\nTagging everyone in {chat.title}```")
     replied = message.reply_to_message
     text = message.input_str
     if not (text or replied):
@@ -179,7 +179,7 @@ async def tadmins_(message: Message):
         return
     c_title = message.chat.title
     c_id = message.chat.id
-    await message.edit(f"```Tagging admins in {c_title}...```")
+    await message.edit(f"```\nTagging admins in {c_title}...```")
     text = f"**{text}**\n" if text else ""
     message_id = replied.id if replied else None
     try:
@@ -202,7 +202,7 @@ async def tadmins_(message: Message):
     except Exception as e:
         text += " " + str(e)
     await message.client.send_message(c_id, text, reply_to_message_id=message_id)
-    await message.edit("```Admins tagged Successfully...```", del_in=3)
+    await message.edit("```\nAdmins tagged Successfully...```", del_in=3)
 
 
 @userge.on_cmd("schat", about={
@@ -218,48 +218,48 @@ async def tadmins_(message: Message):
 async def set_chat(message: Message):
     """ Set or delete chat info """
     if not message.flags:
-        await message.err("```Flags required!...```", del_in=3)
+        await message.err("```\nFlags required!...```", del_in=3)
         return
     chat = await userge.get_chat(message.chat.id)
     if '-ddes' in message.flags:
         if not chat.description:
             await message.edit(
-                "```Chat already haven't any description...```", del_in=5)
+                "```\nChat already haven't any description...```", del_in=5)
         else:
             await userge.set_chat_description(message.chat.id, "")
-            await message.edit("```Chat Description is Successfully removed...```", del_in=3)
+            await message.edit("```\nChat Description is Successfully removed...```", del_in=3)
     args = message.filtered_input_str
     if not args:
-        await message.edit("```Need Text to Update chat info...```", del_in=5)
+        await message.edit("```\nNeed Text to Update chat info...```", del_in=5)
         return
     if '-title' in message.flags:
         await userge.set_chat_title(message.chat.id, args.strip())
-        await message.edit("```Chat Title is Successfully Updated...```", del_in=3)
+        await message.edit("```\nChat Title is Successfully Updated...```", del_in=3)
     elif '-uname' in message.flags:
         try:
             await userge.set_chat_username(message.chat.id, args.strip())
         except ValueError:
-            await message.edit("```I think its a private chat...(^_-)```", del_in=3)
+            await message.edit("```\nI think its a private chat...(^_-)```", del_in=3)
             return
         except UsernameInvalid:
-            await message.edit("```Username, you entered, is invalid... ```", del_in=3)
+            await message.edit("```\nUsername, you entered, is invalid... ```", del_in=3)
             return
         except UsernameOccupied:
             await message.edit(
-                "```Username, you entered, is already Occupied... ```", del_in=3)
+                "```\nUsername, you entered, is already Occupied... ```", del_in=3)
             return
         else:
-            await message.edit("```Chat Username is Successfully Updated...```", del_in=3)
+            await message.edit("```\nChat Username is Successfully Updated...```", del_in=3)
     elif '-des' in message.flags:
         try:
             await userge.set_chat_description(message.chat.id, args.strip())
         except BadRequest:
             await message.edit(
-                "```Chat description is Too Long...  ```", del_in=3)
+                "```\nChat description is Too Long...  ```", del_in=3)
         else:
-            await message.edit("```Chat description is Successfully Updated...```", del_in=3)
+            await message.edit("```\nChat description is Successfully Updated...```", del_in=3)
     else:
-        await message.edit("```Invalid args, Check help...```", del_in=5)
+        await message.edit("```\nInvalid args, Check help...```", del_in=5)
 
 
 @userge.on_cmd('vchat', about={
@@ -277,28 +277,28 @@ async def view_chat(message: Message):
     chat_id = message.chat.id
     chat = await userge.get_chat(chat_id)
     if '-title' in message.flags:
-        await message.edit("```Checking, wait plox !...```", del_in=3)
+        await message.edit("```\nChecking, wait plox !...```", del_in=3)
         title = chat.title
-        await message.edit("<code>{}</code>".format(title), parse_mode=enums.ParseMode.HTML)
+        await message.edit(f"<code>{title}</code>", parse_mode=enums.ParseMode.HTML)
     elif '-uname' in message.flags:
         if not chat.username:
-            await message.err("```I think its private chat !...( ･ิω･ิ)```", del_in=3)
+            await message.err("```\nI think its private chat !...( ･ิω･ิ)```", del_in=3)
         else:
-            await message.edit("```Checking, wait plox !...```", del_in=3)
+            await message.edit("```\nChecking, wait plox !...```", del_in=3)
             uname = chat.username
-            await message.edit("<code>{}</code>".format(uname), parse_mode=enums.ParseMode.HTML)
+            await message.edit(f"<code>{uname}</code>", parse_mode=enums.ParseMode.HTML)
     elif '-des' in message.flags:
         if not chat.description:
-            await message.err("```I think, Chat haven't any description...```", del_in=3)
+            await message.err("```\nI think, Chat haven't any description...```", del_in=3)
         else:
-            await message.edit("```checking, Wait plox !...```", del_in=3)
-            await message.edit("<code>{}</code>".format(chat.description),
+            await message.edit("```\nchecking, Wait plox !...```", del_in=3)
+            await message.edit(f"<code>{chat.description}</code>",
                                parse_mode=enums.ParseMode.HTML)
     else:
         if not chat.photo:
-            await message.err("```Chat haven't any photo... ```", del_in=3)
+            await message.err("```\nChat haven't any photo... ```", del_in=3)
         else:
-            await message.edit("```Checking chat photo, wait plox !...```", del_in=3)
+            await message.edit("```\nChecking chat photo, wait plox !...```", del_in=3)
             await message.client.download_media(chat.photo.big_file_id, file_name=PATH)
             await message.client.send_photo(message.chat.id, PATH)
             if os.path.exists(PATH):

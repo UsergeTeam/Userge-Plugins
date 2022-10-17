@@ -49,11 +49,11 @@ async def setname_(message: Message):
         return
     if '-dlname' in message.flags:
         await userge.update_profile(last_name="")
-        await message.edit("```Last Name is Successfully Removed ...```", del_in=3)
+        await message.edit("```\nLast Name is Successfully Removed ...```", del_in=3)
         return
     if '-duname' in message.flags:
         await userge.set_username(username="")
-        await message.edit("```Username is successfully Removed ...```", del_in=3)
+        await message.edit("```\nUsername is successfully Removed ...```", del_in=3)
         return
     arg = message.filtered_input_str
     if not arg:
@@ -61,24 +61,24 @@ async def setname_(message: Message):
         return
     if '-fname' in message.flags:
         await userge.update_profile(first_name=arg.strip())
-        await message.edit("```First Name is Successfully Updated ...```", del_in=3)
+        await message.edit("```\nFirst Name is Successfully Updated ...```", del_in=3)
     elif '-lname' in message.flags:
         await userge.update_profile(last_name=arg.strip())
-        await message.edit("```Last Name is Successfully Updated ...```", del_in=3)
+        await message.edit("```\nLast Name is Successfully Updated ...```", del_in=3)
     elif '-uname' in message.flags:
         try:
             await userge.set_username(username=arg.strip())
         except UsernameOccupied:
             await message.err("Username is Not Available...")
         else:
-            await message.edit("```Username is Successfully Updated ...```", del_in=3)
+            await message.edit("```\nUsername is Successfully Updated ...```", del_in=3)
     elif '|' in message.input_str:
         fname, lname = message.input_str.split('|', maxsplit=1)
         if not lname:
             await message.err("Need Last Name to Update Profile...")
             return
         await userge.update_profile(first_name=fname.strip(), last_name=lname.strip())
-        await message.edit("```My Profile Name is Successfully Updated ...```", del_in=3)
+        await message.edit("```\nMy Profile Name is Successfully Updated ...```", del_in=3)
     else:
         await message.err("Invalid Args, Exiting...")
 
@@ -99,7 +99,7 @@ async def bio_(message: Message):
         return
     if '-delbio' in message.flags:
         await userge.update_profile(bio="")
-        await message.edit("```Bio is Successfully Deleted ...```", del_in=3)
+        await message.edit("```\nBio is Successfully Deleted ...```", del_in=3)
         return
     if message.input_str:
         try:
@@ -107,7 +107,7 @@ async def bio_(message: Message):
         except AboutTooLong:
             await message.err("Bio is More then 70 characters...")
         else:
-            await message.edit("```My Profile Bio is Successfully Updated ...```", del_in=3)
+            await message.edit("```\nMy Profile Bio is Successfully Updated ...```", del_in=3)
 
 
 @userge.on_cmd('setpfp', about={
@@ -115,7 +115,7 @@ async def bio_(message: Message):
     'usage': "{tr}setpfp [reply to any photo]"}, allow_via_bot=False)
 async def set_profile_picture(message: Message):
     """ Set Profile Picture """
-    await message.edit("```processing ...```")
+    await message.edit("```\nprocessing ...```")
 
     replied = message.reply_to_message
     s_time = datetime.now()
@@ -198,42 +198,42 @@ async def view_profile(message: Message):
             await message.err("invalid user_id!")
             return
     if '-fname' in message.flags:
-        await message.edit("```checking, wait plox !...```", del_in=3)
+        await message.edit("```\nchecking, wait plox !...```", del_in=3)
         first_name = user.first_name
-        await message.edit("<code>{}</code>".format(first_name), parse_mode=enums.ParseMode.HTML)
+        await message.edit(f"<code>{first_name}</code>", parse_mode=enums.ParseMode.HTML)
     elif '-lname' in message.flags:
         if not user.last_name:
             await message.err("User not have last name...")
         else:
-            await message.edit("```checking, wait plox !...```", del_in=3)
+            await message.edit("```\nchecking, wait plox !...```", del_in=3)
             last_name = user.last_name
-            await message.edit("<code>{}</code>".format(last_name), parse_mode=enums.ParseMode.HTML)
+            await message.edit(f"<code>{last_name}</code>", parse_mode=enums.ParseMode.HTML)
     elif '-flname' in message.flags:
-        await message.edit("```checking, wait plox !...```", del_in=3)
+        await message.edit("```\nchecking, wait plox !...```", del_in=3)
         if not user.last_name:
             await message.edit(
-                "<code>{}</code>".format(user.first_name), parse_mode=enums.ParseMode.HTML)
+                f"<code>{user.first_name}</code>", parse_mode=enums.ParseMode.HTML)
         else:
             full_name = user.first_name + " " + user.last_name
-            await message.edit("<code>{}</code>".format(full_name), parse_mode=enums.ParseMode.HTML)
+            await message.edit(f"<code>{full_name}</code>", parse_mode=enums.ParseMode.HTML)
     elif '-bio' in message.flags:
         if not bio:
             await message.err("User not have bio...")
         else:
             await message.edit("`checking, wait plox !...`", del_in=3)
-            await message.edit("<code>{}</code>".format(bio), parse_mode=enums.ParseMode.HTML)
+            await message.edit(f"<code>{bio}</code>", parse_mode=enums.ParseMode.HTML)
     elif '-uname' in message.flags:
         if not user.username:
             await message.err("User not have username...")
         else:
-            await message.edit("```checking, wait plox !...```", del_in=3)
+            await message.edit("```\nchecking, wait plox !...```", del_in=3)
             username = user.username
-            await message.edit("<code>{}</code>".format(username), parse_mode=enums.ParseMode.HTML)
+            await message.edit(f"<code>{username}</code>", parse_mode=enums.ParseMode.HTML)
     elif '-pp' in message.flags:
         if not user.photo:
             await message.err("profile photo not found!...")
         else:
-            await message.edit("```checking pfp, wait plox !...```", del_in=3)
+            await message.edit("```\nchecking pfp, wait plox !...```", del_in=3)
             await message.client.download_media(user.photo.big_file_id, file_name=PHOTO)
             await message.client.send_photo(message.chat.id, PHOTO)
             if os.path.exists(PHOTO):
@@ -253,7 +253,7 @@ async def del_pfp(message: Message):
         except ValueError as v_e:
             await message.err(v_e)
             return
-        await message.edit(f"```Deleting first {del_c} Profile Photos ...```")
+        await message.edit(f"```\nDeleting first {del_c} Profile Photos ...```")
         start = datetime.now()
         ctr = 0
         async for photo in userge.get_chat_photos("me", limit=del_c):
@@ -309,14 +309,14 @@ async def clone_(message: Message):
             return
         USER_DATA['first_name'] = me.first_name or ''
         await userge.update_profile(first_name=user.first_name or '')
-        await message.edit("```First Name is Successfully cloned ...```", del_in=3)
+        await message.edit("```\nFirst Name is Successfully cloned ...```", del_in=3)
     elif '-lname' in message.flags:
         if 'last_name' in USER_DATA:
             await message.err("First Revert!...")
             return
         USER_DATA['last_name'] = me.last_name or ''
         await userge.update_profile(last_name=user.last_name or '')
-        await message.edit("```Last name is successfully cloned ...```", del_in=3)
+        await message.edit("```\nLast name is successfully cloned ...```", del_in=3)
     elif '-bio' in message.flags:
         if 'bio' in USER_DATA:
             await message.err("First Revert!...")
@@ -324,7 +324,7 @@ async def clone_(message: Message):
         mychat = await userge.get_chat(me.id)
         USER_DATA['bio'] = mychat.bio or ''
         await userge.update_profile(bio=chat.description or '')
-        await message.edit("```Bio is Successfully Cloned ...```", del_in=3)
+        await message.edit("```\nBio is Successfully Cloned ...```", del_in=3)
     elif '-pp' in message.flags:
         if os.path.exists(PHOTO):
             await message.err("First Revert!...")
@@ -334,7 +334,7 @@ async def clone_(message: Message):
             return
         await userge.download_media(user.photo.big_file_id, file_name=PHOTO)
         await userge.set_profile_photo(photo=PHOTO)
-        await message.edit("```Profile photo is Successfully Cloned ...```", del_in=3)
+        await message.edit("```\nProfile photo is Successfully Cloned ...```", del_in=3)
     else:
         if USER_DATA or os.path.exists(PHOTO):
             await message.err("First Revert!...")
@@ -354,7 +354,7 @@ async def clone_(message: Message):
             return
         await userge.download_media(user.photo.big_file_id, file_name=PHOTO)
         await userge.set_profile_photo(photo=PHOTO)
-        await message.edit("```Profile is Successfully Cloned ...```", del_in=3)
+        await message.edit("```\nProfile is Successfully Cloned ...```", del_in=3)
 
 
 @userge.on_cmd("revert", about={
@@ -373,4 +373,4 @@ async def revert_(message: Message):
         photo = [prof async for prof in userge.get_chat_photos(me.id, limit=1)][0]
         await userge.delete_profile_photos(photo.file_id)
         os.remove(PHOTO)
-    await message.edit("```Profile is Successfully Reverted...```", del_in=3)
+    await message.edit("```\nProfile is Successfully Reverted...```", del_in=3)
