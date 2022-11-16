@@ -195,7 +195,9 @@ def _re_init_handler():
     global HANDLER  # pylint: disable=global-statement
     handler = GBanHandler()
     if antispam.Dynamic.ANTISPAM_SENTRY:
-        tmp = handler.set_next(CASHandler())
+        # tmp = handler.set_next(CASHandler())
+        # api.cas.chat down
+        tmp = handler
         if antispam.USERGE_ANTISPAM_API:
             tmp = tmp.set_next(UsergeAntiSpamHandler())
         if antispam.SPAM_WATCH_API:
