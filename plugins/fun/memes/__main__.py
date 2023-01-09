@@ -530,18 +530,18 @@ async def scam_(message: Message):
         scam_time = randint(30, 60)
     elif len(args) == 1:  # User decides time/action, bot decides the other.
         try:
-            _scam_action = str(args[0]).lower()
+            _scam_action = str(args[0])
             scam_time = randint(30, 60)
         except ValueError:
             _scam_action = choice(options)
             scam_time = int(args[0])
     elif len(args) == 2:  # User decides both action and time
-        _scam_action = str(args[0]).lower()
+        _scam_action = str(args[0])
         scam_time = int(args[1])
     else:
         await message.err("`Invalid Syntax !!`")
         return
-    scam_action = getattr(enums.ChatAction, _scam_action)
+    scam_action = getattr(enums.ChatAction, _scam_action.upper())
     try:
         if scam_time > 0:
             chat_id = message.chat.id
