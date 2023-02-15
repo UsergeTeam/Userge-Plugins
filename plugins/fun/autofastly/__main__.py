@@ -68,7 +68,7 @@ async def fastly_handler(msg: Message):
     parse = await ocr.ocr_space_file(img)
     try:
         text = parse["ParsedResults"][0]["ParsedText"]
-        text = text.split("By@")[0].replace("\n", "").replace("\r", "")
+        text = text.split("By@")[0].replace("\n", "").replace("\r", "").replace(" ", "")
         if text:
             await msg.reply_text(text.capitalize())
             await CHANNEL.log(f'Auto Fastly Responded in {msg.chat.title} [{msg.chat.id}]')
