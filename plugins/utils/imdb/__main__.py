@@ -27,6 +27,7 @@ from pyrogram import enums
 from userge import userge, Message, config, pool
 from .. import imdb
 
+TMDB_KEY = "5dae31e75ff0f7a0befc272d5deadd73"
 THUMB_PATH = config.Dynamic.DOWN_PATH + "imdb_thumb.jpg"
 
 
@@ -84,6 +85,17 @@ async def get_movie_description(imdb_id, max_length):
     response = await _get(imdb.API_TWO_URL.format(imdbttid=imdb_id))
     soup = json.loads(response.text)
 
+    yt_code = None
+    response2 = await _get(
+        "http://api.themoviedb.org/3/movie/" + imdb_id + "/videos?api_key=" + TMDB_KEY
+    )
+    soup2 = json.loads(response2.text)
+    try:
+        yt_code = soup2.get("results")[0].get("key")
+    except (IndexError, json.JSONDecodeError, AttributeError, TypeError):
+        if soup.get("trailer_vid_id"):
+            yt_code = soup.get("trailer_vid_id")
+
     mov_link = f"https://www.imdb.com/title/{imdb_id}"
     mov_name = soup.get('title')
     image_link = soup.get('poster')
@@ -115,6 +127,7 @@ async def get_movie_description(imdb_id, max_length):
   <b>Stars🎭: </b><code>{stars}</code>
 
 <b>IMDB URL Link🔗: </b>{mov_link}
+<b>YOUTUBE TRAILER 🎦: </b> https://m.youtube.com/watch?v={yt_code}
 
 <b>Story Line : </b><em>{story_line}</em>"""
 
