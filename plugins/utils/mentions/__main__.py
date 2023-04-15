@@ -41,7 +41,7 @@ async def toggle_mentions(msg: Message):
     await SAVED_SETTINGS.update_one(
         {"_id": "MENTION_TOGGLE"}, {"$set": {"data": TOGGLE}}, upsert=True
     )
-    await msg.edit(f"Mentions Alerter **{'enabled' if TOGGLE else 'disabled'}** Successfully.")
+    await msg.edit(f"Mentions Alerter **{'enabled' if TOGGLE else 'disabled'}** Successfully.") # pylint: disable=E501
 
 
 @userge.on_filters(
