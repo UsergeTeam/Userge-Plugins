@@ -36,7 +36,7 @@ async def sangmata_(message: Message):
     try:
         async with userge.conversation(chat) as conv:
             try:
-                await conv.send_message(f"/search_id {user}")
+                await conv.send_message(f"{user}")
             except YouBlockedUser:
                 await message.err(f"**{ERROR_MSG}**", del_in=5)
                 return
