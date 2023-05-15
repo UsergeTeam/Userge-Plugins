@@ -49,4 +49,4 @@ async def sangmata_(message: Message):
             await message.edit("```\nUser never changed his Names & Username...```", del_in=5)
             return
         if msg.text.startswith(y):
-            await message.edit(f"`{msg.text}`")
+            await message.edit(f"{msg.text}")
