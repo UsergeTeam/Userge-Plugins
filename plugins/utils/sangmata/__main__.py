@@ -18,10 +18,7 @@ from userge.utils.exceptions import StopConversation
 
 @userge.on_cmd("sg", about={
     'header': "SangMata gives you user's last updated names and usernames.",
-    'flags': {
-        '-u': "To get Username history of a User"},
-    'usage': "{tr}sg [Reply to user]\n"
-             "{tr}sg -u [Reply to user]"}, allow_via_bot=False)
+    'usage': "{tr}sg [Reply to user]"}, allow_via_bot=False)
 async def sangmata_(message: Message):
     """ Get User's Updated previous Names and Usernames """
     replied = message.reply_to_message
@@ -45,18 +42,11 @@ async def sangmata_(message: Message):
             msgs.append(await conv.get_response(timeout=3, mark_read=True))
     except StopConversation:
         pass
-    name = "Name History"
-    username = "Username History"
+    n = "No data available"
+    y = "History for" or "1 /"
     for msg in msgs:
-        if '-u' in message.flags:
-            if msg.text.startswith("No records found"):
-                await message.edit("```\nUser never changed his Username...```", del_in=5)
-                return
-            if msg.text.startswith(username):
-                await message.edit(f"`{msg.text}`")
-        else:
-            if msg.text.startswith("No records found"):
-                await message.edit("```\nUser never changed his Name...```", del_in=5)
-                return
-            if msg.text.startswith(name):
-                await message.edit(f"`{msg.text}`")
+        if msg.text.startswith(n):
+            await message.edit("```\nUser never changed his Names & Username...```", del_in=5)
+            return
+        if msg.text.startswith(y):
+            await message.edit(f"`{msg.text}`")
