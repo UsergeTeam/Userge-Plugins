@@ -1,6 +1,6 @@
 """ check user name or username history """
 
-# Copyright (C) 2020-2022 by UsergeTeam@Github, < https://github.com/UsergeTeam >.
+# Copyright (C) 2020-2023 by UsergeTeam@Github, < https://github.com/UsergeTeam >.
 #
 # This file is part of < https://github.com/UsergeTeam/Userge > project,
 # and is released under the "GNU v3.0 License Agreement".
@@ -17,7 +17,7 @@ from userge.utils.exceptions import StopConversation
 
 
 @userge.on_cmd("sg", about={
-    'header': "Sangmata gives you user's last updated names and usernames.",
+    'header': "SangMata gives you user's last updated names and usernames.",
     'flags': {
         '-u': "To get Username history of a User"},
     'usage': "{tr}sg [Reply to user]\n"
@@ -29,14 +29,14 @@ async def sangmata_(message: Message):
         await message.err("```\nReply to get Name and Username History...```", del_in=5)
         return
     user = replied.from_user.id
-    chat = "@SangMata_bot"
+    chat = "@SangMata_BOT"
     await message.edit("```\nGetting info, Wait plox ...```")
     msgs = []
-    ERROR_MSG = "For your kind information, you blocked @Sangmatainfo_bot, Unblock it"
+    ERROR_MSG = "For your kind information, you blocked @SangMata_BOT, Unblock it"
     try:
         async with userge.conversation(chat) as conv:
             try:
-                await conv.send_message(f"/search_id {user}")
+                await conv.send_message(f"{user}")
             except YouBlockedUser:
                 await message.err(f"**{ERROR_MSG}**", del_in=5)
                 return
