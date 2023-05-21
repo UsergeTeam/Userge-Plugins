@@ -18,10 +18,7 @@ from userge.utils.exceptions import StopConversation
 
 @userge.on_cmd("sg", about={
     'header': "Sangmata gives you user's last updated names and usernames.",
-    'flags': {
-        '-u': "To get Username history of a User"},
-    'usage': "{tr}sg [Reply to user]\n"
-             "{tr}sg -u [Reply to user]"}, allow_via_bot=False)
+    'usage': "{tr}sg [Reply to user]"}, allow_via_bot=False)
 async def sangmata_(message: Message):
     """ Get User's Updated previous Names and Usernames """
     replied = message.reply_to_message
@@ -29,14 +26,14 @@ async def sangmata_(message: Message):
         await message.err("```\nReply to get Name and Username History...```", del_in=5)
         return
     user = replied.from_user.id
-    chat = "@SangMata_bot"
+    chat = "@SangMata_Bot"
     await message.edit("```\nGetting info, Wait plox ...```")
     msgs = []
     ERROR_MSG = "For your kind information, you blocked @Sangmatainfo_bot, Unblock it"
     try:
         async with userge.conversation(chat) as conv:
             try:
-                await conv.send_message(f"/search_id {user}")
+                await conv.send_message(f"{user}")
             except YouBlockedUser:
                 await message.err(f"**{ERROR_MSG}**", del_in=5)
                 return
@@ -45,18 +42,17 @@ async def sangmata_(message: Message):
             msgs.append(await conv.get_response(timeout=3, mark_read=True))
     except StopConversation:
         pass
-    name = "Name History"
-    username = "Username History"
+    x = "History for"
+    y = "1 /"
+    z = "2 /"
     for msg in msgs:
-        if '-u' in message.flags:
-            if msg.text.startswith("No records found"):
-                await message.edit("```\nUser never changed his Username...```", del_in=5)
-                return
-            if msg.text.startswith(username):
-                await message.edit(f"`{msg.text}`")
-        else:
-            if msg.text.startswith("No records found"):
-                await message.edit("```\nUser never changed his Name...```", del_in=5)
-                return
-            if msg.text.startswith(name):
-                await message.edit(f"`{msg.text}`")
+      if msg.text.startswith("No data available"):
+        await message.edit("```\nUser never changed his Name & Username...```", del_in=5)
+        return
+      if msg.text.startswith(x):
+        await message.edit(f"{msg.text}")
+        return
+      if msg.text.startswith(y):
+        await message.edit(f"{msg.text}")
+      if msg.text.startswith(z):
+        await message.edit(f"{msg.text}")
