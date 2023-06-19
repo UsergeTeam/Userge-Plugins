@@ -56,9 +56,11 @@ async def handle_mentions(msg: Message):
         return
 
     if msg.chat.type == enums.ChatType.PRIVATE:
+        is_private = True
         link = f"tg://openmessage?user_id={msg.chat.id}&message_id={msg.id}"
         text = f"{msg.from_user.mention} 💻 sent you a **Private message.**"
     else:
+        is_private = False
         link = msg.link
         text = f"{msg.from_user.mention} 💻 tagged you in **{msg.chat.title}.**"
     text += f"\n\n[Message]({link}):" if not userge.has_bot else "\n\n**Message:**"
@@ -68,6 +70,13 @@ async def handle_mentions(msg: Message):
     button = InlineKeyboardButton(text="📃 Message Link", url=link)
 
     client = userge.bot if userge.has_bot else userge
+    if not msg.text:
+        if is_private:
+            chat_id = userge.bot.id if userge.dual_mode else config.LOG_CHANNEL_ID
+            media_client = userge
+        else:
+            media_client = client
+            chat_id = userge.id if userge.has_bot else config.LOG_CHANNEL_ID
     try:
         await client.send_message(
             chat_id=userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
@@ -76,14 +85,14 @@ async def handle_mentions(msg: Message):
             reply_markup=InlineKeyboardMarkup([[button]])
         )
         if not msg.text:
-            await client.copy_message(
-                userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
+            await media_client.copy_message(
+                chat_id,
                 msg.chat.id,
                 msg.id
             )
     except PeerIdInvalid:
         if userge.dual_mode:
-            await userge.send_message(userge.id, "/start")
+            await userge.send_message(userge.bot.id, "/start")
             await client.send_message(
                 chat_id=userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
                 text=text,
@@ -91,8 +100,8 @@ async def handle_mentions(msg: Message):
                 reply_markup=InlineKeyboardMarkup([[button]])
             )
             if not msg.text:
-                await client.copy_message(
-                    userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
+                await media_client.copy_message(
+                    chat_id,
                     msg.chat.id,
                     msg.id
                 )
