@@ -61,7 +61,10 @@ async def handle_mentions(msg: Message):
         text = f"{msg.from_user.mention} 💻 sent you a **Private message.**"
     else:
         is_private = False
-        link = msg.link
+        if msg.chat.type == enums.ChatType.GROUP:
+            link = f"tg://openmessage?user_id={str(msg.chat.id).strip('-')}&message_id={msg.id}"
+        else:
+            link = msg.link
         text = f"{msg.from_user.mention} 💻 tagged you in **{msg.chat.title}.**"
     text += f"\n\n[Message]({link}):" if not userge.has_bot else "\n\n**Message:**"
     if msg.text:
