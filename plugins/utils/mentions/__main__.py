@@ -8,7 +8,7 @@
 #
 # All rights reserved.
 
-from pyrogram.errors import PeerIdInvalid
+from pyrogram.errors import PeerIdInvalid, BadRequest
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram import enums
 
@@ -66,8 +66,7 @@ async def handle_mentions(msg: Message):
     text += f"\n\n[Message]({link}):" if not userge.has_bot else "\n\n**Message:**"
     if msg.text:
         text += f"\n`{msg.text}`"
-    buttons = []
-    buttons.append([InlineKeyboardButton(text="📃 Message Link", url=link)])
+    buttons = [[InlineKeyboardButton(text="📃 Message Link", url=link)]]
 
     client = userge.bot if userge.has_bot else userge
     if not msg.text:
@@ -85,7 +84,7 @@ async def handle_mentions(msg: Message):
                     msg.chat.id,
                     msg.id
                 )
-            except:
+            except (PeerIdInvalid, BadRequest):
                 sentMedia = await userge.copy_message(
                     config.LOG_CHANNEL_ID,
                     msg.chat.id,
@@ -108,7 +107,7 @@ async def handle_mentions(msg: Message):
                         msg.chat.id,
                         msg.id
                     )
-                except:
+                except (PeerIdInvalid, BadRequest):
                     sentMedia = await userge.copy_message(
                         config.LOG_CHANNEL_ID,
                         msg.chat.id,
