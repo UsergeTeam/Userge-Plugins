@@ -62,7 +62,7 @@ async def handle_mentions(msg: Message):
     else:
         is_private = False
         if msg.chat.type == enums.ChatType.GROUP:
-            link = f"tg://openmessage?user_id={str(msg.chat.id).strip('-')}&message_id={msg.id}"
+            link = f"tg://openmessage?chat_id={str(msg.chat.id).strip('-')}&message_id={msg.id}"
         else:
             link = msg.link
         text = f"{msg.from_user.mention} 💻 tagged you in **{msg.chat.title}.**"
