@@ -66,44 +66,60 @@ async def handle_mentions(msg: Message):
     text += f"\n\n[Message]({link}):" if not userge.has_bot else "\n\n**Message:**"
     if msg.text:
         text += f"\n`{msg.text}`"
-
-    button = InlineKeyboardButton(text="📃 Message Link", url=link)
+    buttons = []
+    buttons.append([InlineKeyboardButton(text="📃 Message Link", url=link)])
 
     client = userge.bot if userge.has_bot else userge
     if not msg.text:
         if is_private:
-            chat_id = userge.bot.id if userge.dual_mode else config.LOG_CHANNEL_ID
+            chat_id = config.LOG_CHANNEL_ID
             media_client = userge
         else:
             media_client = client
             chat_id = userge.id if userge.has_bot else config.LOG_CHANNEL_ID
     try:
-        await client.send_message(
-            chat_id=userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
-            text=text,
-            disable_web_page_preview=True,
-            reply_markup=InlineKeyboardMarkup([[button]])
-        )
         if not msg.text:
-            await media_client.copy_message(
-                chat_id,
-                msg.chat.id,
-                msg.id
-            )
-    except PeerIdInvalid:
-        if userge.dual_mode:
-            await userge.send_message(userge.bot.id, "/start")
-            await client.send_message(
-                chat_id=userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
-                text=text,
-                disable_web_page_preview=True,
-                reply_markup=InlineKeyboardMarkup([[button]])
-            )
-            if not msg.text:
-                await media_client.copy_message(
+            try:
+                sentMedia = await media_client.copy_message(
                     chat_id,
                     msg.chat.id,
                     msg.id
                 )
+            except:
+                sentMedia = await userge.copy_message(
+                    config.LOG_CHANNEL_ID,
+                    msg.chat.id,
+                    msg.id
+                )
+            buttons.append([InlineKeyboardButton(text="📃 Media Link", url=sentMedia.link)])
+        await client.send_message(
+            chat_id=userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
+            text=text,
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup(buttons)
+        )
+    except PeerIdInvalid:
+        if userge.dual_mode:
+            await userge.send_message(userge.bot.id, "/start")
+            if not msg.text:
+                try:
+                    sentMedia = await media_client.copy_message(
+                        chat_id,
+                        msg.chat.id,
+                        msg.id
+                    )
+                except:
+                    sentMedia = await userge.copy_message(
+                        config.LOG_CHANNEL_ID,
+                        msg.chat.id,
+                        msg.id
+                    )
+                buttons.append([InlineKeyboardButton(text="📃 Media Link", url=sentMedia.link)])
+            await client.send_message(
+                chat_id=userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
+                text=text,
+                disable_web_page_preview=True,
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
         else:
             raise
