@@ -96,12 +96,13 @@ async def handle_mentions(msg: Message):
                                 chat_id,
                                 dl_loc
                             )
+                        os.remove(dl_loc)
                 else:
                     sentMedia = await media_client.copy_message(
                         chat_id,
                         msg.chat.id,
                         msg.id
-                )
+                    )
             except (PeerIdInvalid, BadRequest):
                 sentMedia = await userge.copy_message(
                     config.LOG_CHANNEL_ID,
@@ -134,6 +135,7 @@ async def handle_mentions(msg: Message):
                                     chat_id,
                                     dl_loc
                                 )
+                            os.remove(dl_loc)
                     else:
                         sentMedia = await media_client.copy_message(
                             chat_id,
