@@ -82,10 +82,25 @@ async def handle_mentions(msg: Message):
     try:
         if not msg.text:
             try:
-                sentMedia = await media_client.copy_message(
-                    chat_id,
-                    msg.chat.id,
-                    msg.id
+                media = msg.photo or msg.video or None
+                if media and media.ttl_seconds:
+                    dl_loc = await msg.download(config.Dynamic.DOWN_PATH)
+                    if isinstance(dl_loc, str):
+                        if msg.media.value == "photo":
+                            sentMedia = await media_client.send_photo(
+                                chat_id,
+                                dl_loc
+                            )
+                        elif msg.media.value == "video":
+                            sentMedia = await media_client.send_video(
+                                chat_id,
+                                dl_loc
+                            )
+                else:
+                    sentMedia = await media_client.copy_message(
+                        chat_id,
+                        msg.chat.id,
+                        msg.id
                 )
             except (PeerIdInvalid, BadRequest):
                 sentMedia = await userge.copy_message(
@@ -105,11 +120,26 @@ async def handle_mentions(msg: Message):
             await userge.send_message(userge.bot.id, "/start")
             if not msg.text:
                 try:
-                    sentMedia = await media_client.copy_message(
-                        chat_id,
-                        msg.chat.id,
-                        msg.id
-                    )
+                    media = msg.photo or msg.video or None
+                    if media and media.ttl_seconds:
+                        dl_loc = await msg.download(config.Dynamic.DOWN_PATH)
+                        if isinstance(dl_loc, str):
+                            if msg.media.value == "photo":
+                                sentMedia = await media_client.send_photo(
+                                    chat_id,
+                                    dl_loc
+                                )
+                            elif msg.media.value == "video":
+                                sentMedia = await media_client.send_video(
+                                    chat_id,
+                                    dl_loc
+                                )
+                    else:
+                        sentMedia = await media_client.copy_message(
+                            chat_id,
+                            msg.chat.id,
+                            msg.id
+                        )
                 except (PeerIdInvalid, BadRequest):
                     sentMedia = await userge.copy_message(
                         config.LOG_CHANNEL_ID,
