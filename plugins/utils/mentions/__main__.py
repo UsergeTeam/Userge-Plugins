@@ -117,8 +117,10 @@ async def handle_mentions(msg: Message, is_retry=False):
             disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup(buttons)
         )
-    except (PeerIdInvalid, UserIsBlocked):
+    except (PeerIdInvalid, UserIsBlocked) as e:
         if userge.dual_mode and not is_retry:
+            if isinstance(e, UserIsBlocked):
+                await userge.unblock_user(userge.bot.id)
             await userge.send_message(userge.bot.id, "/start")
             await handle_mentions(msg, True)
         else:
