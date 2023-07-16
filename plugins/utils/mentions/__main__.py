@@ -9,7 +9,7 @@
 # All rights reserved.
 
 import os
-from pyrogram.errors import PeerIdInvalid, BadRequest
+from pyrogram.errors import PeerIdInvalid, BadRequest, UserIsBlocked
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram import enums
 
@@ -117,7 +117,7 @@ async def handle_mentions(msg: Message, is_retry=False):
             disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup(buttons)
         )
-    except PeerIdInvalid:
+    except (PeerIdInvalid, UserIsBlocked):
         if userge.dual_mode and not is_retry:
             await userge.send_message(userge.bot.id, "/start")
             await handle_mentions(msg, True)
