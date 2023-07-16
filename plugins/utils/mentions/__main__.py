@@ -125,5 +125,5 @@ async def handle_mentions(msg: Message, is_retry=False):
         else:
             raise
     finally:
-        if os.path.exists(dl_loc):
+        if dl_loc and os.path.exists(dl_loc):
             os.remove(dl_loc)
