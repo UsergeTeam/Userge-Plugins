@@ -71,7 +71,7 @@ async def handle_mentions(msg: Message, is_retry=False):
     if msg.text:
         text += f"\n`{msg.text}`"
     buttons = [[InlineKeyboardButton(text="📃 Message Link", url=link)]]
-
+    dl_loc = None
     client = userge.bot if userge.has_bot else userge
     if not msg.text:
         if is_private:
@@ -125,3 +125,6 @@ async def handle_mentions(msg: Message, is_retry=False):
             await handle_mentions(msg, True)
         else:
             raise
+    finally:
+        if dl_loc:
+            os.remove(dl_loc)
