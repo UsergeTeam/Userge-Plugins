@@ -8,10 +8,11 @@
 #
 # All rights reserved.
 
+import os
 from pyrogram.errors import PeerIdInvalid, BadRequest
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram import enums
-import os
+
 from userge import userge, Message, config, filters, get_collection
 
 SAVED_SETTINGS = get_collection("CONFIGS")
@@ -47,7 +48,7 @@ async def toggle_mentions(msg: Message):
 @userge.on_filters(
     ~filters.me & ~filters.bot & ~filters.service
     & (filters.mentioned | filters.private), group=1, allow_via_bot=False)
-async def handle_mentions(msg: Message):
+async def handle_mentions(msg: Message, is_retry=False):
 
     if TOGGLE is False:
         return
@@ -117,43 +118,8 @@ async def handle_mentions(msg: Message):
             reply_markup=InlineKeyboardMarkup(buttons)
         )
     except PeerIdInvalid:
-        if userge.dual_mode:
+        if userge.dual_mode and not is_retry:
             await userge.send_message(userge.bot.id, "/start")
-            if not msg.text:
-                try:
-                    media = msg.photo or msg.video or None
-                    if media and media.ttl_seconds:
-                        dl_loc = await msg.download(config.Dynamic.DOWN_PATH)
-                        if isinstance(dl_loc, str):
-                            if msg.media.value == "photo":
-                                sentMedia = await media_client.send_photo(
-                                    chat_id,
-                                    dl_loc
-                                )
-                            elif msg.media.value == "video":
-                                sentMedia = await media_client.send_video(
-                                    chat_id,
-                                    dl_loc
-                                )
-                            os.remove(dl_loc)
-                    else:
-                        sentMedia = await media_client.copy_message(
-                            chat_id,
-                            msg.chat.id,
-                            msg.id
-                        )
-                except (PeerIdInvalid, BadRequest):
-                    sentMedia = await userge.copy_message(
-                        config.LOG_CHANNEL_ID,
-                        msg.chat.id,
-                        msg.id
-                    )
-                buttons.append([InlineKeyboardButton(text="📃 Media Link", url=sentMedia.link)])
-            await client.send_message(
-                chat_id=userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
-                text=text,
-                disable_web_page_preview=True,
-                reply_markup=InlineKeyboardMarkup(buttons)
-            )
+            await handle_mentions(msg, True)
         else:
             raise
