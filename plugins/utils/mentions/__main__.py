@@ -97,7 +97,6 @@ async def handle_mentions(msg: Message, is_retry=False):
                                 chat_id,
                                 dl_loc
                             )
-                        os.remove(dl_loc)
                 else:
                     sentMedia = await media_client.copy_message(
                         chat_id,
@@ -126,5 +125,5 @@ async def handle_mentions(msg: Message, is_retry=False):
         else:
             raise
     finally:
-        if dl_loc:
+        if os.path.exists(dl_loc):
             os.remove(dl_loc)
