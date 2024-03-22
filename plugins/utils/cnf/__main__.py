@@ -51,7 +51,7 @@ async def cnf(message: Message):
         # heading
         payload = f"**[{cmd}]({base_url + cmd})**\n"
         # description
-        payload += f"{soup.find('p', attrs = {'class':'my-0'}).text.strip()}\n\n"
+        payload += f"{soup.find('p', attrs={'class': 'my-0'}).text.strip()}\n\n"
 
         lst = soup.findAll("div", attrs={"class": "command-install"})
 

@@ -17,7 +17,7 @@ from pyrogram import filters
 from pyrogram.types import (
     InlineQuery,
     InlineQueryResultArticle,
-    InputTextMessageContent
+    InputTextMessageContent,
     LinkPreviewOptions
 )
 from pyrogram import enums
