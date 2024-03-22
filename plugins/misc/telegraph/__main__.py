@@ -13,7 +13,7 @@ from PIL import Image
 from aiofiles import os
 from html_telegraph_poster import TelegraphPoster
 from telegraph import upload_file
-
+from pyrogram.types import LinkPreviewOptions
 from userge import userge, Message, config, pool
 from userge.utils import progress
 
@@ -71,7 +71,7 @@ async def telegraph_(message: Message):
                 header = "Pasted content by @theuserge"
         t_url = await pool.run_in_thread(post_to_telegraph)(header, text.replace("\n", "<br>"))
         jv_text = f"**[Here Your Telegra.ph Link!]({t_url})**"
-        await message.edit(text=jv_text, disable_web_page_preview=True)
+        await message.edit(text=jv_text, link_preview_options=LinkPreviewOptions(is_disabled=True))
         return
     dl_loc = await message.client.download_media(
         message=message.reply_to_message,

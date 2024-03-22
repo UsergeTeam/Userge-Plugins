@@ -19,6 +19,8 @@ from urllib.parse import urlparse
 import requests
 from bs4 import BeautifulSoup
 
+from pyrogram.types import LinkPreviewOptions
+
 from userge import Message, userge, pool
 from .. import parser
 
@@ -148,7 +150,7 @@ async def gdtot(message: Message):
                 f'Date: {info[1].text.strip()}\n'
                 f'\nGDrive-URL:\n{gdrive_url}'
             )
-            await message.edit(out, disable_web_page_preview=True)
+            await message.edit(out, link_preview_options=LinkPreviewOptions(is_disabled=True))
         except Exception:
             await message.err("Unable To parse Link")
 
@@ -177,4 +179,4 @@ async def appdrive(message: Message):
                 'Drive_Link: '
                 f'{res.get("gdrive_link", "Something Went Wrong")}'
             )
-            await message.edit(output, disable_web_page_preview=True)
+            await message.edit(output, link_preview_options=LinkPreviewOptions(is_disabled=True))

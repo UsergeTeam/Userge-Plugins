@@ -16,6 +16,8 @@ import aiofiles
 import aiohttp
 from aiohttp import client_exceptions
 
+from pyrogram.types import LinkPreviewOptions
+
 from userge import userge, Message, config
 
 
@@ -268,7 +270,7 @@ async def paste_(message: Message) -> None:
             await message.edit(f"`Failed to reach {service.get_name().title()}`", del_in=5)
         else:
             await message.edit(f"**{service.get_name().title()}** [URL]({url})",
-                               disable_web_page_preview=True)
+                               link_preview_options=LinkPreviewOptions(is_disabled=True))
 
 
 @userge.on_cmd("getpaste", about={

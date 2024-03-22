@@ -23,6 +23,9 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     UsernameNotOccupied,
     PeerIdInvalid)
 from pyrogram import enums
+from pyrogram.types import (
+    LinkPreviewOptions
+)
 
 from userge import userge, config, Message
 
@@ -61,9 +64,8 @@ async def join_chat(message: Message):
     except PeerIdInvalid:
         await message.edit("```\nChat id, you entered, does not exist... ```", del_in=3)
         return
-    else:
-        await message.delete()
-        await asyncio.sleep(2)
+    await message.delete()
+    await asyncio.sleep(2)
 
 
 @userge.on_cmd("leave",
@@ -96,7 +98,7 @@ async def invite_link(message: Message):
                 await message.edit(
                     "**Invite link Generated Successfully for\n"
                     f"{chat_name}**\n[Click here to join]({link})",
-                    disable_web_page_preview=True)
+                    link_preview_options=LinkPreviewOptions(is_disabled=True))
             else:
                 await message.err("Requirements doesn't met...")
         except Exception as e_f:
@@ -248,8 +250,7 @@ async def set_chat(message: Message):
             await message.edit(
                 "```\nUsername, you entered, is already Occupied... ```", del_in=3)
             return
-        else:
-            await message.edit("```\nChat Username is Successfully Updated...```", del_in=3)
+        await message.edit("```\nChat Username is Successfully Updated...```", del_in=3)
     elif '-des' in message.flags:
         try:
             await userge.set_chat_description(message.chat.id, args.strip())

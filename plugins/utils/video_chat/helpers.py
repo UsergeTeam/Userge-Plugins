@@ -13,6 +13,9 @@ from pyrogram.errors import (
     UserAlreadyParticipant,
     UserBannedInChannel
 )
+from pyrogram.types import (
+    LinkPreviewOptions
+)
 
 from pytgcalls import StreamType
 from pytgcalls.types import (
@@ -197,7 +200,7 @@ async def skip_song(clear_queue: bool = False):
         await Vars.CLIENT.send_message(
             Vars.CHAT_ID,
             out,
-            disable_web_page_preview=True
+            link_preview_options=LinkPreviewOptions(is_disabled=True)
         )
         await skip_song()
 
@@ -249,8 +252,7 @@ async def invite_vc_client(msg: Message) -> bool:
         except ChatAdminRequired:
             await reply_text(msg, '`Provide a invite link along command.!!`')
             return False
-        else:
-            invite_link = link.invite_link
+        invite_link = link.invite_link
     try:
         await VC_CLIENT.join_chat(invite_link)
     except UserAlreadyParticipant:

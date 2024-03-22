@@ -15,6 +15,9 @@ import aiohttp
 from pytz import country_timezones as c_tz, timezone as tz, country_names as c_n
 
 from pyrogram import enums
+from pyrogram.types import (
+    LinkPreviewOptions
+)
 
 from userge import userge, Message
 from .. import weather
@@ -52,7 +55,7 @@ async def weather_get(message: Message):
             "<code>Oops!!get the API from</code> "
             "<a href='https://openweathermap.org'>HERE</a> "
             "<code>& add it to Heroku config vars</code> (<code>OPEN_WEATHER_MAP</code>)",
-            disable_web_page_preview=True,
+            link_preview_options=LinkPreviewOptions(is_disabled=True),
             parse_mode=enums.ParseMode.HTML, del_in=0)
         return
 
@@ -112,7 +115,7 @@ async def weather_get(message: Message):
     fullc_n = c_n[f"{country}"]
     dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
 
-    div = (360 / len(dirs))
+    div = 360 / len(dirs)
     funmath = int((winddir + (div / 2)) / div)
     findir = dirs[funmath % len(dirs)]
     kmph = str(wind * 3.6).split(".")

@@ -13,9 +13,8 @@
 # plugin by @aryanvikash
 
 import re
-
 import requests
-
+from pyrogram.types import LinkPreviewOptions
 from userge import userge, Message, pool
 
 
@@ -32,7 +31,7 @@ async def zippyshare(message: Message):
         await message.edit(f"**Original** : {url}\n**FileName** : `{fname}`\n"
                            f"**DirectLink** : {direct_url}\n\n"
                            "**[HINT]** : use `.download [directLink]`",
-                           disable_web_page_preview=True)
+                           link_preview_options=LinkPreviewOptions(is_disabled=True))
     except Exception as z_e:  # pylint: disable=broad-except
         await message.edit(f"`{z_e}`")
 

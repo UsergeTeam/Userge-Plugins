@@ -12,6 +12,10 @@
 
 from countryinfo import CountryInfo
 
+from pyrogram.types import (
+    LinkPreviewOptions
+)
+
 from userge import userge, Message
 
 PREVIEW = False  # False for instant view
@@ -41,6 +45,12 @@ Residence : `{country.demonym()}`
 Timezone : `{country.timezones()}`
 Wiki : {country.wiki()}"""
     try:
-        await update.edit_text(text=info, disable_web_page_preview=PREVIEW)
+        await update.edit_text(
+            text=info,
+            link_preview_options=LinkPreviewOptions(is_disabled=PREVIEW)
+        )
     except Exception as error:
-        await update.edit_text(text=error, disable_web_page_preview=True)
+        await update.edit_text(
+            text=error,
+            link_preview_options=LinkPreviewOptions(is_disabled=True)
+        )

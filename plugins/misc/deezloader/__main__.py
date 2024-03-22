@@ -13,6 +13,8 @@ import re
 import shutil
 from pathlib import Path
 
+from pyrogram.types import LinkPreviewOptions
+
 import deezloader  # pylint: disable=W0406
 from deezloader.exceptions import NoDataApi
 
@@ -51,7 +53,7 @@ async def deezload(message: Message):
         os.makedirs(TEMP_PATH)
     await message.edit("Checking your Token.")
     if ARL_TOKEN is None:
-        await message.edit(ARL_HELP, disable_web_page_preview=True)
+        await message.edit(ARL_HELP, link_preview_options=LinkPreviewOptions(is_disabled=True))
         return
     try:
         loader = deezloader.Login(ARL_TOKEN)

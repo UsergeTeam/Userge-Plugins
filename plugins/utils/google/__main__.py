@@ -10,6 +10,10 @@
 
 from search_engine_parser import GoogleSearch
 
+from pyrogram.types import (
+    LinkPreviewOptions
+)
+
 from userge import userge, Message
 
 GoogleSearch.parse_soup = lambda __, _: _.find_all("div", class_="Gx5Zad fP1Qef xpd EtOod pkphOe")
@@ -51,4 +55,4 @@ async def gsearch(message: Message):
             break
     output = f"**Google Search:**\n`{query}`\n\n**Results:**\n{output}"
     await message.edit_or_send_as_file(text=output, caption=query,
-                                       disable_web_page_preview=True)
+                                       link_preview_options=LinkPreviewOptions(is_disabled=True))

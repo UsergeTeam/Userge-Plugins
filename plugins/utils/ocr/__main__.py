@@ -11,6 +11,7 @@
 import os
 
 from pyrogram import enums
+from pyrogram.types import LinkPreviewOptions
 
 from userge import userge, Message, config
 from .. import ocr
@@ -33,7 +34,7 @@ async def ocr_gen(message: Message):
             "<code>Oops!!get the OCR API from</code> "
             "<a href='https://eepurl.com/bOLOcf'>HERE</a> "
             "<code>& add it to Heroku config vars</code> (<code>OCR_SPACE_API_KEY</code>)",
-            disable_web_page_preview=True,
+            link_preview_options=LinkPreviewOptions(is_disabled=True),
             parse_mode=enums.ParseMode.HTML, del_in=0)
         return
 
@@ -52,9 +53,8 @@ async def ocr_gen(message: Message):
             f"\n\n**ERROR**: `{e_f}`", del_in=0)
         os.remove(file_name)
         return
-    else:
-        await message.edit(
-            "**Here's what I could read from it:**"
-            f"\n\n`{ParsedText}`")
-        os.remove(file_name)
-        return await CHANNEL.log("`ocr` command succefully executed")
+    await message.edit(
+        "**Here's what I could read from it:**"
+        f"\n\n`{ParsedText}`")
+    os.remove(file_name)
+    return await CHANNEL.log("`ocr` command succefully executed")

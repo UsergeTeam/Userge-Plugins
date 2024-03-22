@@ -19,6 +19,7 @@ from pyrogram.errors import (
     FileIdInvalid, FileReferenceEmpty, BadRequest, ChannelInvalid, MediaEmpty
 )
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import LinkPreviewOptions
 
 from userge import userge, Message, pool, config, versions as ver, logging
 from userge.utils import get_file_id_of_media, get_custom_import_re
@@ -51,7 +52,13 @@ async def _alive(message: Message):
 
     alive_text, markup = await _get_text_and_markup(message)
     if _MSG_ID == "text_format":
-        return await message.edit(alive_text, disable_web_page_preview=True, reply_markup=markup)
+        return await message.edit(
+            alive_text,
+            link_preview_options=LinkPreviewOptions(
+                is_disabled=True
+            ),
+            reply_markup=markup
+        )
     await message.delete()
     try:
         await _send_alive(message, alive_text, markup)
@@ -118,10 +125,12 @@ async def _send_alive(message: Message,
         await _send_telegraph(message, text, reply_markup)
     else:
         try:
-            await message.client.send_cached_media(chat_id=message.chat.id,
-                                                   file_id=_LOGO_ID,
-                                                   caption=text,
-                                                   reply_markup=should_mark)
+            await message.client.send_cached_media(
+                chat_id=message.chat.id,
+                file_id=_LOGO_ID,
+                caption=text,
+                reply_markup=should_mark
+            )
             if _IS_STICKER:
                 raise ChatSendMediaForbidden
         except SlowmodeWait as s_m:
@@ -134,10 +143,14 @@ async def _send_alive(message: Message,
             await _refresh_id(message)
             return await _send_alive(message, text, reply_markup, recurs_count + 1)
         except (ChatSendMediaForbidden, Forbidden):
-            await message.client.send_message(chat_id=message.chat.id,
-                                              text=text,
-                                              disable_web_page_preview=True,
-                                              reply_markup=should_mark)
+            await message.client.send_message(
+                chat_id=message.chat.id,
+                text=text,
+                link_preview_options=LinkPreviewOptions(
+                    is_disabled=True
+                ),
+                reply_markup=should_mark
+            )
 
 
 async def _refresh_id(message: Message) -> None:
@@ -147,10 +160,9 @@ async def _refresh_id(message: Message) -> None:
     except (ChannelInvalid, PeerIdInvalid, ValueError):
         _set_data(True)
         return await _refresh_id(message)
-    else:
-        if media.sticker:
-            _IS_STICKER = True
-        _LOGO_ID = get_file_id_of_media(media)
+    if media.sticker:
+        _IS_STICKER = True
+    _LOGO_ID = get_file_id_of_media(media)
 
 
 def _set_data(errored: bool = False) -> None:
