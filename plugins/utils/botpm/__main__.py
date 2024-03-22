@@ -259,8 +259,8 @@ Your var value should only contain telegraph link of any media.
 After Adding a var, you can see your media when you start your Bot.
 """
 
-    SET_CUSTOM_TEXT = """You can set Custom Start text which you will see when you start Bot by /settext command.
-"""
+    SET_CUSTOM_TEXT = """You can set Custom Start text which
+you will see when you start Bot by /settext command."""
 
     HELP_TEXT = """**Here are the available commands for Bot PM:**
 
@@ -518,7 +518,8 @@ Type /cancel to cancel the operation.
     NEXT_MESSAGE = "This message has been added to the post."
     PREVIEW_MESSAGE = "The post preview sent above."
 
-    CONTINUE_MESSAGE = """{} You can continue to send messages. Type /done to send this broadcast post.
+    CONTINUE_MESSAGE = """{} You can continue to send messages.
+Type /done to send this broadcast post.
 
 /preview — preview the broadcast post
 /cancel - cancel the current operation

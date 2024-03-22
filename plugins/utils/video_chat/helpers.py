@@ -252,8 +252,7 @@ async def invite_vc_client(msg: Message) -> bool:
         except ChatAdminRequired:
             await reply_text(msg, '`Provide a invite link along command.!!`')
             return False
-        else:
-            invite_link = link.invite_link
+        invite_link = link.invite_link
     try:
         await VC_CLIENT.join_chat(invite_link)
     except UserAlreadyParticipant:
