@@ -23,6 +23,9 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     UsernameNotOccupied,
     PeerIdInvalid)
 from pyrogram import enums
+from pyrogram.types import (
+    LinkPreviewOptions
+)
 
 from userge import userge, config, Message
 
@@ -96,7 +99,7 @@ async def invite_link(message: Message):
                 await message.edit(
                     "**Invite link Generated Successfully for\n"
                     f"{chat_name}**\n[Click here to join]({link})",
-                    disable_web_page_preview=True)
+                    link_preview_options=LinkPreviewOptions(is_disabled=True))
             else:
                 await message.err("Requirements doesn't met...")
         except Exception as e_f:

@@ -19,7 +19,8 @@ from typing import Optional, List, Dict
 import wget
 from pyrogram.errors import UserIsBlocked, FloodWait
 from pyrogram.types import (
-    Message as PyroMessage, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+    Message as PyroMessage, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery,
+    LinkPreviewOptions
 )
 
 from userge import userge, Message, config, filters, get_collection, pool
@@ -295,7 +296,7 @@ After Adding a var, you can see your media when you start your Bot.
             mp.inline_keyboard.insert(0, btn)
             await cq.edit_message_text(
                 SETTINGS_TEXT,
-                disable_web_page_preview=True,
+                link_preview_options=LinkPreviewOptions(is_disabled=True),
                 reply_markup=mp
             )
         elif cq.data == "en_dis_bot_pm":
@@ -314,7 +315,7 @@ After Adding a var, you can see your media when you start your Bot.
             mp = InlineKeyboardMarkup([[InlineKeyboardButton("Back", callback_data="stngs")]])
             await cq.edit_message_text(
                 HELP_TEXT,
-                disable_web_page_preview=True,
+                link_preview_options=LinkPreviewOptions(is_disabled=True),
                 reply_markup=mp
             )
         elif cq.data == "stats":
@@ -335,7 +336,7 @@ After Adding a var, you can see your media when you start your Bot.
 """
             await cq.edit_message_text(
                 out_str,
-                disable_web_page_preview=True,
+                link_preview_options=LinkPreviewOptions(is_disabled=True),
                 reply_markup=mp
             )
         elif cq.data == "broadcast":
@@ -364,21 +365,21 @@ After Adding a var, you can see your media when you start your Bot.
             )
             await cq.edit_message_text(
                 MISC_TEXT,
-                disable_web_page_preview=True,
+                link_preview_options=LinkPreviewOptions(is_disabled=True),
                 reply_markup=mp
             )
         elif cq.data == "setmedia":
             mp = InlineKeyboardMarkup([[InlineKeyboardButton("Back", callback_data="misc")]])
             await cq.edit_message_text(
                 SET_MEDIA_TEXT,
-                disable_web_page_preview=True,
+                link_preview_options=LinkPreviewOptions(is_disabled=True),
                 reply_markup=mp
             )
         elif cq.data == "settext":
             mp = InlineKeyboardMarkup([[InlineKeyboardButton("Back", callback_data="misc")]])
             await cq.edit_message_text(
                 SET_CUSTOM_TEXT,
-                disable_web_page_preview=True,
+                link_preview_options=LinkPreviewOptions(is_disabled=True),
                 reply_markup=mp
             )
         elif cq.data == "startcq":
@@ -386,7 +387,7 @@ After Adding a var, you can see your media when you start your Bot.
             mp = InlineKeyboardMarkup([[InlineKeyboardButton("Settings", callback_data="stngs")]])
             await cq.edit_message_text(
                 START_TEXT.format_map(SafeDict(**user_dict)),
-                disable_web_page_preview=True,
+                link_preview_options=LinkPreviewOptions(is_disabled=True),
                 reply_markup=mp
             )
 
@@ -394,7 +395,7 @@ After Adding a var, you can see your media when you start your Bot.
         msg: PyroMessage, text: str, path: str, markup: Optional[InlineKeyboardMarkup] = None
     ):
         if not path:
-            return await msg.reply(text, disable_web_page_preview=True, reply_markup=markup)
+            return await msg.reply(text, link_preview_options=LinkPreviewOptions(is_disabled=True), reply_markup=markup)
         if path.lower().endswith((".jpg", ".jpeg", ".png", ".bmp")):
             await bot.send_photo(
                 chat_id=msg.chat.id,
@@ -482,7 +483,7 @@ After Adding a var, you can see your media when you start your Bot.
                 reply_id = _U_ID_F_M_ID.get(replied.id)
             try:
                 if msg.text:
-                    await bot.send_message(reply_id, msg.text, disable_web_page_preview=True)
+                    await bot.send_message(reply_id, msg.text, link_preview_options=LinkPreviewOptions(is_disabled=True))
                 else:
                     await msg.copy(reply_id)
             except UserIsBlocked:

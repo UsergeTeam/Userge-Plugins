@@ -22,6 +22,10 @@ from urllib.parse import unquote_plus
 import requests
 from pySmartDL import SmartDL
 
+from pyrogram.types import (
+    LinkPreviewOptions
+)
+
 from userge import userge, config, Message
 from userge.utils import progress, humanbytes
 
@@ -89,7 +93,7 @@ async def labstack(message: Message):
                     count += 1
                     if count >= 5:
                         count = 0
-                        await message.try_to_edit(progress_str, disable_web_page_preview=True)
+                        await message.try_to_edit(progress_str, link_preview_options=LinkPreviewOptions(is_disabled=True))
                     await asyncio.sleep(1)
             except Exception as d_e:
                 await message.err(d_e)

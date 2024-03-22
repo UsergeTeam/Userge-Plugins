@@ -19,6 +19,7 @@ from pyrogram.errors import (
     FileIdInvalid, FileReferenceEmpty, BadRequest, ChannelInvalid, MediaEmpty
 )
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import LinkPreviewOptions
 
 from userge import userge, Message, pool, config, versions as ver, logging
 from userge.utils import get_file_id_of_media, get_custom_import_re
@@ -51,7 +52,7 @@ async def _alive(message: Message):
 
     alive_text, markup = await _get_text_and_markup(message)
     if _MSG_ID == "text_format":
-        return await message.edit(alive_text, disable_web_page_preview=True, reply_markup=markup)
+        return await message.edit(alive_text, link_preview_options=LinkPreviewOptions(is_disabled=True), reply_markup=markup)
     await message.delete()
     try:
         await _send_alive(message, alive_text, markup)
@@ -136,7 +137,7 @@ async def _send_alive(message: Message,
         except (ChatSendMediaForbidden, Forbidden):
             await message.client.send_message(chat_id=message.chat.id,
                                               text=text,
-                                              disable_web_page_preview=True,
+                                              link_preview_options=LinkPreviewOptions(is_disabled=True),
                                               reply_markup=should_mark)
 
 

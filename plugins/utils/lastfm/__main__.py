@@ -20,6 +20,7 @@ import aiohttp
 import pylast
 import wget
 from pyrogram.errors import ChatWriteForbidden, ChannelPrivate, ChatIdInvalid
+from pyrogram.types import LinkPreviewOptions
 
 from userge import userge, Message, config, pool, get_collection
 from userge.utils import time_formatter
@@ -46,7 +47,7 @@ def check_creds(func):
                 "`This plugins needs environmental variables,"
                 " For more info see` "
                 "[this post](https://t.me/UsergePlugins/123).",
-                disable_web_page_preview=True
+                link_preview_options=LinkPreviewOptions(is_disabled=True)
             )
     return checker
 
@@ -83,7 +84,7 @@ async def _lastfm(msg: Message):
         k = get_track_info(track)
         if not k:
             return await msg.err("Track Not found...")
-        await msg.edit(out + k, disable_web_page_preview=True)
+        await msg.edit(out + k, link_preview_options=LinkPreviewOptions(is_disabled=True))
 
 
 @check_creds
@@ -181,7 +182,7 @@ async def get_track(msg: Message):
     out = get_track_info(track)
     if not out:
         return await msg.err("Track not found...")
-    await msg.edit(out, disable_web_page_preview=True)
+    await msg.edit(out, link_preview_options=LinkPreviewOptions(is_disabled=True))
 
 
 @check_creds
@@ -223,15 +224,15 @@ async def lastfm_worker():
                 if userge.has_bot:
                     try:
                         await userge.bot.send_message(
-                            chat_id, out, disable_web_page_preview=True
+                            chat_id, out, link_preview_options=LinkPreviewOptions(is_disabled=True)
                         )
                     except (ChatWriteForbidden, ChannelPrivate, ChatIdInvalid):
                         await userge.send_message(
-                            chat_id, out, disable_web_page_preview=True
+                            chat_id, out, link_preview_options=LinkPreviewOptions(is_disabled=True)
                         )
                 else:
                     await userge.send_message(
-                        chat_id, out, disable_web_page_preview=True
+                        chat_id, out, link_preview_options=LinkPreviewOptions(is_disabled=True)
                     )
     NOW_PLAYING[0] = False  # Should not update to DB ig ?
 
@@ -429,4 +430,4 @@ async def lastfm_compat_(message: Message):
     disart = ", ".join({comart[r] for r in range(min(len(comart), 5))})
     compat = min((len(comart) * 100 / 40), 100)
     rep = f"{display} both listen to __{disart}__...\nMusic Compatibility is **{compat}%**"
-    await message.edit(rep, disable_web_page_preview=True)
+    await message.edit(rep, link_preview_options=LinkPreviewOptions(is_disabled=True))

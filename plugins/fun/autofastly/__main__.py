@@ -13,6 +13,7 @@
 import os
 
 from pyrogram import enums
+from pyrogram.types import LinkPreviewOptions
 
 from userge import userge, Message, filters, config, get_collection
 from ...utils import ocr
@@ -45,7 +46,9 @@ async def autofastly(msg: Message):
             "<code>Oops!!get the OCR API from</code> "
             "<a href='https://eepurl.com/bOLOcf'>HERE</a> "
             "<code>& add it to Heroku config vars</code> (<code>OCR_SPACE_API_KEY</code>)",
-            disable_web_page_preview=True,
+            link_preview_options=LinkPreviewOptions(
+                is_disabled=True
+            ),
             parse_mode=enums.ParseMode.HTML, del_in=0)
         return
 

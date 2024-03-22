@@ -20,6 +20,7 @@ from urllib.parse import unquote_plus
 from pySmartDL import SmartDL
 from pyrogram.types import Message as PyroMessage
 from pyrogram import enums
+from pyrogram.types import LinkPreviewOptions
 
 from userge import Message, config
 from userge.utils import progress, humanbytes, extract_entities
@@ -112,7 +113,7 @@ async def url_download(message: Message, url: str) -> Tuple[str, int]:
                 humanbytes(total_length),
                 speed,
                 estimated_total_time)
-            await message.edit(progress_str, disable_web_page_preview=True)
+            await message.edit(progress_str, link_preview_options=LinkPreviewOptions(is_disabled=True))
             await asyncio.sleep(config.Dynamic.EDIT_SLEEP_TIMEOUT)
     if message.process_is_canceled:
         raise ProcessCanceled

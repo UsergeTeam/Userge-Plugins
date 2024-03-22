@@ -10,6 +10,10 @@
 
 import wikipedia
 
+from pyrogram.types import (
+    LinkPreviewOptions
+)
+
 from userge import userge, Message
 
 
@@ -43,4 +47,4 @@ async def wiki_pedia(message: Message):
             break
     output = f"**Wikipedia Search:**\n`{query}`\n\n**Results:**\n{output}"
     await message.edit_or_send_as_file(text=output, caption=query,
-                                       disable_web_page_preview=True)
+                                       link_preview_options=LinkPreviewOptions(is_disabled=True))

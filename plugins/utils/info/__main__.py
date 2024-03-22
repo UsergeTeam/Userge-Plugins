@@ -18,7 +18,7 @@ import aiohttp
 import spamwatch
 from UsergeAntiSpamApi import Client
 
-from pyrogram.types import User
+from pyrogram.types import User, LinkPreviewOptions
 from pyrogram import enums
 
 from userge import userge, Message, get_collection
@@ -108,7 +108,7 @@ async def _info(msg: Message):
             user_info += f"\n    **● Reason** : `{reduce_spam(user_gbanned['reason'] or None)}`"
         else:
             user_info += "\n**User Gbanned** : `False`"
-        await msg.edit_or_send_as_file(text=user_info, disable_web_page_preview=True)
+        await msg.edit_or_send_as_file(text=user_info, link_preview_options=LinkPreviewOptions(is_disabled=True))
 
 
 def reduce_spam(text: Optional[str]) -> Optional[str]:

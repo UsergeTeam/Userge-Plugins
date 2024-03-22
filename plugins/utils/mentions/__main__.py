@@ -10,7 +10,7 @@
 
 import os
 from pyrogram.errors import PeerIdInvalid, BadRequest, UserIsBlocked
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, LinkPreviewOptions
 from pyrogram import enums
 
 from userge import userge, Message, config, filters, get_collection
@@ -113,7 +113,7 @@ async def handle_mentions(msg: Message, is_retry=False):
         await client.send_message(
             chat_id=userge.id if userge.has_bot else config.LOG_CHANNEL_ID,
             text=text,
-            disable_web_page_preview=True,
+            link_preview_options=LinkPreviewOptions(is_disabled=True),
             reply_markup=InlineKeyboardMarkup(buttons)
         )
     except (PeerIdInvalid, UserIsBlocked) as e:
