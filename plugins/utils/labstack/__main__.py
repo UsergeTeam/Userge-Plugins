@@ -93,7 +93,12 @@ async def labstack(message: Message):
                     count += 1
                     if count >= 5:
                         count = 0
-                        await message.try_to_edit(progress_str, link_preview_options=LinkPreviewOptions(is_disabled=True))
+                        await message.try_to_edit(
+                            progress_str,
+                            link_preview_options=LinkPreviewOptions(
+                                is_disabled=True
+                            )
+                        )
                     await asyncio.sleep(1)
             except Exception as d_e:
                 await message.err(d_e)

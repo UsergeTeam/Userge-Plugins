@@ -679,8 +679,11 @@ class Worker(_GDrive):
             _LOG.exception(h_e)
             await self._message.err(h_e._get_reason())  # pylint: disable=protected-access
             return
-        await self._message.edit(f"**Shareable Links**\n\n{out}",
-                                 link_preview_options=LinkPreviewOptions(is_disabled=True), log=__name__)
+        await self._message.edit(
+            f"**Shareable Links**\n\n{out}",
+            link_preview_options=LinkPreviewOptions(is_disabled=True),
+            log=__name__
+        )
 
     @creds_dec
     async def search(self) -> None:
@@ -712,8 +715,11 @@ class Worker(_GDrive):
             _LOG.exception(h_e)
             await self._message.err(h_e._get_reason())  # pylint: disable=protected-access
             return
-        await self._message.edit(f"**Folder Created Successfully**\n\n{out}",
-                                 link_preview_options=LinkPreviewOptions(is_disabled=True), log=__name__)
+        await self._message.edit(
+            f"**Folder Created Successfully**\n\n{out}",
+            link_preview_options=LinkPreviewOptions(is_disabled=True),
+            log=__name__
+        )
 
     @creds_dec
     async def list_folder(self) -> None:
@@ -734,7 +740,10 @@ class Worker(_GDrive):
             await self._message.err(h_e._get_reason())  # pylint: disable=protected-access
             return
         await self._message.edit_or_send_as_file(
-            out, link_preview_options=LinkPreviewOptions(is_disabled=True), caption=f"list results for `{file_id}`")
+            out,
+            link_preview_options=LinkPreviewOptions(is_disabled=True),
+            caption=f"list results for `{file_id}`"
+        )
 
     @creds_dec
     async def upload(self) -> None:
@@ -789,7 +798,11 @@ class Worker(_GDrive):
             out = self._output
         else:
             out = "`failed to upload.. check logs?`"
-        await self._message.edit(out, link_preview_options=LinkPreviewOptions(is_disabled=True), log=__name__)
+        await self._message.edit(
+            out,
+            link_preview_options=LinkPreviewOptions(is_disabled=True),
+            log=__name__
+        )
 
     @creds_dec
     async def download(self) -> None:
@@ -840,7 +853,11 @@ class Worker(_GDrive):
             out = self._output
         else:
             out = "`failed to copy.. check logs?`"
-        await self._message.edit(out, link_preview_options=LinkPreviewOptions(is_disabled=True), log=__name__)
+        await self._message.edit(
+            out,
+            link_preview_options=LinkPreviewOptions(is_disabled=True),
+            log=__name__
+        )
 
     @creds_dec
     async def move(self) -> None:
@@ -962,7 +979,9 @@ async def gsetup_(message: Message):
     else:
         await message.edit(
             "`G_DRIVE_CLIENT_ID` and `G_DRIVE_CLIENT_SECRET` not found!\n"
-            f"[Read this]({link}) to know more.", link_preview_options=LinkPreviewOptions(is_disabled=True))
+            f"[Read this]({link}) to know more.",
+            link_preview_options=LinkPreviewOptions(is_disabled=True)
+        )
 
 
 @userge.on_cmd("gconf", about={

@@ -45,6 +45,12 @@ Residence : `{country.demonym()}`
 Timezone : `{country.timezones()}`
 Wiki : {country.wiki()}"""
     try:
-        await update.edit_text(text=info, link_preview_options=LinkPreviewOptions(is_disabled=PREVIEW))
+        await update.edit_text(
+            text=info,
+            link_preview_options=LinkPreviewOptions(is_disabled=PREVIEW)
+        )
     except Exception as error:
-        await update.edit_text(text=error, link_preview_options=LinkPreviewOptions(is_disabled=True))
+        await update.edit_text(
+            text=error,
+            link_preview_options=LinkPreviewOptions(is_disabled=True)
+        )

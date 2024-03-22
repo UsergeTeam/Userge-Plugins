@@ -52,7 +52,13 @@ async def _alive(message: Message):
 
     alive_text, markup = await _get_text_and_markup(message)
     if _MSG_ID == "text_format":
-        return await message.edit(alive_text, link_preview_options=LinkPreviewOptions(is_disabled=True), reply_markup=markup)
+        return await message.edit(
+            alive_text,
+            link_preview_options=LinkPreviewOptions(
+                is_disabled=True
+            ),
+            reply_markup=markup
+        )
     await message.delete()
     try:
         await _send_alive(message, alive_text, markup)
@@ -119,10 +125,12 @@ async def _send_alive(message: Message,
         await _send_telegraph(message, text, reply_markup)
     else:
         try:
-            await message.client.send_cached_media(chat_id=message.chat.id,
-                                                   file_id=_LOGO_ID,
-                                                   caption=text,
-                                                   reply_markup=should_mark)
+            await message.client.send_cached_media(
+                chat_id=message.chat.id,
+                file_id=_LOGO_ID,
+                caption=text,
+                reply_markup=should_mark
+            )
             if _IS_STICKER:
                 raise ChatSendMediaForbidden
         except SlowmodeWait as s_m:
@@ -135,10 +143,14 @@ async def _send_alive(message: Message,
             await _refresh_id(message)
             return await _send_alive(message, text, reply_markup, recurs_count + 1)
         except (ChatSendMediaForbidden, Forbidden):
-            await message.client.send_message(chat_id=message.chat.id,
-                                              text=text,
-                                              link_preview_options=LinkPreviewOptions(is_disabled=True),
-                                              reply_markup=should_mark)
+            await message.client.send_message(
+                chat_id=message.chat.id,
+                text=text,
+                link_preview_options=LinkPreviewOptions(
+                    is_disabled=True
+                ),
+                reply_markup=should_mark
+            )
 
 
 async def _refresh_id(message: Message) -> None:

@@ -113,7 +113,12 @@ async def url_download(message: Message, url: str) -> Tuple[str, int]:
                 humanbytes(total_length),
                 speed,
                 estimated_total_time)
-            await message.edit(progress_str, link_preview_options=LinkPreviewOptions(is_disabled=True))
+            await message.edit(
+                progress_str,
+                link_preview_options=LinkPreviewOptions(
+                    is_disabled=True
+                )
+            )
             await asyncio.sleep(config.Dynamic.EDIT_SLEEP_TIMEOUT)
     if message.process_is_canceled:
         raise ProcessCanceled
