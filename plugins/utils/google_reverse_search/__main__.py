@@ -88,4 +88,10 @@ async def google_rs(message: Message):
 <b>More Info</b>: Open this <a href="{the_location}">Link</a>
 
 <b>Time Taken</b>: {ms} seconds"""
-    await message.edit(out_str, parse_mode=enums.ParseMode.HTML, link_preview_options=LinkPreviewOptions(is_disabled=True))
+    await message.edit(
+        out_str,
+        parse_mode=enums.ParseMode.HTML,
+        link_preview_options=LinkPreviewOptions(
+            is_disabled=True
+        )
+    )

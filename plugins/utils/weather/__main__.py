@@ -115,7 +115,7 @@ async def weather_get(message: Message):
     fullc_n = c_n[f"{country}"]
     dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
 
-    div = (360 / len(dirs))
+    div = 360 / len(dirs)
     funmath = int((winddir + (div / 2)) / div)
     findir = dirs[funmath % len(dirs)]
     kmph = str(wind * 3.6).split(".")

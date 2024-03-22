@@ -266,8 +266,7 @@ __Tags:__ {tags}
 '''
     except pylast.WSError:
         return None
-    else:
-        return out
+    return out
 
 
 @pool.run_in_thread

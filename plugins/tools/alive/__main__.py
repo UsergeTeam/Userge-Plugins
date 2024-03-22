@@ -160,10 +160,9 @@ async def _refresh_id(message: Message) -> None:
     except (ChannelInvalid, PeerIdInvalid, ValueError):
         _set_data(True)
         return await _refresh_id(message)
-    else:
-        if media.sticker:
-            _IS_STICKER = True
-        _LOGO_ID = get_file_id_of_media(media)
+    if media.sticker:
+        _IS_STICKER = True
+    _LOGO_ID = get_file_id_of_media(media)
 
 
 def _set_data(errored: bool = False) -> None:

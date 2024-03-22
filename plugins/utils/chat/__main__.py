@@ -64,9 +64,8 @@ async def join_chat(message: Message):
     except PeerIdInvalid:
         await message.edit("```\nChat id, you entered, does not exist... ```", del_in=3)
         return
-    else:
-        await message.delete()
-        await asyncio.sleep(2)
+    await message.delete()
+    await asyncio.sleep(2)
 
 
 @userge.on_cmd("leave",
@@ -251,8 +250,7 @@ async def set_chat(message: Message):
             await message.edit(
                 "```\nUsername, you entered, is already Occupied... ```", del_in=3)
             return
-        else:
-            await message.edit("```\nChat Username is Successfully Updated...```", del_in=3)
+        await message.edit("```\nChat Username is Successfully Updated...```", del_in=3)
     elif '-des' in message.flags:
         try:
             await userge.set_chat_description(message.chat.id, args.strip())

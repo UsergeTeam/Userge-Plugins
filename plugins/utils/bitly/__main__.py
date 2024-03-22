@@ -40,7 +40,12 @@ async def bitly(msg: Message):
             shorten_url = (
                 await conv.get_response(mark_read=True)
             ).text.split('\n', maxsplit=1)[-1]
-            await msg.edit(f"`{shorten_url}`", link_preview_options=LinkPreviewOptions(is_disabled=True))
+            await msg.edit(
+                f"`{shorten_url}`",
+                link_preview_options=LinkPreviewOptions(
+                    is_disabled=True
+                )
+            )
     except StopConversation:
         await msg.err("bot is down")
 

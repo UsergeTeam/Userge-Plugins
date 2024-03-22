@@ -826,7 +826,13 @@ class Worker(_GDrive):
             out = self._output
         else:
             out = "`failed to download.. check logs?`"
-        await self._message.edit(out, link_preview_options=LinkPreviewOptions(is_disabled=True), log=__name__)
+        await self._message.edit(
+            out,
+            link_preview_options=LinkPreviewOptions(
+                is_disabled=True
+            ),
+            log=__name__
+        )
 
     @creds_dec
     async def copy(self) -> None:

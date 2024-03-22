@@ -53,9 +53,8 @@ async def ocr_gen(message: Message):
             f"\n\n**ERROR**: `{e_f}`", del_in=0)
         os.remove(file_name)
         return
-    else:
-        await message.edit(
-            "**Here's what I could read from it:**"
-            f"\n\n`{ParsedText}`")
-        os.remove(file_name)
-        return await CHANNEL.log("`ocr` command succefully executed")
+    await message.edit(
+        "**Here's what I could read from it:**"
+        f"\n\n`{ParsedText}`")
+    os.remove(file_name)
+    return await CHANNEL.log("`ocr` command succefully executed")
